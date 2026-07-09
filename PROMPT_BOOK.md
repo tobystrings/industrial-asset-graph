@@ -31,3 +31,4 @@ This component will run inside our 'specs' tab. It should read the decompressed 
 - Include a quick-search filter input box so a technician can type a wire or terminal number on their phone and find it instantly.
 
 
+
