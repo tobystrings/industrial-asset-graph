@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGetAssetGraphQuery } from '../store/apiSlice';
 import { CompressionService } from '../services/compression';
+import { MapView } from './MapView'; // Importing our live Google Maps layer
 import { Layers, Activity, FileText, Settings } from 'lucide-react';
 
 type TabType = 'overview' | 'specs' | 'history' | 'jobs';
@@ -24,29 +25,18 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex h-screen w-screen bg-gray-950 text-gray-100 overflow-hidden">
       
-      {/* LEFT SECTION: Mapping Workspace Container */}
-      <div className="w-1/2 h-full border-r border-gray-800 bg-gray-900 flex flex-col items-center justify-center p-4 relative">
-        <div className="absolute top-4 left-4 bg-gray-950/90 border border-gray-800 px-3 py-1.5 rounded text-xs font-mono text-emerald-400 backdrop-blur">
+      {/* LEFT SECTION: Live Mapping Workspace Container */}
+      <div className="w-1/2 h-full border-r border-gray-800 bg-gray-900 relative">
+        <div className="absolute top-4 left-4 z-10 bg-gray-950/90 border border-gray-800 px-3 py-1.5 rounded text-xs font-mono text-emerald-400 backdrop-blur">
           FACILITY COORDINATE MAP VIEW
         </div>
         
-        <div className="text-center space-y-4 max-w-md">
-          <p className="text-sm text-gray-400">Select an area pin or perimeter bound to cross-reference equipment data nodes:</p>
-          <div className="flex flex-col gap-2">
-            <button 
-              onClick={() => setSelectedNodeId('zone_1')}
-              className={`px-4 py-3 rounded border text-left text-sm transition-all ${selectedNodeId === 'zone_1' ? 'bg-emerald-600/10 border-emerald-500 text-emerald-400' : 'bg-gray-950 border-gray-800 text-gray-400'}`}
-            >
-              🏢 Main Production Line (Zone 1 Perimeter)
-            </button>
-            <button 
-              onClick={() => setSelectedNodeId('eq_204')}
-              className={`px-4 py-3 rounded border text-left text-sm transition-all ${selectedNodeId === 'eq_204' ? 'bg-emerald-600/10 border-emerald-500 text-emerald-400' : 'bg-gray-950 border-gray-800 text-gray-400'}`}
-            >
-              ⚡ Rotary Air Compressor (Node EQ-204)
-            </button>
-          </div>
-        </div>
+        {/* Render the real MapView component and link the state handlers */}
+        <MapView 
+          graphData={graphData} 
+          selectedNodeId={selectedNodeId} 
+          onNodeSelect={(id) => setSelectedNodeId(id)} 
+        />
       </div>
 
       {/* RIGHT SECTION: Multi-Tab Detailed Asset Analytics */}
