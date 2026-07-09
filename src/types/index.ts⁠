@@ -1,0 +1,22 @@
+export type NodeType = 'ZONE' | 'EQUIPMENT' | 'COMPONENT' | 'JOB';
+export type EdgeType = 'CONTAINS' | 'PART_OF' | 'REQUIRES_PM' | 'ASSIGNED_TO';
+
+export interface GraphNode {
+  id: string;                    
+  type: NodeType;
+  label: string;
+  coordinates?: [number, number]; 
+  compressedPayload: string;     
+}
+
+export interface GraphEdge {
+  id: string;
+  source: string;                
+  target: string;                
+  type: EdgeType;
+}
+
+export interface AssetGraph {
+  nodes: Record<string, GraphNode>;
+  edges: GraphEdge[];
+}
