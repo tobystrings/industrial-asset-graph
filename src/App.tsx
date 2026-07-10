@@ -1,22 +1,12 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import { graphApi } from './store/apiSlice';
 import { Dashboard } from './components/Dashboard';
 
-// Configure a localized Redux store instance for our asset framework
-const store = configureStore({
-  reducer: {
-    [graphApi.reducerPath]: graphApi.reducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(graphApi.middleware),
-});
-
-export default function App() {
+function App() {
   return (
-    <Provider store={store}>
+    <div className="h-screen w-screen bg-gray-950 text-gray-100 overflow-hidden">
       <Dashboard />
-    </Provider>
+    </div>
   );
 }
+
+export default App;
