@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    {
+      "id": "zone_1",
+      "type": "ZONE",
+      "label": "Main Production Facility",
+      "coordinates": [45.523064, -122.676483],
+      "payload": { "description": "Primary manufacturing floor Area A" }
+    },
+    {
+      "id": "sub_panel_1",
+      "type": "EQUIPMENT",
+      "label": "480V Distribution Sub-Panel Sub-1",
+      "coordinates": [45.522800, -122.676800],
+      "payload": { "amperage": 400, "voltage": 480 }
+    },
+    {
+      "id": "compressor_204",
+      "type": "EQUIPMENT",
+      "label": "Rotary Air Compressor (EQ-204)",
+      "coordinates": [45.523450, -122.676100],
+      "payload": { "HP": 50, "CFM": 200 }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "zone_1", "target": "sub_panel_1", "type": "CONTAINS" },
+    { "id": "e2", "source": "sub_panel_1", "target": "compressor_204", "type": "FEEDS_POWER_TO" }
+  ]
+}
