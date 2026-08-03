@@ -23,6 +23,7 @@ import {
 } from "./osm";
 import { aerialImageUrl, streetMapImageUrl } from "./aerial";
 import { OnlineBuildingModel, reconstructOnlineBuilding } from "./reconstruction";
+import { facilityAssetsFor3D, facilityDependenciesFor3D } from "./facilityData";
 
 type AssetTab = "overview" | "specs" | "history" | "jobs";
 type SelectedMapContext =
@@ -49,8 +50,8 @@ const individuallyToggleableAssets = [
   { id: "mcc-1", label: "MCC-1 / 480V" },
 ] as const;
 
-export default function App() {
-  const [selected, setSelected] = useState<Asset | null>(assets[1]);
+export function Legacy3DView() {
+  const [selected, setSelected] = useState<Asset | null>(() => facilityAssetsFor3D.find((asset) => asset.id === new URLSearchParams(location.search).get("asset")) ?? assets[1]);
   const [isolate, setIsolate] = useState(false);
   const [query, setQuery] = useState("");
   const [kindFilter, setKindFilter] = useState("ALL");
@@ -112,8 +113,8 @@ export default function App() {
     const timers = [1, 2, 3, 4, 5, 6].map((phase) => window.setTimeout(() => setStartupPhase(phase), phase * 350));
     return () => timers.forEach(window.clearTimeout);
   }, []);
-  const displayAssets = useMemo(() => [...assets, ...importedAssets], [importedAssets]);
-  const displayDependencies = [...dependencies, ...evidence.dependencies];
+  const displayAssets = useMemo(() => [...assets, ...facilityAssetsFor3D, ...importedAssets], [importedAssets]);
+  const displayDependencies = [...dependencies, ...facilityDependenciesFor3D, ...evidence.dependencies];
   const visibleAssets = useMemo(() => displayAssets.filter((asset) =>
     !hiddenAssetIds.has(asset.id) &&
     !(!showFieldVerifyElectrical && asset.kind === "ELECTRICAL" && asset.verificationStatus === "field-verify") &&

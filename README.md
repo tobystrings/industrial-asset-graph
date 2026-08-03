@@ -1,6 +1,6 @@
 # Industrial Asset Graph
 
-Interactive Three.js dependency map for recording plant assets, dependencies, and verified public spatial context.
+Evidence-aware facility knowledge dashboard for plant assets, machine documentation, relationships, and verified public spatial context. The 2D building layout is the default maintenance view; the original Three.js dependency map and current public reconstruction tools remain available from **Open 3D**.
 
 The default public-map origin is 2550 23rd Ave, Forest Grove, OR 97116 (`45.523803, -123.1027909`). This identifies the geographic context only; the bundled plant assets and dependencies remain fictional starter records until replaced with reviewed site evidence.
 
@@ -48,6 +48,13 @@ Use the evidence manifest plus locally attached drawings, photos, tags, CMMS exp
 npm run verify:data
 npm run build
 python scripts\visual-check.py
+npm run test:visual
 ```
 
-The visual check starts the app at `:4173`, validates initial layer controls and canvas pixels at default, wide, and close zoom, and writes screenshots under `artifacts\`.
+`npm run test:visual` validates Warehouse F and FG-L4-MTN-001 selection plus the 2D/3D toggle at 1366×768 and 1920×1080. The original visual check remains available for deeper public-layer and Three.js testing.
+
+## Facility records and restricted evidence
+
+Typed facility records live in `src/facilityData.ts` with shared types in `src/types/facility.ts`. `npm run verify:data` validates the legacy graph plus facility identity, hierarchy, overlays, relationships, evidence references, revisions, and machine-document paths.
+
+Field photographs, PLC programs, credentials, and proprietary manuals are not bundled. The dashboard contains `LOCAL_ONLY` evidence metadata and preserves the existing browser hashing workflow for user-attached evidence.
