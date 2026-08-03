@@ -1,0 +1,982 @@
+import { ChangeEvent, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+const AssetScene = lazy(() => import("./AssetScene").then((module) => ({ default: module.AssetScene })));
+import {
+  Asset,
+  assets,
+  colorFor,
+  dependencies,
+  mapListingsToAssets,
+  parseGeographicExport,
+} from "./graph";
+import {
+  attachEvidenceFiles,
+  emptyEvidenceData,
+  EvidenceData,
+  EvidenceSource,
+  parseEvidenceManifest,
+} from "./evidence";
+import {
+  loadOpenStreetMapContext,
+  loadPortlandUtilityContext,
+  StreetPath,
+  UtilityPath,
+} from "./osm";
+import { aerialImageUrl, streetMapImageUrl } from "./aerial";
+import { OnlineBuildingModel, reconstructOnlineBuilding } from "./reconstruction";
+
+type AssetTab = "overview" | "specs" | "history" | "jobs";
+type SelectedMapContext =
+  { kind: "street"; record: StreetPath };
+type PublicLayerState = {
+  state: "current" | "stale" | "unavailable" | "off" | "loading";
+  source: string;
+  query: string;
+  retrievedAt: string | null;
+};
+
+const DEFAULT_SITE = {
+  label: "2550 23rd Ave, Forest Grove, OR 97116",
+  latitude: 45.523803,
+  longitude: -123.1027909,
+} as const;
+const tabs: AssetTab[] = ["overview", "specs", "history", "jobs"];
+const individuallyToggleableAssets = [
+  { id: "zone-production", label: "Production Cell A" },
+  { id: "boiler-1", label: "Steam Header SH-01" },
+  { id: "hyd-1", label: "Hydraulic Unit HU-01" },
+  { id: "safety-eye-1", label: "Safety Eye SE-01" },
+  { id: "plc-1", label: "PLC-1" },
+  { id: "mcc-1", label: "MCC-1 / 480V" },
+] as const;
+
+export default function App() {
+  const [selected, setSelected] = useState<Asset | null>(assets[1]);
+  const [isolate, setIsolate] = useState(false);
+  const [query, setQuery] = useState("");
+  const [kindFilter, setKindFilter] = useState("ALL");
+  const [showFieldVerifyElectrical, setShowFieldVerifyElectrical] = useState(true);
+  const [showFieldVerifyPneumatic, setShowFieldVerifyPneumatic] = useState(true);
+  const [hiddenAssetIds, setHiddenAssetIds] = useState<Set<string>>(() => new Set());
+  const [viewCommand, setViewCommand] = useState<{ preset: "recenter" | "aerial" | "operator"; revision: number; offsetX: number; offsetZ: number }>({ preset: "recenter", revision: 0, offsetX: 0, offsetZ: 0 });
+  const [activeTab, setActiveTab] = useState<AssetTab>("overview");
+  const [importedAssets, setImportedAssets] = useState<Asset[]>([]);
+  const [importMessage, setImportMessage] = useState(
+    "No geographic context imported.",
+  );
+  const [evidence, setEvidence] = useState<EvidenceData>(emptyEvidenceData);
+  const [evidenceMessage, setEvidenceMessage] = useState(
+    "No evidence manifest imported.",
+  );
+  const localSourceUrls = useRef(new Map<string, string>());
+  const [origin, setOrigin] = useState<[number, number]>([
+    DEFAULT_SITE.latitude, DEFAULT_SITE.longitude,
+  ]);
+  const [siteLabel, setSiteLabel] = useState<string>(DEFAULT_SITE.label);
+  const [streets, setStreets] = useState<StreetPath[]>([]);
+  const [buildingModel, setBuildingModel] = useState<OnlineBuildingModel | null>(null);
+  const [showBuildingModel, setShowBuildingModel] = useState(true);
+  const [reconstructionStatus, setReconstructionStatus] = useState("Finding an online building footprint...");
+  const [utilities, setUtilities] = useState<UtilityPath[]>([]);
+  const [showUtilities, setShowUtilities] = useState(true);
+  const [utilityStatus, setUtilityStatus] = useState("Public utilities off.");
+  const [utilityFilter, setUtilityFilter] = useState<"water" | "sewer" | "all">(
+    "all",
+  );
+  const [selectedUtility, setSelectedUtility] = useState<UtilityPath | null>(
+    null,
+  );
+  const [selectedMapContext, setSelectedMapContext] =
+    useState<SelectedMapContext | null>(null);
+  const [showAssetList, setShowAssetList] = useState(true);
+  const [basemapMode, setBasemapMode] = useState<"google" | "street" | "aerial">("aerial");
+  const [aerialUrl, setAerialUrl] = useState<string | null>(null);
+  const [startupPhase, setStartupPhase] = useState(0);
+  const [contextRadius, setContextRadius] = useState(250);
+  const [mapContextStatus, setMapContextStatus] = useState(
+    `Loading public map context near ${DEFAULT_SITE.label}...`,
+  );
+  const [mapLayer, setMapLayer] = useState<PublicLayerState>({
+    state: "loading",
+    source: "OpenStreetMap and Portland public GIS",
+    query: "500 m radius",
+    retrievedAt: null,
+  });
+  const [utilityLayer, setUtilityLayer] = useState<PublicLayerState>({
+    state: "off",
+    source: "Portland public utilities GIS",
+    query: "250 m radius; water and sewer",
+    retrievedAt: null,
+  });
+  const [aerialLayer, setAerialLayer] = useState<PublicLayerState>({ state: "off", source: "Oregon Statewide Imagery Program 2024", query: "up to 1,500 m radius", retrievedAt: null });
+  useEffect(() => {
+    const timers = [1, 2, 3, 4, 5, 6].map((phase) => window.setTimeout(() => setStartupPhase(phase), phase * 350));
+    return () => timers.forEach(window.clearTimeout);
+  }, []);
+  const displayAssets = useMemo(() => [...assets, ...importedAssets], [importedAssets]);
+  const displayDependencies = [...dependencies, ...evidence.dependencies];
+  const visibleAssets = useMemo(() => displayAssets.filter((asset) =>
+    !hiddenAssetIds.has(asset.id) &&
+    !(!showFieldVerifyElectrical && asset.kind === "ELECTRICAL" && asset.verificationStatus === "field-verify") &&
+    !(!showFieldVerifyPneumatic && asset.kind === "PNEUMATIC" && asset.verificationStatus === "field-verify")
+  ), [displayAssets, hiddenAssetIds, showFieldVerifyElectrical, showFieldVerifyPneumatic]);
+  const visibleAssetIds = new Set(visibleAssets.map((asset) => asset.id));
+  const visibleDependencies = displayDependencies.filter((edge) => visibleAssetIds.has(edge.source) && visibleAssetIds.has(edge.target));
+  const visibleUtilities = utilities.filter(
+    (utility) => utilityFilter === "all" || utility.kind === utilityFilter,
+  );
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return visibleAssets.filter(
+      (asset) =>
+        (kindFilter === "ALL" || asset.kind === kindFilter) &&
+        (!needle ||
+          [
+            asset.label,
+            asset.id,
+            asset.kind,
+            asset.source,
+            asset.sourceLocation,
+            ...asset.evidenceGaps,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(needle)),
+    );
+  }, [visibleAssets, kindFilter, query]);
+  useEffect(() => {
+    if (selected && !visibleAssetIds.has(selected.id)) {
+      setSelected(null);
+      setIsolate(false);
+    }
+  }, [selected, hiddenAssetIds, showFieldVerifyElectrical, showFieldVerifyPneumatic]);
+  const related = selected
+    ? visibleDependencies.filter(
+        (edge) => edge.source === selected.id || edge.target === selected.id,
+      )
+    : [];
+  const sourceById = useMemo(
+    () => new Map(evidence.sources.map((source) => [source.id, source])),
+    [evidence.sources],
+  );
+  const selectedClaims = selected
+    ? evidence.claims.filter((claim) => claim.assetId === selected.id)
+    : [];
+  const selectedEvents = selected
+    ? evidence.events.filter((event) => event.assetId === selected.id)
+    : [];
+  const selectedJobs = selected
+    ? evidence.jobs.filter((job) => job.assetId === selected.id)
+    : [];
+  const publicLayers = [mapLayer, utilityLayer, aerialLayer];
+  const loadedLayerCount = publicLayers.filter((layer) => layer.state === "current").length;
+  const loadingLayerCount = publicLayers.filter((layer) => layer.state === "loading").length;
+  const unavailableLayerCount = publicLayers.filter((layer) => layer.state === "unavailable").length;
+  const layerText = (name: string, layer: PublicLayerState) =>
+    `${name}: ${layer.state} | ${layer.source} | ${layer.query}${layer.retrievedAt ? ` | retrieved ${new Date(layer.retrievedAt).toLocaleString()}` : ""}`;
+  const clearLocalSources = () => {
+    localSourceUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    localSourceUrls.current.clear();
+  };
+  const sourceReference = (source: EvidenceSource | undefined) => {
+    if (!source) return null;
+    const localUrl = localSourceUrls.current.get(source.id);
+    return (
+      <>
+        {source.sourceUri ? (
+          <a href={source.sourceUri} target="_blank" rel="noreferrer">
+            {source.title}
+          </a>
+        ) : (
+          source.title
+        )}
+        {source.fileName && (
+          <>
+            {" "}
+            | {source.fileName}
+            {source.sizeBytes !== null &&
+              ` (${source.sizeBytes.toLocaleString()} bytes)`}
+          </>
+        )}
+        {localUrl && (
+          <>
+            {" "}
+            |{" "}
+            <a href={localUrl} target="_blank" rel="noreferrer">
+              Open imported original
+            </a>
+          </>
+        )}
+      </>
+    );
+  };
+
+  useEffect(
+    () => () => {
+      clearLocalSources();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    let current = true;
+    setStreets([]);
+    setBuildingModel(null);
+    setReconstructionStatus("Finding an online building footprint...");
+    setMapContextStatus("Loading public street context...");
+    setMapLayer({
+      state: "loading",
+      source: "OpenStreetMap and Portland public GIS",
+      query: `${contextRadius} m radius`,
+      retrievedAt: null,
+    });
+    loadOpenStreetMapContext(...origin, contextRadius)
+      .then(async (context) => {
+        if (current) {
+          const retrievedAt = new Date().toISOString();
+          setStreets(context.streets);
+          setMapContextStatus(
+            `${context.streetSource}: ${context.streets.length} streets. Not an equipment source.`,
+          );
+          setMapLayer({
+            state: "current",
+            source: context.streetSource,
+            query: `${contextRadius} m radius`,
+            retrievedAt,
+          });
+          const candidate = context.buildings.find((building) => building.isFacilityCandidate);
+          if (!candidate) {
+            setReconstructionStatus("No online building footprint was found at this location.");
+            return;
+          }
+          setReconstructionStatus("Generating the exterior shell and checking public elevation...");
+          const model = await reconstructOnlineBuilding(candidate);
+          if (current) {
+            setBuildingModel(model);
+            setReconstructionStatus(
+              `${candidate.sourceLabel} | ${model.heightMeters.toFixed(1)} m height (${model.heightConfidence})${model.groundElevationMeters === null ? " | ground elevation unavailable" : ` | ground ${model.groundElevationMeters.toFixed(1)} m`}`,
+            );
+          }
+        }
+      })
+      .catch((error) => {
+        if (current) {
+          setBuildingModel(null);
+          setReconstructionStatus("Online reconstruction unavailable.");
+          setMapContextStatus(
+            error instanceof Error
+              ? error.message
+              : "Public OSM context unavailable.",
+          );
+          setMapLayer({
+            state: "unavailable",
+            source: "OpenStreetMap and Portland public GIS",
+            query: `${contextRadius} m radius`,
+            retrievedAt: null,
+          });
+        }
+      });
+    return () => {
+      current = false;
+    };
+  }, [origin, contextRadius]);
+
+  useEffect(() => {
+    setUtilities([]);
+    setSelectedUtility(null);
+    if (!showUtilities) {
+      setUtilityStatus("Public utilities off.");
+      setUtilityLayer({
+        state: "off",
+        source: "Portland public utilities GIS",
+        query: "250 m radius; water and sewer",
+        retrievedAt: null,
+      });
+      return;
+    }
+    let current = true;
+    setUtilityStatus("Loading public utility context...");
+    setUtilityLayer({
+      state: "loading",
+      source: "Portland public utilities GIS",
+      query: "250 m radius; water and sewer",
+      retrievedAt: null,
+    });
+    loadPortlandUtilityContext(...origin)
+      .then((paths) => {
+        if (current) {
+          const retrievedAt = new Date().toISOString();
+          setUtilities(paths);
+          setUtilityStatus(
+            "Public utility context captured; not plant dependency evidence.",
+          );
+          setUtilityLayer({
+            state: "current",
+            source: "Portland public utilities GIS",
+            query: "250 m radius; water and sewer",
+            retrievedAt,
+          });
+        }
+      })
+      .catch(() => {
+        if (current) {
+          setUtilityStatus("Public utility context unavailable.");
+          setUtilityLayer({
+            state: "unavailable",
+            source: "Portland public utilities GIS",
+            query: "250 m radius; water and sewer",
+            retrievedAt: null,
+          });
+        }
+      });
+    return () => {
+      current = false;
+    };
+  }, [origin, showUtilities]);
+
+  useEffect(() => {
+    if (basemapMode === "google") {
+      setAerialUrl(null);
+      setAerialLayer({ state: "current", source: "Google Maps embed", query: "provided site view", retrievedAt: new Date().toISOString() });
+      return;
+    }
+    const source = basemapMode === "aerial" ? "Oregon Statewide Imagery Program 2024" : "Esri World Street Map";
+    if (startupPhase < 5) { setAerialLayer({ state: "loading", source, query: "up to 1,500 m radius", retrievedAt: null }); return; }
+    let current = true;
+    const query = `${Math.min(contextRadius, 1_500)} m radius; 1,024 px image`;
+    const url = basemapMode === "aerial" ? aerialImageUrl(...origin, contextRadius) : streetMapImageUrl(...origin, contextRadius);
+    setAerialLayer({ state: "loading", source, query, retrievedAt: null });
+    const image = new Image();
+    const unavailable = () => { if (current) { setAerialUrl(null); setAerialLayer({ state: "unavailable", source, query, retrievedAt: null }); } };
+    const timeout = window.setTimeout(unavailable, 12_000);
+    image.onload = () => { if (current) { window.clearTimeout(timeout); setAerialUrl(url); setAerialLayer({ state: "current", source, query, retrievedAt: new Date().toISOString() }); } };
+    image.onerror = unavailable;
+    image.src = url;
+    return () => { current = false; window.clearTimeout(timeout); };
+  }, [basemapMode, contextRadius, origin, startupPhase >= 5]);
+
+  const importMapExport = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const listings = parseGeographicExport(await file.text());
+      const imported = mapListingsToAssets(listings);
+      setImportedAssets(imported);
+      setOrigin((current) => {
+        if (
+          current[0] === listings[0].latitude &&
+          current[1] === listings[0].longitude
+        )
+          return current;
+        setSelectedUtility(null);
+        setSelectedMapContext(null);
+        return [listings[0].latitude, listings[0].longitude];
+      });
+      setSiteLabel(listings[0].address || listings[0].title);
+      setImportMessage(
+        `Imported ${imported.length} geographic context record${imported.length === 1 ? "" : "s"} and recentered public map context.`,
+      );
+    } catch (error) {
+      setImportMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not read the map export.",
+      );
+    }
+    event.target.value = "";
+  };
+
+  const importEvidence = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const parsed = parseEvidenceManifest(
+        await file.text(),
+        new Set(displayAssets.map((asset) => asset.id)),
+      );
+      clearLocalSources();
+      setEvidence(parsed);
+      setEvidenceMessage(
+        `Imported ${parsed.sources.length} sources, ${parsed.claims.length} claims, ${parsed.events.length} events, ${parsed.jobs.length} jobs, and ${parsed.dependencies.length} dependency claims.`,
+      );
+    } catch (error) {
+      setEvidenceMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not read the evidence manifest.",
+      );
+    }
+    event.target.value = "";
+  };
+
+  const attachEvidence = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = [...(event.target.files ?? [])];
+    if (!files.length) return;
+    const result = await attachEvidenceFiles(evidence, files);
+    const filesByName = new Map(files.map((file) => [file.name, file]));
+    result.data.sources.forEach((source) => {
+      const file = source.fileName
+        ? filesByName.get(source.fileName)
+        : undefined;
+      if (!file) return;
+      const prior = localSourceUrls.current.get(source.id);
+      if (prior) URL.revokeObjectURL(prior);
+      localSourceUrls.current.set(source.id, URL.createObjectURL(file));
+    });
+    setEvidence(result.data);
+    setEvidenceMessage(
+      `Attached ${result.attached} hashed local evidence file${result.attached === 1 ? "" : "s"}; ${result.unmatched} unmatched.`,
+    );
+    event.target.value = "";
+  };
+
+  return (
+    <main className="app-shell">
+      <header>
+        <div>
+          <p className="eyebrow">Plant knowledge capture</p>
+          <h1>Dependency Map</h1>
+          <p className="site-location">{siteLabel}</p>
+        </div>
+        <div className="legend">
+          {Object.entries(colorFor).map(([kind, color]) => (
+            <span key={kind}>
+              <i style={{ background: color }} />
+              {kind}
+            </span>
+          ))}
+        </div>
+      </header>
+      <section className={`workspace ${showAssetList ? "" : "asset-list-hidden"}`}>
+        {showAssetList && <aside className="asset-list">
+          <label>
+            Find an asset
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Name, ID, source, or evidence gap"
+            />
+          </label>
+          <label className="asset-filter">
+            System
+            <select
+              value={kindFilter}
+              onChange={(event) => setKindFilter(event.target.value)}
+            >
+              <option value="ALL">All systems</option>
+              {Object.keys(colorFor).map((kind) => (
+                <option key={kind}>{kind}</option>
+              ))}
+            </select>
+          </label>
+          <label className="map-import">
+            Import geographic JSON
+            <input
+              type="file"
+              accept="application/json"
+              onChange={importMapExport}
+            />
+            <small>{importMessage}</small>
+          </label>
+          <label className="evidence-import">
+            Import evidence manifest
+            <input
+              type="file"
+              accept="application/json"
+              onChange={importEvidence}
+            />
+            <small>{evidenceMessage}</small>
+          </label>
+          <label className="evidence-import">
+            Attach local evidence files
+            <input
+              type="file"
+              accept="application/pdf,image/*,text/csv,application/json,text/plain"
+              multiple
+              onChange={attachEvidence}
+            />
+          </label>
+          <div className="asset-count">
+            {filtered.length} field-verify starter records
+          </div>
+          {filtered.map((asset) => (
+            <button
+              className={`asset-row ${selected?.id === asset.id ? "selected" : ""}`}
+              key={asset.id}
+              onClick={() => {
+                setSelected(asset);
+                setActiveTab("overview");
+              }}
+            >
+              <i style={{ background: colorFor[asset.kind] }} />
+              <span>
+                {asset.label}
+                <small>
+                  {asset.kind} | {asset.status}
+                </small>
+              </span>
+            </button>
+          ))}
+        </aside>}
+        <section
+          className="map"
+          aria-label="Interactive three dimensional asset dependency map"
+        >
+          <div className="map-toolbar">
+            <span>{mapContextStatus}</span>
+            <div className="view-controls" aria-label="Map view controls">
+              <button onClick={() => setViewCommand((current) => ({ preset: "recenter", revision: current.revision + 1, offsetX: 0, offsetZ: 0 }))}>Recenter</button>
+              <button onClick={() => setViewCommand((current) => ({ preset: "aerial", revision: current.revision + 1, offsetX: 0, offsetZ: 0 }))}>Aerial view</button>
+              <button onClick={() => setViewCommand((current) => ({ preset: "operator", revision: current.revision + 1, offsetX: 0, offsetZ: 0 }))}>Operator view</button>
+            </div>
+            <label>
+              Range
+              <input
+                type="range"
+                min="250"
+                max="5000"
+                step="250"
+                value={contextRadius}
+                onChange={(event) =>
+                  setContextRadius(Number(event.target.value))
+                }
+              />
+            </label>
+            <label title="Live Portland public water and sewer lines. Geographic context only, never plant dependency evidence.">
+              <input
+                className="utility-toggle"
+                type="checkbox"
+                checked={showUtilities}
+                onChange={(event) => setShowUtilities(event.target.checked)}
+              />
+              Utilities
+            </label>
+            {showUtilities && (
+              <label>
+                Type
+                <select
+                  value={utilityFilter}
+                  onChange={(event) =>
+                    setUtilityFilter(
+                      event.target.value as "water" | "sewer" | "all",
+                    )
+                  }
+                >
+                  <option value="water">Water</option>
+                  <option value="sewer">Sewer</option>
+                  <option value="all">All municipal</option>
+                </select>
+              </label>
+            )}
+            <label title="Choose a map-style street or aerial basemap.">
+              Basemap
+              <select value={basemapMode} onChange={(event) => setBasemapMode(event.target.value as "google" | "street" | "aerial")}>
+                <option value="google">Google Maps</option>
+                <option value="street">Street map</option>
+                <option value="aerial">Aerial</option>
+              </select>
+            </label>
+            <label title="Show the single exterior shell reconstructed from the nearest online footprint and height source.">
+              <input type="checkbox" checked={showBuildingModel} onChange={(event) => setShowBuildingModel(event.target.checked)} />
+              Building shell
+            </label>
+            <label title="Show or remove the asset list panel from the map workspace.">
+              <input type="checkbox" checked={showAssetList} onChange={(event) => setShowAssetList(event.target.checked)} />
+              Asset list
+            </label>
+            {individuallyToggleableAssets.map((assetLayer) => (
+              <label key={assetLayer.id} title={`Show or remove ${assetLayer.label} from the asset map and list.`}>
+                <input
+                  type="checkbox"
+                  checked={!hiddenAssetIds.has(assetLayer.id)}
+                  onChange={(event) => setHiddenAssetIds((current) => {
+                    const next = new Set(current);
+                    if (event.target.checked) next.delete(assetLayer.id);
+                    else next.add(assetLayer.id);
+                    return next;
+                  })}
+                />
+                {assetLayer.label}
+              </label>
+            ))}
+            <label title="Hide unverified electrical starter records from both the map and asset list.">
+              <input type="checkbox" checked={showFieldVerifyElectrical} onChange={(event) => setShowFieldVerifyElectrical(event.target.checked)} />
+              Field-verify electrical
+            </label>
+            <label title="Hide unverified pneumatic starter records from both the map and asset list.">
+              <input type="checkbox" checked={showFieldVerifyPneumatic} onChange={(event) => setShowFieldVerifyPneumatic(event.target.checked)} />
+              Field-verify pneumatic
+            </label>
+            <button
+              className={isolate ? "active" : ""}
+              onClick={() => setIsolate((value) => !value)}
+              disabled={!selected}
+            >
+              Isolate dependencies
+            </button>
+            <details className="layer-status">
+              <summary>Layer status</summary>
+              <small>{layerText("Map", mapLayer)}</small>
+              <small>{layerText("Utilities", utilityLayer)}</small>
+              <small>{layerText("Basemap", aerialLayer)}</small>
+            </details>
+          </div>
+          {basemapMode !== "google" && <nav className="view-nudge" aria-label="Move map view">
+            <button className="up" title="Move view up" aria-label="Move view up" onClick={() => setViewCommand((current) => ({ ...current, revision: current.revision + 1, offsetZ: current.offsetZ - 4 }))}>↑</button>
+            <button className="left" title="Move view left" aria-label="Move view left" onClick={() => setViewCommand((current) => ({ ...current, revision: current.revision + 1, offsetX: current.offsetX - 4 }))}>←</button>
+            <button className="center" title="Center view" aria-label="Center view" onClick={() => setViewCommand((current) => ({ ...current, revision: current.revision + 1, offsetX: 0, offsetZ: 0 }))}>•</button>
+            <button className="right" title="Move view right" aria-label="Move view right" onClick={() => setViewCommand((current) => ({ ...current, revision: current.revision + 1, offsetX: current.offsetX + 4 }))}>→</button>
+            <button className="down" title="Move view down" aria-label="Move view down" onClick={() => setViewCommand((current) => ({ ...current, revision: current.revision + 1, offsetZ: current.offsetZ + 4 }))}>↓</button>
+          </nav>}
+          <aside className="reconstruction-status" aria-live="polite">
+            <strong>Online reconstruction</strong>
+            <span>{reconstructionStatus}</span>
+            {basemapMode === "google" && <small>Choose Street map or Aerial to view the generated shell.</small>}
+          </aside>
+          <div className="loading-progress" aria-live="polite">
+            <span className="loading-progress-track"><i style={{ width: `${(loadedLayerCount / publicLayers.length) * 100}%` }} /></span>
+            <small>{loadedLayerCount}/{publicLayers.length} public layers loaded{loadingLayerCount ? ` | ${loadingLayerCount} loading` : ""}{unavailableLayerCount ? ` | ${unavailableLayerCount} unavailable` : ""}</small>
+          </div>
+          {showUtilities && (
+            <div className="utility-legend">
+              <span>
+                <i className="water" />
+                Public water main (
+                {
+                  visibleUtilities.filter((utility) => utility.kind === "water")
+                    .length
+                }
+                )
+              </span>
+              <span>
+                <i className="sewer" />
+                Public sewer pipe (
+                {
+                  visibleUtilities.filter((utility) => utility.kind === "sewer")
+                    .length
+                }
+                )
+              </span>
+              <small>{utilityStatus}</small>
+            </div>
+          )}
+          {basemapMode === "google" ? (
+            <iframe
+              className="google-map-embed"
+              title="Google Maps site view"
+              src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d1397.6758898141636!2d-123.1049417!3d45.5231261!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1783851094542!5m2!1sen!2sus"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          ) : <Suspense fallback={<div className="map-loading">Loading 3D context...</div>}>
+          <AssetScene
+            assets={visibleAssets}
+            dependencies={visibleDependencies}
+            streets={streets}
+            utilities={visibleUtilities}
+            buildingModel={showBuildingModel ? buildingModel : null}
+            aerialUrl={aerialUrl}
+            origin={origin}
+            contextRadius={contextRadius}
+            viewPreset={viewCommand.preset}
+            viewRevision={viewCommand.revision}
+            viewOffsetX={viewCommand.offsetX}
+            viewOffsetZ={viewCommand.offsetZ}
+            selectedId={selected?.id ?? null}
+            selectedUtilityId={selectedUtility?.id ?? null}
+            isolate={isolate}
+            onSelect={(asset) => {
+              setSelectedUtility(null);
+              setSelectedMapContext(null);
+              setSelected(asset);
+              setActiveTab("overview");
+            }}
+            onSelectUtility={(utility) => {
+              setSelected(null);
+              setSelectedMapContext(null);
+              setIsolate(false);
+              setSelectedUtility(utility);
+            }}
+            onSelectStreet={(street) => {
+              setSelected(null);
+              setSelectedUtility(null);
+              setSelectedMapContext({ kind: "street", record: street });
+            }}
+          />
+          </Suspense>}
+          <p className="map-note">
+            Drag to rotate | scroll to zoom | select equipment or public context
+            for its source record
+          </p>
+        </section>
+        <aside className="detail-panel">
+          {selected ? (
+            <>
+              <div className="detail-heading">
+                <i style={{ background: colorFor[selected.kind] }} />
+                <div>
+                  <p className="eyebrow">{selected.kind}</p>
+                  <h2>{selected.label}</h2>
+                </div>
+              </div>
+              <nav className="tabs" aria-label="Asset data views">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab}
+                    className={activeTab === tab ? "active" : ""}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </nav>
+              {activeTab === "overview" && (
+                <>
+                  <dl>
+                    <div>
+                      <dt>Operating state</dt>
+                      <dd className={`status ${selected.status}`}>
+                        {selected.status}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Verification</dt>
+                      <dd>
+                        {selected.verificationStatus} | {selected.reviewState}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Source</dt>
+                      <dd>{selected.source}</dd>
+                    </div>
+                    <div>
+                      <dt>Source location</dt>
+                      <dd>{selected.sourceLocation}</dd>
+                    </div>
+                    <div>
+                      <dt>Captured / reviewed</dt>
+                      <dd>
+                        {selected.capturedAt ?? "Not recorded"} /{" "}
+                        {selected.reviewedBy ?? "Not reviewed"}
+                      </dd>
+                    </div>
+                  </dl>
+                  {selected.sourceUri && (
+                    <p className="details">
+                      <a
+                        href={selected.sourceUri}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open source record
+                      </a>
+                    </p>
+                  )}
+                  <p className="details">{selected.details}</p>
+                  <section className="relationships">
+                    <h3>Evidence gaps</h3>
+                    {selected.evidenceGaps.map((gap) => (
+                      <p key={gap}>{gap}</p>
+                    ))}
+                  </section>
+                  <section className="relationships">
+                    <h3>Direct dependency claims</h3>
+                    {related.length ? (
+                      related.map((edge) => {
+                        const peer = visibleAssets.find(
+                          (asset) =>
+                            asset.id ===
+                            (edge.source === selected.id
+                              ? edge.target
+                              : edge.source),
+                        )!;
+                        const source = edge.evidenceSourceId
+                          ? sourceById.get(edge.evidenceSourceId)
+                          : undefined;
+                        return (
+                          <div key={edge.id}>
+                            <button
+                              title={`${edge.verificationStatus}; source: ${edge.sourceLocation}`}
+                              onClick={() => {
+                                setSelected(peer);
+                                setActiveTab("overview");
+                              }}
+                            >
+                              <span>
+                                {edge.source === selected.id ? "OUT" : "IN"} |{" "}
+                                {edge.relation.replaceAll("_", " ")} |{" "}
+                                {edge.verificationStatus}
+                              </span>
+                              {peer.label}
+                            </button>
+                            {source ? (
+                              <small>{sourceReference(source)}</small>
+                            ) : (
+                              edge.sourceUri && (
+                                <small>
+                                  <a
+                                    href={edge.sourceUri}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    Open source evidence
+                                  </a>
+                                </small>
+                              )
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p>No documented direct edges.</p>
+                    )}
+                  </section>
+                </>
+              )}
+              {activeTab === "specs" && (
+                <section className="tab-copy">
+                  <h3>Record specification</h3>
+                  <p>Type: {selected.kind}</p>
+                  <p>Graph identifier: {selected.id}</p>
+                  {selectedClaims.length ? (
+                    selectedClaims.map((claim) => {
+                      const source = sourceById.get(claim.sourceId);
+                      return (
+                        <p key={claim.id}>
+                          <strong>{claim.field}:</strong> {claim.value}
+                          {claim.unit ? ` ${claim.unit}` : ""} |{" "}
+                          {claim.verificationStatus} | {sourceReference(source)}{" "}
+                          | {claim.locator}
+                          {source?.sha256 ? ` | SHA-256 ${source.sha256}` : ""}
+                        </p>
+                      );
+                    })
+                  ) : (
+                    <p>
+                      No source-backed manufacturer, rating, I/O, pressure,
+                      voltage, or isolation data has been supplied.
+                    </p>
+                  )}
+                  <p>
+                    Coordinates are 3D visualization positions only; geographic
+                    context never proves equipment location.
+                  </p>
+                </section>
+              )}
+              {activeTab === "history" && (
+                <section className="tab-copy">
+                  <h3>Verified history</h3>
+                  {selectedEvents.length ? (
+                    selectedEvents.map((item) => {
+                      const source = sourceById.get(item.sourceId);
+                      return (
+                        <p key={item.id}>
+                          <strong>{item.kind}:</strong> {item.summary} |{" "}
+                          {item.occurredAt ?? "Date not recorded"} |{" "}
+                          {item.verificationStatus} | {sourceReference(source)}{" "}
+                          | {item.locator}
+                        </p>
+                      );
+                    })
+                  ) : (
+                    <>
+                      <p>
+                        No source-backed observation, event, photo, drawing
+                        review, or maintenance log is recorded.
+                      </p>
+                      <p>
+                        Required evidence: {selected.evidenceGaps.join("; ")}.
+                      </p>
+                    </>
+                  )}
+                </section>
+              )}
+              {activeTab === "jobs" && (
+                <section className="tab-copy">
+                  <h3>Work orders</h3>
+                  {selectedJobs.length ? (
+                    selectedJobs.map((job) => {
+                      const source = sourceById.get(job.sourceId);
+                      return (
+                        <p key={job.id}>
+                          <strong>{job.status}:</strong> {job.title} |{" "}
+                          {job.verificationStatus} | {sourceReference(source)} |{" "}
+                          {job.locator}
+                        </p>
+                      );
+                    })
+                  ) : (
+                    <>
+                      <p>
+                        No source-backed work order is recorded for this asset.
+                      </p>
+                      <p>
+                        LOTO source, isolation point, stored-energy release, and
+                        verification steps are not documented. Do not treat
+                        control relationships as isolation evidence.
+                      </p>
+                    </>
+                  )}
+                </section>
+              )}
+            </>
+          ) : selectedUtility ? (
+            <section className="tab-copy">
+              <h3>Public utility context</h3>
+              <p>
+                {selectedUtility.kind === "water"
+                  ? "City-mapped public water main"
+                  : "City-mapped public sewer pipe"}
+                ; no facility connection is documented.
+              </p>
+              <p>Feature: {selectedUtility.objectId}</p>
+              <p>Returned attributes: {selectedUtility.attributeSummary}</p>
+              <p>
+                Last successful capture:{" "}
+                {new Date(selectedUtility.capturedAt).toLocaleString()}
+              </p>
+              <p>
+                <a
+                  href={selectedUtility.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open official source record
+                </a>
+              </p>
+            </section>
+          ) : selectedMapContext ? (
+            <section className="tab-copy">
+              <h3>Public map context</h3>
+              <p>{selectedMapContext.record.sourceLabel}; not a plant asset or dependency.</p>
+              <p>Street: {selectedMapContext.record.name}</p>
+              <p>Record: {selectedMapContext.record.recordId}</p>
+              <p>
+                Captured:{" "}
+                {new Date(
+                  selectedMapContext.record.capturedAt,
+                ).toLocaleString()}
+              </p>
+              <p>
+                <a
+                  href={selectedMapContext.record.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open official source record
+                </a>
+              </p>
+            </section>
+          ) : (
+            <p>Select an asset or public context feature from the model.</p>
+          )}
+        </aside>
+      </section>
+      <footer>
+        Starter dependencies are examples only. Imported map records are
+        geographic context, never equipment links, until corroborated by
+        drawings, labels, or a site walkdown. OpenStreetMap data: ODbL.
+      </footer>
+    </main>
+  );
+}

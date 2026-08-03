@@ -1,0 +1,13 @@
+export function aerialImageUrl(latitude: number, longitude: number, radius: number) {
+  const latitudeDelta = Math.min(radius, 1_500) / 111_320;
+  const longitudeDelta = latitudeDelta / Math.cos(latitude * Math.PI / 180);
+  const bbox = [longitude - longitudeDelta, latitude - latitudeDelta, longitude + longitudeDelta, latitude + latitudeDelta].join(',');
+  return `https://imagery.oregonexplorer.info/arcgis/rest/services/OSIP_2024/OSIP_2024_WM/ImageServer/exportImage?${new URLSearchParams({ bbox, bboxSR: '4326', imageSR: '4326', size: '1024,1024', format: 'png', f: 'image' })}`;
+}
+
+export function streetMapImageUrl(latitude: number, longitude: number, radius: number) {
+  const latitudeDelta = Math.min(radius, 1_500) / 111_320;
+  const longitudeDelta = latitudeDelta / Math.cos(latitude * Math.PI / 180);
+  const bbox = [longitude - longitudeDelta, latitude - latitudeDelta, longitude + longitudeDelta, latitude + latitudeDelta].join(',');
+  return `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/export?${new URLSearchParams({ bbox, bboxSR: '4326', imageSR: '4326', size: '1024,1024', format: 'png32', transparent: 'false', f: 'image' })}`;
+}
