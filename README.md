@@ -1,14 +1,6 @@
 # Industrial Asset Graph
 
-Interactive Three.js dependency map for recording plant assets, dependencies, and verified public spatial context.
-
-The default public-map origin is 2550 23rd Ave, Forest Grove, OR 97116 (`45.523803, -123.1027909`). This identifies the geographic context only; the bundled plant assets and dependencies remain fictional starter records until replaced with reviewed site evidence.
-
-The parcel layer queries the official Washington County tax-lot feature service for the polygon containing the current map origin. Portland-specific zoning, permit, document, and utility integrations remain optional context and may be unavailable outside Portland.
-
-The nearest public building footprint to the geocoded origin is highlighted as a candidate facility outline. Because an address point can fall on a road or parcel edge, this proximity match remains unverified until confirmed with a site plan or field observation.
-
-The map toolbar provides recenter, aerial, and operator camera presets. Field-verification electrical and pneumatic starter records can be independently hidden from the map, asset list, and dependency display.
+Evidence-aware J. Lieb facility knowledge dashboard for plant assets, machine documentation, relationships, and field-verification work. The interactive 2D building layout is the primary application.
 
 ## Local setup
 
@@ -34,20 +26,24 @@ npm run build
 npm run preview -- --host 127.0.0.1 --port 4174
 ```
 
-Open http://127.0.0.1:4174/. Use this mode to check startup performance: the application shell loads first and the Three.js scene loads as a separate chunk. Buildings render before staggered public-layer requests complete.
+Open http://127.0.0.1:4174/industrial-asset-graph/ to test the production dashboard build.
 
 ## Data boundaries
 
-Building footprints, streets, utilities, permits, documents, zoning, parcels, imagery, terrain, and DEQ data are public geographic context only. They never verify equipment location, asset specifications, plant ownership, LOTO, or internal dependency claims.
-
-Use the evidence manifest plus locally attached drawings, photos, tags, CMMS exports, LOTO procedures, field observations, and reviewed claims to verify plant records. Attached originals are hashed in-browser with SHA-256 and are not uploaded.
+Facility facts must be backed by accepted evidence or explicitly marked for field verification. Local drawings, photos, tags, CMMS exports, LOTO procedures, and field observations are controlled evidence and are not bundled into the public frontend.
 
 ## Checks
 
 ```powershell
 npm run verify:data
 npm run build
-python scripts\visual-check.py
+npm run test:visual
 ```
 
-The visual check starts the app at `:4173`, validates initial layer controls and canvas pixels at default, wide, and close zoom, and writes screenshots under `artifacts\`.
+`npm run test:visual` validates Warehouse F and FG-L4-MTN-001 selection at 1366×768 and 1920×1080 and confirms no legacy 3D entry point is present.
+
+## Facility records and restricted evidence
+
+Typed facility records live in `src/facilityData.ts` with shared types in `src/types/facility.ts`. `npm run verify:data` validates facility identity, hierarchy, overlays, relationships, evidence references, revisions, and machine-document paths.
+
+Field photographs, PLC programs, credentials, and proprietary manuals are not bundled. The dashboard contains `LOCAL_ONLY` evidence metadata and preserves the existing browser hashing workflow for user-attached evidence.
