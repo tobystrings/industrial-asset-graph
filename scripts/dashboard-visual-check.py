@@ -30,14 +30,11 @@ try:
             screenshot = output / f'dashboard-{width}x{height}.png'
             page.screenshot(path=str(screenshot), full_page=False)
             verify_pixels(screenshot)
-            page.get_by_role('button', name='Open 3D').click()
-            page.locator('canvas').wait_for(timeout=20000)
-            page.get_by_role('button', name='Facility dashboard').click()
-            page.get_by_role('group', name='Interactive J. Lieb facility layout').wait_for()
+            assert page.get_by_role('button', name='Open 3D').count() == 0
             page.close()
         browser.close()
         assert not errors, f'Browser console errors: {errors}'
-        print('Dashboard interaction and 2D/3D toggle passed at 1366x768 and 1920x1080.')
+        print('Dashboard interaction passed at 1366x768 and 1920x1080; no legacy 3D entry point is present.')
 finally:
     server.terminate()
     server.wait(timeout=10)
