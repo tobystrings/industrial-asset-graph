@@ -31,6 +31,18 @@ try:
             page.screenshot(path=str(screenshot), full_page=False)
             verify_pixels(screenshot)
             assert page.get_by_role('button', name='Open 3D').count() == 0
+            page.get_by_role('button', name='Control cabinets').click()
+            page.get_by_role('heading', name='Line 2 Conveyor Control Cabinet').wait_for()
+            assert 'view=cabinet' in page.url
+            page.get_by_role('button', name='DRIVE #1 Vfd').click()
+            assert page.get_by_role('heading', name='DRIVE #1').count() == 1
+            assert page.locator('[data-device-id="vfd-01"].is-selected').count() == 1
+            assert page.get_by_role('link', name='PDF').get_attribute('href').endswith('/assets/line2/control-cabinet/cabinet.pdf')
+            cabinet_screenshot = output / f'control-cabinet-{width}x{height}.png'
+            page.screenshot(path=str(cabinet_screenshot), full_page=False)
+            verify_pixels(cabinet_screenshot)
+            page.get_by_role('button', name='Facility dashboard').click()
+            page.get_by_role('group', name='Interactive J. Lieb facility layout').wait_for()
             page.close()
         browser.close()
         assert not errors, f'Browser console errors: {errors}'
