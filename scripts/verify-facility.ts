@@ -1,4 +1,4 @@
-import { accessSync } from 'node:fs';
+import { accessSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { areas, components, documents, evidence, machines, relationships, revisions } from '../src/facilityData';
 
@@ -36,4 +36,16 @@ for (const document of documents) {
   accessSync(resolve(document.path));
 }
 accessSync(resolve('public/assets/labeled-building-layout.png'));
+const cabinetRoot = resolve('public/assets/line2/control-cabinet');
+for (const file of ['cabinet.svg', 'cabinet.pdf', 'cabinet.png', 'metadata.json', 'photos/cabinet_reference_render.png']) accessSync(resolve(cabinetRoot, file));
+const cabinet = JSON.parse(readFileSync(resolve(cabinetRoot, 'metadata.json'), 'utf8')) as { cabinet: { id: string; voltage: { value: string }; controlVoltage: { value: string } }; devices: { id: string; type: string; verificationStatus: string }[] };
+if (cabinet.cabinet.id !== 'line2-control-cabinet' || cabinet.cabinet.voltage.value !== '480 VAC 3 phase' || cabinet.cabinet.controlVoltage.value !== '24 VDC') throw new Error('Invalid cabinet identity or power metadata.');
+if (cabinet.devices.length < 50 || new Set(cabinet.devices.map((device) => device.id)).size !== cabinet.devices.length) throw new Error('Cabinet device IDs must be unique and complete.');
+const cabinetSvg = readFileSync(resolve(cabinetRoot, 'cabinet.svg'), 'utf8');
+for (const device of cabinet.devices) {
+  if (!device.id || !device.type || device.verificationStatus !== 'VERIFIED_REFERENCE_DRAWING') throw new Error(`Invalid cabinet device: ${device.id}`);
+  if (!cabinetSvg.includes(`data-device-id="${device.id}"`)) throw new Error(`Cabinet SVG missing device group: ${device.id}`);
+}
+if (/class="[^"]*(wire|conductor)/i.test(cabinetSvg)) throw new Error('Cabinet SVG must not contain inferred conductors.');
 console.log(`Facility verified: ${areas.length} areas, ${machines.length} machine, ${components.length} components, ${documents.length} document categories, ${relationships.length} relationships.`);
+console.log(`Control cabinet verified: ${cabinet.devices.length} individually mapped devices with SVG, PNG, PDF, metadata, and approved reference render.`);
