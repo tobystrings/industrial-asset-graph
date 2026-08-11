@@ -1,6 +1,9 @@
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 
+// Remove any obsolete caption toggle left behind by an older cached page shell.
+document.querySelector('#ccBtn')?.remove();
+
 const introAudio = $('#tylerNarration');
 const masterAudio = $('#masterNarration');
 const finaleAudio = $('#solanaNarration');

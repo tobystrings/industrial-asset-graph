@@ -394,7 +394,6 @@ document.getElementById('startBtn').addEventListener('click',startFilm);
 playBtn.addEventListener('click',togglePlay);
 document.getElementById('prevBtn').addEventListener('click',()=>goToScene(sceneIndex-1,true));
 document.getElementById('nextBtn').addEventListener('click',()=>goToScene(sceneIndex+1,true));
-document.getElementById('ccBtn').addEventListener('click',e=>{captions=!captions;subtitle.classList.toggle('hide',!captions);e.currentTarget.textContent=captions?'CC On':'CC Off';});
 document.getElementById('fullBtn').addEventListener('click',()=>{if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}else{document.exitFullscreen?.();}});
 voiceSelect.addEventListener('change',()=>{if(playing){stopSpeech();paused=false;speakCurrentLine();}});
 document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{terminalOutput.textContent=commands[b.dataset.command];}));
@@ -404,6 +403,6 @@ document.addEventListener('visibilitychange',()=>{
 
 buildChapters();updateScene();
 </script>
-<script src="player.js"></script>
+<script src="player.js?v=20260811-no-caption-toggle"></script>
 </body>
 </html>
