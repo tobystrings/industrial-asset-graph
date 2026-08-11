@@ -204,6 +204,8 @@ function markReady() {
 introAudio.addEventListener('timeupdate', updateFromIntro);
 masterAudio.addEventListener('timeupdate', updateFromMaster);
 finaleAudio.addEventListener('timeupdate', updateFromFinale);
+introAudio.addEventListener('playing', () => { if (masterAudio.networkState === HTMLMediaElement.NETWORK_EMPTY) masterAudio.load(); }, { once: true });
+masterAudio.addEventListener('playing', () => { if (finaleAudio.networkState === HTMLMediaElement.NETWORK_EMPTY) finaleAudio.load(); }, { once: true });
 [introAudio, masterAudio, finaleAudio].forEach(item => {
   item.addEventListener('play', () => setPlayingUi(true));
   item.addEventListener('pause', () => { if (!item.ended && item.currentTime > 0 && item === activeAudio()) setPlayingUi(false); });
