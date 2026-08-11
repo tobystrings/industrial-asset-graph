@@ -7,7 +7,7 @@ HOW TO RUN ON WINDOWS
 3. Click START FILM. Browsers require a click before spoken narration can begin.
 
 WHAT IT DOES
-- Uses the same veteran-electrician presenter scenes created for the project.
+- Opens with Tyler's personal cloned-voice introduction, then preserves the original veteran-electrician narrated film.
 - Narrates the full presentation with your browser's built-in speech engine.
 - Automatically selects a deeper English male voice when available.
 - Provides a voice selector so you can choose any installed browser/system voice.
@@ -23,7 +23,9 @@ For a more veteran-tradesman sound, try a male voice such as Guy, Christopher, M
 FILES
 index.html                    complete film/player
 START_PRESENTATION.bat        one-click Windows launcher
-assets/                       all eight presenter scenes
-narration.txt                 full spoken script
+assets/                       existing presenter scenes
+audio/tyler-project-intro.mp3 Tyler's unmodified opening narration
+audio/industrial-asset-graph-narration.mp3 original master film narration
+narration.txt                 original spoken script and Tyler intro caption guide
 
 No web server, build step, npm install, or internet connection is required for the film itself.
