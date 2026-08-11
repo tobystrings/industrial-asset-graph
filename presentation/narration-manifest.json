@@ -4,8 +4,20 @@
   "ttsProvider": "ElevenLabs",
   "preferredModel": "eleven_v3",
   "outputFormat": "mp3_44100_128",
+  "audio": {
+    "tylerIntro": "audio/tyler-project-intro.mp3",
+    "mainFilm": "audio/industrial-asset-graph-narration.mp3"
+  },
   "runtimeRule": "Never call ElevenLabs from the public GitHub Pages client. Generate narration ahead of time and commit only finished audio/timing assets.",
   "scenes": [
+    {
+      "id": "T00",
+      "slug": "tyler_intro",
+      "title": "Tyler Intro — Why I Started This",
+      "filename": "tyler-project-intro.mp3",
+      "visual": "Tyler's personal introduction moves from the real facility map through field capture, Don's repeated troubleshooting cycle, upstream/downstream effects, and the transition from a personal learning tool to a facility knowledge system.",
+      "narration": "I started this because I am the electrician trying to learn this facility.\n\nThe fastest way for me to understand the plant was to document the machines, panels, cabinets, controls, and power sources—and how they connect.\n\nIf you have seen me standing in front of a machine with my phone in my hand, I was not exactly checking Facebook. I was capturing photos, nameplates, and field information.\n\nAfter only a few days shadowing Don, I saw how often the same questions and the same problems came back around. For Don, it is basically Groundhog Day.\n\nOne adjustment does not always affect only one machine. A change upstream can move through the conveyor, the process, and the equipment downstream.\n\nWhat began as my learning tool could solve a much larger facility problem by connecting equipment, documents, relationships, and the knowledge people carry.\n\nI started it to learn the facility. It became a way for the facility to remember."
+    },
     {
       "id": "00",
       "slug": "cold_open",

@@ -24,6 +24,16 @@
     .film{position:relative;aspect-ratio:16/9;border:1px solid rgba(127,211,255,.26);background:#000;overflow:hidden;border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.5)}
     .scene{position:absolute;inset:0;opacity:0;transition:opacity 1.25s ease;background-size:cover;background-position:center;transform:scale(1.025)}
     .scene.active{opacity:1;animation:kenburns 24s ease-in-out infinite alternate}
+    .tyler-intro{overflow:hidden;background:#02070b;transform:none}
+    .tyler-intro.active{animation:none}
+    .intro-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(54,151,196,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(54,151,196,.09) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent)}
+    .intro-kicker{position:absolute;left:6vw;top:9vh;color:#76d8ff;font:700 14px 'Barlow Condensed',sans-serif;letter-spacing:.22em;text-transform:uppercase;transition:opacity .8s ease}
+    .intro-title{position:absolute;left:6vw;top:14vh;margin:0;color:white;font:800 clamp(38px,6vw,88px)/.95 'Barlow Condensed',sans-serif;letter-spacing:.01em;transition:opacity .8s ease}.intro-title small{display:block;margin-top:14px;color:#9ab0be;font:500 clamp(15px,1.5vw,22px) Inter,sans-serif;letter-spacing:.05em}.tyler-intro:not([data-phase="0"]) .intro-kicker,.tyler-intro:not([data-phase="0"]) .intro-title{opacity:0}
+    .intro-phase{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(18px) scale(.985);transition:opacity 1.1s ease,transform 1.1s ease;pointer-events:none}.tyler-intro[data-phase="0"] .phase-0,.tyler-intro[data-phase="1"] .phase-1,.tyler-intro[data-phase="2"] .phase-2,.tyler-intro[data-phase="3"] .phase-3,.tyler-intro[data-phase="4"] .phase-4,.tyler-intro[data-phase="5"] .phase-5,.tyler-intro[data-phase="6"] .phase-6{opacity:1;transform:none}
+    .intro-map{width:min(64vw,980px);height:68vh;object-fit:contain;filter:invert(.91) hue-rotate(180deg) saturate(.7) brightness(.55) contrast(1.5);opacity:.72}.intro-path{position:absolute;left:8vw;right:8vw;bottom:10vh;display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.intro-path span,.cycle span,.system-line span{padding:13px 8px;border:1px solid #2b7393;background:#061722dd;color:#d6f3ff;text-align:center;font:700 clamp(12px,1.4vw,19px) 'Barlow Condensed',sans-serif;text-transform:uppercase}.intro-path span+span::before,.system-line span+span::before{content:'→';position:absolute;margin-left:-2.2vw;color:#61c9f4}
+    .phone-flow,.system-wrap,.realization{width:min(86vw,1120px);padding:30px;border:1px solid #24546a;background:#06131ee8;box-shadow:0 20px 80px #000}.phone-flow h3,.groundhog h3,.system-wrap h3,.realization h3{margin:0 0 24px;color:#fff;font:800 clamp(34px,5vw,72px) 'Barlow Condensed',sans-serif}.phone-steps,.cycle,.system-line{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.phone-steps span{padding:14px 18px;border:1px solid #4fbde8;background:#0b2a3a;color:white;font:700 clamp(13px,1.8vw,24px) 'Barlow Condensed',sans-serif}.phone-flow p{margin:24px 0 0;color:#80cfee;font-size:clamp(14px,1.5vw,20px);letter-spacing:.08em;text-transform:uppercase}
+    .groundhog{text-align:center}.cycle{max-width:1050px}.cycle span{min-width:135px}.cycle-repeat{margin:24px;color:#ffbe55;font:800 clamp(36px,7vw,100px) 'Barlow Condensed',sans-serif;letter-spacing:.07em}.same-row{color:#cbd8df;font:700 clamp(13px,1.5vw,20px) 'Barlow Condensed',sans-serif;word-spacing:1.2em}
+    .system-wrap{text-align:center}.system-line{flex-wrap:nowrap}.system-line span{position:relative;min-width:150px}.system-pulse{margin-top:30px;color:#ffbe55;font:800 clamp(28px,4vw,58px) 'Barlow Condensed',sans-serif}.realization{text-align:center}.realization h3:first-child{color:#89a2b0}.realization .becomes{margin:6px;color:#5bcfff;font-size:36px}.realization h3:last-child{color:#fff}.final-lines{text-align:center;font:800 clamp(34px,5vw,78px)/1.12 'Barlow Condensed',sans-serif}.final-lines span{display:block;margin-top:20px;color:#69d5ff}
     @keyframes kenburns{0%{transform:scale(1.02) translate3d(0,0,0)}100%{transform:scale(1.075) translate3d(-.7%,-.5%,0)}}
     .film::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.38),transparent 34%,transparent 72%,rgba(0,0,0,.16)),linear-gradient(0deg,rgba(0,0,0,.5),transparent 28%);z-index:3}
     .scan{position:absolute;inset:-40% 0 auto 0;height:42%;z-index:4;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(130,224,255,.07),transparent);animation:scan 7s linear infinite}
@@ -73,6 +83,7 @@
       .start-overlay{position:absolute;align-items:flex-start;overflow:auto;padding:14px;background:rgba(2,8,12,.94)}.start-card{width:100%;max-width:none;padding:22px 16px;margin:auto 0;border-radius:14px}.start-card h2{font-size:32px;line-height:1.02}.start-card p{font-size:17px;line-height:1.45}.primary{width:100%;min-height:58px;font-size:19px}
       .controls{grid-template-columns:repeat(3,1fr);gap:8px}.ctrl{min-height:52px;padding:9px 7px;font-size:16px}.voice{grid-column:1/-1;min-height:50px;font-size:16px}.chapters{grid-template-columns:repeat(2,1fr);gap:8px}.chapter-btn{min-height:48px;padding:9px 7px;font-size:13px;white-space:normal}.meta{font-size:12px}.terminal{padding:12px}.terminal button{min-height:44px}
       .end-card{padding:26px 16px}.end-card h2{font-size:34px}.end-actions{display:grid}.end-actions button,.end-actions a{min-width:0;width:100%}
+      .intro-title{left:7vw;right:7vw;top:8vh;font-size:clamp(30px,12vw,52px)}.intro-kicker{left:7vw;top:4vh}.intro-phase{padding:4px}.intro-map{width:94vw;height:34vh;margin-top:-9vh}.intro-path{left:3vw;right:3vw;bottom:3vh;grid-template-columns:repeat(3,1fr)}.intro-path span{padding:6px 3px}.intro-path span+span::before,.system-line span+span::before{display:none}.phone-flow,.system-wrap,.realization{width:148%;padding:14px 10px;transform:scale(.64)}.phone-flow h3,.groundhog h3,.system-wrap h3,.realization h3{margin-bottom:12px}.phone-steps{gap:5px}.phone-steps span{padding:7px}.groundhog{width:155%;transform:scale(.62)}.cycle{gap:5px}.cycle span{min-width:30%;padding:6px 3px}.cycle-repeat{margin:12px}.same-row{line-height:1.55;word-spacing:.2em}.system-line{display:grid;grid-template-columns:1fr 1fr;gap:6px}.system-line span{min-width:0;padding:8px 4px}.system-pulse{margin-top:12px}.final-lines{width:150%;padding:8px;transform:scale(.64)}
     }
     @media(max-width:420px){
       .film{height:590px}.subtitle{font-size:18px;min-height:160px}.start-card h2{font-size:28px}.start-card p{font-size:16px}.voice-note{font-size:11px}
@@ -91,7 +102,17 @@
     </div>
 
     <div class="film" id="film" aria-label="Industrial Asset Graph narrated presentation">
-      <div class="scene active" data-scene="0" style="background-image:url('assets/00_opening.png')"></div>
+      <div class="scene tyler-intro active" data-scene="0" data-phase="0">
+        <div class="intro-grid"></div><div class="intro-kicker">A personal introduction</div><h2 class="intro-title">WHY I STARTED THIS<small>Tyler · Maintenance Electrician</small></h2>
+        <div class="intro-phase phase-0"></div>
+        <div class="intro-phase phase-1"><img class="intro-map" src="../assets/labeled-building-layout.png" alt="J. Lieb Foods facility map"><div class="intro-path"><span>Facility</span><span>Area</span><span>Line</span><span>Machine</span><span>Cabinet</span><span>Device</span></div></div>
+        <div class="intro-phase phase-2"><div class="phone-flow"><h3>PHONE USE → FIELD DOCUMENTATION</h3><div class="phone-steps"><span>PHONE</span><span>CAMERA</span><span>NAMEPLATE</span><span>PHOTO</span><span>ASSET RECORD</span></div><p>Field capture · Photos · Nameplates · Documentation · Verification</p></div></div>
+        <div class="intro-phase phase-3"><div class="groundhog"><div class="cycle"><span>Line call</span><span>Adjustment</span><span>Troubleshoot</span><span>Don</span><span>Line running</span><span>Next call</span></div><div class="cycle-repeat">GROUNDHOG DAY.</div><div class="same-row">SAME PROBLEM · SAME EXPLANATION · SAME CIRCUIT · SAME KNOWLEDGE</div></div></div>
+        <div class="intro-phase phase-4"><div class="system-wrap"><h3>ONE CHANGE AFFECTS THE SYSTEM</h3><div class="system-line"><span>Upstream machine</span><span>Conveyor</span><span>Process</span><span>Downstream machine</span></div><div class="system-pulse">PARAMETER CHANGE → SYSTEM EFFECT</div></div></div>
+        <div class="intro-phase phase-5"><div class="realization"><h3>MY LEARNING TOOL</h3><div class="becomes">↓</div><h3>FACILITY KNOWLEDGE SYSTEM</h3><div class="intro-path"><span>Machines</span><span>Cabinets</span><span>Power</span><span>Documents</span><span>Experience</span><span>Graph</span></div></div></div>
+        <div class="intro-phase phase-6"><div class="final-lines">I STARTED IT TO LEARN THE FACILITY.<span>IT BECAME A WAY FOR THE FACILITY TO REMEMBER.</span></div></div>
+      </div>
+      <div class="scene" data-scene="1" style="background-image:url('assets/00_opening.png')"></div>
       <div class="scene" data-scene="1" style="background-image:url('assets/01_problem.png')"></div>
       <div class="scene" data-scene="2" style="background-image:url('assets/03_one_place.png')"></div>
       <div class="scene" data-scene="3" style="background-image:url('assets/04_build.png')"></div>
@@ -115,6 +136,7 @@
       <div class="end-screen" id="endScreen"><div class="end-card"><small>J. LIEB FOODS · FACILITY KNOWLEDGE · LIVE SYSTEM</small><h2>INDUSTRIAL ASSET GRAPH</h2><div class="end-actions"><button id="endReplay">↻ REPLAY PRESENTATION</button><a href="../">EXPLORE THE ASSET GRAPH</a></div></div></div>
     </div>
 
+    <audio id="tylerNarration" preload="metadata" src="audio/tyler-project-intro.mp3"></audio>
     <audio id="masterNarration" preload="metadata" src="audio/industrial-asset-graph-narration.mp3"></audio>
 
     <div class="controls">
