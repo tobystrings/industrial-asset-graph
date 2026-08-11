@@ -24,7 +24,12 @@ for (const area of areas) {
   if ([x, y, width, height].some((value) => !Number.isFinite(value)) || x < 0 || y < 0 || width <= 0 || height <= 0 || x + width > 100 || y + height > 100) throw new Error(`Invalid overlay coordinates: ${area.id}`);
   for (const assetId of area.assetIds) if (!machines.some((machine) => machine.id === assetId && machine.areaId === area.id)) throw new Error(`Area/asset mismatch: ${area.id} -> ${assetId}`);
 }
-for (const machine of machines) if (!machine.id || !machine.name || !machine.type || !machine.facilityId || !machine.areaId || !machine.manufacturer.value || !machine.model.value) throw new Error(`Machine missing required identity fields: ${machine.id}`);
+for (const machine of machines) {
+  if (!machine.id || !machine.name || !machine.type || !machine.facilityId || !machine.areaId) throw new Error(`Machine missing required identity fields: ${machine.id}`);
+  for (const [label, identity] of [['manufacturer', machine.manufacturer], ['model', machine.model], ['serial number', machine.serialNumber]] as const) {
+    if (identity.value === null && identity.verificationStatus !== 'FIELD_VERIFY') throw new Error(`Machine ${machine.id} has unknown ${label} without FIELD_VERIFY status.`);
+  }
+}
 for (const revision of revisions) if (!revision.entityId || !revision.fieldPath || Number.isNaN(Date.parse(revision.changedAt)) || !revision.changedBy || !revision.reason) throw new Error(`Invalid revision: ${revision.id}`);
 
 const parents = new Map(components.map((item) => [item.id, item.parentId]));
