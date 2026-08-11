@@ -26,6 +26,7 @@ START_PRESENTATION.bat        one-click Windows launcher
 assets/                       existing presenter scenes
 audio/tyler-project-intro.mp3 Tyler's unmodified opening narration
 audio/industrial-asset-graph-narration.mp3 original master film narration
+audio/solana-finale.mp3          Solana Vale's unmodified final narration
 narration.txt                 original spoken script and Tyler intro caption guide
 
 No web server, build step, npm install, or internet connection is required for the film itself.

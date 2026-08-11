@@ -6,7 +6,8 @@
   "outputFormat": "mp3_44100_128",
   "audio": {
     "tylerIntro": "audio/tyler-project-intro.mp3",
-    "mainFilm": "audio/industrial-asset-graph-narration.mp3"
+    "mainFilm": "audio/industrial-asset-graph-narration.mp3",
+    "solanaFinale": "audio/solana-finale.mp3"
   },
   "runtimeRule": "Never call ElevenLabs from the public GitHub Pages client. Generate narration ahead of time and commit only finished audio/timing assets.",
   "scenes": [
@@ -89,6 +90,14 @@
       "filename": "08_closing.mp3",
       "visual": "Presenter stands still in facility. Plant continues operating behind him. Graph lines slowly illuminate equipment. Finish on title card: J. LIEB FOODS \u00b7 FACILITY KNOWLEDGE \u00b7 LIVE SYSTEM / INDUSTRIAL ASSET GRAPH.",
       "narration": "[reflective, sincere]\nA good tradesman fixes the problem in front of him.\n\nA great one leaves the next person with more than he had.\n\nA clear label.\n\nA correct drawing.\n\nA note that saves an hour.\n\nA procedure that prevents a mistake.\n\nAn explanation of why something was done the way it was done.\n\n[quietly]\nFor years, plants have depended on people remembering.\n\nThis is a way to stop asking one person's memory to carry the whole facility.\n\n[confident, final]\nCapture it once.\n\nVerify it in the field.\n\nConnect it to the equipment.\n\nKeep it alive.\n\nSo when experience walks out the door...\n\nthe knowledge doesn't have to go with it.\n\n[pause]\n\nJ. Lieb Foods.\n\nFacility knowledge.\n\nLive system.\n\nIndustrial Asset Graph."
+    },
+    {
+      "id": "F00",
+      "slug": "solana_finale",
+      "title": "Finale — Leave the Knowledge Behind",
+      "filename": "solana-finale.mp3",
+      "visual": "Commercial replacement value recedes as Solana reframes the project around knowledge transfer, continuity, and the facility's permanent memory.",
+      "narration": "So... we've put a number on the software.\n\nRoughly two hundred thousand dollars to reproduce this kind of system commercially.\n\nNot bad for something being built by the electrician who is also trying to learn the entire plant.\n\nBut here's the important part.\n\nThat number isn't really why this project matters.\n\nTyler started building this because he needed a better way to understand the facility.\n\nAnd while following Don, he discovered something much bigger.\n\nA tremendous amount of what keeps this place running isn't written down.\n\nIt's experience.\n\nIt's knowing which adjustment affects the machine twenty feet down the line.\n\nIt's knowing where to look first when something fails.\n\nIt's knowing which drawing is wrong, which modification was made years ago, and which little problem isn't little at all.\n\nDon spent years learning those things.\n\nTyler's job now is to learn them too.\n\nBut this time, instead of keeping all of that knowledge inside one electrician's head, they're leaving a map behind.\n\nFor maintenance.\n\nFor production.\n\nFor the next electrician.\n\nAnd for whoever comes after that.\n\nSo perhaps the real accomplishment here isn't building a two-hundred-thousand-dollar piece of software.\n\nIt's making sure we never have to start from zero again.\n\nAnd maybe, when Don finally gets to retire...\n\nhe can switch his phone off...\n\nsleep through the night...\n\nand know that when something breaks, seventy-plus people aren't waiting for somebody to call the retired electrician.\n\nThe equipment will change.\n\nPeople will change.\n\nThis facility will change.\n\nBut the knowledge doesn't have to disappear with them.\n\nThat's the Industrial Asset Graph.\n\nNot just a record of what this facility has...\n\nbut a record of what this facility knows."
     }
   ]
 }
