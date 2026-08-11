@@ -37,6 +37,20 @@ const commands = {
   help: 'Controls: Play/Pause · Previous/Next · Captions · Replay · Fullscreen\nUse the chapter buttons to move through the film.'
 };
 
+const fallbackScenes = [
+  ['Introduction', 'Tyler Intro — Why I Started This'],
+  ['Opening', 'Cold Open — What a Plant Really Runs On'],
+  ['01', 'The Problem — Knowledge Walks Out the Door'],
+  ['02', 'The Answer — Industrial Asset Graph'],
+  ['03', 'Capture Reality — Evidence, Not Guesswork'],
+  ['04', 'Build the Standard — Line 2 Control Cabinet'],
+  ['05', 'Capture the Human Knowledge'],
+  ['06', 'When the Line Stops'],
+  ['07', 'What We Are Actually Building'],
+  ['Closing', 'Closing — Leave the Knowledge Behind'],
+  ['Finale', 'Finale — Leave the Knowledge Behind']
+].map(([num, title], index) => ({ num, title, shortTitle: title.split(' — ')[0], captions: [], index }));
+
 function cleanCaptions(text) {
   return text.split(/\n\s*\n/).map(line => line.replace(/\[[^\]]+\]/g, '').replace(/\s+/g, ' ').trim()).filter(Boolean);
 }
@@ -266,6 +280,11 @@ $('#fullBtn').addEventListener('click', () => {
   else document.exitFullscreen?.();
 });
 $$('[data-command]').forEach(button => button.addEventListener('click', () => { terminalOutput.textContent = commands[button.dataset.command]; }));
+
+chapters = fallbackScenes;
+buildChapterButtons();
+updateScene(0);
+markReady();
 
 fetch('narration-manifest.json')
   .then(response => { if (!response.ok) throw new Error(`Narration manifest: ${response.status}`); return response.json(); })
