@@ -1,0 +1,82 @@
+{
+  "project": "J. Lieb Foods Industrial Asset Graph \u2014 Narrated Presentation",
+  "narratorCharacter": "Veteran industrial electrician / maintenance tradesman",
+  "ttsProvider": "ElevenLabs",
+  "preferredModel": "eleven_v3",
+  "outputFormat": "mp3_44100_128",
+  "runtimeRule": "Never call ElevenLabs from the public GitHub Pages client. Generate narration ahead of time and commit only finished audio/timing assets.",
+  "scenes": [
+    {
+      "id": "00",
+      "slug": "cold_open",
+      "title": "Cold Open \u2014 What a Plant Really Runs On",
+      "filename": "00_cold_open.mp3",
+      "visual": "Black screen into real industrial details: disconnect handle, motor fan, conduit, cabinet latch, VFD display, production line. Presenter emerges in a real industrial environment.",
+      "narration": "[calm, experienced]\nEvery plant has equipment.\n\nPanels. Motors. Drives. Control cabinets. Conveyors. Sensors. Valves. Miles of wire.\n\nYou can put a manufacturer and a model number on most of it.\n\nBut that isn't the hardest thing in this building to replace.\n\n[reflective]\nThe hard part is knowing why it's there.\n\nWhere it gets power.\nWhat else depends on it.\nWhat somebody changed ten years ago.\nWhat alarm really means what.\nAnd what you check first... when the line goes down.\n\n[more serious]\nThat knowledge usually doesn't live in a drawing.\n\nIt lives in people.\n\nAnd people eventually leave."
+    },
+    {
+      "id": "01",
+      "slug": "the_problem",
+      "title": "The Problem \u2014 Knowledge Walks Out the Door",
+      "filename": "01_the_problem.mp3",
+      "visual": "Presenter walks past old panels and production equipment. Overlay old drawings, handwritten notes, phone photos, binders, unlabeled cabinet details. End on silhouette of experienced electrician walking away.",
+      "narration": "[serious, understated]\nAt J. Lieb Foods, a lot of this facility was built, modified, repaired, and kept running by people who know it from experience.\n\nOne of the people carrying a huge amount of that knowledge is an electrician with decades in the trade and years inside this plant.\n\nHe knows the production lines because he helped wire them.\n\nHe knows which cabinet actually feeds what.\nWhich modification never made it onto a print.\nWhich fault looks serious but usually starts with one simple check.\nWhich spare part matters.\nWhich machine has a habit nobody would know unless somebody told them.\n\n[pause, reflective]\nWhen that experience retires, the person may leave...\n\nbut the plant still needs the knowledge.\n\nIf we don't capture it, the next electrician starts paying for it again.\n\nIn troubleshooting time.\nIn wire tracing.\nIn downtime.\nIn repeated mistakes.\n\nAnd sometimes... in the middle of production."
+    },
+    {
+      "id": "02",
+      "slug": "the_answer",
+      "title": "The Answer \u2014 Industrial Asset Graph",
+      "filename": "02_the_answer.mp3",
+      "visual": "Dark blueprint/graph interface grows from Facility node into Area/Line, Cabinet, Machine, Device, Documentation. Presenter gestures toward floating graph relationships.",
+      "narration": "[confident, practical]\nThat's what the Industrial Asset Graph is meant to solve.\n\nNot another folder full of pictures.\n\nNot another binder that gets set on a shelf.\n\nA living map of the facility's working knowledge.\n\nStart at the facility.\n\nMove into an area or production line.\n\nOpen a machine.\n\nOpen a control cabinet.\n\nThen drill all the way down to the device that matters.\n\nPLC.\nVFD.\nPower supply.\nContactor.\nRelay.\nTerminal block.\nSensor.\nMotor.\n\nAnd from every one of those points, see the relationships around it.\n\nWhat feeds it.\nWhat it feeds.\nWhere it is.\nWhat controls it.\nWhat documentation exists.\nWhat has been verified in the field.\n\n[slightly emphatic]\nThe goal isn't to collect information.\n\nThe goal is to make the right information usable... when somebody actually needs it."
+    },
+    {
+      "id": "03",
+      "slug": "capture_reality",
+      "title": "Capture Reality \u2014 Evidence, Not Guesswork",
+      "filename": "03_capture_reality.mp3",
+      "visual": "Real field photos flow into structured cards. Cabinet photo becomes black-and-white schematic layout. Status badges appear: Verified, Field Verify, Inferred, Disputed, Retired.",
+      "narration": "[matter-of-fact]\nThe system has to reflect the plant as it actually exists.\n\nThat means field photos.\n\nNameplates.\n\nCabinet layouts.\n\nPanel and circuit sources.\n\nVoltage and control power.\n\nDevice manufacturer, model, and serial information.\n\nVFD parameters.\n\nPLC and I/O information.\n\nSafety devices and interlocks.\n\nCommunications.\n\nProcedures.\n\nTroubleshooting notes.\n\nKnown weak points.\n\nUndocumented modifications.\n\nAnd the things an experienced electrician says you need to know before you touch it.\n\n[firm]\nAnd just as important... we don't pretend a guess is a fact.\n\nInformation can be marked Verified.\n\nField Verify.\n\nInferred.\n\nDisputed.\n\nOr Retired.\n\nThat matters.\n\nBecause bad documentation with a confident label can be worse than no documentation at all."
+    },
+    {
+      "id": "04",
+      "slug": "line2_standard",
+      "title": "Build the Standard \u2014 Line 2 Control Cabinet",
+      "filename": "04_line2_standard.mp3",
+      "visual": "Zoom to Line 2. Show control cabinet exterior, then interior image, then schematic-style device placement without conductors. Click cabinet devices individually.",
+      "narration": "[practical, focused]\nThe way to build a system like this is not to try to document an entire factory in one shot.\n\nYou build one piece correctly.\n\nThen make that the standard.\n\nFor us, that means taking a control cabinet on Line Two and documenting it deeply enough that somebody else can use it.\n\nIts location.\n\nIts purpose.\n\nIts incoming power.\n\nIts disconnect.\n\nEvery major device inside.\n\nWhere each device sits in the cabinet.\n\nWhat the device is.\n\nWhat it talks to.\n\nWhat talks to it.\n\nThen we make the cabinet interactive.\n\nClick the cabinet.\n\nSee the layout.\n\nClick the drive.\n\nOpen the drive record.\n\nClick the PLC.\n\nOpen the PLC record.\n\nClick a relay or contactor and see what we've captured about it.\n\n[confident]\nOnce one cabinet works from top to bottom, we aren't inventing the process anymore.\n\nWe're repeating it."
+    },
+    {
+      "id": "05",
+      "slug": "knowledge_capture",
+      "title": "Capture the Human Knowledge",
+      "filename": "05_knowledge_capture.mp3",
+      "visual": "Presenter beside retiring electrician silhouette / empty workbench. On-screen cards populate: Startup, Shutdown, Reset, Recovery, Recurring Failure, Weak Point, Modification, Critical Spare, Alarm Cause.",
+      "narration": "[warmer, reflective]\nThe drawings tell us what the system was supposed to be.\n\nThe people tell us what happened after that.\n\nThat's why this project has another job.\n\nCapture the human knowledge while we still can.\n\nHow do you start it?\n\nHow do you shut it down?\n\nHow do you reset it after a fault?\n\nWhat usually causes that alarm?\n\nWhat fails more often than it should?\n\nWhat modification was made in the field?\n\nWhat part should already be sitting on the shelf?\n\nWhat do you check before you spend an hour tracing wires?\n\nAnd maybe the most important question of all...\n\n[gentle emphasis]\nWhat do you know about this machine that nobody has ever written down?\n\nThat's the information that turns documentation into knowledge."
+    },
+    {
+      "id": "06",
+      "slug": "failure_scenario",
+      "title": "When the Line Stops",
+      "filename": "06_failure_scenario.mp3",
+      "visual": "Production scene freezes, warning light pulses, sound drops. UI search opens. User navigates Line 2 \u2192 Cabinet \u2192 Device \u2192 Troubleshooting/relationship record. Presenter remains calm.",
+      "narration": "[serious, controlled]\nNow picture the reason this matters.\n\nIt's two in the morning.\n\nA line stops.\n\nThe person who normally knows that machine isn't there.\n\nYou can start opening cabinets and tracing conductors.\n\nYou can search through old PDFs.\n\nYou can scroll through somebody's phone pictures.\n\nYou can call somebody at home.\n\nOr...\n\nyou can open the asset graph.\n\nFind the line.\n\nFind the cabinet.\n\nFind the device.\n\nSee the power source.\n\nSee the relationships.\n\nSee the field photo.\n\nSee the last known notes.\n\nSee the known failure.\n\nSee the reset or recovery procedure.\n\n[pause]\nThat doesn't replace a good electrician.\n\nIt gives the good electrician a better starting point.\n\nAnd in maintenance... a better starting point can save a whole lot of time."
+    },
+    {
+      "id": "07",
+      "slug": "what_we_are_building",
+      "title": "What We Are Actually Building",
+      "filename": "07_what_we_are_building.mp3",
+      "visual": "Fast cinematic montage: building map, service entrance H1/H2/H3, gutters, cabinet nodes, machine records, photos, diagrams, search, relationship graph.",
+      "narration": "[confident, building momentum]\nSo this project is bigger than a website.\n\nWe're building a facility memory.\n\nA map that connects the physical plant to the electrical system, controls, machines, devices, documents, procedures, and field experience behind them.\n\nA place where a service entrance can connect to its downstream equipment.\n\nA cabinet can connect to its devices.\n\nA machine can connect to its procedures.\n\nA component can connect to its replacement information.\n\nA photograph can connect to the exact asset it proves.\n\nAnd a technician can move through those relationships without already knowing where the answer is hidden.\n\n[measured]\nIt will never be finished in the sense that a plant is never finished.\n\nEquipment changes.\n\nPeople learn things.\n\nModifications happen.\n\nThe graph changes with it.\n\nThat's why it is a live system."
+    },
+    {
+      "id": "08",
+      "slug": "closing",
+      "title": "Closing \u2014 Leave the Knowledge Behind",
+      "filename": "08_closing.mp3",
+      "visual": "Presenter stands still in facility. Plant continues operating behind him. Graph lines slowly illuminate equipment. Finish on title card: J. LIEB FOODS \u00b7 FACILITY KNOWLEDGE \u00b7 LIVE SYSTEM / INDUSTRIAL ASSET GRAPH.",
+      "narration": "[reflective, sincere]\nA good tradesman fixes the problem in front of him.\n\nA great one leaves the next person with more than he had.\n\nA clear label.\n\nA correct drawing.\n\nA note that saves an hour.\n\nA procedure that prevents a mistake.\n\nAn explanation of why something was done the way it was done.\n\n[quietly]\nFor years, plants have depended on people remembering.\n\nThis is a way to stop asking one person's memory to carry the whole facility.\n\n[confident, final]\nCapture it once.\n\nVerify it in the field.\n\nConnect it to the equipment.\n\nKeep it alive.\n\nSo when experience walks out the door...\n\nthe knowledge doesn't have to go with it.\n\n[pause]\n\nJ. Lieb Foods.\n\nFacility knowledge.\n\nLive system.\n\nIndustrial Asset Graph."
+    }
+  ]
+}
