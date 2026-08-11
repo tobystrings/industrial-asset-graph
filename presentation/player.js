@@ -20,6 +20,7 @@ const introScene = $('.tyler-intro');
 // introduction is a separate permanent first scene and advances on audio ended.
 const cueFractions = [0, .0849, .2173, .3324, .4302, .5571, .6676, .7780, .8942];
 const introPhaseFractions = [0, .10, .27, .43, .60, .75, .90];
+const knownDurations = { intro: 132.859, master: 278.021 };
 let chapters = [];
 let sceneIndex = 0;
 let captionsEnabled = true;
@@ -42,15 +43,17 @@ function formatTime(seconds) {
   return `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2, '0')}`;
 }
 
-function totalDuration() { return introAudio.duration + masterAudio.duration; }
-function elapsedTime() { return sceneIndex === 0 ? introAudio.currentTime : introAudio.duration + masterAudio.currentTime; }
+function introDuration() { return Number.isFinite(introAudio.duration) ? introAudio.duration : knownDurations.intro; }
+function masterDuration() { return Number.isFinite(masterAudio.duration) ? masterAudio.duration : knownDurations.master; }
+function totalDuration() { return introDuration() + masterDuration(); }
+function elapsedTime() { return sceneIndex === 0 ? introAudio.currentTime : introDuration() + masterAudio.currentTime; }
 function activeAudio() { return sceneIndex === 0 ? introAudio : masterAudio; }
 
-function masterSceneStart(globalIndex) { return cueFractions[globalIndex - 1] * masterAudio.duration; }
-function masterSceneEnd(globalIndex) { return globalIndex < cueFractions.length ? cueFractions[globalIndex] * masterAudio.duration : masterAudio.duration; }
+function masterSceneStart(globalIndex) { return cueFractions[globalIndex - 1] * masterDuration(); }
+function masterSceneEnd(globalIndex) { return globalIndex < cueFractions.length ? cueFractions[globalIndex] * masterDuration() : masterDuration(); }
 function masterSceneAt(time) {
   let result = 1;
-  cueFractions.forEach((fraction, index) => { if (time >= fraction * masterAudio.duration) result = index + 1; });
+  cueFractions.forEach((fraction, index) => { if (time >= fraction * masterDuration()) result = index + 1; });
   return result;
 }
 
@@ -58,14 +61,14 @@ function captionAt(index, time) {
   const lines = chapters[index]?.captions || [];
   if (!lines.length) return '';
   const start = index === 0 ? 0 : masterSceneStart(index);
-  const end = index === 0 ? introAudio.duration : masterSceneEnd(index);
+  const end = index === 0 ? introDuration() : masterSceneEnd(index);
   const position = Math.min(.999, Math.max(0, (time - start) / Math.max(.1, end - start)));
   return lines[Math.floor(position * lines.length)];
 }
 
 function updateIntroVisuals() {
-  if (!introScene || !Number.isFinite(introAudio.duration)) return;
-  const position = introAudio.currentTime / introAudio.duration;
+  if (!introScene) return;
+  const position = introAudio.currentTime / introDuration();
   let phase = 0;
   introPhaseFractions.forEach((fraction, index) => { if (position >= fraction) phase = index; });
   introScene.dataset.phase = String(phase);
@@ -119,7 +122,8 @@ async function playActiveAudio() {
 
 function resetAudio() {
   introAudio.pause(); masterAudio.pause();
-  introAudio.currentTime = 0; masterAudio.currentTime = 0;
+  if (introAudio.readyState) introAudio.currentTime = 0;
+  if (masterAudio.readyState) masterAudio.currentTime = 0;
 }
 
 function startPresentation() {
@@ -144,11 +148,13 @@ function goToScene(index) {
   const wasPlaying = !activeAudio().paused;
   introAudio.pause(); masterAudio.pause();
   updateScene(next);
-  if (next === 0) { introAudio.currentTime = .01; updateIntroVisuals(); }
-  else { masterAudio.currentTime = masterSceneStart(next) + .01; }
+  const targetAudio = activeAudio();
+  const targetTime = next === 0 ? .01 : masterSceneStart(next) + .01;
+  const seek = () => { targetAudio.currentTime = targetTime; if (wasPlaying) playActiveAudio(); };
+  if (targetAudio.readyState) seek(); else { targetAudio.load(); targetAudio.addEventListener('loadedmetadata', seek, { once: true }); }
   if (captionsEnabled) subtitle.textContent = captionAt(next, activeAudio().currentTime);
   updateProgress();
-  if (wasPlaying) playActiveAudio(); else setPlayingUi(false);
+  if (!wasPlaying) setPlayingUi(false);
 }
 
 function buildChapterButtons() {
@@ -164,7 +170,7 @@ function buildChapterButtons() {
 }
 
 function markReady() {
-  if (!chapters.length || introAudio.readyState < 1 || masterAudio.readyState < 1) return;
+  if (!chapters.length) return;
   ready = true;
   $('#startBtn').disabled = false;
   statusText.textContent = `Ready · ${formatTime(totalDuration())} narrated film`;
@@ -182,10 +188,14 @@ masterAudio.addEventListener('timeupdate', updateFromMaster);
 });
 introAudio.addEventListener('ended', () => {
   updateScene(1);
-  masterAudio.currentTime = 0;
-  if (captionsEnabled) subtitle.textContent = captionAt(1, 0);
-  updateProgress();
-  playActiveAudio();
+  const beginMainFilm = () => {
+    masterAudio.currentTime = 0;
+    if (captionsEnabled) subtitle.textContent = captionAt(1, 0);
+    updateProgress();
+    playActiveAudio();
+  };
+  if (masterAudio.readyState) beginMainFilm();
+  else { masterAudio.load(); masterAudio.addEventListener('loadedmetadata', beginMainFilm, { once: true }); }
 });
 masterAudio.addEventListener('ended', () => {
   updateScene(chapters.length - 1);
