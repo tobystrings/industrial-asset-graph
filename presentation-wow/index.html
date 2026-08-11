@@ -34,7 +34,7 @@
 
   <aside class="rail mono" aria-label="Presentation sections">
     <a href="#opening" data-label="OPEN"></a><a href="#problem" data-label="RISK"></a>
-    <a href="#stakes" data-label="CONTEXT"></a><a href="#system" data-label="SYSTEM"></a>
+    <a href="#stakes" data-label="CONTEXT"></a><a href="#incident" data-label="INCIDENT"></a><a href="#system" data-label="SYSTEM"></a>
     <a href="#evidence" data-label="EVIDENCE"></a><a href="#capture" data-label="CAPTURE"></a><a href="#graph" data-label="GRAPH"></a>
     <a href="#value" data-label="VALUE"></a><a href="#close" data-label="CLOSE"></a>
   </aside>
@@ -83,6 +83,30 @@
         <span>POWER SOURCES</span><span>CONTROL LOGIC</span><span>DEVICE LOCATIONS</span><span>HISTORICAL MODIFICATIONS</span><span>TROUBLESHOOTING TECHNIQUES</span><span>EQUIPMENT QUIRKS</span><span>SAFETY INTERLOCKS</span><span>UPSTREAM / DOWNSTREAM RELATIONSHIPS</span>
       </div>
       <p class="thesis reveal">The value lives in <b>how everything connects.</b></p>
+    </section>
+
+    <section class="scene incident" id="incident">
+      <div class="section-tag mono">REAL INCIDENT / MOTOR DOWN</div>
+      <div class="incident-head">
+        <h2 class="reveal">The motor stopped.<br><span>The search started.</span></h2>
+        <p class="reveal">What looked like one failed component became a chain of people, parts, parameters, and mechanical compatibility.</p>
+      </div>
+      <div class="incident-track reveal">
+        <article style="--i:0"><small>01</small><b>MOTOR<br>STOPPED</b><p>The first diagnosis was a failed motor.</p></article>
+        <article style="--i:1"><small>02</small><b>EXPERT<br>AWAY</b><p>Don was unavailable until late afternoon—possibly the next morning.</p></article>
+        <article style="--i:2"><small>03</small><b>PARTS<br>BY RADIO</b><p>Brad made repeated trips upstairs while the team called down which parts to bring.</p></article>
+        <article style="--i:3"><small>04</small><b>FIT + SIZE<br>UNCERTAIN</b><p>Same size or larger? The shaft also had to match the existing gearbox.</p></article>
+        <article style="--i:4"><small>05</small><b>THREE<br>MOTORS</b><p>A second swap brought in a third motor—but production was still down.</p></article>
+        <article style="--i:5"><small>06</small><b>DIAGNOSIS<br>SHIFTS</b><p>Jim concluded that the drive, not the motor, had to be the issue.</p></article>
+        <article style="--i:6"><small>07</small><b>DRIVE<br>LOCATED</b><p>Doug knew where the replacement was stored and directed the electrician to it.</p></article>
+        <article style="--i:7"><small>08</small><b>NOT A DIRECT<br>REPLACEMENT</b><p>The new electrician installed it, connected the replacement motor, and restored production.</p></article>
+        <article style="--i:8"><small>09</small><b>MANUAL<br>CROSSOVER</b><p>When Don arrived, he reviewed the work and cross-referenced two manuals to map every input and output circuit.</p></article>
+      </div>
+      <div class="incident-conclusion reveal">
+        <span class="mono">WITH THE ASSET GRAPH</span>
+        <strong>Correct spare motor. Shaft and gearbox compatibility. Drive location. Parameters. PLC I/O crossover. Known immediately.</strong>
+        <em>Fewer trips. Fewer swaps. Faster production recovery.</em>
+      </div>
     </section>
 
     <section class="scene system" id="system">
