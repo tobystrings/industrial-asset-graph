@@ -3,6 +3,7 @@ const $$ = selector => [...document.querySelectorAll(selector)];
 
 const introAudio = $('#tylerNarration');
 const masterAudio = $('#masterNarration');
+const finaleAudio = $('#solanaNarration');
 const startOverlay = $('#startOverlay');
 const endScreen = $('#endScreen');
 const subtitle = $('#subtitle');
@@ -15,12 +16,14 @@ const runtime = $('#runtime');
 const terminal = $('#terminal');
 const terminalOutput = $('#terminalOutput');
 const introScene = $('.tyler-intro');
+const finaleScene = $('.solana-finale');
 
 // The original film remains one continuous 4:38 master track. Tyler's supplied
 // introduction is a separate permanent first scene and advances on audio ended.
 const cueFractions = [0, .0849, .2173, .3324, .4302, .5571, .6676, .7780, .8942];
 const introPhaseFractions = [0, .10, .27, .43, .60, .75, .90];
-const knownDurations = { intro: 132.859, master: 278.021 };
+const finalePhaseFractions = [0, .16, .38, .62, .78, .91];
+const knownDurations = { intro: 132.859, master: 278.021, finale: 118.544 };
 let chapters = [];
 let sceneIndex = 0;
 let captionsEnabled = true;
@@ -45,9 +48,10 @@ function formatTime(seconds) {
 
 function introDuration() { return Number.isFinite(introAudio.duration) ? introAudio.duration : knownDurations.intro; }
 function masterDuration() { return Number.isFinite(masterAudio.duration) ? masterAudio.duration : knownDurations.master; }
-function totalDuration() { return introDuration() + masterDuration(); }
-function elapsedTime() { return sceneIndex === 0 ? introAudio.currentTime : introDuration() + masterAudio.currentTime; }
-function activeAudio() { return sceneIndex === 0 ? introAudio : masterAudio; }
+function finaleDuration() { return Number.isFinite(finaleAudio.duration) ? finaleAudio.duration : knownDurations.finale; }
+function totalDuration() { return introDuration() + masterDuration() + finaleDuration(); }
+function elapsedTime() { return sceneIndex === 0 ? introAudio.currentTime : sceneIndex === chapters.length - 1 ? introDuration() + masterDuration() + finaleAudio.currentTime : introDuration() + masterAudio.currentTime; }
+function activeAudio() { return sceneIndex === 0 ? introAudio : sceneIndex === chapters.length - 1 ? finaleAudio : masterAudio; }
 
 function masterSceneStart(globalIndex) { return cueFractions[globalIndex - 1] * masterDuration(); }
 function masterSceneEnd(globalIndex) { return globalIndex < cueFractions.length ? cueFractions[globalIndex] * masterDuration() : masterDuration(); }
@@ -60,8 +64,9 @@ function masterSceneAt(time) {
 function captionAt(index, time) {
   const lines = chapters[index]?.captions || [];
   if (!lines.length) return '';
-  const start = index === 0 ? 0 : masterSceneStart(index);
-  const end = index === 0 ? introDuration() : masterSceneEnd(index);
+  const isFinale = index === chapters.length - 1;
+  const start = index === 0 || isFinale ? 0 : masterSceneStart(index);
+  const end = index === 0 ? introDuration() : isFinale ? finaleDuration() : masterSceneEnd(index);
   const position = Math.min(.999, Math.max(0, (time - start) / Math.max(.1, end - start)));
   return lines[Math.floor(position * lines.length)];
 }
@@ -74,13 +79,21 @@ function updateIntroVisuals() {
   introScene.dataset.phase = String(phase);
 }
 
+function updateFinaleVisuals() {
+  if (!finaleScene) return;
+  const position = finaleAudio.currentTime / finaleDuration();
+  let phase = 0;
+  finalePhaseFractions.forEach((fraction, index) => { if (position >= fraction) phase = index; });
+  finaleScene.dataset.phase = String(phase);
+}
+
 function updateScene(index = sceneIndex) {
   sceneIndex = Math.max(0, Math.min(chapters.length - 1, index));
   $$('.scene').forEach((element, i) => element.classList.toggle('active', i === sceneIndex));
   $$('.chapter-btn').forEach((element, i) => element.classList.toggle('active', i === sceneIndex));
   chapterNum.textContent = chapters[sceneIndex]?.num || '';
   chapterTitle.textContent = chapters[sceneIndex]?.title || '';
-  terminal.classList.toggle('show', sceneIndex === chapters.length - 1);
+  terminal.classList.toggle('show', sceneIndex === chapters.length - 2);
 }
 
 function updateProgress() {
@@ -98,10 +111,18 @@ function updateFromIntro() {
 }
 
 function updateFromMaster() {
-  if (!ready || sceneIndex === 0) return;
+  if (!ready || sceneIndex === 0 || sceneIndex === chapters.length - 1) return;
   const nextScene = masterSceneAt(masterAudio.currentTime);
   if (nextScene !== sceneIndex) updateScene(nextScene);
   if (captionsEnabled) subtitle.textContent = captionAt(sceneIndex, masterAudio.currentTime);
+  updateProgress();
+}
+
+
+function updateFromFinale() {
+  if (!ready || sceneIndex !== chapters.length - 1) return;
+  updateFinaleVisuals();
+  if (captionsEnabled) subtitle.textContent = captionAt(sceneIndex, finaleAudio.currentTime);
   updateProgress();
 }
 
@@ -121,9 +142,10 @@ async function playActiveAudio() {
 }
 
 function resetAudio() {
-  introAudio.pause(); masterAudio.pause();
+  introAudio.pause(); masterAudio.pause(); finaleAudio.pause();
   if (introAudio.readyState) introAudio.currentTime = 0;
   if (masterAudio.readyState) masterAudio.currentTime = 0;
+  if (finaleAudio.readyState) finaleAudio.currentTime = 0;
 }
 
 function startPresentation() {
@@ -146,10 +168,10 @@ function goToScene(index) {
   if (!ready) return;
   const next = Math.max(0, Math.min(chapters.length - 1, index));
   const wasPlaying = !activeAudio().paused;
-  introAudio.pause(); masterAudio.pause();
+  introAudio.pause(); masterAudio.pause(); finaleAudio.pause();
   updateScene(next);
   const targetAudio = activeAudio();
-  const targetTime = next === 0 ? .01 : masterSceneStart(next) + .01;
+  const targetTime = next === 0 || next === chapters.length - 1 ? .01 : masterSceneStart(next) + .01;
   const seek = () => { targetAudio.currentTime = targetTime; if (wasPlaying) playActiveAudio(); };
   if (targetAudio.readyState) seek(); else { targetAudio.load(); targetAudio.addEventListener('loadedmetadata', seek, { once: true }); }
   if (captionsEnabled) subtitle.textContent = captionAt(next, activeAudio().currentTime);
@@ -178,10 +200,11 @@ function markReady() {
   updateScene(0); updateIntroVisuals();
 }
 
-[introAudio, masterAudio].forEach(item => item.addEventListener('loadedmetadata', markReady));
+[introAudio, masterAudio, finaleAudio].forEach(item => item.addEventListener('loadedmetadata', markReady));
 introAudio.addEventListener('timeupdate', updateFromIntro);
 masterAudio.addEventListener('timeupdate', updateFromMaster);
-[introAudio, masterAudio].forEach(item => {
+finaleAudio.addEventListener('timeupdate', updateFromFinale);
+[introAudio, masterAudio, finaleAudio].forEach(item => {
   item.addEventListener('play', () => setPlayingUi(true));
   item.addEventListener('pause', () => { if (!item.ended && item.currentTime > 0 && item === activeAudio()) setPlayingUi(false); });
   item.addEventListener('error', () => { statusText.textContent = 'Narration could not load. Refresh and try again.'; });
@@ -199,8 +222,20 @@ introAudio.addEventListener('ended', () => {
 });
 masterAudio.addEventListener('ended', () => {
   updateScene(chapters.length - 1);
+  const beginFinale = () => {
+    finaleAudio.currentTime = 0;
+    updateFinaleVisuals();
+    if (captionsEnabled) subtitle.textContent = captionAt(sceneIndex, 0);
+    updateProgress();
+    playActiveAudio();
+  };
+  if (finaleAudio.readyState) beginFinale();
+  else { finaleAudio.load(); finaleAudio.addEventListener('loadedmetadata', beginFinale, { once: true }); }
+});
+finaleAudio.addEventListener('ended', () => {
+  updateScene(chapters.length - 1);
   progressBar.style.width = '100%';
-  subtitle.textContent = 'When experience leaves, the knowledge does not have to leave with it.';
+  subtitle.textContent = 'A record of what this facility knows.';
   playBtn.textContent = '↻ Replay';
   statusText.textContent = 'Presentation complete';
   endScreen.classList.add('show');
@@ -209,7 +244,7 @@ masterAudio.addEventListener('ended', () => {
 $('#startBtn').disabled = true;
 $('#startBtn').addEventListener('click', startPresentation);
 playBtn.addEventListener('click', () => {
-  if (masterAudio.ended || (sceneIndex === chapters.length - 1 && masterAudio.currentTime >= masterAudio.duration - .1)) replayPresentation();
+  if (finaleAudio.ended || (sceneIndex === chapters.length - 1 && finaleAudio.currentTime >= finaleDuration() - .1)) replayPresentation();
   else if (activeAudio().paused) playActiveAudio();
   else activeAudio().pause();
 });
@@ -217,12 +252,12 @@ $('#prevBtn').addEventListener('click', () => goToScene(sceneIndex - 1));
 $('#nextBtn').addEventListener('click', () => goToScene(sceneIndex + 1));
 $('#replayBtn').addEventListener('click', replayPresentation);
 $('#endReplay').addEventListener('click', replayPresentation);
-$('#exitBtn').addEventListener('click', () => { introAudio.pause(); masterAudio.pause(); location.href = '../'; });
+$('#exitBtn').addEventListener('click', () => { introAudio.pause(); masterAudio.pause(); finaleAudio.pause(); location.href = '../'; });
 $('#ccBtn').addEventListener('click', event => {
   captionsEnabled = !captionsEnabled;
   subtitle.classList.toggle('hide', !captionsEnabled);
   event.currentTarget.textContent = captionsEnabled ? 'CC On' : 'CC Off';
-  if (captionsEnabled) sceneIndex === 0 ? updateFromIntro() : updateFromMaster();
+  if (captionsEnabled) sceneIndex === 0 ? updateFromIntro() : sceneIndex === chapters.length - 1 ? updateFromFinale() : updateFromMaster();
 });
 $('#fullBtn').addEventListener('click', () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
@@ -234,7 +269,7 @@ fetch('narration-manifest.json')
   .then(response => { if (!response.ok) throw new Error(`Narration manifest: ${response.status}`); return response.json(); })
   .then(manifest => {
     chapters = manifest.scenes.map((scene, index) => ({
-      num: scene.id === 'T00' ? 'Introduction' : scene.id === '00' ? 'Opening' : scene.id === '08' ? 'Closing' : scene.id,
+      num: scene.id === 'T00' ? 'Introduction' : scene.id === '00' ? 'Opening' : scene.id === '08' ? 'Closing' : scene.id === 'F00' ? 'Finale' : scene.id,
       title: scene.title,
       shortTitle: scene.title.split(' — ')[0],
       captions: cleanCaptions(scene.narration),
