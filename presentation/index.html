@@ -42,13 +42,13 @@
     .start-card p{color:#d3dce3;line-height:1.5;margin:0 auto 20px;max-width:650px}
     .primary{border:0;border-radius:999px;background:var(--green);color:#091007;font-weight:900;padding:14px 24px;letter-spacing:.04em}
     .primary:hover{filter:brightness(1.07)}
-    .controls{display:grid;grid-template-columns:auto auto auto auto 1fr auto;gap:8px;margin-top:12px;align-items:center}
+    .controls{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:12px;align-items:center}
     .ctrl{border:1px solid rgba(135,207,243,.25);background:#0a131b;color:var(--text);border-radius:10px;padding:10px 13px;min-height:42px}
     .ctrl:hover{border-color:rgba(135,207,243,.55)}
     .voice{min-width:0;width:100%;background:#0a131b;color:var(--text);border:1px solid rgba(135,207,243,.25);border-radius:10px;padding:10px}
     .progress{height:6px;background:#101820;border-radius:999px;overflow:hidden;margin-top:10px}
     .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .35s ease}
-    .chapters{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:10px}
+    .chapters{display:grid;grid-template-columns:repeat(9,1fr);gap:7px;margin-top:10px}
     .chapter-btn{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:var(--muted);border-radius:9px;padding:8px 5px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .chapter-btn.active{color:#071119;background:var(--cyan);border-color:transparent;font-weight:800}
     .terminal{display:none;margin-top:12px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(7,21,30,.96),rgba(3,12,17,.96));border-radius:14px;padding:15px}
@@ -59,6 +59,8 @@
     .meta{display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:13px;margin-top:10px;flex-wrap:wrap}
     .badge{color:var(--green)}
     .voice-note{color:var(--muted);font-size:12px;margin-top:7px}
+    .end-screen{position:absolute;inset:0;z-index:35;display:none;align-items:center;justify-content:center;padding:24px;text-align:center;background:rgba(2,8,12,.93);backdrop-filter:blur(8px)}
+    .end-screen.show{display:flex}.end-card{width:min(720px,100%);padding:34px;border:1px solid var(--line);border-radius:18px;background:#06111a}.end-card small{color:var(--cyan);font-weight:800;letter-spacing:.15em}.end-card h2{font-size:clamp(32px,5vw,58px);line-height:1.02;margin:12px 0 24px}.end-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.end-actions button,.end-actions a{min-width:220px;padding:15px 20px;border-radius:999px;border:1px solid var(--cyan);font-weight:900;text-decoration:none}.end-actions button{background:var(--green);color:#091007;border-color:transparent}.end-actions a{background:#0b2230;color:white}
     @media(max-width:800px){
       .app{padding:10px}.topbar{margin-bottom:10px}.brand small{font-size:10px}.brand strong{font-size:20px;line-height:1.1}.status{font-size:12px}
       .film{height:620px;min-height:72vh;max-height:760px;aspect-ratio:auto;border-radius:12px;background:#07111a}
@@ -70,6 +72,7 @@
       .subtitle{width:100%;min-height:150px;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1.42;padding:18px;text-align:left;background:#0c1c28;border:2px solid rgba(119,214,255,.38)}
       .start-overlay{position:absolute;align-items:flex-start;overflow:auto;padding:14px;background:rgba(2,8,12,.94)}.start-card{width:100%;max-width:none;padding:22px 16px;margin:auto 0;border-radius:14px}.start-card h2{font-size:32px;line-height:1.02}.start-card p{font-size:17px;line-height:1.45}.primary{width:100%;min-height:58px;font-size:19px}
       .controls{grid-template-columns:repeat(3,1fr);gap:8px}.ctrl{min-height:52px;padding:9px 7px;font-size:16px}.voice{grid-column:1/-1;min-height:50px;font-size:16px}.chapters{grid-template-columns:repeat(2,1fr);gap:8px}.chapter-btn{min-height:48px;padding:9px 7px;font-size:13px;white-space:normal}.meta{font-size:12px}.terminal{padding:12px}.terminal button{min-height:44px}
+      .end-card{padding:26px 16px}.end-card h2{font-size:34px}.end-actions{display:grid}.end-actions button,.end-actions a{min-width:0;width:100%}
     }
     @media(max-width:420px){
       .film{height:590px}.subtitle{font-size:18px;min-height:160px}.start-card h2{font-size:28px}.start-card p{font-size:16px}.voice-note{font-size:11px}
@@ -90,12 +93,13 @@
     <div class="film" id="film" aria-label="Industrial Asset Graph narrated presentation">
       <div class="scene active" data-scene="0" style="background-image:url('assets/00_opening.png')"></div>
       <div class="scene" data-scene="1" style="background-image:url('assets/01_problem.png')"></div>
-      <div class="scene" data-scene="2" style="background-image:url('assets/02_breakdown.png')"></div>
-      <div class="scene" data-scene="3" style="background-image:url('assets/03_one_place.png')"></div>
+      <div class="scene" data-scene="2" style="background-image:url('assets/03_one_place.png')"></div>
+      <div class="scene" data-scene="3" style="background-image:url('assets/04_build.png')"></div>
       <div class="scene" data-scene="4" style="background-image:url('assets/04_build.png')"></div>
-      <div class="scene" data-scene="5" style="background-image:url('assets/05_connect.png')"></div>
-      <div class="scene" data-scene="6" style="background-image:url('assets/06_value.png')"></div>
-      <div class="scene" data-scene="7" style="background-image:url('assets/07_terminal.png')"></div>
+      <div class="scene" data-scene="5" style="background-image:url('assets/01_problem.png')"></div>
+      <div class="scene" data-scene="6" style="background-image:url('assets/02_breakdown.png')"></div>
+      <div class="scene" data-scene="7" style="background-image:url('assets/05_connect.png')"></div>
+      <div class="scene" data-scene="8" style="background-image:url('assets/07_terminal.png')"></div>
       <div class="scan"></div><div class="grain"></div>
       <div class="chapter"><div class="num" id="chapterNum">Opening</div><h1 id="chapterTitle">Industrial Asset Graph</h1></div>
       <div class="subtitle-wrap"><div class="subtitle" id="subtitle">Click START FILM to begin narration.</div></div>
@@ -104,18 +108,22 @@
           <div class="kicker">Interactive narrated film</div>
           <h2>THE FACILITY SHOULD KNOW HOW THE FACILITY WORKS.</h2>
           <p>The veteran electrician will narrate the entire story. Visuals move cinematically, captions follow the narration, and the final terminal lets you explore Risk, Map, Trace, Verify, and Help.</p>
-          <button class="primary" id="startBtn">▶ START FILM</button>
-          <div class="voice-note">Your browser supplies the speaking voice. The film automatically selects the deepest natural English male voice it can find.</div>
+          <button class="primary" id="startBtn">▶ PLAY PRESENTATION</button>
+          <div class="voice-note">One narration. One continuous industrial short film.</div>
         </div>
       </div>
+      <div class="end-screen" id="endScreen"><div class="end-card"><small>J. LIEB FOODS · FACILITY KNOWLEDGE · LIVE SYSTEM</small><h2>INDUSTRIAL ASSET GRAPH</h2><div class="end-actions"><button id="endReplay">↻ REPLAY PRESENTATION</button><a href="../">EXPLORE THE ASSET GRAPH</a></div></div></div>
     </div>
+
+    <audio id="masterNarration" preload="metadata" src="audio/industrial-asset-graph-narration.mp3"></audio>
 
     <div class="controls">
       <button class="ctrl" id="prevBtn" title="Previous chapter">⏮</button>
       <button class="ctrl" id="playBtn" title="Play/Pause">▶ Play</button>
       <button class="ctrl" id="nextBtn" title="Next chapter">⏭</button>
       <button class="ctrl" id="ccBtn" title="Toggle captions">CC On</button>
-      <select class="voice" id="voiceSelect" aria-label="Narrator voice"></select>
+      <button class="ctrl" id="replayBtn" title="Replay presentation">↻ Replay</button>
+      <button class="ctrl" id="exitBtn" title="Exit presentation">Exit</button>
       <button class="ctrl" id="fullBtn" title="Fullscreen">⛶</button>
     </div>
     <div class="progress"><div id="progressBar"></div></div>
@@ -134,13 +142,13 @@
     </div>
 
     <div class="meta">
-      <div><span class="badge">●</span> Narration: browser speech synthesis · cinematic still animation · interactive chapters</div>
-      <div id="runtime">Chapter 1 of 8</div>
+      <div><span class="badge">●</span> Master narration · cinematic still animation · interactive chapters</div>
+      <div id="runtime">Ready</div>
     </div>
   </div>
 </div>
 
-<script>
+<script type="text/plain" id="legacy-player">
 const chapters = [
   {
     num:'Opening', title:'Industrial Asset Graph', image:'assets/00_opening.png',
@@ -371,5 +379,6 @@ document.addEventListener('visibilitychange',()=>{
 
 buildChapters();updateScene();
 </script>
+<script src="player.js"></script>
 </body>
 </html>
