@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Industrial Asset Graph — Interactive Film</title>
+  <style>
+    :root{
+      --bg:#05090d; --panel:rgba(3,13,20,.78); --line:rgba(76,193,255,.42);
+      --cyan:#77d6ff; --green:#b8f37a; --text:#f3f7fa; --muted:#aebdca;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+    body{overflow-x:hidden}
+    button,select{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;background:radial-gradient(circle at 70% 15%,rgba(30,119,168,.16),transparent 35%),#05090d;padding:18px}
+    .shell{max-width:1500px;margin:0 auto}
+    .topbar{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap}
+    .brand small{display:block;color:var(--cyan);letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+    .brand strong{display:block;font-size:clamp(20px,2.5vw,32px);letter-spacing:.04em}
+    .status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px}
+    .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 16px rgba(184,243,122,.9)}
+    .film{position:relative;aspect-ratio:16/9;border:1px solid rgba(127,211,255,.26);background:#000;overflow:hidden;border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.5)}
+    .scene{position:absolute;inset:0;opacity:0;transition:opacity 1.25s ease;background-size:cover;background-position:center;transform:scale(1.025)}
+    .scene.active{opacity:1;animation:kenburns 24s ease-in-out infinite alternate}
+    @keyframes kenburns{0%{transform:scale(1.02) translate3d(0,0,0)}100%{transform:scale(1.075) translate3d(-.7%,-.5%,0)}}
+    .film::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.38),transparent 34%,transparent 72%,rgba(0,0,0,.16)),linear-gradient(0deg,rgba(0,0,0,.5),transparent 28%);z-index:3}
+    .scan{position:absolute;inset:-40% 0 auto 0;height:42%;z-index:4;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(130,224,255,.07),transparent);animation:scan 7s linear infinite}
+    @keyframes scan{to{transform:translateY(350%)}}
+    .grain{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.11;background-image:repeating-radial-gradient(circle at 0 0,transparent 0,rgba(255,255,255,.08) 1px,transparent 2px);background-size:4px 4px;mix-blend-mode:overlay}
+    .chapter{position:absolute;top:22px;left:24px;z-index:8;max-width:62%;text-shadow:0 2px 12px #000}
+    .chapter .num{color:var(--cyan);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:12px}
+    .chapter h1{margin:5px 0 0;font-size:clamp(24px,4.2vw,54px);line-height:1.02;text-transform:uppercase}
+    .subtitle-wrap{position:absolute;z-index:10;left:6%;right:6%;bottom:6.5%;display:flex;justify-content:center;pointer-events:none}
+    .subtitle{max-width:1050px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 18px;font-size:clamp(16px,2.1vw,27px);line-height:1.35;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35);opacity:1;transition:opacity .25s}
+    .subtitle.hide{display:none}
+    .start-overlay{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%,rgba(4,16,24,.55),rgba(0,0,0,.88));padding:28px;text-align:center}
+    .start-card{max-width:760px;padding:28px;border:1px solid var(--line);border-radius:18px;background:rgba(3,12,18,.86);backdrop-filter:blur(10px)}
+    .start-card .kicker{color:var(--cyan);text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:800}
+    .start-card h2{font-size:clamp(28px,5vw,56px);margin:8px 0 10px;line-height:1}
+    .start-card p{color:#d3dce3;line-height:1.5;margin:0 auto 20px;max-width:650px}
+    .primary{border:0;border-radius:999px;background:var(--green);color:#091007;font-weight:900;padding:14px 24px;letter-spacing:.04em}
+    .primary:hover{filter:brightness(1.07)}
+    .controls{display:grid;grid-template-columns:auto auto auto auto 1fr auto;gap:8px;margin-top:12px;align-items:center}
+    .ctrl{border:1px solid rgba(135,207,243,.25);background:#0a131b;color:var(--text);border-radius:10px;padding:10px 13px;min-height:42px}
+    .ctrl:hover{border-color:rgba(135,207,243,.55)}
+    .voice{min-width:0;width:100%;background:#0a131b;color:var(--text);border:1px solid rgba(135,207,243,.25);border-radius:10px;padding:10px}
+    .progress{height:6px;background:#101820;border-radius:999px;overflow:hidden;margin-top:10px}
+    .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .35s ease}
+    .chapters{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:10px}
+    .chapter-btn{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:var(--muted);border-radius:9px;padding:8px 5px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chapter-btn.active{color:#071119;background:var(--cyan);border-color:transparent;font-weight:800}
+    .terminal{display:none;margin-top:12px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(7,21,30,.96),rgba(3,12,17,.96));border-radius:14px;padding:15px}
+    .terminal.show{display:block}
+    .terminal-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .terminal button{border:1px solid rgba(184,243,122,.32);background:#07130e;color:var(--green);border-radius:8px;padding:8px 12px;font-family:Consolas,monospace}
+    .terminal-output{font-family:Consolas,monospace;color:#d6f6ff;margin-top:12px;padding:12px;border-left:3px solid var(--green);background:rgba(0,0,0,.26);min-height:58px;white-space:pre-line;line-height:1.45}
+    .meta{display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:13px;margin-top:10px;flex-wrap:wrap}
+    .badge{color:var(--green)}
+    .voice-note{color:var(--muted);font-size:12px;margin-top:7px}
+    @media(max-width:800px){
+      .app{padding:8px}.film{border-radius:10px}.chapter{top:12px;left:12px;max-width:75%}.chapter h1{font-size:24px}.subtitle{font-size:15px;padding:9px 11px}.controls{grid-template-columns:repeat(4,1fr)}.voice{grid-column:1/-1}.chapters{grid-template-columns:repeat(4,1fr)}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <small>J. Lieb Foods · Facility Knowledge · Live System</small>
+        <strong>Industrial Asset Graph — Interactive Short Film</strong>
+      </div>
+      <div class="status"><span class="dot"></span><span id="statusText">System ready</span></div>
+    </div>
+
+    <div class="film" id="film" aria-label="Industrial Asset Graph narrated presentation">
+      <div class="scene active" data-scene="0" style="background-image:url('assets/00_opening.png')"></div>
+      <div class="scene" data-scene="1" style="background-image:url('assets/01_problem.png')"></div>
+      <div class="scene" data-scene="2" style="background-image:url('assets/02_breakdown.png')"></div>
+      <div class="scene" data-scene="3" style="background-image:url('assets/03_one_place.png')"></div>
+      <div class="scene" data-scene="4" style="background-image:url('assets/04_build.png')"></div>
+      <div class="scene" data-scene="5" style="background-image:url('assets/05_connect.png')"></div>
+      <div class="scene" data-scene="6" style="background-image:url('assets/06_value.png')"></div>
+      <div class="scene" data-scene="7" style="background-image:url('assets/07_terminal.png')"></div>
+      <div class="scan"></div><div class="grain"></div>
+      <div class="chapter"><div class="num" id="chapterNum">Opening</div><h1 id="chapterTitle">Industrial Asset Graph</h1></div>
+      <div class="subtitle-wrap"><div class="subtitle" id="subtitle">Click START FILM to begin narration.</div></div>
+      <div class="start-overlay" id="startOverlay">
+        <div class="start-card">
+          <div class="kicker">Interactive narrated film</div>
+          <h2>THE FACILITY SHOULD KNOW HOW THE FACILITY WORKS.</h2>
+          <p>The veteran electrician will narrate the entire story. Visuals move cinematically, captions follow the narration, and the final terminal lets you explore Risk, Map, Trace, Verify, and Help.</p>
+          <button class="primary" id="startBtn">▶ START FILM</button>
+          <div class="voice-note">Your browser supplies the speaking voice. The film automatically selects the deepest natural English male voice it can find.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl" id="prevBtn" title="Previous chapter">⏮</button>
+      <button class="ctrl" id="playBtn" title="Play/Pause">▶ Play</button>
+      <button class="ctrl" id="nextBtn" title="Next chapter">⏭</button>
+      <button class="ctrl" id="ccBtn" title="Toggle captions">CC On</button>
+      <select class="voice" id="voiceSelect" aria-label="Narrator voice"></select>
+      <button class="ctrl" id="fullBtn" title="Fullscreen">⛶</button>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="chapters" id="chapterButtons"></div>
+
+    <div class="terminal" id="terminal">
+      <div class="terminal-row">
+        <strong style="color:var(--cyan);font-family:Consolas,monospace;margin-right:4px">SYSTEM&gt;</strong>
+        <button data-command="risk">Risk</button>
+        <button data-command="map">Map</button>
+        <button data-command="trace">Trace</button>
+        <button data-command="verify">Verify</button>
+        <button data-command="help">Help</button>
+      </div>
+      <div class="terminal-output" id="terminalOutput" aria-live="polite">System ready. Commands: Risk · Map · Trace · Verify · Help</div>
+    </div>
+
+    <div class="meta">
+      <div><span class="badge">●</span> Narration: browser speech synthesis · cinematic still animation · interactive chapters</div>
+      <div id="runtime">Chapter 1 of 8</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  {
+    num:'Opening', title:'Industrial Asset Graph', image:'assets/00_opening.png',
+    lines:[
+      'You spend enough years in a place like this, you start to realize something.',
+      'The building remembers nothing. The machines remember nothing.',
+      'They do not remember who installed them, why somebody changed that wire twenty years ago, or which replacement drive will actually work when production is down.',
+      'People remember. And that is the problem.',
+      'The Industrial Asset Graph is one place to find the machines, spare parts, manuals, settings, relationships, and the hard-won knowledge normally carried around inside somebody’s head.',
+      'The mission is simple: capture decades of facility knowledge before it disappears.'
+    ]
+  },
+  {
+    num:'01', title:'The Problem', image:'assets/01_problem.png',
+    lines:[
+      'Forty-five years in the electrical trade. Fifteen years in this facility.',
+      'He has built it, wired it, modified it, repaired it, and troubleshot it when production was dead and everybody wanted an answer.',
+      'After enough years, you know which panel feeds what, which disconnect was added later, which motor looks right but will not fit, and which drive needs different parameters before you dare hit start.',
+      'That is not a list of machines. It is power sources, control logic, device locations, historical modifications, troubleshooting techniques, equipment quirks, safety interlocks, and upstream and downstream relationships.',
+      'The value lives in how everything connects.',
+      'And when that knowledge exists in only one person’s memory, retirement becomes an operational risk.'
+    ]
+  },
+  {
+    num:'Real Example', title:'Production Motor Stopped', image:'assets/02_breakdown.png',
+    lines:[
+      'Here is what that risk looks like in the real world.',
+      'A production motor stopped. We assumed the motor was bad, and the experienced electrician who knew the system was away.',
+      'Now the questions started. Which motor fits? Does the shaft match? Where is the replacement? Is the drive bad too? Can the new drive replace the old one? How does the wiring cross over?',
+      'Brad made several trips upstairs for parts. Three motors were involved before the drive was replaced. Doug knew where the replacement drive was stored. Another person knew something about the motor. The manuals had another piece.',
+      'The answer existed. It just did not exist in one place.',
+      'Eventually the replacement drive was connected and production came back. Later, Don compared two manuals and finished working out the wiring crossover.',
+      'Now imagine opening one record before the work begins and seeing the correct motor, whether the shaft fits, where the drive is stored, which replacement works, and exactly how the wiring changes.',
+      'Less guessing. Less running around. Production back sooner.'
+    ]
+  },
+  {
+    num:'02', title:'One Place to Find the Answer', image:'assets/03_one_place.png',
+    lines:[
+      'The idea is simple. You should not have to know where the information is stored. You should only have to know where the machine is.',
+      'Click the building. Find the area. Find the machine. Then follow the system.',
+      'The record brings together the building layout, assets, documents, control cabinets, relationships, photos, drawings, and field evidence.',
+      'The physical facility is already becoming data: cabinet interiors, device layouts, schematics, service distribution, building plans, and annotated field views.',
+      'Scattered information becomes one connected system and one trusted source.'
+    ]
+  },
+  {
+    num:'03', title:'How We Build It', image:'assets/04_build.png',
+    lines:[
+      'This part is not magic. Somebody still has to put boots on the floor.',
+      'First, walk the real equipment and understand it in its actual environment.',
+      'Second, capture what matters: cabinets, tags, nameplates, motors, drives, disconnects, breakers, handwritten notes, photos, and drawings.',
+      'Third, interview the expert. Ask why it is there, what changed, what usually fails, what happens when it trips, where the power really comes from, and what the next electrician needs to know.',
+      'Fourth, verify. A fact can be verified, marked for field verification, inferred from evidence, or disputed when sources disagree.',
+      'Finally, connect it. Machine to cabinet. Cabinet to disconnect. Disconnect to breaker. Breaker to panel. Drive to motor. Documents and photographs to the equipment they describe.',
+      'That is how a pile of information becomes a living facility knowledge graph.'
+    ]
+  },
+  {
+    num:'04', title:'How the Parts Connect', image:'assets/05_connect.png',
+    lines:[
+      'Start with the machine and follow what feeds it.',
+      'Service to panel. Panel to breaker. Breaker to disconnect. Disconnect to control cabinet. Cabinet to VFD. VFD to motor. Motor to machine.',
+      'Then add the control path, safety devices, interlocks, documents, spare parts, and troubleshooting history.',
+      'A future technician can trace the system before opening the cabinet door.',
+      'He does not have to hope the one person who knows the answer happens to be working that day.',
+      'Trace it. Verify each link. Do not guess it.'
+    ]
+  },
+  {
+    num:'05', title:'Operational Value', image:'assets/06_value.png',
+    lines:[
+      'This is not documentation for the sake of documentation. A plant does not make money because it owns good binders. It makes money when the equipment runs.',
+      'The result is faster troubleshooting, safer planning, faster onboarding, and less rediscovery.',
+      'A technician can see likely dependencies before opening a cabinet. A new electrician can understand the facility without needing fifteen years here first. And a fix discovered once does not have to be rediscovered three years later by another shift.',
+      'For years, facilities like this have depended on one sentence: the electrician knows how this works.',
+      'The transformation is this: the facility knows how this works.',
+      'You cannot replace forty-five years of experience with a computer. The goal is to make sure forty-five years of experience does not disappear.',
+      'People retire. Equipment changes. Knowledge should remain.'
+    ]
+  },
+  {
+    num:'Terminal', title:'Knowledge Should Remain', image:'assets/07_terminal.png',
+    lines:[
+      'The system is ready.',
+      'Risk tells us what undocumented knowledge is approaching retirement.',
+      'Map turns the building layout into the navigation layer.',
+      'Trace follows an area to a machine, its cabinet, its controls, and the evidence behind the relationship.',
+      'Verify makes every claim carry a source and a review state.',
+      'The Industrial Asset Graph does not replace the tradesman. It preserves the trail he spent a career learning to follow.',
+      'The facility should know how the facility works.',
+      'Capture it. Verify it. Connect it. Keep it.'
+    ]
+  }
+];
+
+const commands = {
+  risk:'45 years in the trade · 15 years at this facility\nWARNING: Undocumented operational knowledge is approaching retirement.',
+  map:'11 facility areas indexed.\nBuilding layout is the navigation layer.\nBuilding → Area → Equipment → Evidence.',
+  trace:'Warehouse F / Line 2\nArea → Machine → Cabinet → Controls → Evidence\nRelationship path ready.',
+  verify:'Verified · Field verify · Inferred · Disputed · Retired\nEvery claim carries a source and review state.',
+  help:'Commands: Risk · Map · Trace · Verify\nFilm controls: Play/Pause · Previous/Next · CC · Voice · Fullscreen\nYou can jump to any chapter using the buttons below the film.'
+};
+
+let sceneIndex=0, lineIndex=0, playing=false, paused=false, captions=true, voices=[];
+const synth=window.speechSynthesis;
+const film=document.getElementById('film');
+const subtitle=document.getElementById('subtitle');
+const chapterNum=document.getElementById('chapterNum');
+const chapterTitle=document.getElementById('chapterTitle');
+const statusText=document.getElementById('statusText');
+const playBtn=document.getElementById('playBtn');
+const voiceSelect=document.getElementById('voiceSelect');
+const terminal=document.getElementById('terminal');
+const terminalOutput=document.getElementById('terminalOutput');
+const progressBar=document.getElementById('progressBar');
+const runtime=document.getElementById('runtime');
+
+function buildChapters(){
+  const wrap=document.getElementById('chapterButtons');
+  chapters.forEach((c,i)=>{
+    const b=document.createElement('button'); b.className='chapter-btn'; b.textContent=`${i+1}. ${c.title}`;
+    b.addEventListener('click',()=>goToScene(i,true)); wrap.appendChild(b);
+  });
+}
+
+function loadVoices(){
+  voices=synth ? synth.getVoices() : [];
+  voiceSelect.innerHTML='';
+  const english=voices.filter(v=>/^en[-_]/i.test(v.lang)||/English/i.test(v.name));
+  const pool=english.length?english:voices;
+  pool.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;voiceSelect.appendChild(o)});
+  const preferences=['Guy','Christopher','Mark','David','Daniel','Arthur','Alex','Fred','Ralph','Male','Natural'];
+  let chosen=pool.find(v=>preferences.some(p=>v.name.toLowerCase().includes(p.toLowerCase())));
+  if(!chosen) chosen=pool[0];
+  if(chosen) voiceSelect.value=chosen.name;
+}
+if(synth){loadVoices(); speechSynthesis.onvoiceschanged=loadVoices;}
+
+function selectedVoice(){return voices.find(v=>v.name===voiceSelect.value)||voices[0]||null;}
+
+function updateScene(){
+  document.querySelectorAll('.scene').forEach((el,i)=>el.classList.toggle('active',i===sceneIndex));
+  document.querySelectorAll('.chapter-btn').forEach((el,i)=>el.classList.toggle('active',i===sceneIndex));
+  chapterNum.textContent=chapters[sceneIndex].num;
+  chapterTitle.textContent=chapters[sceneIndex].title;
+  runtime.textContent=`Chapter ${sceneIndex+1} of ${chapters.length}`;
+  const totalLines=chapters.reduce((n,c)=>n+c.lines.length,0);
+  const before=chapters.slice(0,sceneIndex).reduce((n,c)=>n+c.lines.length,0);
+  const current=before+lineIndex;
+  progressBar.style.width=`${Math.min(100,(current/totalLines)*100)}%`;
+  terminal.classList.toggle('show',sceneIndex===chapters.length-1);
+}
+
+function stopSpeech(){if(synth) synth.cancel(); paused=false;}
+
+function speakCurrentLine(){
+  if(!playing) return;
+  const c=chapters[sceneIndex];
+  if(lineIndex>=c.lines.length){
+    if(sceneIndex<chapters.length-1){sceneIndex++;lineIndex=0;updateScene();setTimeout(speakCurrentLine,700);}
+    else{playing=false;paused=false;playBtn.textContent='↻ Replay';statusText.textContent='Film complete';progressBar.style.width='100%';subtitle.textContent='People retire. Equipment changes. Knowledge should remain.';}
+    return;
+  }
+  const text=c.lines[lineIndex];
+  subtitle.textContent=text; subtitle.classList.toggle('hide',!captions);
+  statusText.textContent=`Narrating · ${c.title}`;
+  updateScene();
+  if(!synth || !('SpeechSynthesisUtterance' in window)){
+    setTimeout(()=>{lineIndex++;speakCurrentLine()},Math.max(3000,text.split(/\s+/).length*390));
+    return;
+  }
+  const u=new SpeechSynthesisUtterance(text);
+  const v=selectedVoice(); if(v) u.voice=v;
+  u.rate=.91; u.pitch=.82; u.volume=1;
+  u.onend=()=>{if(playing&&!paused){lineIndex++;speakCurrentLine();}};
+  u.onerror=()=>{if(playing){lineIndex++;setTimeout(speakCurrentLine,300);}};
+  synth.speak(u);
+}
+
+function startFilm(){
+  document.getElementById('startOverlay').style.display='none';
+  stopSpeech(); sceneIndex=0;lineIndex=0;playing=true;paused=false;updateScene();playBtn.textContent='⏸ Pause';speakCurrentLine();
+}
+
+function togglePlay(){
+  if(!playing){
+    if(sceneIndex===chapters.length-1 && lineIndex>=chapters[sceneIndex].lines.length){sceneIndex=0;lineIndex=0;}
+    playing=true;paused=false;playBtn.textContent='⏸ Pause';speakCurrentLine();return;
+  }
+  if(!paused){if(synth)synth.pause();paused=true;playBtn.textContent='▶ Resume';statusText.textContent='Paused';}
+  else{if(synth)synth.resume();paused=false;playBtn.textContent='⏸ Pause';statusText.textContent='Narrating';}
+}
+
+function goToScene(i,autoplay=false){
+  stopSpeech();sceneIndex=Math.max(0,Math.min(chapters.length-1,i));lineIndex=0;updateScene();subtitle.textContent=chapters[sceneIndex].lines[0];
+  if(autoplay){playing=true;playBtn.textContent='⏸ Pause';speakCurrentLine();} else {playing=false;playBtn.textContent='▶ Play';}
+}
+
+document.getElementById('startBtn').addEventListener('click',startFilm);
+playBtn.addEventListener('click',togglePlay);
+document.getElementById('prevBtn').addEventListener('click',()=>goToScene(sceneIndex-1,true));
+document.getElementById('nextBtn').addEventListener('click',()=>goToScene(sceneIndex+1,true));
+document.getElementById('ccBtn').addEventListener('click',e=>{captions=!captions;subtitle.classList.toggle('hide',!captions);e.currentTarget.textContent=captions?'CC On':'CC Off';});
+document.getElementById('fullBtn').addEventListener('click',()=>{if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}else{document.exitFullscreen?.();}});
+voiceSelect.addEventListener('change',()=>{if(playing){stopSpeech();paused=false;speakCurrentLine();}});
+document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{terminalOutput.textContent=commands[b.dataset.command];}));
+
+buildChapters();updateScene();
+</script>
+</body>
+</html>

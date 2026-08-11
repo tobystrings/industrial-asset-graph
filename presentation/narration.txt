@@ -1,0 +1,70 @@
+INDUSTRIAL ASSET GRAPH — FULL NARRATION
+
+OPENING
+You spend enough years in a place like this, you start to realize something.
+The building remembers nothing. The machines remember nothing.
+They do not remember who installed them, why somebody changed that wire twenty years ago, or which replacement drive will actually work when production is down.
+People remember. And that is the problem.
+The Industrial Asset Graph is one place to find the machines, spare parts, manuals, settings, relationships, and the hard-won knowledge normally carried around inside somebody’s head.
+The mission is simple: capture decades of facility knowledge before it disappears.
+
+01 — THE PROBLEM
+Forty-five years in the electrical trade. Fifteen years in this facility.
+He has built it, wired it, modified it, repaired it, and troubleshot it when production was dead and everybody wanted an answer.
+After enough years, you know which panel feeds what, which disconnect was added later, which motor looks right but will not fit, and which drive needs different parameters before you dare hit start.
+That is not a list of machines. It is power sources, control logic, device locations, historical modifications, troubleshooting techniques, equipment quirks, safety interlocks, and upstream and downstream relationships.
+The value lives in how everything connects.
+And when that knowledge exists in only one person’s memory, retirement becomes an operational risk.
+
+REAL EXAMPLE — PRODUCTION MOTOR STOPPED
+Here is what that risk looks like in the real world.
+A production motor stopped. We assumed the motor was bad, and the experienced electrician who knew the system was away.
+Now the questions started. Which motor fits? Does the shaft match? Where is the replacement? Is the drive bad too? Can the new drive replace the old one? How does the wiring cross over?
+Brad made several trips upstairs for parts. Three motors were involved before the drive was replaced. Doug knew where the replacement drive was stored. Another person knew something about the motor. The manuals had another piece.
+The answer existed. It just did not exist in one place.
+Eventually the replacement drive was connected and production came back. Later, Don compared two manuals and finished working out the wiring crossover.
+Now imagine opening one record before the work begins and seeing the correct motor, whether the shaft fits, where the drive is stored, which replacement works, and exactly how the wiring changes.
+Less guessing. Less running around. Production back sooner.
+
+02 — ONE PLACE TO FIND THE ANSWER
+The idea is simple. You should not have to know where the information is stored. You should only have to know where the machine is.
+Click the building. Find the area. Find the machine. Then follow the system.
+The record brings together the building layout, assets, documents, control cabinets, relationships, photos, drawings, and field evidence.
+The physical facility is already becoming data: cabinet interiors, device layouts, schematics, service distribution, building plans, and annotated field views.
+Scattered information becomes one connected system and one trusted source.
+
+03 — HOW WE BUILD IT
+This part is not magic. Somebody still has to put boots on the floor.
+First, walk the real equipment and understand it in its actual environment.
+Second, capture what matters: cabinets, tags, nameplates, motors, drives, disconnects, breakers, handwritten notes, photos, and drawings.
+Third, interview the expert. Ask why it is there, what changed, what usually fails, what happens when it trips, where the power really comes from, and what the next electrician needs to know.
+Fourth, verify. A fact can be verified, marked for field verification, inferred from evidence, or disputed when sources disagree.
+Finally, connect it. Machine to cabinet. Cabinet to disconnect. Disconnect to breaker. Breaker to panel. Drive to motor. Documents and photographs to the equipment they describe.
+That is how a pile of information becomes a living facility knowledge graph.
+
+04 — HOW THE PARTS CONNECT
+Start with the machine and follow what feeds it.
+Service to panel. Panel to breaker. Breaker to disconnect. Disconnect to control cabinet. Cabinet to VFD. VFD to motor. Motor to machine.
+Then add the control path, safety devices, interlocks, documents, spare parts, and troubleshooting history.
+A future technician can trace the system before opening the cabinet door.
+He does not have to hope the one person who knows the answer happens to be working that day.
+Trace it. Verify each link. Do not guess it.
+
+05 — OPERATIONAL VALUE
+This is not documentation for the sake of documentation. A plant does not make money because it owns good binders. It makes money when the equipment runs.
+The result is faster troubleshooting, safer planning, faster onboarding, and less rediscovery.
+A technician can see likely dependencies before opening a cabinet. A new electrician can understand the facility without needing fifteen years here first. And a fix discovered once does not have to be rediscovered three years later by another shift.
+For years, facilities like this have depended on one sentence: the electrician knows how this works.
+The transformation is this: the facility knows how this works.
+You cannot replace forty-five years of experience with a computer. The goal is to make sure forty-five years of experience does not disappear.
+People retire. Equipment changes. Knowledge should remain.
+
+TERMINAL / CLOSING
+The system is ready.
+Risk tells us what undocumented knowledge is approaching retirement.
+Map turns the building layout into the navigation layer.
+Trace follows an area to a machine, its cabinet, its controls, and the evidence behind the relationship.
+Verify makes every claim carry a source and a review state.
+The Industrial Asset Graph does not replace the tradesman. It preserves the trail he spent a career learning to follow.
+The facility should know how the facility works.
+Capture it. Verify it. Connect it. Keep it.
