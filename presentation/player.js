@@ -9,7 +9,7 @@ const masterAudio = $('#masterNarration');
 const finaleAudio = $('#solanaNarration');
 const startOverlay = $('#startOverlay');
 const endScreen = $('#endScreen');
-const subtitle = $('#subtitle');
+const subtitle = $('#subtitle') || document.createElement('div');
 const chapterNum = $('#chapterNum');
 const chapterTitle = $('#chapterTitle');
 const statusText = $('#statusText');
@@ -29,7 +29,7 @@ const finalePhaseFractions = [0, .16, .38, .62, .78, .91];
 const knownDurations = { intro: 132.859, master: 278.021, finale: 118.544 };
 let chapters = [];
 let sceneIndex = 0;
-let captionsEnabled = true;
+let captionsEnabled = false;
 let ready = false;
 
 const commands = {
@@ -254,7 +254,6 @@ masterAudio.addEventListener('ended', () => {
 finaleAudio.addEventListener('ended', () => {
   updateScene(chapters.length - 1);
   progressBar.style.width = '100%';
-  subtitle.textContent = 'A record of what this facility knows.';
   playBtn.textContent = '↻ Replay';
   statusText.textContent = 'Presentation complete';
   endScreen.classList.add('show');
