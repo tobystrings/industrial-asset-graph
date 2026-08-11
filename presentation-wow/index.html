@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Industrial Asset Graph — Facility Knowledge</title>
+  <meta name="theme-color" content="#09090c">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-booting">
+  <div class="codefield" aria-hidden="true"><pre id="codefield"></pre><i id="cursorGlow"></i></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="progress"><i id="progress"></i></div>
+
+  <div class="boot" id="boot" aria-hidden="true">
+    <canvas id="bootCanvas"></canvas>
+    <div class="boot-core"><span>⚡</span></div>
+    <p class="boot-label mono" id="bootLabel">INITIALIZING FACILITY KNOWLEDGE GRAPH</p>
+    <button id="skipBoot" class="skip mono">skip →</button>
+  </div>
+
+  <header class="nav">
+    <a class="brand" href="#opening"><span class="mark mono">&gt;_</span><b>Industrial Asset Graph</b></a>
+    <nav class="navlinks mono">
+      <a href="#problem"><span>01</span> Problem</a>
+      <a href="#system"><span>02</span> System</a>
+      <a href="#value"><span>03</span> Value</a>
+    </nav>
+    <button class="key mono" id="helpBtn">?</button>
+  </header>
+
+  <aside class="rail mono" aria-label="Presentation sections">
+    <a href="#opening" data-label="OPEN"></a><a href="#problem" data-label="RISK"></a>
+    <a href="#stakes" data-label="CONTEXT"></a><a href="#system" data-label="SYSTEM"></a>
+    <a href="#evidence" data-label="EVIDENCE"></a><a href="#capture" data-label="CAPTURE"></a><a href="#graph" data-label="GRAPH"></a>
+    <a href="#value" data-label="VALUE"></a><a href="#close" data-label="CLOSE"></a>
+  </aside>
+
+  <main>
+    <section class="scene hero" id="opening">
+      <div class="eyebrow mono reveal">J. LIEB FOODS · FACILITY KNOWLEDGE · LIVE SYSTEM</div>
+      <div class="hero-grid">
+        <div class="terminal reveal" data-tilt>
+          <div class="term-bar mono"><span class="dots"><i></i><i></i><i></i></span><span>facility@knowledge:~</span><em>live demo · type a command</em></div>
+          <div class="term-chips mono">
+            <button data-cmd="risk">risk</button><button data-cmd="map">map</button><button data-cmd="trace">trace</button><button data-cmd="verify">verify</button><button data-cmd="help">help</button>
+          </div>
+          <div class="ascii" aria-label="Industrial Asset Graph">
+            <span>INDUSTRIAL</span><span>ASSET GRAPH</span>
+          </div>
+          <div class="term-output mono" id="termOutput">
+            <p><b>$ mission</b></p>
+            <p>Capture decades of facility knowledge before it disappears.</p>
+            <p class="ok">● system ready</p>
+          </div>
+          <label class="term-input mono"><span>facility@knowledge <b>$</b></span><input id="termInput" autocomplete="off" spellcheck="false"><button id="termSend">→</button></label>
+        </div>
+        <div class="hero-copy reveal">
+          <h1>Make the facility’s knowledge <span class="gradient">belong to the facility.</span></h1>
+          <p>A living map of equipment, evidence, documentation, and the relationships between them.</p>
+          <a class="scroll mono" href="#problem">BEGIN THE STORY <i></i></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="scene problem" id="problem">
+      <div class="section-tag mono">01 / THE PROBLEM</div>
+      <div class="metric-stage">
+        <div class="metric reveal"><strong data-count="45">0</strong><span>YEARS IN THE<br>ELECTRICAL TRADE</span></div>
+        <div class="metric reveal"><strong data-count="15">0</strong><span>YEARS AT<br>THIS FACILITY</span></div>
+      </div>
+      <p class="kinetic reveal">BUILT <i>•</i> WIRED <i>•</i> MODIFIED <i>•</i> REPAIRED <i>•</i> TROUBLESHOT</p>
+      <h2 class="danger reveal">WHEN HE LEAVES,<br><span>UNDOCUMENTED KNOWLEDGE LEAVES WITH HIM.</span></h2>
+    </section>
+
+    <section class="scene stakes" id="stakes">
+      <div class="section-tag mono">THE KNOWLEDGE AT RISK</div>
+      <h2 class="giant reveal">NOT A LIST<br>OF MACHINES.</h2>
+      <div class="risk-cloud mono reveal" id="riskCloud">
+        <span>POWER SOURCES</span><span>CONTROL LOGIC</span><span>DEVICE LOCATIONS</span><span>HISTORICAL MODIFICATIONS</span><span>TROUBLESHOOTING TECHNIQUES</span><span>EQUIPMENT QUIRKS</span><span>SAFETY INTERLOCKS</span><span>UPSTREAM / DOWNSTREAM RELATIONSHIPS</span>
+      </div>
+      <p class="thesis reveal">The value lives in <b>how everything connects.</b></p>
+    </section>
+
+    <section class="scene system" id="system">
+      <div class="section-tag mono">02 / THE WORKING SYSTEM</div>
+      <h2 class="reveal">The facility becomes the interface.</h2>
+      <div class="dashboard-shell reveal" data-tilt>
+        <div class="windowbar mono"><span class="dots"><i></i><i></i><i></i></span><span>tobystrings.github.io/industrial-asset-graph</span><b>LIVE</b></div>
+        <img src="assets/facility-dashboard.png" alt="Live Industrial Asset Graph facility dashboard">
+        <div class="scanline"></div>
+        <div class="hotspot one"><i></i><span class="mono">AREA STATUS</span></div>
+        <div class="hotspot two"><i></i><span class="mono">MACHINE RECORD</span></div>
+        <div class="hotspot three"><i></i><span class="mono">VERIFICATION</span></div>
+      </div>
+      <div class="system-caption mono reveal"><span>BUILDING LAYOUT</span><span>ASSETS</span><span>DOCUMENTS</span><span>CONTROL CABINETS</span><span>RELATIONSHIPS</span></div>
+    </section>
+
+    <section class="scene evidence" id="evidence">
+      <div class="section-tag mono">THE PROJECT EVIDENCE LIBRARY</div>
+      <div class="evidence-grid">
+        <div class="evidence-copy">
+          <h2 class="reveal">The physical facility<br><span>is already becoming data.</span></h2>
+          <p class="reveal">Cabinet interiors. Device layouts. Schematics. Service distribution. Building plans. Annotated field views.</p>
+          <div class="evidence-stats mono reveal"><span><b>10</b> RECOVERED VISUALS</span><span><b>06</b> TECHNICAL DRAWINGS</span><span><b>02</b> FIELD VIEWS</span></div>
+        </div>
+        <div class="evidence-index reveal" data-tilt>
+          <div class="index-bar mono"><span>MASTER_PICTURE_INDEX.png</span><b>RECOVERED</b></div>
+          <div class="index-viewport"><img src="assets/master-picture-index.png" alt="Industrial Asset Graph master picture index"></div>
+          <div class="index-scan"></div>
+        </div>
+      </div>
+      <div class="evidence-ticker mono" aria-hidden="true"><div>LINE 2 CABINET · INTERIOR LAYOUT · SCHEMATIC · SERVICE GUTTER · ROOF PLAN · ANNOTATED CONVEYOR AREA · LINE 2 CABINET · INTERIOR LAYOUT · SCHEMATIC · SERVICE GUTTER · ROOF PLAN · ANNOTATED CONVEYOR AREA · </div></div>
+    </section>
+
+    <section class="scene capture" id="capture">
+      <div class="section-tag mono">03 / KNOWLEDGE CAPTURE</div>
+      <h2 class="reveal">The graph starts in the field.</h2>
+      <div class="pipeline reveal">
+        <article><small>01</small><b>WALK</b><p>Observe the real machine and its environment.</p></article>
+        <article><small>02</small><b>CAPTURE</b><p>Photograph cabinets, tags, nameplates, and notes.</p></article>
+        <article><small>03</small><b>INTERVIEW</b><p>Record the expert’s history, logic, and troubleshooting knowledge.</p></article>
+        <article><small>04</small><b>VERIFY</b><p>Separate observed facts from items that still need proof.</p></article>
+        <article><small>05</small><b>CONNECT</b><p>Place the evidence into the facility knowledge graph.</p></article>
+      </div>
+      <div class="statusline mono reveal"><span><i class="green"></i> VERIFIED</span><span><i class="amber"></i> FIELD VERIFY</span><span><i class="violet"></i> INFERRED</span><span><i class="red"></i> DISPUTED</span></div>
+    </section>
+
+    <section class="scene graph" id="graph">
+      <div class="section-tag mono">04 / THE GRAPH</div>
+      <h2 class="reveal">Start anywhere.<br>Follow the system.</h2>
+      <div class="trace" id="trace">
+        <div class="trace-line"></div>
+        <button style="--i:0">SERVICE</button><button style="--i:1">PANEL</button><button style="--i:2">BREAKER</button><button style="--i:3">DISCONNECT</button><button style="--i:4">CABINET</button><button style="--i:5">VFD</button><button style="--i:6">MOTOR</button><button style="--i:7">MACHINE</button>
+      </div>
+      <div class="graph-copy reveal"><span>UPSTREAM SUPPLY</span><span>CONTROL PATH</span><span>PHYSICAL OUTCOME</span></div>
+      <p class="reveal">A future technician can trace the system without relying on one person’s memory.</p>
+    </section>
+
+    <section class="scene value" id="value">
+      <div class="section-tag mono">05 / OPERATIONAL VALUE</div>
+      <h2 class="reveal">Knowledge that stays<br><span>keeps the facility moving.</span></h2>
+      <div class="value-grid">
+        <article class="reveal"><em>01</em><h3>Faster troubleshooting</h3><p>Trace likely dependencies before opening a cabinet.</p><i></i></article>
+        <article class="reveal"><em>02</em><h3>Safer planning</h3><p>Bring source-backed context into maintenance decisions.</p><i></i></article>
+        <article class="reveal"><em>03</em><h3>Faster onboarding</h3><p>Give the next technician a navigable facility map.</p><i></i></article>
+        <article class="reveal"><em>04</em><h3>Less rediscovery</h3><p>Preserve fixes, modifications, and hard-won field knowledge.</p><i></i></article>
+      </div>
+    </section>
+
+    <section class="scene close" id="close">
+      <div class="close-map" aria-hidden="true"><img src="assets/facility-dashboard.png" alt=""></div>
+      <div class="section-tag mono reveal">THE TRANSFORMATION</div>
+      <p class="old reveal">“The electrician knows how this works.”</p>
+      <div class="transform-arrow reveal">↓</div>
+      <h2 class="reveal">“THE FACILITY KNOWS<br>HOW THIS WORKS.”</h2>
+      <div class="final-rule reveal"></div>
+      <p class="final reveal">PEOPLE RETIRE. EQUIPMENT CHANGES. <b>KNOWLEDGE SHOULD REMAIN.</b></p>
+    </section>
+  </main>
+
+  <dialog id="help" class="help"><button id="helpClose">×</button><p class="mono">PRESENTATION CONTROLS</p><div><kbd>↓</kbd><span>next scene</span><kbd>↑</kbd><span>previous scene</span><kbd>F</kbd><span>fullscreen</span><kbd>Esc</kbd><span>close / exit</span></div></dialog>
+  <script src="app.js"></script>
+</body>
+</html>
