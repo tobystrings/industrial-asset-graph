@@ -269,12 +269,6 @@ $('#nextBtn').addEventListener('click', () => goToScene(sceneIndex + 1));
 $('#replayBtn').addEventListener('click', replayPresentation);
 $('#endReplay').addEventListener('click', replayPresentation);
 $('#exitBtn').addEventListener('click', () => { introAudio.pause(); masterAudio.pause(); finaleAudio.pause(); location.href = '../'; });
-$('#ccBtn').addEventListener('click', event => {
-  captionsEnabled = !captionsEnabled;
-  subtitle.classList.toggle('hide', !captionsEnabled);
-  event.currentTarget.textContent = captionsEnabled ? 'CC On' : 'CC Off';
-  if (captionsEnabled) sceneIndex === 0 ? updateFromIntro() : sceneIndex === chapters.length - 1 ? updateFromFinale() : updateFromMaster();
-});
 $('#fullBtn').addEventListener('click', () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
