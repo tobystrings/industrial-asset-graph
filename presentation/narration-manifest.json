@@ -5,6 +5,7 @@
   "preferredModel": "eleven_v3",
   "outputFormat": "mp3_44100_128",
   "audio": {
+    "completeFilm": "audio/complete-project-film.mp3",
     "tylerIntro": "audio/tyler-project-intro.mp3",
     "mainFilm": "audio/industrial-asset-graph-narration.mp3",
     "solanaFinale": "audio/solana-finale.mp3"
