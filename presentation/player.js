@@ -31,6 +31,7 @@ let chapters = [];
 let sceneIndex = 0;
 let captionsEnabled = false;
 let ready = false;
+const priming = new WeakSet();
 
 const commands = {
   risk: '45 years in the trade · 15 years at this facility\nWARNING: Undocumented operational knowledge is approaching retirement.',
@@ -158,6 +159,27 @@ async function playActiveAudio() {
   }
 }
 
+function authorizeContinuousPlayback() {
+  [masterAudio, finaleAudio].forEach(item => {
+    if (item.readyState) item.currentTime = 0;
+    const originalVolume = item.volume;
+    item.volume = 0;
+    priming.add(item);
+    const attempt = item.play();
+    if (!attempt) { priming.delete(item); item.volume = originalVolume; return; }
+    attempt.then(() => {
+      item.pause();
+      if (item.readyState) item.currentTime = 0;
+      item.volume = originalVolume;
+      priming.delete(item);
+    }).catch(() => {
+      item.volume = originalVolume;
+      priming.delete(item);
+      item.load();
+    });
+  });
+}
+
 function resetAudio() {
   introAudio.pause(); masterAudio.pause(); finaleAudio.pause();
   if (introAudio.readyState) introAudio.currentTime = 0;
@@ -170,6 +192,7 @@ function startPresentation() {
   startOverlay.style.display = 'none';
   resetAudio();
   updateScene(0); updateIntroVisuals(); updateProgress();
+  authorizeContinuousPlayback();
   playActiveAudio();
 }
 
@@ -178,6 +201,7 @@ function replayPresentation() {
   endScreen.classList.remove('show');
   resetAudio();
   updateScene(0); updateIntroVisuals(); updateProgress();
+  authorizeContinuousPlayback();
   playActiveAudio();
 }
 
@@ -224,8 +248,8 @@ finaleAudio.addEventListener('timeupdate', updateFromFinale);
 introAudio.addEventListener('playing', () => { if (masterAudio.networkState === HTMLMediaElement.NETWORK_EMPTY) masterAudio.load(); }, { once: true });
 masterAudio.addEventListener('playing', () => { if (finaleAudio.networkState === HTMLMediaElement.NETWORK_EMPTY) finaleAudio.load(); }, { once: true });
 [introAudio, masterAudio, finaleAudio].forEach(item => {
-  item.addEventListener('play', () => setPlayingUi(true));
-  item.addEventListener('pause', () => { if (!item.ended && item.currentTime > 0 && item === activeAudio()) setPlayingUi(false); });
+  item.addEventListener('play', () => { if (!priming.has(item)) setPlayingUi(true); });
+  item.addEventListener('pause', () => { if (!priming.has(item) && !item.ended && item.currentTime > 0 && item === activeAudio()) setPlayingUi(false); });
   item.addEventListener('error', () => { statusText.textContent = 'Narration could not load. Refresh and try again.'; });
 });
 introAudio.addEventListener('ended', () => {
