@@ -148,6 +148,15 @@ export default function Dashboard({
   }, [view]);
 
   useEffect(() => {
+    const handler = (event: Event) => {
+      const tab = (event as CustomEvent<WorkspaceTab>).detail;
+      if (tab === 'relationships') { setWorkspaceTab('relationships'); setTraceOn(true); }
+    };
+    addEventListener('facility-guide-workspace', handler);
+    return () => removeEventListener('facility-guide-workspace', handler);
+  }, []);
+
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') {
         event.preventDefault();
@@ -410,7 +419,7 @@ export default function Dashboard({
             </article>
           </div>
 
-          {workspaceTab === 'map' && <section className="map-panel panel enter" style={{ animationDelay: '80ms' }}>
+          {workspaceTab === 'map' && <section className="map-panel panel enter" data-guide-target="facility-map" style={{ animationDelay: '80ms' }}>
             <div className="panel-heading">
               <b>Building layout</b>
               <small className="crumb">{breadcrumb}{selectedArea && <button type="button" onClick={() => { setSelectedArea(null); setSelectedAsset(null); setFocusDevice(null); }}> · All areas</button>}</small>
@@ -428,7 +437,7 @@ export default function Dashboard({
             <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
           </section>}
 
-          {workspaceTab === 'relationships' && <section className="relationship-panel panel enter" style={{ animationDelay: '120ms' }}>
+          {workspaceTab === 'relationships' && <section className="relationship-panel panel enter" data-guide-target="relationships" style={{ animationDelay: '120ms' }}>
             <div className="panel-heading">
               <b>Asset relationships</b>
               <small data-testid="trace-heading">{traceHeading}</small>
@@ -478,7 +487,7 @@ export default function Dashboard({
       )}
 
       {view === 'assets' && (
-        <section className="panel list-view scroll-pane enter">
+        <section className="panel list-view scroll-pane enter" data-guide-target="asset-workspace">
           <p className="panel-title">Assets</p>
           <div className="system-chips" data-testid="systems-filter">
             {SYSTEM_KINDS.map((kind) => (
@@ -523,7 +532,7 @@ export default function Dashboard({
       )}
 
       {view === 'documents' && (
-        <section className="panel list-view scroll-pane enter" data-testid="documents-grouped">
+        <section className="panel list-view scroll-pane enter" data-testid="documents-grouped" data-guide-target="documents">
           <p className="panel-title">Documents</p>
           <div className="system-chips">
             {(['ALL', 'COMPLETE', 'REVIEW', 'IN_PROGRESS', 'DRAFT', 'NOT_STARTED'] as const).map((state) => (

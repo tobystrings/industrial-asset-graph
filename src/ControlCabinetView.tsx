@@ -169,7 +169,7 @@ export default function ControlCabinetView({ onBack, onOpenFilm }: { onBack: () 
   };
 
   return (
-    <main className="cabinet-page" data-testid="cabinet-package" data-cabinet-package={LINE2_PACKAGE?.id} data-dest-unknown={LINE2_PACKAGE?.destUnknown ? 'true' : 'false'}>
+    <main className="cabinet-page" data-guide-target="cabinet" data-testid="cabinet-package" data-cabinet-package={LINE2_PACKAGE?.id} data-dest-unknown={LINE2_PACKAGE?.destUnknown ? 'true' : 'false'}>
       <header className="cabinet-header">
         <div>
           <button type="button" className="cabinet-back" onClick={onBack} aria-label="Facility dashboard">
