@@ -30,19 +30,19 @@ import {
 import { areas } from '../facilityData';
 
 describe('board chrome helpers', () => {
-  it('maps legacy query tabs onto capture / intel / record / docs / activity', () => {
+  it('maps query tabs onto overview / capture / intel / record / docs / activity', () => {
     expect(parseInspectorTab('queue')).toBe('capture');
-    expect(parseInspectorTab('overview')).toBe('record');
+    expect(parseInspectorTab('overview')).toBe('overview');
     expect(parseInspectorTab('intel')).toBe('intel');
     expect(parseInspectorTab('docs')).toBe('docs');
     expect(parseInspectorTab('log')).toBe('activity');
-    expect(parseInspectorTab(null)).toBe('record');
-    expect(cycleInspectorTab('capture', 1)).toBe('intel');
-    expect(cycleInspectorTab('capture', -1)).toBe('activity');
+    expect(parseInspectorTab(null)).toBe('overview');
+    expect(cycleInspectorTab('overview', 1)).toBe('capture');
+    expect(cycleInspectorTab('overview', -1)).toBe('activity');
     expect(inspectorVisible('capture', 'unknowns')).toBe(true);
     expect(inspectorVisible('capture', 'intel')).toBe(false);
     expect(inspectorVisible('intel', 'intel')).toBe(true);
-    expect(inspectorVisible('record', 'verification')).toBe(true);
+    expect(inspectorVisible('overview', 'verification')).toBe(true);
     expect(inspectorVisible('docs', 'docs')).toBe(true);
     expect(inspectorVisible('activity', 'activity')).toBe(true);
     expect(inspectorVisible('intel', 'banner')).toBe(true);
@@ -67,8 +67,8 @@ describe('board chrome helpers', () => {
     expect(phoneCabinetOrder()).toEqual(['devices', 'detail', 'drawing']);
     expect(MIN_HIT_TARGET_PX).toBe(44);
     const fit = phoneBarFits(390);
-    expect(fit.tabs).toBe(5);
-    expect(fit.nav).toBe(4);
+    expect(fit.tabs).toBe(6);
+    expect(fit.nav).toBe(5);
     expect(fit.tabWidth).toBeGreaterThanOrEqual(44);
     expect(fit.navWidth).toBeGreaterThanOrEqual(44);
     expect(phoneTargetsMeetMinimum(390)).toBe(true);

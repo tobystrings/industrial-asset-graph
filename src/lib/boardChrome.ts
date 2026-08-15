@@ -1,9 +1,9 @@
-export type InspectorTab = 'capture' | 'intel' | 'record' | 'docs' | 'activity';
+export type InspectorTab = 'overview' | 'capture' | 'intel' | 'record' | 'docs' | 'activity';
 export type InspectorPanel = InspectorTab | 'verification' | 'unknowns' | 'banner';
-export type PhoneNav = 'map' | 'find' | 'queue' | 'cabinet';
+export type PhoneNav = 'map' | 'asset' | 'queue' | 'docs' | 'more';
 
-export const INSPECTOR_TABS: InspectorTab[] = ['capture', 'intel', 'record', 'docs', 'activity'];
-export const PHONE_NAV: PhoneNav[] = ['map', 'find', 'queue', 'cabinet'];
+export const INSPECTOR_TABS: InspectorTab[] = ['overview', 'capture', 'intel', 'record', 'docs', 'activity'];
+export const PHONE_NAV: PhoneNav[] = ['map', 'asset', 'queue', 'docs', 'more'];
 export const MIN_HIT_TARGET_PX = 44;
 
 export const KEPT_SURFACES = [
@@ -36,11 +36,12 @@ export function cycleInspectorTab(current: InspectorTab, delta: 1 | -1): Inspect
 
 export function parseInspectorTab(raw: string | null | undefined): InspectorTab {
   if (raw === 'queue' || raw === 'capture') return 'capture';
-  if (raw === 'overview' || raw === 'record') return 'record';
+  if (raw === 'overview') return 'overview';
+  if (raw === 'record') return 'record';
   if (raw === 'intel') return 'intel';
   if (raw === 'docs') return 'docs';
   if (raw === 'activity' || raw === 'log') return 'activity';
-  return 'record';
+  return 'overview';
 }
 
 export function railColumnWidth(viewport: number): number {
@@ -57,7 +58,7 @@ export function railBodyScrolls(): true {
 export function inspectorVisible(tab: InspectorTab, panel: InspectorPanel): boolean {
   if (panel === 'banner') return true;
   if (panel === 'unknowns' || panel === 'capture') return tab === 'capture';
-  if (panel === 'verification') return tab === 'record';
+  if (panel === 'verification') return tab === 'overview';
   return tab === panel;
 }
 
@@ -93,7 +94,7 @@ export function destUnknownHighlight(deviceId: string, destId: string | null): '
   return destId ? '' : 'is-dest-unknown';
 }
 
-/** Phone chrome must fit five inspector tabs and four nav items without sideways scroll. */
+/** Phone chrome must fit six inspector tabs and the primary phone nav without sideways scroll. */
 export function phoneBarFits(width: number): { tabs: number; nav: number; tabWidth: number; navWidth: number } {
   const gutter = 16;
   const inner = Math.max(0, width - gutter);
@@ -109,7 +110,7 @@ export function phoneBarFits(width: number): { tabs: number; nav: number; tabWid
 
 export function phoneTargetsMeetMinimum(width: number): boolean {
   const fit = phoneBarFits(width);
-  return fit.tabs === 5 && fit.nav === 4 && fit.tabWidth >= 44 && fit.navWidth >= 44;
+  return fit.tabs === 6 && fit.nav === 5 && fit.tabWidth >= 44 && fit.navWidth >= 44;
 }
 
 /** Phone must hide the tall device list without killing the chip picker. */

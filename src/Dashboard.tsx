@@ -38,6 +38,7 @@ const stateLabel: Record<string, string> = {
 };
 
 export type AppView = 'dashboard' | 'assets' | 'documents' | 'cabinet';
+type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents';
 
 function useCount(target: number) {
   const [value, setValue] = useState(0);
@@ -89,7 +90,13 @@ export default function Dashboard({
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>(
     params.get('tab') ? parseInspectorTab(params.get('tab')) : (initialAsset?.id === 'L2-CC-001' ? 'intel' : parseInspectorTab(params.get('tab'))),
   );
-  const [phoneTab, setPhoneTab] = useState<'map' | 'find' | 'queue' | 'cabinet'>(() => phoneTabFromQuery(params.get('tab'), params.get('command')));
+  const [phoneTab, setPhoneTab] = useState<'map' | 'find' | 'queue' | 'cabinet' | 'docs' | 'more'>(() => {
+    const tab = phoneTabFromQuery(params.get('tab'), params.get('command'));
+    return tab === 'map' && initialAsset ? 'find' : tab;
+  });
+  const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>(() => (
+    view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : params.get('command') === 'trace' ? 'relationships' : 'map'
+  ));
   const [traceOn, setTraceOn] = useState(params.get('command') === 'trace');
   const [mapMode, setMapMode] = useState<MapMode>(mapModeFromQuery(location.search));
   const [systemKind, setSystemKind] = useState<SystemKind>('ALL');
@@ -136,6 +143,11 @@ export default function Dashboard({
   }), []);
 
   useEffect(() => {
+    if (view === 'assets') setWorkspaceTab('assets');
+    if (view === 'documents') setWorkspaceTab('documents');
+  }, [view]);
+
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') {
         event.preventDefault();
@@ -156,6 +168,7 @@ export default function Dashboard({
       if (!typing && event.key === 't') {
         event.preventDefault();
         setTraceOn(true);
+        setWorkspaceTab('relationships');
         onView('dashboard');
       }
       if (!typing && event.key === 'q') {
@@ -207,17 +220,20 @@ export default function Dashboard({
       setSelectedArea(warehouse);
       setSelectedAsset(null);
       setMapMode('2d');
+      setWorkspaceTab('map');
       onView('dashboard');
     }
     if (pendingCommand === '3d') {
       setSelectedArea(warehouse);
       setMapMode('3d');
+      setWorkspaceTab('map');
       onView('dashboard');
     }
     if (pendingCommand === 'trace' && cabinet) {
       setSelectedAsset(cabinet);
       setSelectedArea(warehouse);
       setTraceOn(true);
+      setWorkspaceTab('relationships');
       onView('dashboard');
     }
     if (pendingCommand === 'verify' && cabinet) {
@@ -256,6 +272,7 @@ export default function Dashboard({
     }
     setTraceOn(true);
     setDrawerOpen(false);
+    if (matchMedia('(max-width: 619px)').matches) setPhoneTab('find');
   };
   const selectAsset = (asset: FacilityAsset) => {
     setSelectedAsset(asset);
@@ -267,6 +284,19 @@ export default function Dashboard({
     });
     if (asset.id === 'L2-CC-001') setInspectorTab('intel');
     if (asset.id === 'FG-L4-MTN-001') setInspectorTab('record');
+    if (matchMedia('(max-width: 619px)').matches) setPhoneTab('find');
+  };
+
+  const openWorkspace = (tab: WorkspaceTab) => {
+    setWorkspaceTab(tab);
+    setNavOpen(false);
+    setDrawerOpen(false);
+    if (tab === 'assets') onView('assets');
+    else if (tab === 'documents') onView('documents');
+    else {
+      if (tab === 'relationships') setTraceOn(true);
+      onView('dashboard');
+    }
   };
   const applyHit = (hit: SearchHit) => {
     if (hit.areaId) setSelectedArea(areas.find((area) => area.id === hit.areaId) ?? null);
@@ -302,15 +332,16 @@ export default function Dashboard({
   const breadcrumb = [selectedArea?.name, selectedAsset?.id].filter(Boolean).join(' / ') || 'All documented areas';
 
   return (
-    <main className={`dashboard phone-${phoneTab} view-${view}${focusCabinet ? ' focus-cabinet' : ''}`}>
+    <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${focusCabinet ? ' focus-cabinet' : ''}`}>
       <header className="top-nav">
         <button className="nav-toggle" type="button" aria-label="Open menu" aria-expanded={drawerOpen} onClick={() => setDrawerOpen((value) => !value)}>☰</button>
         <div className="brand"><span className="brand-mark">JL</span><div><strong>J. Lieb Foods</strong><em>Industrial Asset Graph</em></div></div>
         <nav className={navOpen ? 'open' : ''} aria-label="Primary">
-          <button className={view === 'dashboard' ? 'nav-active' : ''} onClick={() => onView('dashboard')}>Dashboard</button>
-          <button className={view === 'assets' ? 'nav-active' : ''} onClick={() => onView('assets')}>Assets</button>
-          <button className={view === 'documents' ? 'nav-active' : ''} onClick={() => onView('documents')}>Documents</button>
-          <button onClick={onOpenCabinet}>Control cabinets</button>
+          <button className={workspaceTab === 'map' ? 'nav-active' : ''} onClick={() => openWorkspace('map')}>Map</button>
+          <button className={workspaceTab === 'assets' ? 'nav-active' : ''} onClick={() => openWorkspace('assets')}>Assets</button>
+          <button className={workspaceTab === 'relationships' ? 'nav-active' : ''} onClick={() => openWorkspace('relationships')}>Relationships</button>
+          <button className={workspaceTab === 'documents' ? 'nav-active' : ''} onClick={() => openWorkspace('documents')}>Documents</button>
+          <button onClick={onOpenCabinet}>Cabinet</button>
         </nav>
         <button className="film-link" type="button" data-playing={filmPlaying ? 'true' : 'false'} onClick={() => onToggleFilm?.()} aria-label={filmPlaying ? 'Pause film' : 'Play film'}>{filmPlaying ? '❚❚' : '▶'} <span>{filmPlaying ? 'Pause' : 'Play'}</span></button>
         <label className="global-search" onClick={() => setPaletteOpen(true)}>
@@ -323,10 +354,10 @@ export default function Dashboard({
       <aside className={`facility-sidebar ${drawerOpen ? 'open' : ''} enter`} style={{ animationDelay: '40ms' }}>
         <section>
           <p className="panel-title">Facility navigation</p>
-          <button className={view === 'dashboard' ? 'side-active' : ''} onClick={() => { onView('dashboard'); setDrawerOpen(false); }}>Building layout</button>
-          <button className={view === 'assets' ? 'side-selected' : ''} onClick={() => { onView('assets'); setDrawerOpen(false); }}>Areas<b>{areas.length}</b></button>
-          <button onClick={() => { onView('assets'); setDrawerOpen(false); }}>Equipment<b>{recordCount()}</b></button>
-          <button className={view === 'documents' ? 'side-selected' : ''} onClick={() => { onView('documents'); setDrawerOpen(false); }}>Documents</button>
+          <button className={workspaceTab === 'map' ? 'side-active' : ''} onClick={() => openWorkspace('map')}>Building layout</button>
+          <button className={workspaceTab === 'assets' ? 'side-selected' : ''} onClick={() => openWorkspace('assets')}>Areas<b>{areas.length}</b></button>
+          <button onClick={() => openWorkspace('assets')}>Equipment<b>{recordCount()}</b></button>
+          <button className={workspaceTab === 'documents' ? 'side-selected' : ''} onClick={() => openWorkspace('documents')}>Documents</button>
           <button onClick={() => { onOpenCabinet(); setDrawerOpen(false); }}>Control cabinets</button>
           <button className={view === 'assets' && systemKind !== 'ALL' ? 'side-selected' : ''} onClick={() => { setSystemKind('VFD'); onView('assets'); setDrawerOpen(false); }}>Systems</button>
         </section>
@@ -379,7 +410,7 @@ export default function Dashboard({
             </article>
           </div>
 
-          <section className="map-panel panel enter" style={{ animationDelay: '80ms' }}>
+          {workspaceTab === 'map' && <section className="map-panel panel enter" style={{ animationDelay: '80ms' }}>
             <div className="panel-heading">
               <b>Building layout</b>
               <small className="crumb">{breadcrumb}{selectedArea && <button type="button" onClick={() => { setSelectedArea(null); setSelectedAsset(null); setFocusDevice(null); }}> · All areas</button>}</small>
@@ -399,9 +430,9 @@ export default function Dashboard({
               </span>
             </div>
             <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} mode={mapMode} onMode={setMapMode} />
-          </section>
+          </section>}
 
-          <section className="relationship-panel panel enter" style={{ animationDelay: '120ms' }}>
+          {workspaceTab === 'relationships' && <section className="relationship-panel panel enter" style={{ animationDelay: '120ms' }}>
             <div className="panel-heading">
               <b>Asset relationships</b>
               <small data-testid="trace-heading">{traceHeading}</small>
@@ -446,7 +477,7 @@ export default function Dashboard({
                 <button className="relationship-more" onClick={onOpenCabinet}>+ more devices →</button>
               )}
             </div>
-          </section>
+          </section>}
         </>
       )}
 
@@ -529,13 +560,13 @@ export default function Dashboard({
           <div className="inspector-tabs" data-testid="inspector-tabs">
             {INSPECTOR_TABS.map((tab) => (
               <button key={tab} type="button" className={inspectorTab === tab ? 'active' : ''} onClick={() => setInspectorTab(tab)}>
-                {tab === 'capture' ? 'Capture' : tab === 'intel' ? 'Intel' : tab === 'record' ? 'Record' : tab === 'docs' ? 'Docs' : 'Log'}
+                {tab === 'overview' ? 'Overview' : tab === 'capture' ? 'Capture' : tab === 'intel' ? 'Intel' : tab === 'record' ? 'Record' : tab === 'docs' ? 'Docs' : 'Activity'}
               </button>
             ))}
           </div>
         </div>
         <div className="rail-body scroll-pane" ref={railRef}>
-        {inspectorTab === 'record' && (
+        {inspectorTab === 'overview' && (
           <section className="verification-panel panel enter">
             <p className="panel-title">Verification status</p>
             {(['VERIFIED', 'FIELD_VERIFY', 'INFERRED', 'DISPUTED', 'RETIRED'] as VerificationState[]).map((state) => (
@@ -549,7 +580,7 @@ export default function Dashboard({
             <footer>Total tracked facts <strong>{totalTrackedFacts(selectedAsset)}</strong></footer>
           </section>
         )}
-        {(inspectorTab !== 'record' || selectedAsset || selectedArea) && (
+        {(inspectorTab !== 'overview' || selectedAsset || selectedArea) && (
         <SelectedAssetPanel
           asset={selectedAsset}
           area={selectedArea}
@@ -561,7 +592,7 @@ export default function Dashboard({
           onFocusCabinet={() => setFocusCabinet((value) => !value)}
           onDoorSheet={() => setDoorOpen(true)}
           focusCabinet={focusCabinet}
-          tab={inspectorTab}
+          tab={inspectorTab === 'overview' ? 'record' : inspectorTab}
           onCapture={() => setCaptureTick((value) => value + 1)}
           onTrace={() => { setTraceOn(true); setInspectorTab('intel'); }}
           openUnknown={openUnknown}
@@ -691,10 +722,11 @@ export default function Dashboard({
       </footer>
 
       <nav className="bottom-nav" aria-label="Phone">
-        <button className={phoneTab === 'map' ? 'active' : ''} onClick={() => { setPhoneTab('map'); onView('dashboard'); }}><i aria-hidden="true">▣</i>Map</button>
-        <button className={phoneTab === 'find' ? 'active' : ''} onClick={() => { setPhoneTab('find'); setPaletteOpen(true); }}><i aria-hidden="true">⌕</i>Find</button>
+        <button className={phoneTab === 'map' ? 'active' : ''} onClick={() => { setPhoneTab('map'); openWorkspace('map'); }}><i aria-hidden="true">▣</i>Map</button>
+        <button className={phoneTab === 'find' ? 'active' : ''} onClick={() => { setPhoneTab('find'); selectedArea || selectedAsset ? onView('dashboard') : openWorkspace('assets'); }}><i aria-hidden="true">◎</i>Asset</button>
         <button className={phoneTab === 'queue' ? 'active' : ''} onClick={() => { setPhoneTab('queue'); setInspectorTab('capture'); }}><i aria-hidden="true">☰</i>Queue</button>
-        <button className={phoneTab === 'cabinet' ? 'active' : ''} onClick={() => { setPhoneTab('cabinet'); onOpenCabinet(); }}><i aria-hidden="true">▤</i>Cabinet</button>
+        <button className={phoneTab === 'docs' ? 'active' : ''} onClick={() => { setPhoneTab('docs'); openWorkspace('documents'); }}><i aria-hidden="true">▤</i>Docs</button>
+        <button className={phoneTab === 'more' ? 'active' : ''} onClick={() => { setPhoneTab('more'); setDrawerOpen(true); }}><i aria-hidden="true">•••</i>More</button>
       </nav>
 
       {doorOpen && <DoorSheet onClose={() => setDoorOpen(false)} />}
