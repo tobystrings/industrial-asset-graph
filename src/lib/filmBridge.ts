@@ -59,11 +59,10 @@ export function filmHonestyForAsset(assetId: string): { kind: 'chapter'; scene: 
   return { kind: 'intro-only', scene: 0, note: 'No L4 chapter is mapped. Intro only — the app does not invent a scene.' };
 }
 
-export function filmEmbedSrc(scene?: number, options?: { path?: 'line2'; captions?: boolean }): string {
+export function filmEmbedSrc(scene?: number, options?: { path?: 'line2' }): string {
   const params = new URLSearchParams({ embed: '1' });
   if (scene !== undefined && Number.isFinite(scene) && scene >= 0) params.set('scene', String(scene));
   if (options?.path === 'line2') params.set('path', 'line2');
-  if (options?.captions) params.set('captions', '1');
   return `./presentation/?${params}`;
 }
 

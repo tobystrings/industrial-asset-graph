@@ -16,12 +16,9 @@ const terminal = $('#terminal');
 const terminalOutput = $('#terminalOutput');
 const introScene = $('.tyler-intro');
 const finaleScene = $('.solana-finale');
-const captionsEl = $('#captions');
-const captionText = $('#captionText');
 const liveJump = $('#liveJump');
 const fullPathBtn = $('#fullPathBtn');
 const line2PathBtn = $('#line2PathBtn');
-const captionToggle = $('#captionToggle');
 
 // One continuous MP3 is the only playback clock. The component source tracks
 // remain in the repository for replacement, but browsers never hand off between them.
@@ -38,24 +35,14 @@ const params = new URLSearchParams(location.search);
 const embedded = params.has('embed') || window.parent !== window;
 const requestedScene = Number(params.get('scene'));
 const startOnLine2 = params.get('path') === 'line2';
-const captionsOnStart = params.get('captions') === '1';
 if (embedded) document.documentElement.classList.add('embed');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reducedMotion) document.documentElement.classList.add('reduce-motion');
 
-let captionsOn = captionsOnStart;
 let line2Only = startOnLine2;
 let line2Path = [5, 7];
 let manifestScenes = [];
 
-function captionLinesFromNarration(narration) {
-  return String(narration || '').split('\n').map((line) => line.replace(/^\[[^\]]+\]\s*/, '').trim()).filter(Boolean);
-}
-function captionAtProgress(lines, progress) {
-  if (!lines.length) return '';
-  const t = Math.min(1, Math.max(0, progress));
-  return lines[Math.min(lines.length - 1, Math.floor(t * lines.length))];
-}
 function line2PathIndexes(scenes) {
   return scenes.flatMap((scene, index) => (scene.slug === 'line2_standard' || scene.slug === 'failure_scenario' || scene.id === '04' || scene.id === '06' ? [index] : []));
 }
@@ -191,7 +178,7 @@ function updateScene(index = sceneIndex) {
     liveJump.textContent = command === 'cabinet' ? 'Open Line 2 cabinet' : command === '3d' ? 'Open map' : 'Open in the live graph';
   }
   updateCinematicPhases();
-  updateCaption();
+  emitBeat();
 }
 
 function sceneLocalProgress() {
@@ -203,28 +190,17 @@ function sceneLocalProgress() {
 function emitBeat() {
   if (!embedded || window.parent === window) return;
   const scene = manifestScenes[sceneIndex] || {};
-  const lines = captionLinesFromNarration(scene.narration || chapters[sceneIndex]?.title || '');
   const progress = sceneLocalProgress();
   window.parent.postMessage({
     source: 'iag-film',
     type: 'beat',
     sceneIndex,
     progress,
-    caption: captionAtProgress(lines, progress),
+    caption: '',
     visual: scene.visual || '',
     slug: scene.slug || '',
     id: scene.id || '',
   }, '*');
-}
-
-function updateCaption() {
-  if (!captionsEl || !captionText) return;
-  captionsEl.hidden = !captionsOn;
-  const scene = manifestScenes[sceneIndex];
-  const lines = captionLinesFromNarration(scene?.narration || chapters[sceneIndex]?.title || '');
-  const progress = sceneLocalProgress();
-  if (captionsOn) captionText.textContent = captionAtProgress(lines, progress);
-  emitBeat();
 }
 
 function updateFromAudio() {
@@ -243,7 +219,7 @@ function updateFromAudio() {
   }
   if (next !== sceneIndex) updateScene(next);
   updateCinematicPhases();
-  updateCaption();
+  emitBeat();
   progressBar.style.width = `${Math.min(100, (audio.currentTime / duration()) * 100)}%`;
   runtime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration())} · Scene ${sceneIndex + 1} of ${chapters.length}`;
 }
@@ -358,12 +334,6 @@ $('#endCabinet')?.addEventListener('click', () => openInApp('cabinet'));
 $('#end3d')?.addEventListener('click', () => openInApp('3d'));
 fullPathBtn?.addEventListener('click', () => setPathMode(false));
 line2PathBtn?.addEventListener('click', () => setPathMode(true));
-captionToggle?.addEventListener('click', () => {
-  captionsOn = !captionsOn;
-  captionToggle.setAttribute('aria-pressed', captionsOn ? 'true' : 'false');
-  captionToggle.classList.toggle('active', captionsOn);
-  updateCaption();
-});
 liveJump?.addEventListener('click', () => {
   const command = liveJump.dataset.command;
   if (command) openInApp(command);
@@ -395,10 +365,6 @@ if (Number.isFinite(requestedScene) && requestedScene >= 0 || line2Only) {
   audio.addEventListener('loadedmetadata', () => goToScene(resolveStartScene()), { once: true });
 }
 
-if (captionsOn) {
-  captionToggle?.setAttribute('aria-pressed', 'true');
-  captionToggle?.classList.add('active');
-}
 if (line2Only) setPathMode(true);
 
 fetch('narration-manifest.json')

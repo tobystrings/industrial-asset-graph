@@ -51,8 +51,8 @@ describe('film Genie helpers', () => {
     expect(embed).toContain('embed=1');
     expect(embed).toContain('scene=5');
     expect(embed).toContain('path=line2');
-    expect(embed).toContain('captions=1');
-    expect(filmEmbedSrc(5, { path: 'line2', captions: true })).toBe(embed);
+    expect(embed).not.toContain('captions=1');
+    expect(filmEmbedSrc(5, { path: 'line2' })).toBe(embed);
     expect(standalonePresentationHref()).toBe('./presentation/');
     expect(parseFilmMessage({ source: 'iag-film', type: 'open', command: 'cabinet' })?.type).toBe('open');
     expect(parseFilmMessage({ source: 'iag-film', type: 'open', command: 'trace' })?.command).toBe('trace');

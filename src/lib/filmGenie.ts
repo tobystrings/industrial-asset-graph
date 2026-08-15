@@ -133,7 +133,7 @@ export function standalonePresentationHref(): string {
 }
 
 export function genieEmbedSrc(target: Pick<GenieTarget, 'scene' | 'path'>): string {
-  return filmEmbedSrc(target.scene, { path: target.path, captions: true });
+  return filmEmbedSrc(target.scene, { path: target.path });
 }
 
 export function geniePreservesChapter(assetId: string): { scene: number; path?: 'line2' } | { scene: 0 } {

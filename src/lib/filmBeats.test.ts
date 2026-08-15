@@ -65,7 +65,7 @@ describe('film beat visuals', () => {
     expect(embed).toContain('embed=1');
     expect(embed).toContain('scene=5');
     expect(embed).toContain('path=line2');
-    expect(filmEmbedSrc(5, { path: 'line2', captions: true })).toBe(embed);
+    expect(filmEmbedSrc(5, { path: 'line2' })).toBe(embed);
     expect(parseFilmMessage({ source: 'iag-film', type: 'open', command: 'cabinet' })?.command).toBe('cabinet');
     expect(parseFilmMessage({ source: 'iag-film', type: 'open', command: 'trace' })?.command).toBe('trace');
     expect(parseFilmMessage({ source: 'iag-film', type: 'open', command: '3d' })?.command).toBe('3d');

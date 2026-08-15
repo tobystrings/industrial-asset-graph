@@ -35,10 +35,6 @@ function BeatStageView({ beat }: { beat: BeatStage }) {
   return (
     <div className="film-beat-stage" data-testid="film-beat" data-token={beat.token} data-motion={beat.motion} data-kenburns={beat.kenBurns ? 'on' : 'off'}>
       {beat.still && <img className={beat.kenBurns ? 'beat-still is-live' : 'beat-still is-hold'} src={beat.still} alt="" />}
-      <div className="film-beat-copy">
-        <small>{beat.label.replaceAll('_', ' ')}</small>
-        <p>{beat.caption || 'The facility should know how the facility works'}</p>
-      </div>
     </div>
   );
 }
@@ -72,7 +68,6 @@ export default function FilmTheater({
   const [localPath, setLocalPath] = useState(path);
   const [clockIndex, setClockIndex] = useState(scene ?? 0);
   const [clockTime, setClockTime] = useState(0);
-  const [captions, setCaptions] = useState(true);
   const [scenes, setScenes] = useState<ManifestScene[]>([]);
   const [beat, setBeat] = useState<BeatStage>(() => beatStageFor(undefined, 0, reduced));
   const [showOverride, setShowOverride] = useState<GenieShow | null>(null);
@@ -206,7 +201,7 @@ export default function FilmTheater({
             <button type="button" className="film-tour-continue" data-testid="film-tour-continue" onClick={continueTour}>Continue tour</button>
           </div>
         )}
-        <BeatStageView beat={captions ? beat : { ...beat, caption: '' }} />
+        <BeatStageView beat={beat} />
         <nav className="film-genie-actions" aria-label="Film chapters and jumps">
           {genieActions().map((action) => (
             <button
@@ -226,7 +221,6 @@ export default function FilmTheater({
         </nav>
         <div className="film-clock-bar" data-testid="film-clock">
           <button type="button" className={playing ? 'is-current' : ''} onClick={togglePlay}>{playing ? 'Pause' : 'Play'}</button>
-          <button type="button" className={captions ? 'is-current' : ''} onClick={() => setCaptions((value) => !value)}>Captions</button>
           <a href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer">Standalone ↗</a>
         </div>
         <div className="film-clock-meter">

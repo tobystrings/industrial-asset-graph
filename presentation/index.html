@@ -83,13 +83,10 @@
       .controls{grid-template-columns:repeat(3,1fr);gap:8px}.ctrl{min-height:52px;padding:9px 7px;font-size:16px}.voice{grid-column:1/-1;min-height:50px;font-size:16px}.chapters{grid-template-columns:repeat(2,1fr);gap:8px}.chapter-btn{min-height:48px;padding:9px 7px;font-size:13px;white-space:normal}.meta{font-size:12px}.terminal{padding:12px}.terminal button{min-height:44px}
     }
     .scene.still-hold.active{animation:none}
-    .captions{position:absolute;left:16px;right:16px;bottom:18px;z-index:12;text-align:center;pointer-events:none}
-    .captions[hidden]{display:none}
-    .captions p{margin:0 auto;max-width:820px;padding:8px 12px;border-radius:10px;background:rgba(9,17,32,.72);color:#f1f5f9;font:600 15px/1.35 'Source Sans 3',sans-serif}
     .live-jump{position:absolute;right:16px;bottom:18px;z-index:13;min-height:44px;padding:10px 14px;border:0;border-radius:10px;background:#0d9488;color:#fff;font:800 13px 'Source Sans 3',sans-serif}
     .live-jump[hidden]{display:none}
     .path-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
-    .path-bar button,.caption-toggle{min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#e2e8f0}
+    .path-bar button{min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#e2e8f0}
     .path-bar button.active{background:#0d9488;border-color:transparent;color:#fff}
     .ctrl{min-height:44px}
     html.embed,html.embed body{height:100%;overflow:hidden;background:#091120;font-family:'Source Sans 3',system-ui,sans-serif;color:#f1f5f9}
@@ -109,7 +106,7 @@
       .intro-title{left:7vw;right:7vw;top:8vh;font-size:clamp(30px,12vw,52px)}.intro-kicker{left:7vw;top:4vh}.intro-phase{padding:4px}.intro-map{width:94vw;height:34vh;margin-top:-9vh}.intro-path{left:3vw;right:3vw;bottom:3vh;grid-template-columns:repeat(3,1fr)}.intro-path span{padding:6px 3px}.intro-path span+span::before,.system-line span+span::before{display:none}.phone-flow,.system-wrap,.realization{width:148%;padding:14px 10px;transform:scale(.64)}.phone-flow h3,.groundhog h3,.system-wrap h3,.realization h3{margin-bottom:12px}.phone-steps{gap:5px}.phone-steps span{padding:7px}.groundhog{width:155%;transform:scale(.62)}.cycle{gap:5px}.cycle span{min-width:30%;padding:6px 3px}.cycle-repeat{margin:12px}.same-row{line-height:1.55;word-spacing:.2em}.system-line{display:grid;grid-template-columns:1fr 1fr;gap:6px}.system-line span{min-width:0;padding:8px 4px}.system-pulse{margin-top:12px}.final-lines{width:150%;padding:8px;transform:scale(.64)}.finale-phase{padding:5px}.value-card,.knowledge-transfer,.map-behind,.continuity,.finale-statement{width:150%;transform:scale(.64)}.transfer-line,.zoom-line{gap:5px}.transfer-line span,.zoom-line span{padding:7px 9px}.transfer-line b,.zoom-line b{font-size:17px}.knowledge-transfer h3,.map-behind h3,.continuity h3,.finale-statement h3{margin-bottom:12px}.phone-off{width:135px;height:75px;margin-bottom:7px}.continuity .people{font-size:52px}.finale-statement strong{margin-top:10px}
     }
     @media (max-width:619px){
-      .ctrl,.path-bar button,.live-jump,.end-actions button,.end-actions a,.caption-toggle{min-height:44px}
+      .ctrl,.path-bar button,.live-jump,.end-actions button,.end-actions a{min-height:44px}
       .chapters{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media(max-width:420px){
@@ -151,13 +148,12 @@
       <div class="scene solana-finale" data-scene="10" data-phase="0"><div class="intro-grid"></div><div class="finale-phase finale-0"><div class="value-card"><small>ESTIMATED COMMERCIAL REPLACEMENT VALUE</small><strong>≈ $200,000</strong><div class="value-shift">THE SOFTWARE HAS A PRICE.</div></div></div><div class="finale-phase finale-1"><div class="knowledge-transfer"><h3>THE KNOWLEDGE DOES NOT.</h3><div class="transfer-line"><span>Don</span><b>→</b><span>Tyler</span><b>→</b><span>Asset Graph</span><b>→</b><span>Future Maintenance</span></div><p>Experience becomes documented, connected, and available to the people who come next.</p></div></div><div class="finale-phase finale-2"><div class="map-behind"><h3>THEY'RE LEAVING A MAP BEHIND.</h3><div class="zoom-line"><span>Device</span><b>→</b><span>Cabinet</span><b>→</b><span>Machine</span><b>→</b><span>Line</span><b>→</b><span>Facility</span></div><p>Equipment · Documents · Relationships · Troubleshooting knowledge</p></div></div><div class="finale-phase finale-3"><div class="continuity"><div class="phone-off"><b>DON</b><span>DO NOT DISTURB</span></div><div class="people">70+ PEOPLE</div><p>DEPEND ON A FACILITY THAT KEEPS MOVING</p><p>KNOWLEDGE SUPPORTS CONTINUITY</p></div></div><div class="finale-phase finale-4"><div class="continuity"><h3>THE EQUIPMENT WILL CHANGE.<br>PEOPLE WILL CHANGE.<br>THIS FACILITY WILL CHANGE.</h3><p>BUT THE KNOWLEDGE DOESN'T HAVE TO DISAPPEAR.</p></div></div><div class="finale-phase finale-5"><div class="finale-statement"><h3>THE INDUSTRIAL ASSET GRAPH</h3><p>Not just a record of what this facility has.</p><strong>A RECORD OF WHAT THIS FACILITY KNOWS.</strong></div></div></div>
       <div class="scan"></div><div class="grain"></div>
       <div class="chapter"><div class="num" id="chapterNum">Opening</div><h1 id="chapterTitle">Industrial Asset Graph</h1></div>
-      <div class="captions" id="captions" hidden><p id="captionText"></p></div>
       <button class="live-jump" id="liveJump" type="button" hidden>Open in the live graph</button>
       <div class="start-overlay" id="startOverlay">
         <div class="start-card">
           <div class="kicker">Interactive narrated film</div>
           <h2>THE FACILITY SHOULD KNOW HOW THE FACILITY WORKS.</h2>
-          <p>The veteran electrician will narrate the entire story. Visuals move cinematically, captions follow the narration, and the final terminal lets you explore Risk, Map, Trace, Verify, and Help.</p>
+          <p>The veteran electrician will narrate the entire story. Visuals move cinematically, and the final terminal lets you explore Risk, Map, Trace, Verify, and Help.</p>
           <button class="primary" id="startBtn">▶ PLAY PRESENTATION</button>
           <div class="voice-note">One narration. One continuous industrial short film.</div>
         </div>
@@ -179,7 +175,6 @@
     <div class="path-bar">
       <button type="button" id="fullPathBtn" class="active">Full film</button>
       <button type="button" id="line2PathBtn">Line 2 path</button>
-      <button type="button" id="captionToggle" class="caption-toggle" aria-pressed="false">Captions</button>
     </div>
     <div class="chapters" id="chapterButtons"></div>
 
@@ -204,236 +199,7 @@
   </div>
 </div>
 
-<script type="text/plain" id="legacy-player">
-const chapters = [
-  {
-    num:'Opening', title:'Industrial Asset Graph', image:'assets/00_opening.png',
-    lines:[
-      'You spend enough years in a place like this, you start to realize something.',
-      'The building remembers nothing. The machines remember nothing.',
-      'They do not remember who installed them, why somebody changed that wire twenty years ago, or which replacement drive will actually work when production is down.',
-      'People remember. And that is the problem.',
-      'The Industrial Asset Graph is one place to find the machines, spare parts, manuals, settings, relationships, and the hard-won knowledge normally carried around inside somebody’s head.',
-      'The mission is simple: capture decades of facility knowledge before it disappears.'
-    ]
-  },
-  {
-    num:'01', title:'The Problem', image:'assets/01_problem.png',
-    lines:[
-      'Forty-five years in the electrical trade. Fifteen years in this facility.',
-      'He has built it, wired it, modified it, repaired it, and troubleshot it when production was dead and everybody wanted an answer.',
-      'After enough years, you know which panel feeds what, which disconnect was added later, which motor looks right but will not fit, and which drive needs different parameters before you dare hit start.',
-      'That is not a list of machines. It is power sources, control logic, device locations, historical modifications, troubleshooting techniques, equipment quirks, safety interlocks, and upstream and downstream relationships.',
-      'The value lives in how everything connects.',
-      'And when that knowledge exists in only one person’s memory, retirement becomes an operational risk.'
-    ]
-  },
-  {
-    num:'Real Example', title:'Production Motor Stopped', image:'assets/02_breakdown.png',
-    lines:[
-      'Here is what that risk looks like in the real world.',
-      'A production motor stopped. We assumed the motor was bad, and the experienced electrician who knew the system was away.',
-      'Now the questions started. Which motor fits? Does the shaft match? Where is the replacement? Is the drive bad too? Can the new drive replace the old one? How does the wiring cross over?',
-      'Brad made several trips upstairs for parts. Three motors were involved before the drive was replaced. Doug knew where the replacement drive was stored. Another person knew something about the motor. The manuals had another piece.',
-      'The answer existed. It just did not exist in one place.',
-      'Eventually the replacement drive was connected and production came back. Later, Don compared two manuals and finished working out the wiring crossover.',
-      'Now imagine opening one record before the work begins and seeing the correct motor, whether the shaft fits, where the drive is stored, which replacement works, and exactly how the wiring changes.',
-      'Less guessing. Less running around. Production back sooner.'
-    ]
-  },
-  {
-    num:'02', title:'One Place to Find the Answer', image:'assets/03_one_place.png',
-    lines:[
-      'The idea is simple. You should not have to know where the information is stored. You should only have to know where the machine is.',
-      'Click the building. Find the area. Find the machine. Then follow the system.',
-      'The record brings together the building layout, assets, documents, control cabinets, relationships, photos, drawings, and field evidence.',
-      'The physical facility is already becoming data: cabinet interiors, device layouts, schematics, service distribution, building plans, and annotated field views.',
-      'Scattered information becomes one connected system and one trusted source.'
-    ]
-  },
-  {
-    num:'03', title:'How We Build It', image:'assets/04_build.png',
-    lines:[
-      'This part is not magic. Somebody still has to put boots on the floor.',
-      'First, walk the real equipment and understand it in its actual environment.',
-      'Second, capture what matters: cabinets, tags, nameplates, motors, drives, disconnects, breakers, handwritten notes, photos, and drawings.',
-      'Third, interview the expert. Ask why it is there, what changed, what usually fails, what happens when it trips, where the power really comes from, and what the next electrician needs to know.',
-      'Fourth, verify. A fact can be verified, marked for field verification, inferred from evidence, or disputed when sources disagree.',
-      'Finally, connect it. Machine to cabinet. Cabinet to disconnect. Disconnect to breaker. Breaker to panel. Drive to motor. Documents and photographs to the equipment they describe.',
-      'That is how a pile of information becomes a living facility knowledge graph.'
-    ]
-  },
-  {
-    num:'04', title:'How the Parts Connect', image:'assets/05_connect.png',
-    lines:[
-      'Start with the machine and follow what feeds it.',
-      'Service to panel. Panel to breaker. Breaker to disconnect. Disconnect to control cabinet. Cabinet to VFD. VFD to motor. Motor to machine.',
-      'Then add the control path, safety devices, interlocks, documents, spare parts, and troubleshooting history.',
-      'A future technician can trace the system before opening the cabinet door.',
-      'He does not have to hope the one person who knows the answer happens to be working that day.',
-      'Trace it. Verify each link. Do not guess it.'
-    ]
-  },
-  {
-    num:'05', title:'Operational Value', image:'assets/06_value.png',
-    lines:[
-      'This is not documentation for the sake of documentation. A plant does not make money because it owns good binders. It makes money when the equipment runs.',
-      'The result is faster troubleshooting, safer planning, faster onboarding, and less rediscovery.',
-      'A technician can see likely dependencies before opening a cabinet. A new electrician can understand the facility without needing fifteen years here first. And a fix discovered once does not have to be rediscovered three years later by another shift.',
-      'For years, facilities like this have depended on one sentence: the electrician knows how this works.',
-      'The transformation is this: the facility knows how this works.',
-      'You cannot replace forty-five years of experience with a computer. The goal is to make sure forty-five years of experience does not disappear.',
-      'People retire. Equipment changes. Knowledge should remain.'
-    ]
-  },
-  {
-    num:'Terminal', title:'Knowledge Should Remain', image:'assets/07_terminal.png',
-    lines:[
-      'The system is ready.',
-      'Risk tells us what undocumented knowledge is approaching retirement.',
-      'Map turns the building layout into the navigation layer.',
-      'Trace follows an area to a machine, its cabinet, its controls, and the evidence behind the relationship.',
-      'Verify makes every claim carry a source and a review state.',
-      'The Industrial Asset Graph does not replace the tradesman. It preserves the trail he spent a career learning to follow.',
-      'The facility should know how the facility works.',
-      'Capture it. Verify it. Connect it. Keep it.'
-    ]
-  }
-];
 
-const commands = {
-  risk:'45 years in the trade · 15 years at this facility\nWARNING: Undocumented operational knowledge is approaching retirement.',
-  map:'11 facility areas indexed.\nBuilding layout is the navigation layer.\nBuilding → Area → Equipment → Evidence.',
-  trace:'Warehouse F / Line 2\nArea → Machine → Cabinet → Controls → Evidence\nRelationship path ready.',
-  verify:'Verified · Field verify · Inferred · Disputed · Retired\nEvery claim carries a source and review state.',
-  help:'Commands: Risk · Map · Trace · Verify\nFilm controls: Play/Pause · Previous/Next · CC · Voice · Fullscreen\nYou can jump to any chapter using the buttons below the film.'
-};
-
-let sceneIndex=0, lineIndex=0, playing=false, paused=false, captions=true, voices=[];
-let speechTimer=0, speechRun=0;
-const synth=window.speechSynthesis;
-const film=document.getElementById('film');
-const subtitle=document.getElementById('subtitle');
-const chapterNum=document.getElementById('chapterNum');
-const chapterTitle=document.getElementById('chapterTitle');
-const statusText=document.getElementById('statusText');
-const playBtn=document.getElementById('playBtn');
-const voiceSelect=document.getElementById('voiceSelect');
-const terminal=document.getElementById('terminal');
-const terminalOutput=document.getElementById('terminalOutput');
-const progressBar=document.getElementById('progressBar');
-const runtime=document.getElementById('runtime');
-
-function buildChapters(){
-  const wrap=document.getElementById('chapterButtons');
-  chapters.forEach((c,i)=>{
-    const b=document.createElement('button'); b.className='chapter-btn'; b.textContent=`${i+1}. ${c.title}`;
-    b.addEventListener('click',()=>goToScene(i,true)); wrap.appendChild(b);
-  });
-}
-
-function loadVoices(){
-  voices=synth ? synth.getVoices() : [];
-  voiceSelect.innerHTML='';
-  const english=voices.filter(v=>/^en[-_]/i.test(v.lang)||/English/i.test(v.name));
-  const pool=english.length?english:voices;
-  pool.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;voiceSelect.appendChild(o)});
-  const preferences=['Guy','Christopher','Mark','David','Daniel','Arthur','Alex','Fred','Ralph','Male','Natural'];
-  let chosen=pool.find(v=>preferences.some(p=>v.name.toLowerCase().includes(p.toLowerCase())));
-  if(!chosen) chosen=pool[0];
-  if(chosen) voiceSelect.value=chosen.name;
-}
-if(synth){loadVoices(); speechSynthesis.onvoiceschanged=loadVoices;}
-
-function selectedVoice(){return voices.find(v=>v.name===voiceSelect.value)||voices[0]||null;}
-
-function updateScene(){
-  document.querySelectorAll('.scene').forEach((el,i)=>el.classList.toggle('active',i===sceneIndex));
-  document.querySelectorAll('.chapter-btn').forEach((el,i)=>el.classList.toggle('active',i===sceneIndex));
-  chapterNum.textContent=chapters[sceneIndex].num;
-  chapterTitle.textContent=chapters[sceneIndex].title;
-  runtime.textContent=`Chapter ${sceneIndex+1} of ${chapters.length}`;
-  const totalLines=chapters.reduce((n,c)=>n+c.lines.length,0);
-  const before=chapters.slice(0,sceneIndex).reduce((n,c)=>n+c.lines.length,0);
-  const current=before+lineIndex;
-  progressBar.style.width=`${Math.min(100,(current/totalLines)*100)}%`;
-  terminal.classList.toggle('show',sceneIndex===chapters.length-1);
-}
-
-function stopSpeech(){
-  clearTimeout(speechTimer); speechRun++;
-  if(synth) synth.cancel();
-  paused=false;
-}
-
-function advanceLine(run){
-  if(run!==speechRun || !playing || paused) return;
-  clearTimeout(speechTimer); lineIndex++;
-  setTimeout(speakCurrentLine,220);
-}
-
-function speakCurrentLine(){
-  if(!playing) return;
-  const c=chapters[sceneIndex];
-  if(lineIndex>=c.lines.length){
-    if(sceneIndex<chapters.length-1){sceneIndex++;lineIndex=0;updateScene();setTimeout(speakCurrentLine,700);}
-    else{playing=false;paused=false;playBtn.textContent='↻ Replay';statusText.textContent='Film complete';progressBar.style.width='100%';subtitle.textContent='People retire. Equipment changes. Knowledge should remain.';}
-    return;
-  }
-  const text=c.lines[lineIndex];
-  subtitle.textContent=text; subtitle.classList.toggle('hide',!captions);
-  statusText.textContent=`Narrating · ${c.title}`;
-  updateScene();
-  if(!synth || !('SpeechSynthesisUtterance' in window)){
-    const run=++speechRun;
-    speechTimer=setTimeout(()=>advanceLine(run),Math.max(3500,text.split(/\s+/).length*430));
-    return;
-  }
-  const run=++speechRun;
-  const u=new SpeechSynthesisUtterance(text);
-  const v=selectedVoice(); if(v) u.voice=v;
-  u.rate=.91; u.pitch=.82; u.volume=1;
-  u.onend=()=>advanceLine(run);
-  u.onerror=e=>{if(!['canceled','interrupted'].includes(e.error))advanceLine(run);};
-  // Mobile speech engines occasionally omit onend. This watchdog keeps the film moving.
-  speechTimer=setTimeout(()=>{
-    if(run===speechRun && playing && !paused){if(synth)synth.cancel();advanceLine(run);}
-  },Math.max(7000,text.split(/\s+/).length*850));
-  synth.speak(u);
-}
-
-function startFilm(){
-  document.getElementById('startOverlay').style.display='none';
-  stopSpeech(); sceneIndex=0;lineIndex=0;playing=true;paused=false;updateScene();playBtn.textContent='⏸ Pause';speakCurrentLine();
-}
-
-function togglePlay(){
-  if(!playing){
-    if(sceneIndex===chapters.length-1 && lineIndex>=chapters[sceneIndex].lines.length){sceneIndex=0;lineIndex=0;}
-    playing=true;paused=false;playBtn.textContent='⏸ Pause';speakCurrentLine();return;
-  }
-  if(!paused){clearTimeout(speechTimer);speechRun++;if(synth)synth.cancel();paused=true;playBtn.textContent='▶ Resume';statusText.textContent='Paused';}
-  else{paused=false;playBtn.textContent='⏸ Pause';statusText.textContent='Narrating';speakCurrentLine();}
-}
-
-function goToScene(i,autoplay=false){
-  stopSpeech();sceneIndex=Math.max(0,Math.min(chapters.length-1,i));lineIndex=0;updateScene();subtitle.textContent=chapters[sceneIndex].lines[0];
-  if(autoplay){playing=true;playBtn.textContent='⏸ Pause';speakCurrentLine();} else {playing=false;playBtn.textContent='▶ Play';}
-}
-
-document.getElementById('startBtn').addEventListener('click',startFilm);
-playBtn.addEventListener('click',togglePlay);
-document.getElementById('prevBtn').addEventListener('click',()=>goToScene(sceneIndex-1,true));
-document.getElementById('nextBtn').addEventListener('click',()=>goToScene(sceneIndex+1,true));
-document.getElementById('fullBtn').addEventListener('click',()=>{if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}else{document.exitFullscreen?.();}});
-voiceSelect.addEventListener('change',()=>{if(playing){stopSpeech();paused=false;speakCurrentLine();}});
-document.querySelectorAll('[data-command]').forEach(b=>b.addEventListener('click',()=>{terminalOutput.textContent=commands[b.dataset.command];}));
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible' && playing && !paused){stopSpeech();playing=true;speakCurrentLine();}
-});
-
-buildChapters();updateScene();
-</script>
 <script src="player.js?v=20260811-single-master-audio"></script>
 </body>
 </html>
