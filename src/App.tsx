@@ -101,7 +101,7 @@ export default function App() {
           }
         }}
       />
-      <FacilityGuide />
+      {!filmPlaying && !filmOpen && <FacilityGuide />}
     </div>
   );
 }

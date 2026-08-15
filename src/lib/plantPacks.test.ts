@@ -92,6 +92,7 @@ describe('review patch and plant packs', () => {
     expect(theater).toContain('landingSearch');
     expect(theater).toContain('liveSearch');
     expect(theater).toContain('genieHoldMini');
-    expect(theater).toContain('onPlayingChange?.(!playing)');
+    expect(theater).toContain('else continueTour()');
+    expect(theater).toContain('filmLiveCommandForScene(index)');
   });
 });
