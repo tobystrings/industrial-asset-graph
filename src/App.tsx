@@ -93,6 +93,8 @@ export default function App() {
         onPlayingChange={setFilmPlaying}
         onCommand={(command) => {
           if (command === 'cabinet') changeView('cabinet');
+          else if (command === 'assets') changeView('assets');
+          else if (command === 'documents') changeView('documents');
           else {
             changeView('dashboard');
             setPendingCommand(command);

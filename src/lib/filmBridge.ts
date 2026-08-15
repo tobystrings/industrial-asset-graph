@@ -1,6 +1,6 @@
 /** Film → app deep links. Only uses existing area/asset ids. */
 
-export type FilmCommand = 'map' | 'trace' | 'verify' | 'cabinet' | '3d' | 'risk' | 'help';
+export type FilmCommand = 'map' | 'assets' | 'documents' | 'trace' | 'verify' | 'cabinet' | '3d' | 'risk' | 'help';
 
 export type FilmCue = {
   id: string;
@@ -17,8 +17,18 @@ export const filmCues: FilmCue[] = [
   { id: 'explore', label: 'Map', scene: 3, command: '3d' },
 ];
 
+/** Narrated chapters drive only real, existing product views. */
+export function filmLiveCommandForScene(scene: number): FilmCommand {
+  if (scene === 2) return 'trace';
+  if (scene === 3) return 'verify';
+  if (scene === 4 || scene === 5) return 'cabinet';
+  if (scene === 6) return 'assets';
+  if (scene === 7) return 'documents';
+  return 'map';
+}
+
 export function isFilmCommand(value: string): value is FilmCommand {
-  return ['map', 'trace', 'verify', 'cabinet', '3d', 'risk', 'help'].includes(value);
+  return ['map', 'assets', 'documents', 'trace', 'verify', 'cabinet', '3d', 'risk', 'help'].includes(value);
 }
 
 export function appQueryForFilmCommand(command: FilmCommand): URLSearchParams {

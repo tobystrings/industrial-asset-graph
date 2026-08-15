@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { parseFilmMessage, type FilmCommand } from './lib/filmBridge';
+import { filmLiveCommandForScene, parseFilmMessage, type FilmCommand } from './lib/filmBridge';
 import { beatStageFor, type BeatStage } from './lib/filmBeats';
 import {
   FILM_AUDIO_SRC,
@@ -64,6 +64,7 @@ export default function FilmTheater({
   const audioRef = useRef<HTMLAudioElement>(null);
   const seekRef = useRef(true);
   const tourRef = useRef(false);
+  const guidedSceneRef = useRef<number | null>(null);
   const [localScene, setLocalScene] = useState(scene);
   const [localPath, setLocalPath] = useState(path);
   const [clockIndex, setClockIndex] = useState(scene ?? 0);
@@ -163,10 +164,17 @@ export default function FilmTheater({
     const progress = filmSceneProgress(audio.currentTime, index, scenes.length);
     const current = scenes[index];
     if (current) setBeat(beatStageFor(current, progress, reduced));
+    if (playing && (opened || tourRef.current) && guidedSceneRef.current !== index) {
+      guidedSceneRef.current = index;
+      onCommand(filmLiveCommandForScene(index));
+    }
     setClockIndex(index);
     setClockTime(audio.currentTime);
   };
-  const togglePlay = () => onPlayingChange?.(!playing);
+  const togglePlay = () => {
+    if (playing) onPlayingChange?.(false);
+    else continueTour();
+  };
   const seekRatio = (ratio: number) => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -197,7 +205,7 @@ export default function FilmTheater({
       <section className={genieDockClass(reduced, show)} aria-label="Project film Genie">
         {show === 'mini' && (
           <div className="film-mini-bar" data-testid="film-mini">
-            <strong>Genie</strong>
+            <strong>Live graph tour</strong>
             <button type="button" className="film-tour-continue" data-testid="film-tour-continue" onClick={continueTour}>Continue tour</button>
           </div>
         )}

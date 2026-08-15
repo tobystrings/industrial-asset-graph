@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { areas, machines, relationships } from '../facilityData';
-import { appHrefForFilmCommand, appQueryForFilmCommand, filmCues, filmEmbedSrc, parseFilmMessage } from './filmBridge';
+import { appHrefForFilmCommand, appQueryForFilmCommand, filmCues, filmEmbedSrc, filmLiveCommandForScene, parseFilmMessage } from './filmBridge';
 
 describe('filmBridge', () => {
+  it('maps narration chapters onto real application views', () => {
+    expect([0, 2, 3, 4, 6, 7, 8].map(filmLiveCommandForScene)).toEqual(['map', 'trace', 'verify', 'cabinet', 'assets', 'documents', 'map']);
+  });
   it('deep-links only to existing facility ids', () => {
     const areaIds = new Set(areas.map((item) => item.id));
     const assetIds = new Set(machines.map((item) => item.id));
