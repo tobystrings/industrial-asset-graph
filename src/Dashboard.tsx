@@ -225,7 +225,7 @@ export default function Dashboard({
     }
     if (pendingCommand === '3d') {
       setSelectedArea(warehouse);
-      setMapMode('3d');
+      setMapMode('2d');
       setWorkspaceTab('map');
       onView('dashboard');
     }
@@ -419,17 +419,13 @@ export default function Dashboard({
                 <span>{fieldItems} field</span>
                 <span>{documentedAssetCount()} assets</span>
               </span>
-              <span className="map-mode" role="tablist" aria-label="Map projection">
-                <button type="button" role="tab" aria-selected={mapMode === '2d'} className={mapMode === '2d' ? 'active' : ''} onClick={() => setMapMode('2d')}>2D</button>
-                <button type="button" role="tab" aria-selected={mapMode === '3d'} aria-label="Show 3D facility map" className={mapMode === '3d' ? 'active' : ''} onClick={() => setMapMode('3d')}>3D</button>
-              </span>
               <span className="map-legend">
                 <span><i className={markerClass('COMPLETE')} />Complete</span>
                 <span><i className={markerClass('IN_PROGRESS')} />In progress</span>
                 <span><i className={markerClass('NOT_STARTED')} />Not started</span>
               </span>
             </div>
-            <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} mode={mapMode} onMode={setMapMode} />
+            <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
           </section>}
 
           {workspaceTab === 'relationships' && <section className="relationship-panel panel enter" style={{ animationDelay: '120ms' }}>

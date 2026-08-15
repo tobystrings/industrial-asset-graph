@@ -113,8 +113,7 @@ export function dashboardSearch(state: {
   if (state.area) next.set('area', state.area);
   if (state.asset) next.set('asset', state.asset);
   if (state.doc) next.set('doc', state.doc);
-  if (state.map === '2d') next.set('map', '2d');
-  else next.set('map', '3d');
+  next.set('map', '2d');
   if (state.tab && state.tab !== 'record') next.set('tab', state.tab);
   if (state.focus) next.set('focus', 'cabinet');
   if (state.q) next.set('q', state.q);

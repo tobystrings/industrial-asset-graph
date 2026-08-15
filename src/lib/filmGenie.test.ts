@@ -27,7 +27,7 @@ describe('film Genie helpers', () => {
   it('keeps every film entry as one Genie target and preserves L2 / L4 honesty', () => {
     expect(genieChromeMode()).toBe('dock');
     const actions = genieActions();
-    expect(actions.map((item) => item.label)).toEqual(['Intro', 'Line 2 path', 'Line 2 cabinet', '3D map']);
+    expect(actions.map((item) => item.label)).toEqual(['Intro', 'Line 2 path', 'Line 2 cabinet', 'Map']);
     expect(actions.filter((item) => item.kind === 'play').map((item) => item.id)).toEqual(['intro', 'line2path']);
     expect(actions.find((item) => item.id === 'line2')?.command).toBe('cabinet');
     expect(actions.find((item) => item.id === 'explore')?.command).toBe('3d');

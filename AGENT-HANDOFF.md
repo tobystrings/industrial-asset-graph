@@ -24,14 +24,14 @@ npm run dev -- --host 0.0.0.0 --port 4173
 **Board (required base path):**  
 http://127.0.0.1:4173/industrial-asset-graph/
 
-**3D is the default map.** Explicit 2D: `?map=2d`. Share 3D: `?map=3d` (also written automatically).
+The building layout is the fixed bird's-eye **2D schematic only**. Legacy `map=3d` links are normalized to `map=2d`.
 
 Useful URLs:
 
 | What | URL |
 |------|-----|
-| Default board (3D) | `/industrial-asset-graph/` |
-| Force 2D schematic | `/industrial-asset-graph/?map=2d` |
+| Default board (2D) | `/industrial-asset-graph/` |
+| Bird's-eye schematic | `/industrial-asset-graph/?map=2d` |
 | Line 2 cabinet | `/industrial-asset-graph/?view=cabinet` |
 | Intel on L2 cabinet | `/industrial-asset-graph/?asset=L2-CC-001&tab=intel` |
 | Hold Genie mini | `/industrial-asset-graph/?film=1` |
@@ -65,7 +65,7 @@ PWA manifest must be `/industrial-asset-graph/manifest.webmanifest` (one prefix)
 
 Evidence-aware dashboard for **J. Lieb Foods**:
 
-- Building layout (default **3D** schematic; 2D blueprint on toggle)
+- Building layout (fixed bird's-eye **2D** schematic)
 - Inspector: Capture / Intel / Record / Docs / Log
 - Line 2 Conveyor Control Cabinet drawing (SVG + PNG + PDF + JSON)
 - Local walkdown / Keep review (never auto-merges into `facilityData`)
@@ -84,17 +84,17 @@ Phone: Map / Find / Queue / Cabinet. ☰ opens the **area drawer only** (Documen
 - Dest-null reconnect stays `FIELD_VERIFY`.
 - L2 film chapter is scene **5** or `path=line2`. L4 (`FG-L4-MTN-001`) is **intro-only**.
 - **Do not regenerate film MP3s.**
-- **No “Open 3D” button.** 3D is the default map mode and the heading **2D / 3D** toggle. No second 3D engine.
+- **No 3D map or map-mode toggle.** The building layout stays on the fixed bird's-eye 2D schematic.
 - Genie is a dock / mini player, not a modal sheet or iframe theater.
 - `LOCAL_ONLY` evidence is not bundled.
 
-`docs/MODERNIZATION-HANDOFF.md` is **stale** (it says “do not add 3D”). Ignore that line. This file is current.
+`docs/MODERNIZATION-HANDOFF.md` is stale. This file is current.
 
 ---
 
 ## Stack
 
-Vite 6 + React 19 + TypeScript. 1e glass + Source Sans 3. Three.js / R3F / drei (lazy) for the **one** 3D schematic. Tests: Vitest (`npm test`).
+Vite 6 + React 19 + TypeScript. 1e glass + Source Sans 3. Tests: Vitest (`npm test`).
 
 Key source:
 
@@ -104,8 +104,7 @@ Key source:
 | `src/Dashboard.tsx` | Board, inspector, URL `replaceState` |
 | `src/ControlCabinetView.tsx` | Line 2 cabinet package |
 | `src/FilmTheater.tsx` | Genie mini → dock, native MP3 clock |
-| `src/map/MapStage.tsx` | `mapModeFromQuery` — default **3d** unless `map=2d` |
-| `src/map/FacilityMap3D.tsx` | 3D schematic; Html labels portal to map host |
+| `src/map/MapStage.tsx` | 2D-only building-layout stage; legacy map queries normalize to 2D |
 | `src/map/BlueprintMap.tsx` | 2D schematic |
 | `src/facilityData.ts` | Typed facility records |
 | `src/lib/viewport.ts` | `dashboardSearch` + `genieQueryFromSearch` |
@@ -167,9 +166,9 @@ Empty areas (Dock 1, etc.) have **capture kits only**. Export area walk pack doe
 - Collapsible Intel / PLC rack / walkdown More start **expanded**; user can collapse (useState + onToggle).
 - Cabinet drawing is clipped to its grid cell; inspector is opaque; dock does not cover Save on desktop/tablet.
 - Tablet cabinet: chips-only row (no search/title in that strip).
-- Phone ☰: drawer only. 2D/3D lives in the map **heading**, not on Unmapped.
+- Phone ☰: drawer only. The map heading has no projection toggle.
 - Mini player parks on the map above the relationship strip when opened.
-- **3D is the default map.** Camera/fog tuned so buildings are in view; area labels stay visible.
+- The bird's-eye 2D layout is the only building map; area labels stay visible.
 - Cabinet page is opaque navy (no dashboard photo showing through). SVG hit-layer text is invisible so titles do not double-print on the PNG.
 - Genie **does not autoplay** and **does not open mini on load**. Header Play plays in the bar. Film / Continue tour / `?film=1` opens mini. Escape returns to the bar.
 
@@ -177,7 +176,7 @@ Empty areas (Dock 1, etc.) have **capture kits only**. Export area walk pack doe
 
 ## Out of scope
 
-Golfgold / Foursomes, new film audio, invented dests/motors/LOTO, second 3D, **Open 3D**, auto-merge Keep, App Store, new plants.
+Golfgold / Foursomes, new film audio, invented dests/motors/LOTO, 3D/orbital map modes, auto-merge Keep, App Store, new plants.
 
 ---
 

@@ -100,7 +100,7 @@ const appHrefs = {
   trace: '../?area=area-warehouse-f&asset=L2-CC-001&command=trace',
   verify: '../?area=area-warehouse-f&asset=L2-CC-001&command=verify',
   cabinet: '../?view=cabinet',
-  '3d': '../?area=area-warehouse-f&map=3d',
+  '3d': '../?area=area-warehouse-f&map=2d',
 };
 
 function openInApp(command) {
@@ -188,7 +188,7 @@ function updateScene(index = sceneIndex) {
   if (liveJump) {
     liveJump.hidden = !command;
     liveJump.dataset.command = command || '';
-    liveJump.textContent = command === 'cabinet' ? 'Open Line 2 cabinet' : command === '3d' ? '3D map' : 'Open in the live graph';
+    liveJump.textContent = command === 'cabinet' ? 'Open Line 2 cabinet' : command === '3d' ? 'Open map' : 'Open in the live graph';
   }
   updateCinematicPhases();
   updateCaption();

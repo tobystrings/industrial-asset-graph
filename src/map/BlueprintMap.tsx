@@ -1,7 +1,17 @@
 import { areas, machines } from '../facilityData';
 import { markerClass } from '../lib/statusMark';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
-import { schematicFor, unmappedSchematic } from './layout';
+
+const floorPlanCrop = { x: 6, y: 10, width: 90, height: 78 } as const;
+
+function floorPlanRect(rect: FacilityArea['overlay']) {
+  return {
+    left: `${((rect.x - floorPlanCrop.x) / floorPlanCrop.width) * 100}%`,
+    top: `${((rect.y - floorPlanCrop.y) / floorPlanCrop.height) * 100}%`,
+    width: `${(rect.width / floorPlanCrop.width) * 100}%`,
+    height: `${(rect.height / floorPlanCrop.height) * 100}%`,
+  };
+}
 
 export default function BlueprintMap({
   selectedArea,
@@ -17,31 +27,34 @@ export default function BlueprintMap({
   onAsset: (asset: FacilityAsset) => void;
 }) {
   return (
-    <div className="blueprint-root" data-testid="map-stage" role="group" aria-label="Interactive J. Lieb facility layout">
-      <div className="blueprint-grid" />
-      <div
-        className="blueprint-area unmapped"
-        style={{ left: `${unmappedSchematic.x}%`, top: `${unmappedSchematic.y}%`, width: `${unmappedSchematic.width}%`, height: `${unmappedSchematic.height}%` }}
-        aria-hidden="true"
-      >
-        <span className="blueprint-label">Unmapped</span>
-      </div>
+    <div className="blueprint-root floor-plan-root" data-testid="map-stage" role="group" aria-label="Interactive J. Lieb facility floor plan">
+      <img className="floor-plan-image" src="/industrial-asset-graph/assets/facility-floor-plan.png" alt="" aria-hidden="true" />
       {areas.map((area) => {
-        const rect = schematicFor(area.id);
+        const rect = area.overlay;
         const dimmed = Boolean(selectedArea && selectedArea.id !== area.id);
         return (
-          <button
+          <div
             key={area.id}
-            type="button"
-            className={`blueprint-area ${selectedArea?.id === area.id ? 'selected' : ''} ${dimmed ? 'dimmed' : ''}`}
-            style={{ left: `${rect.x}%`, top: `${rect.y}%`, width: `${rect.width}%`, height: `${rect.height}%` }}
+            role="button"
+            tabIndex={0}
+            data-area={area.id}
+            className={`floor-plan-area ${selectedArea?.id === area.id ? 'selected' : ''} ${dimmed ? 'dimmed' : ''}`}
+            style={floorPlanRect(rect)}
             aria-label={`${area.name}, ${area.status}, ${area.assetIds.length} assets`}
             onClick={() => onArea(area)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onArea(area);
+              }
+            }}
           >
-            <span className="blueprint-label">{area.shortName}</span>
-            <i className={`${markerClass(area.status)} pop`} aria-hidden="true" />
+            <span className="floor-plan-label">
+              <i className={markerClass(area.status)} aria-hidden="true" />
+              <b>{area.shortName}</b>
+            </span>
             {area.assetIds.length > 0 && (
-              <span className="area-tray">
+              <span className="floor-plan-assets">
                 {area.assetIds.map((id) => {
                   const asset = machines.find((item) => item.id === id);
                   if (!asset) return null;
@@ -50,7 +63,7 @@ export default function BlueprintMap({
                     <button
                       key={id}
                       type="button"
-                      className={`machine-chip pop ${selectedAsset?.id === id ? 'selected' : ''} ${hidden ? 'is-dimmed' : ''}`}
+                      className={`machine-chip ${selectedAsset?.id === id ? 'selected' : ''} ${hidden ? 'is-dimmed' : ''}`}
                       onClick={(event) => {
                         event.stopPropagation();
                         onAsset(asset);
@@ -63,10 +76,10 @@ export default function BlueprintMap({
                 })}
               </span>
             )}
-          </button>
+          </div>
         );
       })}
-      <span className="blueprint-disclaimer">Schematic layout · markers are area-level · exact positions require field verification</span>
+      <span className="blueprint-disclaimer">Reference floor plan · labels are area-level · exact asset positions require field verification</span>
     </div>
   );
 }

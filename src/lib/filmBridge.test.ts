@@ -19,7 +19,7 @@ describe('filmBridge', () => {
     }
     expect(appQueryForFilmCommand('cabinet').get('view')).toBe('cabinet');
     expect(appHrefForFilmCommand('trace')).toContain('asset=L2-CC-001');
-    expect(appHrefForFilmCommand('3d')).toContain('map=3d');
+    expect(appHrefForFilmCommand('3d')).toContain('map=2d');
     expect(filmEmbedSrc(5)).toContain('embed=1');
     expect(filmEmbedSrc(5)).toContain('scene=5');
     expect(filmEmbedSrc(5, { path: 'line2' })).toContain('path=line2');

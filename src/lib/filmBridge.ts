@@ -14,7 +14,7 @@ export const filmCues: FilmCue[] = [
   { id: 'intro', label: 'Intro', scene: 0 },
   { id: 'line2path', label: 'Line 2 path', scene: 5, path: 'line2' },
   { id: 'line2', label: 'Line 2 cabinet', scene: 5, command: 'cabinet' },
-  { id: 'explore', label: '3D map', scene: 3, command: '3d' },
+  { id: 'explore', label: 'Map', scene: 3, command: '3d' },
 ];
 
 export function isFilmCommand(value: string): value is FilmCommand {
@@ -37,7 +37,7 @@ export function appQueryForFilmCommand(command: FilmCommand): URLSearchParams {
   if (command === 'cabinet') next.set('view', 'cabinet');
   if (command === '3d') {
     next.set('area', 'area-warehouse-f');
-    next.set('map', '3d');
+    next.set('map', '2d');
   }
   return next;
 }

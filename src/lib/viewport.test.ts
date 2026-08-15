@@ -23,7 +23,7 @@ describe('viewport rebalance', () => {
     expect(query).toContain('asset=L2-CC-001');
     expect(query).toContain('tab=intel');
     expect(query).not.toContain('device=');
-    expect(dashboardSearch({ view: 'dashboard' })).toBe('?map=3d');
+    expect(dashboardSearch({ view: 'dashboard' })).toBe('?map=2d');
   });
 
   it('carries film/motion/hold/scene/path/view through dashboardSearch so mini-player URLs survive mount', () => {
@@ -50,8 +50,8 @@ describe('viewport rebalance', () => {
     expect(held).toContain('film=1');
     expect(held).toContain('motion=reduce');
     expect(held).not.toContain('view=film');
-    expect(dashboardSearch({ view: 'dashboard', ...genieQueryFromSearch('') })).toBe('?map=3d');
-    expect(dashboardSearch({ view: 'dashboard', film: '0', motion: 'off', hold: 'dock', path: 'line4' })).toBe('?map=3d');
+    expect(dashboardSearch({ view: 'dashboard', ...genieQueryFromSearch('') })).toBe('?map=2d');
+    expect(dashboardSearch({ view: 'dashboard', film: '0', motion: 'off', hold: 'dock', path: 'line4' })).toBe('?map=2d');
     expect(dashboardSearch({ view: 'dashboard', map: '2d' })).toBe('?map=2d');
   });
 
@@ -83,8 +83,8 @@ describe('viewport rebalance', () => {
     const player = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../presentation/player.js'), 'utf8');
     expect(presentation).not.toContain('Open 3D');
     expect(player).not.toContain('Open 3D');
-    expect(presentation).toContain('>3D map<');
-    expect(player).toContain("command === '3d' ? '3D map'");
+    expect(presentation).toContain('data-command="3d">Map<');
+    expect(player).toContain("command === '3d' ? 'Open map'");
   });
 
   it('writes --app-height for load/reload rebalance', () => {

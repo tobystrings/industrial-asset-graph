@@ -14,7 +14,7 @@ npm run dev -- --host 0.0.0.0 --port 4173
 
 Open: **http://127.0.0.1:4173/industrial-asset-graph/**
 
-- 3D map is the **default**. `?map=2d` for the flat schematic.
+- Building layout is the fixed bird's-eye **2D schematic only**. Legacy `map=3d` links resolve to 2D.
 - Cabinet: `?view=cabinet`
 - Genie is the **bottom bar** unless you open Film / `?film=1`.
 

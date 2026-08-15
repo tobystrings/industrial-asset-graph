@@ -26,7 +26,7 @@ describe('schematic layout', () => {
     }
   });
 
-  it('maps schematic percent rects into world units used by the 3D stage', () => {
+  it('keeps the legacy world projection deterministic for existing layout helpers', () => {
     const world = rectToWorld(schematicFor('area-warehouse-f'));
     expect(world.x).toBeCloseTo(20);
     expect(world.z).toBeCloseTo(60);
@@ -35,22 +35,18 @@ describe('schematic layout', () => {
     expect(world.height).toBeGreaterThan(0);
   });
 
-  it('opens the existing 3D stage from map=3d and never a second Open 3D entry', () => {
-    expect(mapModeFromQuery('?map=3d')).toBe('3d');
-    expect(mapModeFromQuery('map=3d')).toBe('3d');
-    expect(mapModeFromQuery('')).toBe('3d');
-    expect(mapModeFromQuery('?area=area-warehouse-f')).toBe('3d');
+  it('always opens the fixed bird-eye 2D stage, including from legacy map links', () => {
+    expect(mapModeFromQuery('?map=3d')).toBe('2d');
+    expect(mapModeFromQuery('map=3d')).toBe('2d');
+    expect(mapModeFromQuery('')).toBe('2d');
+    expect(mapModeFromQuery('?area=area-warehouse-f')).toBe('2d');
     expect(mapModeFromQuery('?map=2d')).toBe('2d');
-    const three = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), 'FacilityMap3D.tsx'), 'utf8');
-    expect(three).toContain("fog attach=\"fog\" args={['#dce6f0', 180, 420]}");
-    expect(three).toContain('position: [52, 36, 88]');
     const stage = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), 'MapStage.tsx'), 'utf8');
     const dashboard = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../Dashboard.tsx'), 'utf8');
-    expect(three).toContain('portal={host}');
-    expect(three).not.toContain('distanceFactor');
-    expect(three).toContain('map3d-label');
-    expect(stage).not.toContain('className="map-mode"');
-    expect(dashboard).toContain('className="map-mode"');
+    expect(stage).toContain('BlueprintMap');
+    expect(stage).not.toContain('FacilityMap3D');
+    expect(stage).not.toContain('lazy(');
+    expect(dashboard).not.toContain('className="map-mode"');
     expect(dashboard).toContain('aria-expanded={drawerOpen}');
     expect(dashboard).toContain('setDrawerOpen((value) => !value)');
     expect(dashboard).not.toContain('setNavOpen((value) => !value)');

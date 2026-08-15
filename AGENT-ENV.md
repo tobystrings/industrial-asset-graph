@@ -10,7 +10,7 @@ Live local board:
 
 ```
 http://localhost:4173/industrial-asset-graph/
-http://127.0.0.1:4173/industrial-asset-graph/?area=area-warehouse-f&map=3d&tab=docs&device=io-1762-ia8
+http://127.0.0.1:4173/industrial-asset-graph/?area=area-warehouse-f&map=2d&tab=docs&device=io-1762-ia8
 ```
 
 ## Where it lives
@@ -43,13 +43,13 @@ Open `http://127.0.0.1:4173/industrial-asset-graph/`. Production-shaped preview:
 - Walkdown / Keep is local-only. Keep never writes `facilityData`. Dest / motor / recovery overlay only after explicit **Apply**.
 - Do not invent machines, surveyed coordinates, Line 2 `FEEDS`, wiring, LOTO steps, or motor HP.
 - L2 film chapter is scene **5** or `path=line2`. L4 is **intro-only**. Do not regenerate film MP3s.
-- **3D is the default map.** `?map=2d` forces the 2D schematic. Not a second 3D. No **Open 3D** button.
+- The building layout is the fixed bird's-eye **2D schematic only**. There is no orbital 3D mode or map-mode toggle.
 - Film Genie is an always-mounted **dock bar** (native `complete-project-film.mp3` clock). Mini only when opened. Not a modal / iframe. No autoplay on load.
 - LOCAL_ONLY evidence stays unbundled. FIELD_VERIFY stays honest.
 
 ## Stack
 
-Vite 6 + React 19 + TypeScript. 1e glass + Source Sans 3. Three.js / R3F / drei (lazy) for the existing 3D schematic. Tests: Vitest (`npm test`).
+Vite 6 + React 19 + TypeScript. 1e glass + Source Sans 3. Tests: Vitest (`npm test`).
 
 ## Surfaces that must stay one product
 
@@ -63,4 +63,4 @@ Golfgold, CMMS/SCADA/twin, App Store, auto-merge keep, new plants, new film audi
 
 A clean source zip (no `node_modules`, no golfgold) belongs outside OneDrive, preferably in **Downloads**.
 
-Read **`AGENT-HANDOFF.md`** first. It is the current how-to (3D default, assets list, honesty, URLs).
+Read **`AGENT-HANDOFF.md`** first. It is the current how-to (2D-only layout, assets list, honesty, URLs).
