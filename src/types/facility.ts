@@ -13,6 +13,95 @@ export interface FacilityAsset {
   facts: { label: string; value: VerifiedFact<string | number> }[];
   componentIds: string[]; unknowns: string[];
 }
-export interface ComponentRecord { id: string; label: string; type: string; parentId: string; verificationStatus: VerificationState; manufacturer?: string; model?: string; evidenceIds: string[]; }
+export interface ComponentRecord { id: string; label: string; type: string; parentId: string; verificationStatus: VerificationState; manufacturer?: string; model?: string; evidenceIds: string[]; productFamilyId?: string; }
 export interface RelationshipRecord { id: string; source: string; target: string; type: RelationshipType; verificationStatus: VerificationState; evidenceIds: string[]; }
+export type SignalKind = 'ANALOG' | 'DIGITAL' | 'NETWORK' | 'DISCRETE';
+export interface ProductParam {
+  code: string;
+  name: string;
+  catalogDefault: string | number | null;
+  fieldValue: string | number | null;
+  unit?: string;
+  verificationStatus: VerificationState;
+  note?: string;
+}
+export interface TerminalLegend {
+  silk: string;
+  meaning: string;
+  note?: string;
+}
+export interface ProductFamily {
+  id: string;
+  brand: string;
+  model: string;
+  kind: 'VFD' | 'SPEED_CONTROL' | 'SERVO';
+  installStatus: 'INSTALLED' | 'CATALOG_EXAMPLE';
+  params: ProductParam[];
+  terminals: TerminalLegend[];
+  manualId: string;
+}
+export type WalkdownField = 'dest' | 'motor' | 'recovery' | 'note' | 'param' | 'serial' | 'unknown';
+export type ReviewDecision = 'pending' | 'keep' | 'reject';
+export interface WalkdownCapture {
+  id: string;
+  targetId: string;
+  field: WalkdownField;
+  value: string;
+  capturedBy: string;
+  capturedAt: string;
+  photoRef?: string;
+  photoHash?: string;
+  review?: ReviewDecision;
+  /** Live dest/motor/recovery overlay only when keep + applied. Keep alone is review-only. */
+  applied?: boolean;
+}
+export interface SerialSource {
+  id: string;
+  assetId: string;
+  label: string;
+  value: string;
+  evidenceId: string;
+  verificationStatus: VerificationState;
+}
+export interface DriveInstance {
+  index: number;
+  componentId: string;
+  cabinetDeviceId: string;
+  drawingLabel: string;
+  loadLabel: string | null;
+  motorHp: string | null;
+  destId: string | null;
+}
+export interface SilkPair {
+  fromSilk: string;
+  toSilk: string;
+  note: string;
+}
+export interface SilkMap {
+  fromFamilyId: string;
+  toFamilyId: string;
+  pairs: SilkPair[];
+  disclaimer: string;
+}
+export type SystemKind = 'ALL' | 'VFD' | 'PLC' | 'IO' | 'SERVO' | 'POWER';
+export interface ManualRecord {
+  id: string;
+  familyId: string;
+  title: string;
+  path: string;
+  excerpt: string;
+  access: 'PUBLIC_APP' | 'LOCAL_ONLY';
+}
+export interface IoSignalRecord {
+  id: string;
+  sourceId: string;
+  sourceTerminal: string;
+  destId: string | null;
+  destTerminal: string | null;
+  purpose: string;
+  kind: SignalKind;
+  verificationStatus: VerificationState;
+  evidenceIds: string[];
+  note?: string;
+}
 export interface RevisionRecord { id: string; entityId: string; fieldPath: string; changedAt: string; changedBy: string; reason: string; evidenceIds: string[]; reviewState: 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'REJECTED'; }

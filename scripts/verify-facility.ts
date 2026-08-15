@@ -37,7 +37,8 @@ for (const start of parents.keys()) { const seen = new Set<string>(); let curren
 for (const document of documents) {
   if (!document.path.endsWith('.md') || document.path.includes('..')) throw new Error(`Broken document path: ${document.path}`);
   const knownTemplate = ['overview', 'electrical', 'controls', 'pneumatics', 'mechanical', 'troubleshooting', 'pm', 'loto', 'parts', 'photos'].some((name) => document.path.endsWith(`/${name}.md`));
-  if (!knownTemplate) throw new Error(`Unknown document path: ${document.path}`);
+  const isPublicManual = document.path.startsWith('docs/manuals/') && document.path.endsWith('.md');
+  if (!knownTemplate && !isPublicManual) throw new Error(`Unknown document path: ${document.path}`);
   accessSync(resolve(document.path));
 }
 accessSync(resolve('public/assets/labeled-building-layout.png'));

@@ -16,6 +16,12 @@ const terminal = $('#terminal');
 const terminalOutput = $('#terminalOutput');
 const introScene = $('.tyler-intro');
 const finaleScene = $('.solana-finale');
+const captionsEl = $('#captions');
+const captionText = $('#captionText');
+const liveJump = $('#liveJump');
+const fullPathBtn = $('#fullPathBtn');
+const line2PathBtn = $('#line2PathBtn');
+const captionToggle = $('#captionToggle');
 
 // One continuous MP3 is the only playback clock. The component source tracks
 // remain in the repository for replacement, but browsers never hand off between them.
@@ -28,13 +34,83 @@ let chapters = [];
 let sceneIndex = 0;
 let ready = false;
 
+const params = new URLSearchParams(location.search);
+const embedded = params.has('embed') || window.parent !== window;
+const requestedScene = Number(params.get('scene'));
+const startOnLine2 = params.get('path') === 'line2';
+const captionsOnStart = params.get('captions') === '1';
+if (embedded) document.documentElement.classList.add('embed');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reducedMotion) document.documentElement.classList.add('reduce-motion');
+
+let captionsOn = captionsOnStart;
+let line2Only = startOnLine2;
+let line2Path = [5, 7];
+let manifestScenes = [];
+
+function captionLinesFromNarration(narration) {
+  return String(narration || '').split('\n').map((line) => line.replace(/^\[[^\]]+\]\s*/, '').trim()).filter(Boolean);
+}
+function captionAtProgress(lines, progress) {
+  if (!lines.length) return '';
+  const t = Math.min(1, Math.max(0, progress));
+  return lines[Math.min(lines.length - 1, Math.floor(t * lines.length))];
+}
+function line2PathIndexes(scenes) {
+  return scenes.flatMap((scene, index) => (scene.slug === 'line2_standard' || scene.slug === 'failure_scenario' || scene.id === '04' || scene.id === '06' ? [index] : []));
+}
+function stillHoldsKenBurns(visual) {
+  const text = String(visual || '').toLowerCase();
+  return text.includes('cabinet') || text.includes('schematic') || text.includes('layout');
+}
+function jumpCommandForScene(scene) {
+  const slug = scene?.slug || '';
+  if (slug === 'line2_standard' || slug === 'failure_scenario') return 'cabinet';
+  if (slug === 'the_answer' || slug === 'what_we_are_building') return '3d';
+  return null;
+}
+function nextPathIndex(path, current, delta) {
+  if (!path.length) return null;
+  const at = path.indexOf(current);
+  if (at < 0) return path[0];
+  const next = at + delta;
+  if (next < 0 || next >= path.length) return null;
+  return path[next];
+}
+
+function ensureAudio() {
+  if (!audio.getAttribute('src')) {
+    const src = audio.dataset.src || 'audio/complete-project-film.mp3';
+    audio.src = src;
+  }
+}
+
 const commands = {
   risk: '45 years in the trade · 15 years at this facility\nWARNING: Undocumented operational knowledge is approaching retirement.',
   map: '11 facility areas indexed.\nBuilding layout is the navigation layer.\nBuilding → Area → Equipment → Evidence.',
   trace: 'Warehouse F / Line 2\nArea → Machine → Cabinet → Controls → Evidence\nRelationship path ready.',
   verify: 'Verified · Field verify · Inferred · Disputed · Retired\nEvery claim carries a source and review state.',
+  cabinet: 'Line 2 conveyor control cabinet · L2-CC-INT-001 Rev A\n50 indexed devices. No inferred wiring.',
+  '3d': 'Schematic 3D facility map · Warehouse F highlighted.\nOrbit, click a building, open a documented asset.',
   help: 'Controls: Play/Pause · Previous/Next · Replay · Fullscreen\nUse the chapter buttons to move through the film.'
 };
+
+const appHrefs = {
+  map: '../?area=area-warehouse-f',
+  trace: '../?area=area-warehouse-f&asset=L2-CC-001&command=trace',
+  verify: '../?area=area-warehouse-f&asset=L2-CC-001&command=verify',
+  cabinet: '../?view=cabinet',
+  '3d': '../?area=area-warehouse-f&map=3d',
+};
+
+function openInApp(command) {
+  if (embedded && window.parent !== window) {
+    window.parent.postMessage({ source: 'iag-film', type: 'open', command }, '*');
+    return;
+  }
+  const href = appHrefs[command];
+  if (href) location.href = href;
+}
 
 const fallbackScenes = [
   ['Introduction', 'Tyler Intro — Why I Started This'],
@@ -71,6 +147,17 @@ function sceneAt(time) {
   return result;
 }
 
+function resolveStartScene() {
+  if (line2Only) {
+    if (Number.isFinite(requestedScene) && requestedScene >= 0 && (!line2Path.length || line2Path.includes(requestedScene))) {
+      return requestedScene;
+    }
+    return line2Path[0] ?? 5;
+  }
+  if (Number.isFinite(requestedScene) && requestedScene >= 0) return requestedScene;
+  return sceneAt(audio.currentTime || 0);
+}
+
 function updateCinematicPhases() {
   if (sceneIndex === 0 && introScene) {
     const position = Math.min(1, audio.currentTime / segmentTimes.introEnd);
@@ -88,19 +175,75 @@ function updateCinematicPhases() {
 
 function updateScene(index = sceneIndex) {
   sceneIndex = Math.max(0, Math.min(chapters.length - 1, index));
-  $$('.scene').forEach((element, i) => element.classList.toggle('active', i === sceneIndex));
-  $$('.chapter-btn').forEach((element, i) => element.classList.toggle('active', i === sceneIndex));
+  $$('.scene').forEach((element, i) => {
+    element.classList.toggle('active', i === sceneIndex);
+    const visual = manifestScenes[i]?.visual || '';
+    element.classList.toggle('still-hold', stillHoldsKenBurns(visual) || element.classList.contains('still-hold'));
+  });
+  $$('.chapter-btn').forEach((element) => element.classList.toggle('active', Number(element.dataset.scene) === sceneIndex));
   chapterNum.textContent = chapters[sceneIndex]?.num || '';
   chapterTitle.textContent = chapters[sceneIndex]?.title || '';
   terminal.classList.toggle('show', sceneIndex === chapters.length - 2);
+  const command = jumpCommandForScene(manifestScenes[sceneIndex] || {});
+  if (liveJump) {
+    liveJump.hidden = !command;
+    liveJump.dataset.command = command || '';
+    liveJump.textContent = command === 'cabinet' ? 'Open Line 2 cabinet' : command === '3d' ? '3D map' : 'Open in the live graph';
+  }
   updateCinematicPhases();
+  updateCaption();
+}
+
+function sceneLocalProgress() {
+  const start = sceneStart(sceneIndex);
+  const end = sceneIndex >= chapters.length - 1 ? duration() : sceneStart(sceneIndex + 1);
+  return (audio.currentTime - start) / Math.max(0.1, end - start);
+}
+
+function emitBeat() {
+  if (!embedded || window.parent === window) return;
+  const scene = manifestScenes[sceneIndex] || {};
+  const lines = captionLinesFromNarration(scene.narration || chapters[sceneIndex]?.title || '');
+  const progress = sceneLocalProgress();
+  window.parent.postMessage({
+    source: 'iag-film',
+    type: 'beat',
+    sceneIndex,
+    progress,
+    caption: captionAtProgress(lines, progress),
+    visual: scene.visual || '',
+    slug: scene.slug || '',
+    id: scene.id || '',
+  }, '*');
+}
+
+function updateCaption() {
+  if (!captionsEl || !captionText) return;
+  captionsEl.hidden = !captionsOn;
+  const scene = manifestScenes[sceneIndex];
+  const lines = captionLinesFromNarration(scene?.narration || chapters[sceneIndex]?.title || '');
+  const progress = sceneLocalProgress();
+  if (captionsOn) captionText.textContent = captionAtProgress(lines, progress);
+  emitBeat();
 }
 
 function updateFromAudio() {
   if (!ready) return;
-  const next = sceneAt(audio.currentTime);
+  let next = sceneAt(audio.currentTime);
+  if (line2Only && line2Path.length && !line2Path.includes(next)) {
+    const upcoming = line2Path.find((index) => sceneStart(index) > audio.currentTime);
+    if (upcoming === undefined) {
+      audio.pause();
+      endScreen.classList.add('show');
+      setPlayingUi(false);
+      return;
+    }
+    audio.currentTime = sceneStart(upcoming) + .01;
+    next = upcoming;
+  }
   if (next !== sceneIndex) updateScene(next);
   updateCinematicPhases();
+  updateCaption();
   progressBar.style.width = `${Math.min(100, (audio.currentTime / duration()) * 100)}%`;
   runtime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration())} · Scene ${sceneIndex + 1} of ${chapters.length}`;
 }
@@ -112,6 +255,7 @@ function setPlayingUi(playing) {
 
 async function playFilm() {
   endScreen.classList.remove('show');
+  ensureAudio();
   try { await audio.play(); setPlayingUi(true); }
   catch { statusText.textContent = 'Tap Play to allow audio'; }
 }
@@ -119,24 +263,30 @@ async function playFilm() {
 function startPresentation() {
   if (!ready) return;
   startOverlay.style.display = 'none';
-  audio.currentTime = 0;
-  updateScene(0); updateFromAudio();
+  const first = line2Only && line2Path.length ? line2Path[0] : 0;
+  ensureAudio();
+  audio.currentTime = sceneStart(first);
+  updateScene(first); updateFromAudio();
   playFilm();
 }
 
 function replayPresentation() {
   startOverlay.style.display = 'none';
   endScreen.classList.remove('show');
-  audio.currentTime = 0;
-  updateScene(0); updateFromAudio();
-  playFilm();
+  startPresentation();
 }
 
 function goToScene(index) {
   if (!ready) return;
-  const next = Math.max(0, Math.min(chapters.length - 1, index));
+  let next = Math.max(0, Math.min(chapters.length - 1, index));
+  if (line2Only && line2Path.length && !line2Path.includes(next)) {
+    const mapped = nextPathIndex(line2Path, sceneIndex, next > sceneIndex ? 1 : -1);
+    if (mapped === null) return;
+    next = mapped;
+  }
   const wasPlaying = !audio.paused;
   audio.pause();
+  ensureAudio();
   audio.currentTime = sceneStart(next) + .01;
   updateScene(next); updateFromAudio();
   if (wasPlaying) playFilm(); else setPlayingUi(false);
@@ -145,13 +295,26 @@ function goToScene(index) {
 function buildChapterButtons() {
   const wrap = $('#chapterButtons');
   wrap.innerHTML = '';
-  chapters.forEach((chapter, index) => {
+  const visible = line2Only && line2Path.length ? line2Path : chapters.map((_, index) => index);
+  visible.forEach((index) => {
+    const chapter = chapters[index];
+    if (!chapter) return;
     const button = document.createElement('button');
     button.className = 'chapter-btn';
+    button.dataset.scene = String(index);
     button.textContent = `${index + 1}. ${chapter.shortTitle}`;
     button.addEventListener('click', () => goToScene(index));
     wrap.appendChild(button);
   });
+}
+
+function setPathMode(nextLine2) {
+  line2Only = nextLine2;
+  fullPathBtn?.classList.toggle('active', !line2Only);
+  line2PathBtn?.classList.toggle('active', line2Only);
+  buildChapterButtons();
+  if (line2Only && line2Path.length && !line2Path.includes(sceneIndex)) goToScene(line2Path[0]);
+  else updateScene(sceneIndex);
 }
 
 function markReady() {
@@ -191,23 +354,71 @@ $('#prevBtn').addEventListener('click', () => goToScene(sceneIndex - 1));
 $('#nextBtn').addEventListener('click', () => goToScene(sceneIndex + 1));
 $('#replayBtn').addEventListener('click', replayPresentation);
 $('#endReplay').addEventListener('click', replayPresentation);
-$('#exitBtn').addEventListener('click', () => { audio.pause(); location.href = '../'; });
+$('#endCabinet')?.addEventListener('click', () => openInApp('cabinet'));
+$('#end3d')?.addEventListener('click', () => openInApp('3d'));
+fullPathBtn?.addEventListener('click', () => setPathMode(false));
+line2PathBtn?.addEventListener('click', () => setPathMode(true));
+captionToggle?.addEventListener('click', () => {
+  captionsOn = !captionsOn;
+  captionToggle.setAttribute('aria-pressed', captionsOn ? 'true' : 'false');
+  captionToggle.classList.toggle('active', captionsOn);
+  updateCaption();
+});
+liveJump?.addEventListener('click', () => {
+  const command = liveJump.dataset.command;
+  if (command) openInApp(command);
+});
+$('#exitBtn').addEventListener('click', () => {
+  audio.pause();
+  if (embedded && window.parent !== window) window.parent.postMessage({ source: 'iag-film', type: 'close' }, '*');
+  else location.href = '../';
+});
 $('#fullBtn').addEventListener('click', () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
 });
-$$('[data-command]').forEach(button => button.addEventListener('click', () => { terminalOutput.textContent = commands[button.dataset.command]; }));
+$$('[data-command]').forEach(button => button.addEventListener('click', () => {
+  const command = button.dataset.command;
+  terminalOutput.textContent = commands[command] || '';
+  if (['map', 'trace', 'verify', 'cabinet', '3d'].includes(command)) {
+    const action = document.createElement('button');
+    action.textContent = 'OPEN IN APP';
+    action.style.cssText = 'display:inline-block;margin-top:8px;color:#091120;background:#5eead4;border:0;border-radius:8px;padding:8px 12px;font-weight:800';
+    action.addEventListener('click', () => openInApp(command));
+    terminalOutput.append('\n');
+    terminalOutput.append(action);
+  }
+}));
+
+if (Number.isFinite(requestedScene) && requestedScene >= 0 || line2Only) {
+  ensureAudio();
+  audio.addEventListener('loadedmetadata', () => goToScene(resolveStartScene()), { once: true });
+}
+
+if (captionsOn) {
+  captionToggle?.setAttribute('aria-pressed', 'true');
+  captionToggle?.classList.add('active');
+}
+if (line2Only) setPathMode(true);
 
 fetch('narration-manifest.json')
   .then(response => { if (!response.ok) throw new Error(`Narration manifest: ${response.status}`); return response.json(); })
   .then(manifest => {
+    manifestScenes = manifest.scenes;
+    line2Path = line2PathIndexes(manifestScenes);
     chapters = manifest.scenes.map((scene, index) => ({
       num: scene.id === 'T00' ? 'Introduction' : scene.id === '00' ? 'Opening' : scene.id === '08' ? 'Closing' : scene.id === 'F00' ? 'Finale' : scene.id,
       title: scene.title,
       shortTitle: scene.title.split(' — ')[0],
       index
     }));
-    buildChapterButtons(); updateScene(sceneAt(audio.currentTime)); markReady();
+    if (line2Only) setPathMode(true);
+    else buildChapterButtons();
+    const start = resolveStartScene();
+    updateScene(start);
+    emitBeat();
+    markReady();
+    if (audio.readyState >= 1) goToScene(start);
   })
   .catch(error => console.error(error));
 

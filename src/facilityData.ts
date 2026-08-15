@@ -46,8 +46,8 @@ export const machines: FacilityAsset[] = [{
 }];
 
 export const components: ComponentRecord[] = [
-  { id: 'FG-L4-VFD-001', label: 'VFD1 · PowerFlex 70', type: 'VFD', parentId: 'FG-L4-MTN-001', manufacturer: 'Allen-Bradley', model: 'PowerFlex 70', verificationStatus: 'VERIFIED', evidenceIds: ['ev-panel-vfd-001'] },
-  ...['SD13041', 'SD13042', 'SD13043'].map((label) => ({ id: `FG-L4-${label}`, label, type: 'SERVO_DRIVE', parentId: 'FG-L4-MTN-001', verificationStatus: 'VERIFIED' as const, evidenceIds: ['ev-panel-servo-001'] })),
+  { id: 'FG-L4-VFD-001', label: 'VFD1 · PowerFlex 70', type: 'VFD', parentId: 'FG-L4-MTN-001', manufacturer: 'Allen-Bradley', model: 'PowerFlex 70', productFamilyId: 'family-powerflex-70', verificationStatus: 'VERIFIED', evidenceIds: ['ev-panel-vfd-001'] },
+  ...['SD13041', 'SD13042', 'SD13043'].map((label) => ({ id: `FG-L4-${label}`, label, type: 'SERVO_DRIVE', parentId: 'FG-L4-MTN-001', productFamilyId: 'family-l4-servo', verificationStatus: 'VERIFIED' as const, evidenceIds: ['ev-panel-servo-001'] })),
   { id: 'FG-L4-RIO-001', label: 'Rexroth Inline I/O', type: 'REMOTE_IO', parentId: 'FG-L4-MTN-001', manufacturer: 'Bosch Rexroth', verificationStatus: 'VERIFIED', evidenceIds: ['ev-panel-io-001'] },
   { id: 'L2-CC-PLC-001', label: 'MicroLogix 1400', type: 'PLC', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: 'MicroLogix 1400', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
   { id: 'L2-CC-DI-001', label: '1762-IA8', type: 'DIGITAL_INPUT', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: '1762-IA8', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
@@ -56,7 +56,7 @@ export const components: ComponentRecord[] = [
   { id: 'L2-CC-AI-001', label: '1762-IF4', type: 'ANALOG_INPUT', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: '1762-IF4', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
   { id: 'L2-CC-AO-001', label: '1762-OF4', type: 'ANALOG_OUTPUT', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: '1762-OF4', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
   { id: 'L2-CC-RO-001', label: '1762-OW8', type: 'RELAY_OUTPUT', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: '1762-OW8', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
-  ...Array.from({ length: 8 }, (_, index): ComponentRecord => ({ id: `L2-CC-VFD-${String(index + 1).padStart(3, '0')}`, label: index === 5 ? 'CONV #6' : index === 6 ? 'CONV #7' : `DRIVE #${index + 1}`, type: 'VFD', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: 'PowerFlex 4', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] })),
+  ...Array.from({ length: 8 }, (_, index): ComponentRecord => ({ id: `L2-CC-VFD-${String(index + 1).padStart(3, '0')}`, label: index === 5 ? 'CONV #6' : index === 6 ? 'CONV #7' : `DRIVE #${index + 1}`, type: 'VFD', parentId: 'L2-CC-001', manufacturer: 'Allen-Bradley', model: 'PowerFlex 4', productFamilyId: 'family-powerflex-4', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] })),
   { id: 'L2-CC-PS-001', label: '120W 24VDC power supply', type: 'POWER_SUPPLY', parentId: 'L2-CC-001', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
   { id: 'L2-CC-DS-001', label: 'Door disconnect', type: 'DISCONNECT', parentId: 'L2-CC-001', verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-drawing'] },
 ];
@@ -80,10 +80,14 @@ documents.push(
   { id: 'doc-l2-photos', assetId: 'L2-CC-001', category: 'Photos', title: 'Approved cabinet reference render', path: 'docs/control-cabinets/line2/photos.md', state: 'COMPLETE', required: true, verificationStatus: 'VERIFIED', evidenceIds: ['ev-line2-reference-render'] },
   { id: 'doc-l2-troubleshooting', assetId: 'L2-CC-001', category: 'Troubleshooting', title: 'Line 2 troubleshooting knowledge', path: 'docs/control-cabinets/line2/troubleshooting.md', state: 'NOT_STARTED', required: true, verificationStatus: 'FIELD_VERIFY', evidenceIds: [] },
   { id: 'doc-l2-loto', assetId: 'L2-CC-001', category: 'LOTO', title: 'Line 2 cabinet isolation procedure', path: 'docs/control-cabinets/line2/loto.md', state: 'NOT_STARTED', required: true, verificationStatus: 'FIELD_VERIFY', evidenceIds: [] },
+  { id: 'doc-manual-pf4', assetId: 'L2-CC-001', category: 'Manual', title: 'PowerFlex 4 terminal legend', path: 'docs/manuals/powerflex-4-terminals.md', state: 'COMPLETE', required: false, verificationStatus: 'INFERRED', evidenceIds: [] },
+  { id: 'doc-manual-d700', assetId: 'L2-CC-001', category: 'Manual', title: 'Mitsubishi FR-D700 terminal legend (catalog example)', path: 'docs/manuals/mitsubishi-fr-d700-terminals.md', state: 'REVIEW', required: false, verificationStatus: 'INFERRED', evidenceIds: [] },
+  { id: 'doc-manual-pf70', assetId: 'FG-L4-MTN-001', category: 'Manual', title: 'PowerFlex 70 terminal legend', path: 'docs/manuals/powerflex-70-terminals.md', state: 'COMPLETE', required: false, verificationStatus: 'INFERRED', evidenceIds: [] },
+  { id: 'doc-manual-l4-servo', assetId: 'FG-L4-MTN-001', category: 'Manual', title: 'L4 servo terminal legend (not in this build)', path: 'docs/manuals/l4-servo-terminals.md', state: 'NOT_STARTED', required: false, verificationStatus: 'FIELD_VERIFY', evidenceIds: [] },
 );
 export const relationships: RelationshipRecord[] = [
   { id: 'rel-machine-area', source: 'FG-L4-MTN-001', target: 'area-warehouse-f', type: 'LOCATED_IN', verificationStatus: 'VERIFIED', evidenceIds: ['ev-asset-tag-001'] },
-  ...components.map((item) => ({ id: `rel-${item.id}`, source: 'FG-L4-MTN-001', target: item.id, type: 'CONTAINS' as const, verificationStatus: item.verificationStatus, evidenceIds: item.evidenceIds })),
+  ...components.filter((item) => item.parentId === 'FG-L4-MTN-001').map((item) => ({ id: `rel-${item.id}`, source: 'FG-L4-MTN-001', target: item.id, type: 'CONTAINS' as const, verificationStatus: item.verificationStatus, evidenceIds: item.evidenceIds })),
   ...evidence.filter((item) => !item.id.startsWith('ev-line2-')).map((item) => ({ id: `rel-${item.id}`, source: 'FG-L4-MTN-001', target: item.id, type: 'SUPPORTED_BY_EVIDENCE' as const, verificationStatus: 'VERIFIED' as const, evidenceIds: [item.id] })),
   { id: 'rel-line2-area', source: 'L2-CC-001', target: 'area-warehouse-f', type: 'LOCATED_IN', verificationStatus: 'INFERRED', evidenceIds: [] },
   ...components.filter((item) => item.parentId === 'L2-CC-001').map((item) => ({ id: `rel-line2-component-${item.id}`, source: 'L2-CC-001', target: item.id, type: 'CONTAINS' as const, verificationStatus: item.verificationStatus, evidenceIds: item.evidenceIds })),
@@ -92,3 +96,8 @@ export const relationships: RelationshipRecord[] = [
 export const revisions: RevisionRecord[] = [{ id: 'rev-fg-seed', entityId: 'FG-L4-MTN-001', fieldPath: 'identity', changedAt: '2026-07-31T00:00:00Z', changedBy: 'Build package import', reason: 'Created initial evidence-aware machine package', evidenceIds: ['ev-machine-nameplate-001'], reviewState: 'DRAFT' }, { id: 'rev-line2-seed', entityId: 'L2-CC-001', fieldPath: 'cabinet.referencePackage', changedAt: '2026-08-11T00:00:00Z', changedBy: 'Approved reference package import', reason: 'Promoted Line 2 cabinet and key devices into the facility graph', evidenceIds: ['ev-line2-reference-drawing', 'ev-line2-reference-render'], reviewState: 'REVIEWED' }];
 
 export const documentationPercent = (assetId: string) => { const required = documents.filter((item) => item.assetId === assetId && item.required); return Math.round(required.reduce((sum, item) => sum + ({ COMPLETE: 1, REVIEW: .8, IN_PROGRESS: .5, DRAFT: .25, NOT_STARTED: 0 }[item.state]), 0) / required.length * 100); };
+
+export const assetSerialSources = [
+  { id: 'serial-l4-nameplate', assetId: 'FG-L4-MTN-001', label: 'Machine nameplate', value: 'MT081619A', evidenceId: 'ev-machine-nameplate-001', verificationStatus: 'DISPUTED' as const },
+  { id: 'serial-l4-tag', assetId: 'FG-L4-MTN-001', label: 'Equipment asset tag', value: '1619A', evidenceId: 'ev-asset-tag-001', verificationStatus: 'DISPUTED' as const },
+];

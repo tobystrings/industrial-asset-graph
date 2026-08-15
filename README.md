@@ -9,17 +9,19 @@ The **Control cabinets** workspace includes an interactive Line 2 Conveyor Contr
 Requires Node.js 20+ and Python 3 with Playwright/Pillow only for the visual check.
 
 ```powershell
-Set-Location C:\Users\ptoul\Downloads\industrial-asset-graph-working
+Set-Location C:\Users\ptoul\Downloads\industrial-asset-graph-main
 npm install
 ```
+
+On the Mac mini: `cd /Users/p/Downloads/industrial-asset-graph-main && npm install`
 
 ## Development server
 
 ```powershell
-npm run dev -- --host 127.0.0.1 --port 4173
+npm run dev -- --host 0.0.0.0 --port 4173
 ```
 
-Open http://127.0.0.1:4173/. This mode rebuilds on file changes.
+Open http://127.0.0.1:4173/industrial-asset-graph/. Vite `base` is `/industrial-asset-graph/`. This mode rebuilds on file changes.
 
 ## Fast local preview
 

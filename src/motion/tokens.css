@@ -1,0 +1,88 @@
+:root {
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --dur-fast: 160ms;
+  --dur: 280ms;
+  --dur-enter: 320ms;
+  --dur-slow: 560ms;
+  --dur-trace: 900ms;
+  --dur-kpi: 900ms;
+}
+
+@keyframes panel-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mark-pop {
+  from { opacity: 0; transform: scale(.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mark-pulse {
+  0%, 100% { filter: none; }
+  50% { filter: drop-shadow(0 0 6px currentColor); }
+}
+
+@keyframes map-crossfade {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes device-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px #2dd4bf); }
+  50% { filter: drop-shadow(0 0 10px #5eead4); }
+}
+
+.enter {
+  animation: panel-enter var(--dur-enter) var(--ease-out) both;
+}
+
+.pop {
+  animation: mark-pop var(--dur) var(--ease-out) both;
+}
+
+.status-mark {
+  animation: mark-pop var(--dur-fast) var(--ease-out) both;
+}
+
+.kpi-bar > i {
+  transform-origin: left center;
+  transition: width var(--dur-kpi) var(--ease-out);
+}
+
+.trace-node {
+  opacity: 0;
+  animation: panel-enter var(--dur-enter) var(--ease-out) both;
+}
+
+.trace-line {
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  animation: draw-line var(--dur-trace) var(--ease-out) forwards;
+}
+
+.map-viewport {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: map-crossfade var(--dur-enter) var(--ease-out) both;
+}
+
+@keyframes draw-line {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter, .pop, .trace-node, .trace-line, .status-mark, .kpi-bar > i,
+  .map-viewport, .machine-chip, .blueprint-area, .cabinet-svg, .cabinet-detail-heading h2,
+  .cabinet-svg [data-device-id].is-selected, .scroll-pane, .rail {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .trace-node { opacity: 1; }
+  .trace-line { stroke-dashoffset: 0; }
+  .map-viewport { opacity: 1; transform: none; }
+}

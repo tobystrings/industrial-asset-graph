@@ -1,0 +1,135 @@
+import { describe, expect, it, beforeEach } from 'vitest';
+import { areas, documentationPercent, machines } from '../facilityData';
+import { parseDeviceQuery } from './deviceQuery';
+import { filmChapterForAsset } from './filmBridge';
+import { doorCodeCaption, hrefMatrix, hrefMatrixSvg, intelSectionsCollapsed, intelSectionsDefaultOpen, walkdownMoreDefaultOpen, chipCountLabel, chipPeekMinVisible } from './hrefMatrix';
+import { doorSheetCards } from './doorSheet';
+import { assetDocumentationCompleteness, documentationCoveragePercent, documentedAreaCount, graphFieldItemCount, openFieldItemCount } from './facilityMetrics';
+import { reconnectAfterFault } from './productLookup';
+import { unusedRelationshipCounts } from './relationshipHonesty';
+import { line2DriveInstances } from './driveInstances';
+import { faultCardFor } from './faultCard';
+import { applyKeepDecision, decideReview, filterReviewCaptures, keepPatchSummary, keepPatchText } from './reviewPack';
+import { applyKeptCapture, capturedPlantFacts, markUnknownCaptured, recordWalkdownCapture, resetWalkdownStore } from './walkdown';
+import { todayChipTarget, todayWalkdownItems } from './walkdownPrompts';
+import { parseInspectorTab } from './boardChrome';
+import { ioChannelSummary } from './ioChannels';
+import { machinesInSystem } from './systemKinds';
+
+describe('floor-loop helpers', () => {
+  beforeEach(() => resetWalkdownStore());
+
+  it('emits a keep patch that names the capture and does not invent dest/motor/recovery', () => {
+    const saved = recordWalkdownCapture({ targetId: 'L2-CC-VFD-001', field: 'note', value: 'nameplate photo', capturedBy: 'Don' });
+    const { patch } = applyKeepDecision(saved!.id);
+    expect(patch?.inGraph).toBe(false);
+    expect(patch?.applied).toBe(false);
+    expect(patch?.captureId).toBe(saved!.id);
+    expect(patch?.targetId).toBe('L2-CC-VFD-001');
+    const text = keepPatchText(patch!);
+    expect(text).toContain(saved!.id);
+    expect(text).toContain('L2-CC-VFD-001');
+    const facts = capturedPlantFacts('L2-CC-VFD-001');
+    expect(facts.dest).toBeNull();
+    expect(facts.motor).toBeNull();
+    expect(facts.recovery).toBeNull();
+    expect(patch?.inventsDest).toBe(false);
+    expect(patch?.proposesDest).toBe(false);
+    expect(keepPatchSummary(patch!)).toContain('L2-CC-VFD-001');
+    const destCap = recordWalkdownCapture({ targetId: 'L2-CC-VFD-001', field: 'dest', value: 'typed dest', capturedBy: 'Don' });
+    const destKeep = applyKeepDecision(destCap!.id).patch;
+    expect(destKeep?.inGraph).toBe(false);
+    expect(destKeep?.applied).toBe(false);
+    expect(destKeep?.inventsDest).toBe(false);
+    expect(destKeep?.proposesDest).toBe(true);
+    expect(filterReviewCaptures([{ ...destCap!, review: 'keep' }], 'keep')).toHaveLength(1);
+    expect(filterReviewCaptures([{ ...destCap!, review: 'pending' }], 'pending')).toHaveLength(1);
+  });
+
+  it('does not overlay dest/motor/recovery on keep or reject — dest-unknown chips stay', () => {
+    const destCap = recordWalkdownCapture({ targetId: 'L2-CC-VFD-001', field: 'dest', value: 'typed dest', capturedBy: 'Don' });
+    const recoveryCap = recordWalkdownCapture({ targetId: 'L2-CC-VFD-001', field: 'recovery', value: 'typed restart', capturedBy: 'Don' });
+    const motorCap = recordWalkdownCapture({ targetId: 'L2-CC-VFD-001', field: 'motor', value: '5 HP', capturedBy: 'Don' });
+    expect(destCap).not.toBeNull();
+    applyKeepDecision(destCap!.id);
+    applyKeepDecision(recoveryCap!.id);
+    decideReview(motorCap!.id, 'reject');
+    expect(capturedPlantFacts('L2-CC-VFD-001')).toEqual({ dest: null, motor: null, recovery: null });
+    const afterKeep = line2DriveInstances().find((item) => item.componentId === 'L2-CC-VFD-001');
+    expect(afterKeep?.destId).toBeNull();
+    expect(afterKeep?.motorHp).toBeNull();
+    expect(todayWalkdownItems().some((item) => item.id === 'L2-CC-VFD-001' && item.kind === 'dest-unknown')).toBe(true);
+    expect(faultCardFor('L2-CC-VFD-001').recoverySteps).toEqual([]);
+    decideReview(destCap!.id, 'reject');
+    expect(line2DriveInstances().find((item) => item.componentId === 'L2-CC-VFD-001')?.destId).toBeNull();
+    expect(todayWalkdownItems().some((item) => item.id === 'L2-CC-VFD-001' && item.kind === 'dest-unknown')).toBe(true);
+    const applied = applyKeptCapture(destCap!.id);
+    expect(applied).toBeNull();
+    applyKeepDecision(destCap!.id);
+    expect(applyKeptCapture(destCap!.id)?.applied).toBe(true);
+    expect(capturedPlantFacts('L2-CC-VFD-001').dest).toBe('typed dest');
+    expect(line2DriveInstances().find((item) => item.componentId === 'L2-CC-VFD-001')?.destId).toBe('typed dest');
+    expect(todayWalkdownItems().some((item) => item.id === 'L2-CC-VFD-001' && item.kind === 'dest-unknown')).toBe(false);
+    decideReview(destCap!.id, 'reject');
+    expect(capturedPlantFacts('L2-CC-VFD-001').dest).toBeNull();
+    expect(line2DriveInstances().find((item) => item.componentId === 'L2-CC-VFD-001')?.destId).toBeNull();
+    expect(todayWalkdownItems().some((item) => item.id === 'L2-CC-VFD-001' && item.kind === 'dest-unknown')).toBe(true);
+    expect(faultCardFor('L2-CC-VFD-001').recoverySteps).toEqual([]);
+  });
+
+  it('maps today chips to existing ids and dest-unknown devices', () => {
+    const items = todayWalkdownItems();
+    const dest = items.find((item) => item.kind === 'dest-unknown');
+    const jump = todayChipTarget(dest!);
+    expect(jump.assetId).toBe('L2-CC-001');
+    expect(jump.device).toBe('vfd-01');
+    expect(jump.openCabinet).toBe(false);
+    expect(jump.tab).toBe('intel');
+    expect(parseDeviceQuery(jump.device)?.componentId).toBe('L2-CC-VFD-001');
+    const serial = items.find((item) => item.kind === 'serial');
+    expect(todayChipTarget(serial!).tab).toBe('record');
+    expect(machines.some((item) => item.id === todayChipTarget(serial!).assetId)).toBe(true);
+    const kit = items.find((item) => item.kind === 'area-kit');
+    expect(areas.some((area) => area.id === todayChipTarget(kit!).areaId)).toBe(true);
+  });
+
+  it('builds door QR matrices from live hrefs and keeps Intel expanded by default', () => {
+    const card = doorSheetCards('https://example.test').find((item) => item.deviceId === 'vfd-01');
+    expect(card?.href).toContain('device=vfd-01');
+    const grid = hrefMatrix(card!.href);
+    expect(grid).toHaveLength(21);
+    expect(grid.every((row) => row.length === 21)).toBe(true);
+    expect(grid.flat().some(Boolean)).toBe(true);
+    expect(hrefMatrixSvg(card!.href)).toContain(card!.href);
+    expect(doorCodeCaption().toLowerCase()).toContain('not a camera qr');
+    expect(intelSectionsDefaultOpen()).toEqual({ rack: true, manual: true, params: true, silk: true });
+    expect(intelSectionsCollapsed()).toEqual({ rack: false, manual: false, params: false, silk: false });
+    expect(walkdownMoreDefaultOpen()).toBe(true);
+    expect(chipPeekMinVisible()).toBeGreaterThanOrEqual(3);
+    expect(chipCountLabel(1, 56)).toBe('1 / 56');
+    const other = doorSheetCards('https://example.test').find((item) => item.deviceId === 'vfd-02');
+    expect(hrefMatrix(card!.href).flat().join('')).not.toBe(hrefMatrix(other!.href).flat().join(''));
+  });
+
+  it('keeps honesty helpers and derives coverage from live records', () => {
+    const unused = unusedRelationshipCounts();
+    expect(unused.FEEDS).toBe(0);
+    expect(unused.CONTROLS).toBe(0);
+    expect(unused.SENSES).toBe(0);
+    expect(unused.INTERLOCKS_WITH).toBe(0);
+    expect(parseDeviceQuery('vfd-01')?.componentId).toBe('L2-CC-VFD-001');
+    expect(filmChapterForAsset('L2-CC-001')).toEqual({ scene: 5, path: 'line2' });
+    expect(reconnectAfterFault('L2-CC-VFD-001').status).toBe('FIELD_VERIFY');
+    expect(reconnectAfterFault('L2-CC-VFD-001').signals.every((item) => item.destId === null)).toBe(true);
+    expect(documentationCoveragePercent()).toBe(Math.round((documentedAreaCount() / areas.length) * 100));
+    expect(assetDocumentationCompleteness().every((row) => row.percent === documentationPercent(row.assetId))).toBe(true);
+    expect(parseInspectorTab('log')).toBe('activity');
+    expect(ioChannelSummary('1762-IB16')).toBe('16 channels · no addresses recorded');
+    expect(machinesInSystem('VFD').some((item) => item.id === 'L2-CC-001')).toBe(true);
+    const graphOpen = graphFieldItemCount(null);
+    expect(openFieldItemCount(null)).toBe(graphOpen);
+    markUnknownCaptured('L2-CC-001', 'Confirm cabinet asset ID', 'Don');
+    expect(openFieldItemCount(null)).toBe(graphOpen - 1);
+    expect(graphFieldItemCount(null)).toBe(graphOpen);
+  });
+});
