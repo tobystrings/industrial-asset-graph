@@ -79,6 +79,7 @@ describe('review patch and plant packs', () => {
     expect(dashboard).toContain('...genieQueryFromSearch(location.search)');
     expect(presentation.match(/data-scene="\d+"/g)).toHaveLength(11);
     expect(new Set(presentation.match(/data-scene="\d+"/g))).toHaveLength(11);
-    expect(presentation).toContain('class="scene board-scene" data-scene="9"');
+    expect(presentation).toContain('class="scene cinematic-scene" data-scene="9"');
+    expect(presentation).not.toContain('class="display-board"');
   });
 });

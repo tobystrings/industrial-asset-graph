@@ -161,10 +161,10 @@ function updateCinematicPhases() {
     finalePhaseFractions.forEach((fraction, index) => { if (position >= fraction) phase = index; });
     finaleScene.dataset.phase = String(phase);
   }
-  const board = document.querySelector('.scene.active.board-scene');
+  const board = document.querySelector('.scene.active.cinematic-scene');
   if (board) {
     const progress = sceneLocalProgress();
-    board.dataset.beat = progress < .3 ? '0' : progress < .64 ? '1' : '2';
+    board.dataset.beat = String(Math.min(3, Math.floor(progress * 4)));
   }
 }
 
