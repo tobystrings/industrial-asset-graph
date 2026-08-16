@@ -53,6 +53,7 @@ describe('review patch and plant packs', () => {
     const cabinet = readFileSync(resolve(root, 'ControlCabinetView.tsx'), 'utf8');
     const css = readFileSync(resolve(root, 'dashboard.css'), 'utf8');
     const app = readFileSync(resolve(root, 'App.tsx'), 'utf8');
+    const presentation = readFileSync(resolve(root, '..', 'presentation', 'index.html'), 'utf8');
     expect(dashboard).toContain('graphPatchPreview');
     expect(dashboard).toContain('graphPatchText');
     expect(dashboard).toContain('exportAreaWalkPack');
@@ -76,5 +77,8 @@ describe('review patch and plant packs', () => {
     expect(dashboard).toContain('target="_blank"');
     expect(dashboard).toContain('genieQueryFromSearch');
     expect(dashboard).toContain('...genieQueryFromSearch(location.search)');
+    expect(presentation.match(/data-scene="\d+"/g)).toHaveLength(11);
+    expect(new Set(presentation.match(/data-scene="\d+"/g))).toHaveLength(11);
+    expect(presentation).toContain('class="scene board-scene" data-scene="9"');
   });
 });
