@@ -428,11 +428,6 @@ export default function Dashboard({
                 <span>{fieldItems} field</span>
                 <span>{documentedAssetCount()} assets</span>
               </span>
-              <span className="map-legend">
-                <span><i className={markerClass('COMPLETE')} />Complete</span>
-                <span><i className={markerClass('IN_PROGRESS')} />In progress</span>
-                <span><i className={markerClass('NOT_STARTED')} />Not started</span>
-              </span>
             </div>
             <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
           </section>}

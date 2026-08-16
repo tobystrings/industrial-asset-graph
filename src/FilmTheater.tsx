@@ -32,9 +32,13 @@ import { prefersReducedMotion } from './lib/motion';
 type ManifestScene = FilmSceneRef & { id?: string; title?: string };
 
 function BeatStageView({ beat }: { beat: BeatStage }) {
+  const [fitted, setFitted] = useState(false);
   return (
-    <div className="film-beat-stage" data-testid="film-beat" data-token={beat.token} data-motion={beat.motion} data-kenburns={beat.kenBurns ? 'on' : 'off'}>
-      {beat.still && <img className={beat.kenBurns ? 'beat-still is-live' : 'beat-still is-hold'} src={beat.still} alt="" />}
+    <div className={`film-beat-stage ${fitted ? 'is-fitted' : ''}`} data-testid="film-beat" data-token={beat.token} data-motion={beat.motion} data-kenburns={beat.kenBurns ? 'on' : 'off'}>
+      {beat.still && <>
+        <img className={beat.kenBurns && !fitted ? 'beat-still is-live' : 'beat-still is-hold'} src={beat.still} alt="Presentation scene" />
+        <button type="button" className="image-fit-button" onClick={() => setFitted(true)} aria-label="Fit presentation image">Fit</button>
+      </>}
     </div>
   );
 }

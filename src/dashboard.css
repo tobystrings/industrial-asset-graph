@@ -1094,6 +1094,21 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   background: #fff;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .12);
 }
+.floor-plan-viewer { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 0; }
+.image-viewer-tools { position: absolute; z-index: 8; top: 10px; right: 10px; display: flex; gap: 7px; }
+.image-viewer-tools button, .image-fit-button { min-height: 36px; padding: 7px 11px; border: 1px solid rgba(15,23,42,.38); border-radius: 8px; background: rgba(255,255,255,.94); color: #0f172a; box-shadow: 0 4px 14px rgba(15,23,42,.18); font-weight: 850; }
+.floor-plan-legend { position: absolute; z-index: 10; top: 54px; right: 10px; width: min(330px, calc(100% - 20px)); max-height: calc(100% - 68px); overflow: auto; padding: 14px; border: 1px solid rgba(148,163,184,.5); border-radius: 13px; background: rgba(9,17,32,.97); color: #f8fafc; box-shadow: 0 18px 45px rgba(0,0,0,.45); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity 150ms ease, transform 150ms ease, visibility 150ms; }
+.floor-plan-legend.is-open { opacity: 1; visibility: visible; transform: none; }
+.floor-plan-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 17px; }
+.floor-plan-legend-head button { width: 34px; height: 34px; border: 0; border-radius: 8px; background: rgba(255,255,255,.08); color: #fff; font-size: 22px; }
+.floor-plan-legend-status, .floor-plan-legend-equipment { display: flex; flex-wrap: wrap; gap: 8px 13px; padding: 10px 0; border-block: 1px solid rgba(148,163,184,.22); color: #cbd5e1; font-size: 12px; }
+.floor-plan-legend-status span { display: inline-flex; align-items: center; gap: 6px; }
+.floor-plan-legend ol { display: grid; gap: 5px; margin: 10px 0; padding: 0; list-style: none; }
+.floor-plan-legend li button { width: 100%; display: grid; grid-template-columns: 31px 1fr; align-items: center; gap: 9px; padding: 8px; border: 0; border-radius: 8px; background: transparent; color: #fff; text-align: left; }
+.floor-plan-legend li button:hover, .floor-plan-legend li button:focus-visible { background: rgba(45,212,191,.12); }
+.floor-plan-legend li button > b { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; background: #fff; color: #0f172a; }
+.floor-plan-legend li span { display: grid; gap: 2px; font-weight: 800; }
+.floor-plan-legend li small { color: #94a3b8; font-weight: 600; }
 .floor-plan-image {
   position: absolute;
   z-index: 0;
@@ -1134,15 +1149,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   z-index: 3;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  min-height: 38px;
-  padding: 8px 12px;
+  justify-content: center;
+  gap: 4px;
+  width: 31px;
+  min-width: 31px;
+  height: 31px;
+  min-height: 31px;
+  padding: 0;
   border: 1px solid rgba(15, 23, 42, .55);
   border-radius: 999px;
   background: rgba(255, 255, 255, .94);
   color: #111827;
   box-shadow: 0 5px 16px rgba(15, 23, 42, .18);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
   letter-spacing: .035em;
   text-transform: uppercase;
@@ -1154,7 +1173,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   right: 10px;
   bottom: 10px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
@@ -1164,7 +1183,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
 .floor-plan-area[data-area='area-warehouse-f'] { align-items: flex-start; padding-top: 8px; }
 .floor-plan-area[data-area='area-warehouse-f'] .floor-plan-assets { bottom: 4px; gap: 3px; }
 .floor-plan-area[data-area='area-warehouse-f'] .machine-chip { min-height: 25px; padding: 4px 6px; font-size: 9px; }
-.floor-plan-area[data-area^='area-dock-'] .floor-plan-label { min-height: 32px; padding-inline: 6px; font-size: 11px; letter-spacing: 0; }
+.floor-plan-area[data-area^='area-dock-'] .floor-plan-label { min-height: 24px; width: 24px; min-width: 24px; height: 24px; padding: 0; font-size: 10px; letter-spacing: 0; }
 .floor-plan-area[data-area='area-dock-6'] .floor-plan-label { transform: translateX(-20%); }
 .floor-plan-area[data-area='area-dock-8'] .floor-plan-label { transform: translateX(12%); }
 .floor-plan-root .blueprint-disclaimer {
@@ -1174,6 +1193,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   background: rgba(255,255,255,.88);
   color: #334155;
 }
+.film-beat-stage { position: relative; }
+.film-beat-stage.is-fitted .beat-still { object-fit: contain; transform: none !important; }
+.film-beat-stage .image-fit-button { position: absolute; z-index: 3; right: 7px; top: 7px; min-height: 30px; padding: 4px 8px; font-size: 11px; }
 
 .relationship-panel { overflow: auto; }
 .relationship-panel .panel-heading { margin-bottom: 18px; }
@@ -1281,8 +1303,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   .film-genie-actions button { min-height: 36px; font-size: 12px; }
   .app-shell.has-genie-dock { --genie-dock-height: 72px; }
   .blueprint-root.floor-plan-root { width: 100%; height: auto; max-height: 100%; }
-  .floor-plan-label { min-height: 32px; padding: 6px 9px; font-size: 12px; }
-  .floor-plan-area[data-area^='area-dock-'] .floor-plan-label { padding-inline: 5px; font-size: 10px; }
+  .floor-plan-label { width: 25px; min-width: 25px; height: 25px; min-height: 25px; padding: 0; font-size: 10px; }
+  .floor-plan-area[data-area^='area-dock-'] .floor-plan-label { padding: 0; font-size: 9px; }
   .floor-plan-assets { display: none; }
 }
 
@@ -1381,7 +1403,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   .facility-guide .guide-character { display: none; }
   .facility-guide .guide-bubble { width: min(330px, calc(100vw - 20px)); }
   .floor-plan-area[data-area^='area-dock-'] .floor-plan-label { width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 0; border-radius: 50%; }
-  .floor-plan-area[data-area^='area-dock-'] .floor-plan-label b { display: none; }
   .floor-plan-area[data-area^='area-dock-'] .floor-plan-label i { margin: 0; }
-  .floor-plan-label { min-height: 24px; padding: 3px 6px; font-size: 9px; letter-spacing: .02em; }
+  .floor-plan-label { min-height: 22px; width: 22px; min-width: 22px; height: 22px; padding: 0; font-size: 9px; letter-spacing: .02em; }
+  .floor-plan-legend { top: 50px; max-height: calc(100% - 58px); }
 }
