@@ -489,28 +489,29 @@ export default function Dashboard({
       )}
 
       {view === 'documents' && (
-        <section className="panel list-view scroll-pane enter" data-testid="documents-grouped" data-guide-target="documents">
-          <p className="panel-title">Documents</p>
-          <div className="system-chips">
+        <section className={`document-directory enter ${activeDocument ? 'has-preview' : ''}`} data-testid="documents-grouped" data-guide-target="documents">
+          <div className="document-browser scroll-pane">
+          <header className="document-directory-head"><div><p className="panel-title">Knowledge library</p><h1>Documents</h1><p>Grouped by the equipment they explain—not dumped into one flat list.</p></div><strong>{documents.length}<small>records</small></strong></header>
+          <div className="document-state-filters">
             {(['ALL', 'COMPLETE', 'REVIEW', 'IN_PROGRESS', 'DRAFT', 'NOT_STARTED'] as const).map((state) => (
-              <button key={state} type="button" className={docStateFilter === state ? 'selected' : ''} onClick={() => setDocStateFilter(state)}>{state}</button>
+              <button key={state} type="button" className={docStateFilter === state ? 'selected' : ''} onClick={() => setDocStateFilter(state)}>{stateLabel[state] ?? state}</button>
             ))}
           </div>
+          <div className="document-groups">
           {machines.map((asset) => {
             const rows = documents.filter((item) => item.assetId === asset.id && (docStateFilter === 'ALL' || item.state === docStateFilter));
             if (!rows.length) return null;
             return (
-              <div key={asset.id} className="doc-group">
-                <p className="panel-title">{asset.id} · {asset.name}</p>
-                {rows.slice().sort((left, right) => Number(left.state === 'COMPLETE') - Number(right.state === 'NOT_STARTED') || left.title.localeCompare(right.title)).map((item) => (
-                  <button key={item.id} type="button" onClick={() => setActiveDocument(item.id)} style={{ width: '100%', textAlign: 'left', padding: '10px 0', border: 0, borderBottom: '1px solid rgba(255,255,255,.12)', background: 'transparent' }}>
-                    <b>{item.title}</b> · {item.category} · {stateLabel[item.state]}
-                  </button>
-                ))}
-              </div>
+              <section key={asset.id} className="doc-group">
+                <header><div><small>{asset.line}</small><h2>{asset.name}</h2><code>{asset.id}</code></div><span>{rows.length} {rows.length === 1 ? 'document' : 'documents'}</span></header>
+                <div className="doc-cards">{rows.slice().sort((left, right) => left.title.localeCompare(right.title)).map((item) => (
+                  <button key={item.id} type="button" className={activeDocument === item.id ? 'selected' : ''} onClick={() => setActiveDocument(item.id)}><span><small>{item.category}</small><b>{item.title}</b></span><em>{stateLabel[item.state]}</em></button>
+                ))}</div>
+              </section>
             );
           })}
-          {activeDocument && <DocumentBody documentId={activeDocument} onClose={() => setActiveDocument(null)} />}
+          </div></div>
+          {activeDocument && <aside className="document-preview scroll-pane"><DocumentBody documentId={activeDocument} onClose={() => setActiveDocument(null)} /></aside>}
         </section>
       )}
 

@@ -81,5 +81,8 @@ describe('review patch and plant packs', () => {
     expect(new Set(presentation.match(/data-scene="\d+"/g))).toHaveLength(11);
     expect(presentation).toContain('class="scene cinematic-scene" data-scene="9"');
     expect(presentation).not.toContain('class="display-board"');
+    expect(presentation).toContain('background-size:contain');
+    expect(presentation).toContain('.shot-copy{display:none}');
+    expect(presentation).not.toContain('@keyframes edge-sweep');
   });
 });
