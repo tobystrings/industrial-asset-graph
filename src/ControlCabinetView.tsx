@@ -27,7 +27,7 @@ const assetUrl = (file: string) => {
 };
 const pretty = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-export default function ControlCabinetView({ onBack, onOpenFilm }: { onBack: () => void; onOpenFilm?: () => void }) {
+export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
   const [metadata, setMetadata] = useState<CabinetMetadata | null>(null);
   const [svg, setSvg] = useState('');
   const requested = parseDeviceQuery(new URLSearchParams(location.search).get('device'));
@@ -182,7 +182,7 @@ export default function ControlCabinetView({ onBack, onOpenFilm }: { onBack: () 
           </div>
         </div>
         <nav aria-label="Cabinet downloads">
-          {onOpenFilm && <button type="button" className="film-ghost" onClick={onOpenFilm}>Film</button>}
+          <a className="film-ghost" href="./presentation/" target="_blank" rel="noopener noreferrer">Presentation ↗</a>
           <button type="button" onClick={() => setPacketOpen((value) => !value)}>Packet</button>
           <a href={assetUrl('cabinet.svg')} download>SVG</a>
           <a href={assetUrl('cabinet.pdf')} download>PDF</a>

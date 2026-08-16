@@ -11,7 +11,7 @@ import { documentSource } from './lib/documentCatalog';
 import { parseDeviceQuery, writeDeviceQuery } from './lib/deviceQuery';
 import { assetDocumentationCompleteness, documentedAssetCount, documentationCoveragePercent, openFieldItemCount, recordCount, totalTrackedFacts, verificationCounts } from './lib/facilityMetrics';
 import { filmHonestyForAsset, type FilmCommand } from './lib/filmBridge';
-import { genieTargetFromAsset } from './lib/filmGenie';
+import { standalonePresentationHref } from './lib/filmGenie';
 import { renderMarkdown } from './lib/markdown';
 import { countAt } from './lib/motion';
 import { doorSheetCards, doorSheetText } from './lib/doorSheet';
@@ -63,14 +63,11 @@ function StatusI({ status }: { status: string }) {
 }
 
 export default function Dashboard({
-  view, onView, onOpenCabinet, onOpenFilm, filmPlaying, onToggleFilm, pendingCommand, onPendingCommand,
+  view, onView, onOpenCabinet, pendingCommand, onPendingCommand,
 }: {
   view: AppView;
   onView: (view: AppView) => void;
   onOpenCabinet: () => void;
-  onOpenFilm?: (scene?: number, path?: 'line2') => void;
-  filmPlaying?: boolean;
-  onToggleFilm?: () => void;
   pendingCommand?: FilmCommand | null;
   onPendingCommand?: (command: FilmCommand | null) => void;
 }) {
@@ -322,7 +319,7 @@ export default function Dashboard({
       return;
     }
     if (hit.kind === 'film') {
-      onOpenFilm?.(hit.scene);
+      window.open(standalonePresentationHref(), '_blank', 'noopener,noreferrer');
       setPaletteOpen(false);
       return;
     }
@@ -352,7 +349,7 @@ export default function Dashboard({
           <button className={workspaceTab === 'documents' ? 'nav-active' : ''} onClick={() => openWorkspace('documents')}>Documents</button>
           <button onClick={onOpenCabinet}>Cabinet</button>
         </nav>
-        <button className="film-link" type="button" data-playing={filmPlaying ? 'true' : 'false'} onClick={() => onToggleFilm?.()} aria-label={filmPlaying ? 'Pause film' : 'Play film'}>{filmPlaying ? '❚❚' : '▶'} <span>{filmPlaying ? 'Pause' : 'Play'}</span></button>
+        <a className="film-link" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer" aria-label="Open standalone presentation">▶ <span>Presentation ↗</span></a>
         <label className="global-search" onClick={() => setPaletteOpen(true)}>
           <span className="sr-only">Search assets</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets…" onFocus={() => setPaletteOpen(true)} />
@@ -552,7 +549,6 @@ export default function Dashboard({
           activeDocument={activeDocument}
           onDocument={setActiveDocument}
           onOpenCabinet={onOpenCabinet}
-          onOpenFilm={onOpenFilm}
           onPacket={(assetId) => { setPacketAsset(assetId); setPacketOpen(true); }}
           onFocusCabinet={() => setFocusCabinet((value) => !value)}
           onDoorSheet={() => setDoorOpen(true)}
@@ -758,14 +754,13 @@ function DocumentBody({ documentId, onClose }: { documentId: string; onClose: ()
 }
 
 function SelectedAssetPanel({
-  asset, area, activeDocument, onDocument, onOpenCabinet, onOpenFilm, onPacket, onFocusCabinet, onDoorSheet, focusCabinet, tab, onCapture, onTrace, openUnknown, onOpenUnknown, onTodayJump, focusDevice, todayIndex, onTodayIndex,
+  asset, area, activeDocument, onDocument, onOpenCabinet, onPacket, onFocusCabinet, onDoorSheet, focusCabinet, tab, onCapture, onTrace, openUnknown, onOpenUnknown, onTodayJump, focusDevice, todayIndex, onTodayIndex,
 }: {
   asset: FacilityAsset | null;
   area: FacilityArea | null;
   activeDocument: string | null;
   onDocument: (id: string | null) => void;
   onOpenCabinet: () => void;
-  onOpenFilm?: (scene?: number, path?: 'line2') => void;
   onPacket: (assetId: string) => void;
   onFocusCabinet: () => void;
   onDoorSheet: () => void;
@@ -846,14 +841,9 @@ function SelectedAssetPanel({
       <div className="asset-actions">
         {asset.id === 'L2-CC-001' && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
         {asset.id === 'L2-CC-001' && <button className="packet-btn" type="button" onClick={onFocusCabinet}>{focusCabinet ? 'Board' : 'At panel'}</button>}
-        {(() => {
-          const target = genieTargetFromAsset(asset.id);
-          return (
-            <button className="film-chapter is-ghost" type="button" onClick={() => onOpenFilm?.(target.scene, target.path)}>
-              {film.kind === 'chapter' ? 'Film · L2' : 'Film · intro'}
-            </button>
-          );
-        })()}
+        <a className="film-chapter is-ghost" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer">
+          {film.kind === 'chapter' ? 'Presentation · L2 ↗' : 'Presentation ↗'}
+        </a>
         <button className="packet-btn" type="button" onClick={() => onPacket(asset.id)}>Packet</button>
         {asset.id === 'L2-CC-001' && <button className="packet-btn" type="button" onClick={onDoorSheet}>Door</button>}
       </div>
