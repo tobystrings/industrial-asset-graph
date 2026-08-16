@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { areas, components, documentationPercent, documents, evidence, facility, machines, revisions } from './facilityData';
 import DeviceIntel from './DeviceIntel';
+import AssetDirectory from './AssetDirectory';
 import FloorPacket from './FloorPacket';
 import PlcRackView from './PlcRackView';
 import WalkdownForm from './WalkdownForm';
@@ -24,7 +25,6 @@ import { todayChipTarget, todayWalkdownItems } from './lib/walkdownPrompts';
 import { searchCatalog, type SearchHit } from './lib/searchIndex';
 import { serialSourcesDisagree, serialSourcesFor } from './lib/serialSources';
 import { markerClass } from './lib/statusMark';
-import { SYSTEM_KINDS, componentsInSystem, machinesInSystem } from './lib/systemKinds';
 import { componentBelongsToAsset, containedComponentIds, resolveTraceComponentId, traceHeadingFor, traceNodesFor } from './lib/tracePath';
 import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
@@ -487,48 +487,13 @@ export default function Dashboard({
       )}
 
       {view === 'assets' && (
-        <section className="panel list-view scroll-pane enter" data-guide-target="asset-workspace">
-          <p className="panel-title">Assets</p>
-          <div className="system-chips" data-testid="systems-filter">
-            {SYSTEM_KINDS.map((kind) => (
-              <button key={kind} type="button" className={systemKind === kind ? 'selected' : ''} onClick={() => setSystemKind(kind)}>{kind}</button>
-            ))}
-          </div>
-          <table className="data-table">
-            <thead><tr><th>Id</th><th>Name</th><th>Area</th><th>Status</th></tr></thead>
-            <tbody>
-              {machinesInSystem(systemKind).filter((item) => !query || `${item.id} ${item.name}`.toLowerCase().includes(query.toLowerCase())).map((asset) => (
-                <tr key={asset.id}>
-                  <td><button type="button" onClick={() => { selectAsset(asset); onView('dashboard'); }}>{asset.id}</button></td>
-                  <td>{asset.name}</td>
-                  <td>{areas.find((area) => area.id === asset.areaId)?.name}</td>
-                  <td><StatusI status={asset.verificationStatus} /> {stateLabel[asset.verificationStatus]}</td>
-                </tr>
-              ))}
-              {componentsInSystem(systemKind).filter((item) => !query || `${item.id} ${item.label}`.toLowerCase().includes(query.toLowerCase())).map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <button type="button" onClick={() => {
-                      const parent = machines.find((asset) => asset.id === item.parentId);
-                      if (parent) selectAsset(parent);
-                      setFocusDevice(item.id);
-                      const parsed = parseDeviceQuery(item.id);
-                      if (parent?.id === 'L2-CC-001') {
-                        if (parsed) writeDeviceQuery(parsed.deviceId);
-                        onOpenCabinet();
-                      } else {
-                        onView('dashboard');
-                      }
-                    }}>{item.id}</button>
-                  </td>
-                  <td>{item.label}</td>
-                  <td>{item.parentId}</td>
-                  <td><StatusI status={item.verificationStatus} /> {stateLabel[item.verificationStatus]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <AssetDirectory systemKind={systemKind} onSystemKind={setSystemKind} query={query} onQuery={setQuery} onAsset={(asset) => { selectAsset(asset); onView('dashboard'); }} onDevice={(item, parent) => {
+          selectAsset(parent);
+          setFocusDevice(item.id);
+          const parsed = parseDeviceQuery(item.id);
+          if (parent.id === 'L2-CC-001') { if (parsed) writeDeviceQuery(parsed.deviceId); onOpenCabinet(); }
+          else onView('dashboard');
+        }} />
       )}
 
       {view === 'documents' && (

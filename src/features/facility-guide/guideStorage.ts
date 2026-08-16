@@ -2,7 +2,7 @@ import { GUIDE_STORAGE_KEY } from './guideConfig';
 import type { GuidePreferences } from './guideTypes';
 
 export const defaultGuidePreferences: GuidePreferences = {
-  enabled: true, automaticTips: true, muted: true, animationMode: 'full', dismissed: [], tourComplete: false,
+  enabled: true, automaticTips: false, muted: true, animationMode: 'full', dismissed: [], tourComplete: false,
 };
 
 export function loadGuidePreferences(): GuidePreferences {
@@ -15,4 +15,3 @@ export function loadGuidePreferences(): GuidePreferences {
 export function saveGuidePreferences(value: GuidePreferences) {
   localStorage.setItem(GUIDE_STORAGE_KEY, JSON.stringify(value));
 }
-

@@ -17,7 +17,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   const [context, setContext] = useState<GuideContext>({ page: 'map' });
   const [preferences, setPreferences] = useState(loadGuidePreferences);
   const [message, setMessage] = useState<GuideMessage | null>(() => preferences.tourComplete ? null : guideDialogue.welcome());
-  const [open, setOpen] = useState(() => !preferences.tourComplete);
+  const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const controller = useRef(new GuideController());
   useEffect(() => saveGuidePreferences(preferences), [preferences]);
@@ -29,12 +29,12 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   const api = useMemo<GuideApi>(() => ({
     context, preferences, message, open, settingsOpen, setContext, setPreferences, setOpen, setSettingsOpen,
     show: (next) => { setMessage(next); setOpen(true); },
-    dismiss: (forever = false) => { if (forever && message) setPreferences((p) => ({ ...p, dismissed: [...new Set([...p.dismissed, message.id])] })); setOpen(false); },
+    dismiss: (forever = false) => { controller.current.recordPrompt(); if (forever && message) setPreferences((p) => ({ ...p, dismissed: [...new Set([...p.dismissed, message.id])] })); setOpen(false); },
     dispatch: (action) => {
       if (action === 'start-tour') { setMessage(guideDialogue.map()); setOpen(true); }
       else window.dispatchEvent(new CustomEvent('facility-guide-action', { detail: action }));
     },
-    reset: () => { controller.current.reset(); setPreferences({ enabled: true, automaticTips: true, muted: true, animationMode: 'full', dismissed: [], tourComplete: false }); setMessage(guideDialogue.welcome()); setOpen(true); },
+    reset: () => { controller.current.reset(); setPreferences({ enabled: true, automaticTips: false, muted: true, animationMode: 'full', dismissed: [], tourComplete: false }); setMessage(guideDialogue.welcome()); setOpen(false); },
   }), [context, preferences, message, open, settingsOpen]);
   return <FacilityGuideContext.Provider value={api}>{children}</FacilityGuideContext.Provider>;
 }
