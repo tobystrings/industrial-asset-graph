@@ -17,6 +17,9 @@ const terminalOutput = $('#terminalOutput');
 const introScene = $('.tyler-intro');
 const finaleScene = $('.solana-finale');
 const liveJump = $('#liveJump');
+const chaptersBtn = $('#chaptersBtn');
+const chapterButtons = $('#chapterButtons');
+const pathBar = $('.path-bar');
 const fullPathBtn = $('#fullPathBtn');
 const line2PathBtn = $('#line2PathBtn');
 
@@ -351,6 +354,12 @@ $('#exitBtn').addEventListener('click', () => {
 $('#fullBtn').addEventListener('click', () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
+});
+chaptersBtn?.addEventListener('click', () => {
+  const open = !chapterButtons?.classList.contains('open');
+  chapterButtons?.classList.toggle('open', open);
+  pathBar?.classList.toggle('open', open);
+  chaptersBtn.setAttribute('aria-expanded', String(open));
 });
 $$('[data-command]').forEach(button => button.addEventListener('click', () => {
   const command = button.dataset.command;
