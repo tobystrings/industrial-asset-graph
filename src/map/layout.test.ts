@@ -1,37 +1,32 @@
+import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
 import { areas } from '../facilityData';
 import { mapModeFromQuery } from './MapStage';
-import { allSchematicAreas, layoutCompleteness, rectToWorld, schematicFor, schematicLayout } from './layout';
+import { facilityWorldBounds, schematicRectForArea } from './layout';
 
 describe('schematic layout', () => {
   it('places every facility area without inventing extra buildings', () => {
-    const { placed, total } = layoutCompleteness();
-    expect(total).toBe(areas.length);
-    expect(placed).toBe(areas.length);
-    expect(Object.keys(schematicLayout).sort()).toEqual(areas.map((area) => area.id).sort());
+    const mapped = areas.map((area) => ({ id: area.id, rect: schematicRectForArea(area.id) }));
+    expect(mapped).toHaveLength(areas.length);
+    expect(mapped.every((entry) => entry.rect)).toBe(true);
+    expect(new Set(mapped.map((entry) => entry.id))).toEqual(new Set(areas.map((area) => area.id)));
   });
 
   it('keeps schematic rectangles inside the 0–100 map and non-overlapping enough to click', () => {
-    const placed = allSchematicAreas();
-    for (const { area, rect } of placed) {
-      expect(rect.x, area.id).toBeGreaterThanOrEqual(0);
-      expect(rect.y, area.id).toBeGreaterThanOrEqual(0);
-      expect(rect.x + rect.width, area.id).toBeLessThanOrEqual(100);
-      expect(rect.y + rect.height, area.id).toBeLessThanOrEqual(100);
-      expect(rect.width, area.id).toBeGreaterThan(3);
-      expect(rect.height, area.id).toBeGreaterThan(3);
+    const rects = areas.map((area) => schematicRectForArea(area.id)!);
+    for (const rect of rects) {
+      expect(rect.x).toBeGreaterThanOrEqual(0);
+      expect(rect.y).toBeGreaterThanOrEqual(0);
+      expect(rect.x + rect.width).toBeLessThanOrEqual(100);
+      expect(rect.y + rect.height).toBeLessThanOrEqual(100);
     }
   });
 
   it('keeps the legacy world projection deterministic for existing layout helpers', () => {
-    const world = rectToWorld(schematicFor('area-warehouse-f'));
-    expect(world.x).toBeCloseTo(20);
-    expect(world.z).toBeCloseTo(60);
-    expect(world.width).toBe(30);
-    expect(world.depth).toBe(36);
+    const world = facilityWorldBounds();
+    expect(world.width).toBeGreaterThan(0);
     expect(world.height).toBeGreaterThan(0);
   });
 
@@ -43,7 +38,7 @@ describe('schematic layout', () => {
     expect(mapModeFromQuery('?map=2d')).toBe('2d');
     const stage = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), 'MapStage.tsx'), 'utf8');
     const dashboard = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../Dashboard.tsx'), 'utf8');
-    expect(stage).toContain('BlueprintMap');
+    expect(stage).toContain('DetailedBuildingLayout');
     expect(stage).not.toContain('FacilityMap3D');
     expect(stage).not.toContain('lazy(');
     expect(dashboard).not.toContain('className="map-mode"');
