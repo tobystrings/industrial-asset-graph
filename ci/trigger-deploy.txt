@@ -1,0 +1,5 @@
+Triggering CI/deploy to GitHub Pages
+
+This file is a no-op commit created by the automation to retrigger workflows after the accessibility fix.
+
+Timestamp: 2026-08-19T23:02:42Z
