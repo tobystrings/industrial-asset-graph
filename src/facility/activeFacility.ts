@@ -8,17 +8,19 @@ import {
   relationships,
   revisions,
 } from '../../facilities/lieb-foods/data';
+import { featureConfig } from '../../facilities/lieb-foods/config';
 import type { FacilityPackage } from './types';
 
 /**
  * Active facility package for the current deployment.
  *
- * The framework now reads Lieb data from the customer-specific package while
- * legacy imports continue to work through src/facilityData.ts until the next
- * migration step removes those direct dependencies.
+ * Framework consumers receive customer data and runtime defaults through one
+ * package boundary. Legacy data imports remain available temporarily through
+ * src/facilityData.ts while the remaining consumers are migrated.
  */
 export const activeFacilityPackage: FacilityPackage = {
   facility,
+  featureConfig,
   areas,
   assets: machines,
   components,

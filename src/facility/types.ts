@@ -20,12 +20,25 @@ export interface FacilityIdentity {
 }
 
 /**
+ * Facility-specific runtime defaults. These IDs identify which records should
+ * be highlighted by framework features without teaching framework code about
+ * any particular customer's naming scheme.
+ */
+export interface FacilityFeatureConfig {
+  defaultAreaId: string;
+  featuredCabinetAssetId: string;
+  featuredMachineAssetId: string;
+  brandMark?: string;
+}
+
+/**
  * The contract between the reusable Industrial Asset Graph framework and a
  * facility-specific dataset. Keeping this boundary explicit lets a future
  * facility package replace Lieb data without changing framework behavior.
  */
 export interface FacilityPackage {
   facility: FacilityIdentity;
+  featureConfig: FacilityFeatureConfig;
   areas: FacilityArea[];
   assets: FacilityAsset[];
   components: ComponentRecord[];
