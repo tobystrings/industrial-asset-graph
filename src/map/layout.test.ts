@@ -43,7 +43,7 @@ describe('schematic layout', () => {
     expect(mapModeFromQuery('?map=2d')).toBe('2d');
     const stage = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), 'MapStage.tsx'), 'utf8');
     const dashboard = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../Dashboard.tsx'), 'utf8');
-    expect(stage).toContain('BlueprintMap');
+    expect(stage).toContain('DetailedBuildingLayout');
     expect(stage).not.toContain('FacilityMap3D');
     expect(stage).not.toContain('lazy(');
     expect(dashboard).not.toContain('className="map-mode"');

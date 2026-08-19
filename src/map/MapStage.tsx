@@ -1,5 +1,5 @@
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
-import BlueprintMap from './BlueprintMap';
+import DetailedBuildingLayout from './DetailedBuildingLayout';
 
 export type MapMode = '2d';
 
@@ -22,9 +22,9 @@ export default function MapStage({
   onAsset: (asset: FacilityAsset) => void;
 }) {
   return (
-    <div className="map-stage">
-      <div className="map-viewport" data-mode="2d">
-        <BlueprintMap selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={onArea} onAsset={onAsset} />
+    <div className="map-stage detailed-map-stage">
+      <div className="map-viewport detailed-map-viewport" data-mode="2d">
+        <DetailedBuildingLayout selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={onArea} onAsset={onAsset} />
       </div>
     </div>
   );
