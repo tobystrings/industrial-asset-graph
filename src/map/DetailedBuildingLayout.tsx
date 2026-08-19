@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { useFacility } from '../facility';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
 import './detailedBuildingLayout.css';
@@ -12,16 +13,37 @@ type Props = {
 };
 
 const markerWidth = (id: string) => id.length > 7 ? 68 : 60;
+const clampZoom = (value: number) => Math.max(0.85, Math.min(1.75, Math.round(value * 100) / 100));
 
 export default function DetailedBuildingLayout({ selectedArea, selectedAsset, filters, onArea, onAsset }: Props) {
   const { facility, areas, assets, mapConfig } = useFacility();
   const markers = mapConfig?.markers ?? [];
+  const planWrapRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
   const areaByName = (name: string) => areas.find((area) => area.name === name) ?? null;
   const warehouseA = areaByName('Warehouse A');
   const warehouseF = areaByName('Warehouse F');
   const freezers = areaByName('Freezers');
   const liveAsset = (assetId?: string) => assetId ? assets.find((asset) => asset.id === assetId) ?? null : null;
   const clickArea = (area: FacilityArea | null) => area && onArea(area);
+  const selectedMarker = selectedAsset ? markers.find((marker) => marker.assetId === selectedAsset.id) : null;
+  const actionableMarkers = markers.filter((marker) => marker.state !== 'REFERENCE' && liveAsset(marker.assetId));
+
+  const fitPlan = () => {
+    setZoom(1);
+    requestAnimationFrame(() => {
+      const wrap = planWrapRef.current;
+      if (!wrap) return;
+      wrap.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    });
+  };
+
+  const activateMarker = (markerId: string) => {
+    const marker = markers.find((item) => item.id === markerId);
+    if (!marker || marker.state === 'REFERENCE') return;
+    const asset = liveAsset(marker.assetId);
+    if (asset && filters.has(asset.verificationStatus)) onAsset(asset);
+  };
 
   return (
     <section className="reference-layout" aria-label="Building Layout">
@@ -30,15 +52,18 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
           <h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2>
           <p>Interior layout merged with asset graph</p>
         </div>
-        <div className="reference-layout-actions">
-          <button type="button" onClick={() => document.querySelector('.reference-plan')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })}>Fit to Screen</button>
+        <div className="reference-layout-actions" aria-label="Map controls">
+          <button type="button" onClick={() => setZoom((value) => clampZoom(value - 0.15))} aria-label="Zoom out">−</button>
+          <output className="map-zoom-readout" aria-live="polite">{Math.round(zoom * 100)}%</output>
+          <button type="button" onClick={() => setZoom((value) => clampZoom(value + 0.15))} aria-label="Zoom in">+</button>
+          <button type="button" onClick={fitPlan}>Fit to Screen</button>
           <button type="button" onClick={() => window.print()}>Print / PDF</button>
         </div>
       </header>
 
       <div className="reference-drawing-sheet">
-        <div className="reference-plan-wrap">
-          <svg className="reference-plan" viewBox="0 0 1210 525" role="img" aria-label={`${facility.name} detailed interior facility plan`}>
+        <div className="reference-plan-wrap" ref={planWrapRef}>
+          <svg className="reference-plan" style={{ width: `${zoom * 100}%` }} viewBox="0 0 1210 525" role="img" aria-label={`${facility.name} detailed interior facility plan`}>
             <rect className="sheet-bg" x="0" y="0" width="1210" height="525" />
             <g className="zone-fills" aria-hidden="true">
               <path className="production-fill" d="M300 18H704V286H300V245H286V208H300Z" />
@@ -87,7 +112,21 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
               const clickable = marker.state !== 'REFERENCE' && visibleLive;
               const width = markerWidth(marker.id);
               return (
-                <g key={marker.id} className={`reference-marker ${marker.tone} state-${marker.state.toLowerCase()} ${selected ? 'selected' : ''}`} transform={`translate(${marker.x} ${marker.y})`} onClick={clickable && asset ? () => onAsset(asset) : undefined} role={clickable ? 'button' : undefined} tabIndex={clickable ? 0 : undefined} aria-label={`${marker.id}: ${marker.label}. ${marker.state.replace('_', ' ').toLowerCase()}.`}>
+                <g
+                  key={marker.id}
+                  className={`reference-marker ${marker.tone} state-${marker.state.toLowerCase()} ${selected ? 'selected' : ''}`}
+                  transform={`translate(${marker.x} ${marker.y})`}
+                  onClick={clickable ? () => activateMarker(marker.id) : undefined}
+                  onKeyDown={clickable ? (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      activateMarker(marker.id);
+                    }
+                  } : undefined}
+                  role={clickable ? 'button' : undefined}
+                  tabIndex={clickable ? 0 : undefined}
+                  aria-label={`${marker.id}: ${marker.label}. ${marker.state.replace('_', ' ').toLowerCase()}.`}
+                >
                   <rect x={-width / 2} y={-13} width={width} height={26} rx="4" />
                   <text textAnchor="middle" y="4">{marker.id}</text>
                   <title>{marker.label} — {marker.state === 'REFERENCE' ? 'reference only, not linked to a verified asset record' : marker.state === 'FIELD_VERIFY' ? 'linked asset; physical position requires field verification' : 'live asset'}</title>
@@ -95,6 +134,12 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
               );
             })}
           </svg>
+        </div>
+
+        <div className="reference-map-status" aria-live="polite">
+          <span><b>{actionableMarkers.length}</b> graph-linked map tags</span>
+          <span><b>{markers.length - actionableMarkers.length}</b> reference-only tags</span>
+          <span>{selectedMarker ? `Selected: ${selectedMarker.id} · ${selectedMarker.label}` : selectedArea ? `Selected area: ${selectedArea.name}` : 'No map selection'}</span>
         </div>
 
         <div className="reference-info-strip">
@@ -108,15 +153,41 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
           </section>
           <section>
             <h3>Control Cabinets</h3>
-            {markers.filter((m) => m.tone !== 'machine').map((marker) => <div className="directory-row" key={marker.id}><b className={`tag ${marker.tone}`}>{marker.id}</b><span>{marker.label}<em>{marker.state === 'REFERENCE' ? 'REF' : 'VERIFY'}</em></span></div>)}
+            {markers.filter((m) => m.tone !== 'machine').map((marker) => {
+              const asset = liveAsset(marker.assetId);
+              const actionable = marker.state !== 'REFERENCE' && Boolean(asset);
+              return (
+                <button className={`directory-row ${actionable ? 'actionable' : 'reference-only'}`} type="button" key={marker.id} disabled={!actionable} onClick={() => activateMarker(marker.id)}>
+                  <b className={`tag ${marker.tone}`}>{marker.id}</b><span>{marker.label}<em>{marker.state === 'REFERENCE' ? 'REF' : marker.state === 'FIELD_VERIFY' ? 'VERIFY' : 'LIVE'}</em></span>
+                </button>
+              );
+            })}
           </section>
           <section>
             <h3>Major Machines / Equipment</h3>
-            {markers.filter((m) => m.tone === 'machine').map((marker) => <div className="directory-row" key={marker.id}><b className="tag machine">{marker.id}</b><span>{marker.label}<em>{marker.state === 'REFERENCE' ? 'REF' : 'VERIFY'}</em></span></div>)}
+            {markers.filter((m) => m.tone === 'machine').map((marker) => {
+              const asset = liveAsset(marker.assetId);
+              const actionable = marker.state !== 'REFERENCE' && Boolean(asset);
+              return (
+                <button className={`directory-row ${actionable ? 'actionable' : 'reference-only'}`} type="button" key={marker.id} disabled={!actionable} onClick={() => activateMarker(marker.id)}>
+                  <b className="tag machine">{marker.id}</b><span>{marker.label}<em>{marker.state === 'REFERENCE' ? 'REF' : marker.state === 'FIELD_VERIFY' ? 'VERIFY' : 'LIVE'}</em></span>
+                </button>
+              );
+            })}
           </section>
           <section>
             <h3>Area Directory</h3>
-            <div className="area-grid"><b>Warehouse A</b><span>Raw Materials / Storage</span><b>Warehouse B</b><span>Storage / Staging</span><b>Building C</b><span>Main Production</span><b>Coolers 2 / 3 / 4</b><span>Refrigerated Storage</span><b>Warehouse 5</b><span>Dry Storage</span><b>Freezers 7 / 8</b><span>Frozen Storage</span><b>Warehouse E</b><span>Packing / Storage</span><b>Warehouse F</b><span>Equipment / Storage</span><b>Main Offices</b><span>Administration / Support</span></div>
+            <div className="area-grid">
+              <button type="button" disabled={!warehouseA} onClick={() => clickArea(warehouseA)}><b>Warehouse A</b><span>Raw Materials / Storage</span></button>
+              <div><b>Warehouse B</b><span>Storage / Staging</span></div>
+              <div><b>Building C</b><span>Main Production</span></div>
+              <div><b>Coolers 2 / 3 / 4</b><span>Refrigerated Storage</span></div>
+              <div><b>Warehouse 5</b><span>Dry Storage</span></div>
+              <button type="button" disabled={!freezers} onClick={() => clickArea(freezers)}><b>Freezers 7 / 8</b><span>Frozen Storage</span></button>
+              <div><b>Warehouse E</b><span>Packing / Storage</span></div>
+              <button type="button" disabled={!warehouseF} onClick={() => clickArea(warehouseF)}><b>Warehouse F</b><span>Equipment / Storage</span></button>
+              <div><b>Main Offices</b><span>Administration / Support</span></div>
+            </div>
           </section>
           <section className="notes-column"><h3>Map confidence</h3><ul><li>Reference-only tags reproduce drawing context but are not asset records.</li><li>Field-verify tags are linked to the graph, but their physical location is not yet verified.</li><li>Fire alarm assembly and ammonia shelter-in-place callouts are intentionally omitted.</li></ul></section>
         </div>
