@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { areas, machines } from '../facilityData';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
+import './detailedBuildingLayout.css';
 
 type Props = {
   selectedArea: FacilityArea | null;
