@@ -6,6 +6,9 @@ import AssetDirectory from './AssetDirectory';
 import FloorPacket from './FloorPacket';
 import PlcRackView from './PlcRackView';
 import WalkdownForm from './WalkdownForm';
+import TopNav, { type WorkspaceTab } from './dashboard/TopNav';
+import FacilitySidebar from './dashboard/FacilitySidebar';
+import KpiStrip from './dashboard/KpiStrip';
 import { captureKitForArea } from './lib/areaKit';
 import { INSPECTOR_TABS, cycleInspectorTab, parseInspectorTab, type InspectorTab } from './lib/boardChrome';
 import { documentSource } from './lib/documentCatalog';
@@ -45,7 +48,6 @@ const defaultAreaId = featureConfig.defaultAreaId;
 const brandMark = featureConfig.brandMark ?? activeFacilityPackage.facility.name.slice(0, 2).toUpperCase();
 
 export type AppView = 'dashboard' | 'assets' | 'documents' | 'cabinet';
-type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents';
 
 function useCount(target: number) {
   const [value, setValue] = useState(0);
@@ -346,82 +348,54 @@ export default function Dashboard({
 
   return (
     <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${focusCabinet ? ' focus-cabinet' : ''}`}>
-      <header className="top-nav">
-        <button className="nav-toggle" type="button" aria-label="Open menu" aria-expanded={drawerOpen} onClick={() => setDrawerOpen((value) => !value)}>☰</button>
-        <div className="brand"><span className="brand-mark">{brandMark}</span><div><strong>{facility.name}</strong><em>Industrial Asset Graph</em></div></div>
-        <nav className={navOpen ? 'open' : ''} aria-label="Primary">
-          <button className={workspaceTab === 'map' ? 'nav-active' : ''} onClick={() => openWorkspace('map')}>Map</button>
-          <button className={workspaceTab === 'assets' ? 'nav-active' : ''} onClick={() => openWorkspace('assets')}>Assets</button>
-          <button className={workspaceTab === 'relationships' ? 'nav-active' : ''} onClick={() => openWorkspace('relationships')}>Relationships</button>
-          <button className={workspaceTab === 'documents' ? 'nav-active' : ''} onClick={() => openWorkspace('documents')}>Documents</button>
-          <button onClick={onOpenCabinet}>Cabinet</button>
-        </nav>
-        <a className="film-link" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer" aria-label="Open standalone presentation">▶ <span>Presentation ↗</span></a>
-        <label className="global-search" onClick={() => setPaletteOpen(true)}>
-          <span className="sr-only">Search assets</span>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets…" onFocus={() => setPaletteOpen(true)} />
-          <kbd>/</kbd>
-        </label>
-      </header>
+      <TopNav
+        brandMark={brandMark}
+        facilityName={facility.name}
+        workspaceTab={workspaceTab}
+        navOpen={navOpen}
+        drawerOpen={drawerOpen}
+        query={query}
+        onToggleDrawer={() => setDrawerOpen((value) => !value)}
+        onWorkspace={openWorkspace}
+        onOpenCabinet={onOpenCabinet}
+        onQuery={setQuery}
+        onOpenSearch={() => setPaletteOpen(true)}
+      />
 
-      <aside className={`facility-sidebar ${drawerOpen ? 'open' : ''} enter`} style={{ animationDelay: '40ms' }}>
-        <section>
-          <p className="panel-title">Facility navigation</p>
-          <button className={workspaceTab === 'map' ? 'side-active' : ''} onClick={() => openWorkspace('map')}>Building layout</button>
-          <button className={workspaceTab === 'assets' ? 'side-selected' : ''} onClick={() => openWorkspace('assets')}>Areas<b>{areas.length}</b></button>
-          <button onClick={() => openWorkspace('assets')}>Equipment<b>{recordCount()}</b></button>
-          <button className={workspaceTab === 'documents' ? 'side-selected' : ''} onClick={() => openWorkspace('documents')}>Documents</button>
-          <button onClick={() => { onOpenCabinet(); setDrawerOpen(false); }}>Control cabinets</button>
-          <button className={view === 'assets' && systemKind !== 'ALL' ? 'side-selected' : ''} onClick={() => { setSystemKind('VFD'); onView('assets'); setDrawerOpen(false); }}>Systems</button>
-        </section>
-        <section>
-          <p className="panel-title">Areas</p>
-          <div className="area-scroll scroll-pane">
-            {areas.map((area) => (
-              <button key={area.id} className={selectedArea?.id === area.id ? 'side-selected' : ''} onClick={() => selectArea(area)}>
-                <StatusI status={area.status} /><span>{area.shortName}</span><b>{area.assetIds.length || ''}</b>
-              </button>
-            ))}
-          </div>
-        </section>
-        <section className="legend">
-          <p className="panel-title">Verification filters</p>
-          {(['VERIFIED', 'FIELD_VERIFY', 'INFERRED', 'DISPUTED', 'RETIRED'] as VerificationState[]).map((item) => (
-            <label key={item} className={filters.has(item) ? '' : 'is-dimmed'}>
-              <input type="checkbox" checked={filters.has(item)} onChange={() => {
-                const next = new Set(filters);
-                next.has(item) ? next.delete(item) : next.add(item);
-                setFilters(next);
-              }} />
-              <StatusI status={item} />{stateLabel[item]}
-            </label>
-          ))}
-        </section>
-      </aside>
+      <FacilitySidebar
+        drawerOpen={drawerOpen}
+        workspaceTab={workspaceTab}
+        view={view}
+        systemKind={systemKind}
+        areas={areas}
+        equipmentCount={recordCount()}
+        selectedArea={selectedArea}
+        filters={filters}
+        onWorkspace={openWorkspace}
+        onArea={selectArea}
+        onOpenCabinet={() => { onOpenCabinet(); setDrawerOpen(false); }}
+        onSystems={() => { setSystemKind('VFD'); onView('assets'); setDrawerOpen(false); }}
+        onToggleFilter={(item) => {
+          const next = new Set(filters);
+          next.has(item) ? next.delete(item) : next.add(item);
+          setFilters(next);
+        }}
+      />
       {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
 
       {view === 'dashboard' && (
         <>
-          <div className="kpi-row">
-            <article className="kpi-card enter">
-              <p className="panel-title">Documentation coverage</p>
-              <b>{coverageN}%</b>
-              <small>{coverageSubtitle()} · {assetDocumentationCompleteness().map((item) => `${item.assetId} ${item.percent}%`).join(' · ')}</small>
-              <div className="kpi-bar"><i style={{ width: `${coverage}%` }} /></div>
-            </article>
-            <article className="kpi-card alert enter" style={{ animationDelay: '40ms' }}>
-              <p className="panel-title">Open field items</p>
-              <b>{fieldN}</b>
-              <small>{queueCountLabel(null)}</small>
-              <div className="kpi-bar"><i style={{ width: `${Math.min(100, fieldItems * 4)}%` }} /></div>
-            </article>
-            <article className="kpi-card enter" style={{ animationDelay: '80ms' }}>
-              <p className="panel-title">Assets documented</p>
-              <b>{assetN}</b>
-              <small>of {recordCount()} records</small>
-              <div className="kpi-bar"><i style={{ width: `${Math.round((documentedAssetCount() / recordCount()) * 100)}%` }} /></div>
-            </article>
-          </div>
+          <KpiStrip
+            coverage={coverage}
+            coverageDisplay={coverageN}
+            coverageSubtitle={`${coverageSubtitle()} · ${assetDocumentationCompleteness().map((item) => `${item.assetId} ${item.percent}%`).join(' · ')}`}
+            fieldItems={fieldItems}
+            fieldDisplay={fieldN}
+            fieldSubtitle={queueCountLabel(null)}
+            documentedAssets={documentedAssetCount()}
+            documentedDisplay={assetN}
+            recordCount={recordCount()}
+          />
 
           {workspaceTab === 'map' && <section className="map-panel panel enter" data-guide-target="facility-map" style={{ animationDelay: '80ms' }}>
             <div className="panel-heading">
