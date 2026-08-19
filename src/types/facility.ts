@@ -1,6 +1,6 @@
 export type VerificationState = 'VERIFIED' | 'FIELD_VERIFY' | 'INFERRED' | 'DISPUTED' | 'RETIRED';
 export type DocumentationState = 'COMPLETE' | 'REVIEW' | 'IN_PROGRESS' | 'DRAFT' | 'NOT_STARTED';
-export type RelationshipType = 'LOCATED_IN' | 'CONTAINS' | 'FEEDS' | 'CONTROLS' | 'SENSES' | 'SUPPLIES' | 'ISOLATES' | 'INTERLOCKS_WITH' | 'UPSTREAM_OF' | 'DOWNSTREAM_OF' | 'HAS_DOCUMENT' | 'SUPPORTED_BY_EVIDENCE';
+export type RelationshipType = 'LOCATED_IN' | 'CONTAINS' | 'FEEDS' | 'CONTROLS' | 'SENSES' | 'SUPPLIES' | 'ISOLATES' | 'INTERLOCKS_WITH' | 'UPSTREAM_OF' | 'DOWNSTREAM_OF' | 'SENDS_DATA_TO' | 'MECHANICALLY_DRIVES' | 'HAS_DOCUMENT' | 'SUPPORTED_BY_EVIDENCE';
 
 export interface VerifiedFact<T> { value: T | null; verificationStatus: VerificationState; evidenceIds: string[]; unit?: string; note?: string; }
 export interface AreaOverlay { x: number; y: number; width: number; height: number; }
