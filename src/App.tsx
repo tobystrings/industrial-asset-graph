@@ -3,6 +3,7 @@ import ControlCabinetView from './ControlCabinetView';
 import Dashboard, { type AppView } from './Dashboard';
 import { useFacility } from './facility';
 import PlantManager from './editor/PlantManager';
+import './editor/plantManagerCrud.css';
 import type { FilmCommand } from './lib/filmBridge';
 import { subscribeViewport } from './lib/viewport';
 import { FacilityGuide, guideDialogue, useFacilityGuide, type GuideActionId, type GuidePage } from './features/facility-guide';
