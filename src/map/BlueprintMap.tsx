@@ -38,7 +38,7 @@ export default function BlueprintMap({
         </button>
       </div>
       <div key={fitVersion} className="blueprint-root floor-plan-root" data-testid="map-stage" role="group" aria-label="Interactive J. Lieb facility floor plan">
-        <img className="floor-plan-image" src="/industrial-asset-graph/assets/facility-floor-plan.png" alt="J. Lieb facility floor plan" draggable={false} />
+        <img className="floor-plan-image" src="/industrial-asset-graph/assets/facility-floor-plan-merged.jpg" alt="J. Lieb detailed interior facility layout merged with the Industrial Asset Graph" draggable={false} />
       {areas.map((area) => {
         const symbol = areas.indexOf(area) + 1;
         const rect = area.overlay;
@@ -91,7 +91,7 @@ export default function BlueprintMap({
           </div>
         );
       })}
-      <span className="blueprint-disclaimer">Reference floor plan · labels are area-level · exact asset positions require field verification</span>
+      <span className="blueprint-disclaimer">Detailed interior reference layout · fire alarm assembly and ammonia shelter-in-place callouts removed · exact asset positions require field verification</span>
       </div>
       <aside id="floor-plan-legend" className={`floor-plan-legend ${legendOpen ? 'is-open' : ''}`} aria-hidden={!legendOpen}>
         <div className="floor-plan-legend-head"><b>Map symbols</b><button type="button" onClick={() => setLegendOpen(false)} aria-label="Close map legend">×</button></div>
