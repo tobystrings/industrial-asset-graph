@@ -1,0 +1,104 @@
+/* Reference-shell rebuild: image-1 layout is the source of truth. */
+:root{--ref-sidebar:232px;--ref-topbar:62px;--ref-navy:#071625;--ref-navy2:#0b2235;--ref-blue:#2369a8;--ref-line:#d5dbe2;--ref-ink:#111827;--ref-muted:#657386}
+html,body,#root,.app-shell{background:#fff!important}
+.backdrop{display:none!important}
+
+/* Fixed left navigation rail */
+.reference-sidebar.facility-sidebar{position:fixed!important;z-index:60!important;left:0!important;top:0!important;bottom:0!important;width:var(--ref-sidebar)!important;height:100dvh!important;margin:0!important;padding:0 10px 18px!important;display:flex!important;flex-direction:column!important;overflow:auto!important;border:0!important;border-right:1px solid #173047!important;border-radius:0!important;background:linear-gradient(180deg,#071625 0%,#0b2437 100%)!important;box-shadow:none!important;color:#fff!important}
+.reference-sidebar-brand{height:62px;min-height:62px;display:flex;align-items:center;gap:10px;padding:0 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.reference-network-mark{display:grid;place-items:center;width:56px;height:42px;color:#fff;font-size:36px;line-height:1;transform:rotate(-20deg)}
+.reference-sidebar-brand strong{font-size:17px;line-height:1.05;letter-spacing:.01em;color:#fff}
+.reference-nav-group{padding:14px 0 10px!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.08)!important}
+.reference-nav-heading{margin:0 8px 8px;color:#c5d1dd;font-size:11px;font-weight:700;letter-spacing:.02em}
+.reference-nav-group button{width:100%;min-height:38px;margin:1px 0;padding:7px 9px!important;display:grid!important;grid-template-columns:24px 1fr;align-items:center;gap:7px;border:0!important;border-radius:6px!important;background:transparent!important;color:#eef4fa!important;text-align:left!important;font-size:14px!important;font-weight:500!important;box-shadow:none!important}
+.reference-nav-group button:hover{background:rgba(255,255,255,.07)!important}
+.reference-nav-group button.side-active{background:linear-gradient(90deg,#246caf,#2e77b8)!important;color:#fff!important;box-shadow:none!important}
+.reference-nav-icon{display:grid;place-items:center;width:22px;color:#e8f0f7;font-size:17px}
+.reference-collapse{margin-top:auto!important;width:100%;min-height:40px;padding:8px 12px!important;border:0!important;border-radius:6px!important;background:transparent!important;color:#eef4fa!important;text-align:left!important;font-size:14px!important}
+.reference-collapse span{display:inline-block;margin-right:12px;font-size:22px;vertical-align:-2px}
+
+/* Fixed top bar starts after sidebar */
+.reference-topbar.top-nav{position:fixed!important;z-index:55!important;left:var(--ref-sidebar)!important;right:0!important;top:0!important;width:auto!important;height:var(--ref-topbar)!important;min-height:var(--ref-topbar)!important;padding:0 18px!important;display:flex!important;align-items:center!important;gap:16px!important;background:#071625!important;border:0!important;border-bottom:1px solid #173047!important;box-shadow:none!important;backdrop-filter:none!important}
+.reference-menu-button{display:grid!important;place-items:center!important;width:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important;border:0!important;background:transparent!important;color:#fff!important;font-size:21px!important}
+.reference-breadcrumbs{display:flex;align-items:center;gap:12px;min-width:0;color:#dbe6ef;font-size:15px;white-space:nowrap}
+.reference-breadcrumbs strong{font-size:20px;color:#fff;letter-spacing:.01em}
+.reference-breadcrumbs>span:not(.reference-breadcrumb-map){color:#8798a9}
+.reference-breadcrumb-map{color:#4a91d0}
+.reference-breadcrumbs b{font-weight:600;color:#fff}
+.reference-search.global-search{margin-left:auto!important;width:min(335px,28vw)!important;min-width:220px!important;height:38px!important;display:flex!important;align-items:center!important;gap:8px!important;padding:0 12px!important;border:1px solid #294056!important;border-radius:7px!important;background:#0e2133!important;box-shadow:none!important}
+.reference-search input{display:block!important;width:100%!important;height:100%!important;padding:0!important;border:0!important;background:transparent!important;color:#fff!important;font-size:13px!important;outline:0!important}
+.reference-search input::placeholder{color:#98a7b5}
+.reference-search kbd{display:none!important}.reference-search-icon{color:#c8d3df;font-size:18px}
+.reference-icon-button,.reference-user-button{display:grid;place-items:center;flex:0 0 auto;width:38px;height:38px;padding:0;border:0;border-radius:50%;background:transparent;color:#f4f7fa;font-size:20px}
+.reference-icon-button:nth-of-type(3){border:2px solid #d8e1e8;font-size:16px}
+.reference-user-button{background:#0c4b78;color:#fff;font-size:12px;font-weight:800}
+.reference-topbar .mobile-search-button{display:none!important}
+
+/* The map workspace owns the page. */
+.dashboard.workspace-map.view-dashboard{position:relative!important;height:100dvh!important;min-height:100dvh!important;width:100%!important;padding:calc(var(--ref-topbar) + 0px) 0 0 var(--ref-sidebar)!important;display:block!important;overflow:hidden!important;background:#fff!important}
+.dashboard.workspace-map.view-dashboard>.kpi-row,
+.dashboard.workspace-map.view-dashboard>.rail,
+.dashboard.workspace-map.view-dashboard>.relationship-panel,
+.dashboard.workspace-map.view-dashboard>.facility-status,
+.dashboard.workspace-map.view-dashboard>.bottom-nav{display:none!important}
+.dashboard.workspace-map.view-dashboard>.map-panel{position:relative!important;width:100%!important;height:calc(100dvh - var(--ref-topbar))!important;min-height:0!important;margin:0!important;padding:0!important;display:block!important;overflow:auto!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+.dashboard.workspace-map.view-dashboard>.map-panel>.panel-heading{display:none!important}
+.dashboard.workspace-map.view-dashboard .map-stage,
+.dashboard.workspace-map.view-dashboard .map-viewport,
+.dashboard.workspace-map.view-dashboard .detailed-map-stage,
+.dashboard.workspace-map.view-dashboard .detailed-map-viewport{width:100%!important;height:auto!important;min-height:100%!important;overflow:visible!important;background:#fff!important}
+
+/* Engineering drawing workspace */
+.dashboard.workspace-map .reference-layout{width:100%!important;min-width:0!important;min-height:100%!important;padding:14px 20px 18px!important;background:#fff!important;color:var(--ref-ink)!important}
+.dashboard.workspace-map .reference-layout-head{min-height:62px;margin:0!important;padding:0 2px 10px!important;align-items:center!important}
+.dashboard.workspace-map .reference-layout-head h2{font-size:27px!important;font-weight:800!important;letter-spacing:-.02em!important;color:#101827!important}
+.dashboard.workspace-map .reference-layout-head p{margin-top:3px!important;font-size:14px!important;color:#596677!important}
+.dashboard.workspace-map .reference-layout-actions{gap:12px!important}
+.dashboard.workspace-map .reference-layout-actions button{min-width:106px!important;min-height:36px!important;padding:7px 14px!important;border:1px solid #cfd6de!important;border-radius:6px!important;background:#fff!important;color:#172130!important;font-size:13px!important;font-weight:700!important;box-shadow:none!important}
+/* Hide zoom controls from the reference header. */
+.dashboard.workspace-map .reference-layout-actions button[aria-label='Zoom out'],
+.dashboard.workspace-map .reference-layout-actions button[aria-label='Zoom in'],
+.dashboard.workspace-map .reference-layout-actions .map-zoom-readout{display:none!important}
+/* The reference includes an Edit Map control; render it as a visual affordance until editing is implemented. */
+.dashboard.workspace-map .reference-layout-actions::after{content:'Edit Map';display:grid;place-items:center;min-width:94px;min-height:36px;padding:0 14px;border-radius:6px;background:#0b1e31;color:#fff;font-size:13px;font-weight:800}
+.dashboard.workspace-map .reference-drawing-sheet{width:100%!important;overflow:hidden!important;border:1px solid #cfd6de!important;border-radius:9px!important;background:#fff!important;box-shadow:none!important}
+.dashboard.workspace-map .reference-plan-wrap{width:100%!important;overflow:hidden!important;padding:10px 10px 2px!important;background:#fff!important}
+.dashboard.workspace-map .reference-plan{display:block!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1210/525!important;background:#fff!important}
+.dashboard.workspace-map .reference-map-status{display:none!important}
+.dashboard.workspace-map .reference-info-strip{grid-template-columns:1.1fr .95fr .95fr 1.15fr .9fr!important;border-top:1px solid #ccd4dc!important;border-bottom:1px solid #ccd4dc!important;background:#fff!important}
+.dashboard.workspace-map .reference-info-strip>section{padding:9px 11px!important;border-right:1px solid #d5dbe2!important;background:#fff!important}
+.dashboard.workspace-map .reference-info-strip h3{font-size:10px!important;margin-bottom:7px!important}
+.dashboard.workspace-map .legend-grid span,
+.dashboard.workspace-map .directory-row,
+.dashboard.workspace-map .area-grid,
+.dashboard.workspace-map .notes-column li{font-size:9px!important}
+.dashboard.workspace-map .reference-title-block{min-height:70px!important;background:#fff!important;border-top:0!important}
+.dashboard.workspace-map .reference-title-block>div:last-child{font-size:9px!important}
+
+/* Other workspaces can keep their existing product layouts. */
+.dashboard:not(.workspace-map){padding-left:calc(var(--ref-sidebar) + 12px)!important;padding-top:calc(var(--ref-topbar) + 12px)!important}
+.dashboard:not(.workspace-map) .facility-sidebar{display:none!important}
+
+@media(max-width:900px){
+  :root{--ref-sidebar:0px;--ref-topbar:58px}
+  .reference-sidebar.facility-sidebar{transform:translateX(-105%)!important;width:min(280px,84vw)!important;transition:transform .2s ease!important}
+  .reference-sidebar.facility-sidebar.open{transform:translateX(0)!important}
+  .reference-sidebar-brand{height:58px;min-height:58px}
+  .reference-topbar.top-nav{left:0!important;padding:0 9px!important;gap:8px!important}
+  .reference-breadcrumbs strong{font-size:16px}.reference-breadcrumbs b,.reference-breadcrumb-map,.reference-breadcrumbs>span{display:none!important}
+  .reference-search.global-search,.reference-icon-button{display:none!important}
+  .reference-user-button{margin-left:auto;width:34px;height:34px}
+  .reference-topbar .mobile-search-button{display:grid!important;place-items:center!important;width:36px!important;min-width:36px!important;height:36px!important;padding:0!important;border:1px solid #294056!important;border-radius:7px!important;background:#0e2133!important;color:#fff!important}
+  .dashboard.workspace-map.view-dashboard{padding-left:0!important;padding-top:var(--ref-topbar)!important;height:100dvh!important}
+  .dashboard.workspace-map.view-dashboard>.map-panel{height:calc(100dvh - var(--ref-topbar))!important;overflow:auto!important}
+  .dashboard.workspace-map .reference-layout{padding:10px!important}
+  .dashboard.workspace-map .reference-layout-head{align-items:flex-start!important;gap:8px!important}
+  .dashboard.workspace-map .reference-layout-head h2{font-size:22px!important}
+  .dashboard.workspace-map .reference-layout-actions{gap:6px!important}
+  .dashboard.workspace-map .reference-layout-actions button{min-width:auto!important;padding:6px 9px!important;font-size:11px!important}
+  .dashboard.workspace-map .reference-layout-actions::after{display:none!important}
+  .dashboard.workspace-map .reference-plan-wrap{overflow:auto!important}
+  .dashboard.workspace-map .reference-plan{width:980px!important;max-width:none!important;aspect-ratio:auto!important}
+  .dashboard.workspace-map .reference-info-strip{min-width:980px!important}
+  .dashboard.workspace-map .reference-title-block{min-width:980px!important}
+}

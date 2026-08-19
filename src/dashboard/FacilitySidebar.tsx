@@ -4,16 +4,6 @@ import type { WorkspaceTab } from './TopNav';
 
 type AppView = 'dashboard' | 'assets' | 'documents' | 'cabinet';
 
-const stateLabel: Record<VerificationState, string> = {
-  VERIFIED: 'Verified',
-  FIELD_VERIFY: 'Field verify',
-  INFERRED: 'Inferred',
-  DISPUTED: 'Disputed',
-  RETIRED: 'Retired',
-};
-
-const filterStates: VerificationState[] = ['VERIFIED', 'FIELD_VERIFY', 'INFERRED', 'DISPUTED', 'RETIRED'];
-
 type Props = {
   drawerOpen: boolean;
   workspaceTab: WorkspaceTab;
@@ -30,51 +20,59 @@ type Props = {
   onToggleFilter: (state: VerificationState) => void;
 };
 
+const group = (label: string, items: { icon: string; label: string; action?: () => void; active?: boolean }[]) => (
+  <section className="reference-nav-group" key={label}>
+    <p className="reference-nav-heading">{label}</p>
+    {items.map((item) => (
+      <button key={item.label} type="button" className={item.active ? 'side-active' : ''} onClick={item.action} aria-disabled={!item.action || undefined}>
+        <span className="reference-nav-icon" aria-hidden="true">{item.icon}</span>
+        <span>{item.label}</span>
+      </button>
+    ))}
+  </section>
+);
+
 export default function FacilitySidebar({
   drawerOpen,
   workspaceTab,
-  view,
-  systemKind,
-  areas,
-  equipmentCount,
-  selectedArea,
-  filters,
   onWorkspace,
-  onArea,
   onOpenCabinet,
   onSystems,
-  onToggleFilter,
 }: Props) {
   return (
-    <aside className={`facility-sidebar ${drawerOpen ? 'open' : ''} enter`} style={{ animationDelay: '40ms' }}>
-      <section>
-        <p className="panel-title">Facility navigation</p>
-        <button className={workspaceTab === 'map' ? 'side-active' : ''} onClick={() => onWorkspace('map')}>Building layout</button>
-        <button className={workspaceTab === 'assets' ? 'side-selected' : ''} onClick={() => onWorkspace('assets')}>Areas<b>{areas.length}</b></button>
-        <button onClick={() => onWorkspace('assets')}>Equipment<b>{equipmentCount}</b></button>
-        <button className={workspaceTab === 'documents' ? 'side-selected' : ''} onClick={() => onWorkspace('documents')}>Documents</button>
-        <button onClick={onOpenCabinet}>Control cabinets</button>
-        <button className={view === 'assets' && systemKind !== 'ALL' ? 'side-selected' : ''} onClick={onSystems}>Systems</button>
-      </section>
-      <section>
-        <p className="panel-title">Areas</p>
-        <div className="area-scroll scroll-pane">
-          {areas.map((area) => (
-            <button key={area.id} className={selectedArea?.id === area.id ? 'side-selected' : ''} onClick={() => onArea(area)}>
-              <i className={markerClass(area.status)} aria-hidden="true" /><span>{area.shortName}</span><b>{area.assetIds.length || ''}</b>
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="legend">
-        <p className="panel-title">Verification filters</p>
-        {filterStates.map((item) => (
-          <label key={item} className={filters.has(item) ? '' : 'is-dimmed'}>
-            <input type="checkbox" checked={filters.has(item)} onChange={() => onToggleFilter(item)} />
-            <i className={markerClass(item)} aria-hidden="true" />{stateLabel[item]}
-          </label>
-        ))}
-      </section>
+    <aside className={`facility-sidebar reference-sidebar ${drawerOpen ? 'open' : ''}`}>
+      <div className="reference-sidebar-brand" aria-label="Industrial Asset Graph">
+        <span className="reference-network-mark" aria-hidden="true">⌁</span>
+        <strong>INDUSTRIAL<br />ASSET GRAPH</strong>
+      </div>
+
+      {group('OVERVIEW', [
+        { icon: '⌂', label: 'Dashboard', action: () => onWorkspace('map') },
+        { icon: '◫', label: 'Map', action: () => onWorkspace('map'), active: workspaceTab === 'map' },
+      ])}
+      {group('ASSETS', [
+        { icon: '⌘', label: 'Equipment', action: () => onWorkspace('assets') },
+        { icon: '▣', label: 'Control Cabinets', action: onOpenCabinet },
+        { icon: '▤', label: 'Panels', action: onSystems },
+        { icon: '◉', label: 'Components', action: onSystems },
+      ])}
+      {group('DOCUMENTS', [
+        { icon: '▧', label: 'Procedures', action: () => onWorkspace('documents') },
+        { icon: '▱', label: 'Drawings', action: () => onWorkspace('documents') },
+        { icon: '▥', label: 'Files', action: () => onWorkspace('documents') },
+      ])}
+      {group('OPERATIONS', [
+        { icon: '◇', label: 'Work Orders' },
+        { icon: '◷', label: 'Downtime' },
+        { icon: '◇', label: 'Training' },
+      ])}
+      {group('ADMIN', [
+        { icon: '⌂', label: 'Facilities' },
+        { icon: '♙', label: 'Users' },
+        { icon: '⚙', label: 'Settings' },
+      ])}
+
+      <button className="reference-collapse" type="button" aria-label="Collapse sidebar"><span aria-hidden="true">‹</span> Collapse</button>
     </aside>
   );
 }

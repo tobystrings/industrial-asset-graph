@@ -1,5 +1,3 @@
-import { standalonePresentationHref } from '../lib/filmGenie';
-
 export type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents';
 
 type Props = {
@@ -17,7 +15,7 @@ type Props = {
 };
 
 const workspaceLabel: Record<WorkspaceTab, string> = {
-  map: 'Map',
+  map: 'Maps / Building Layout',
   assets: 'Assets',
   relationships: 'Relationships',
   documents: 'Documents',
@@ -27,52 +25,31 @@ export default function TopNav({
   brandMark,
   facilityName,
   workspaceTab,
-  navOpen,
   drawerOpen,
   query,
   onToggleDrawer,
-  onWorkspace,
-  onOpenCabinet,
   onQuery,
   onOpenSearch,
 }: Props) {
   return (
-    <header className="top-nav">
-      <button
-        className="nav-toggle"
-        type="button"
-        aria-label={drawerOpen ? 'Close facility menu' : 'Open facility menu'}
-        aria-expanded={drawerOpen}
-        onClick={onToggleDrawer}
-      >
-        <span aria-hidden="true">☰</span>
-      </button>
-      <div className="brand">
-        <span className="brand-mark">{brandMark}</span>
-        <div className="brand-copy">
-          <strong>{facilityName}</strong>
-          <em>Industrial Asset Graph</em>
-          <small className="mobile-workspace-label">{workspaceLabel[workspaceTab]}</small>
-        </div>
+    <header className="top-nav reference-topbar">
+      <button className="nav-toggle reference-menu-button" type="button" aria-label={drawerOpen ? 'Close facility menu' : 'Open facility menu'} aria-expanded={drawerOpen} onClick={onToggleDrawer}>☰</button>
+      <div className="reference-breadcrumbs">
+        <strong>{facilityName.toUpperCase()}</strong>
+        <small className="mobile-workspace-label">{workspaceLabel[workspaceTab]}</small>
+        <span>/</span>
+        <span className="reference-breadcrumb-map" aria-current={workspaceTab === 'map' ? 'page' : undefined}>{workspaceLabel[workspaceTab].split(' / ')[0]}</span>
+        {workspaceTab === 'map' && <><span>/</span><b>Building Layout</b></>}
       </div>
-      <nav className={navOpen ? 'open' : ''} aria-label="Primary workspace">
-        <button aria-current={workspaceTab === 'map' ? 'page' : undefined} className={workspaceTab === 'map' ? 'nav-active' : ''} onClick={() => onWorkspace('map')}>Map</button>
-        <button aria-current={workspaceTab === 'assets' ? 'page' : undefined} className={workspaceTab === 'assets' ? 'nav-active' : ''} onClick={() => onWorkspace('assets')}>Assets</button>
-        <button aria-current={workspaceTab === 'relationships' ? 'page' : undefined} className={workspaceTab === 'relationships' ? 'nav-active' : ''} onClick={() => onWorkspace('relationships')}>Relationships</button>
-        <button aria-current={workspaceTab === 'documents' ? 'page' : undefined} className={workspaceTab === 'documents' ? 'nav-active' : ''} onClick={() => onWorkspace('documents')}>Documents</button>
-        <button onClick={onOpenCabinet}>Cabinet</button>
-      </nav>
-      <a className="film-link" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer" aria-label="Open standalone presentation">
-        <span aria-hidden="true">▶</span><span className="film-link-label">Presentation ↗</span>
-      </a>
-      <label className="global-search">
-        <span className="sr-only">Search assets</span>
-        <input value={query} onChange={(event) => onQuery(event.target.value)} placeholder="Search assets…" onFocus={onOpenSearch} />
-        <kbd>/</kbd>
+      <label className="global-search reference-search">
+        <span className="reference-search-icon" aria-hidden="true">⌕</span>
+        <span className="sr-only">Search assets, areas, documents</span>
+        <input value={query} onChange={(event) => onQuery(event.target.value)} placeholder="Search assets, areas, docs..." onFocus={onOpenSearch} />
       </label>
-      <button className="mobile-search-button" type="button" onClick={onOpenSearch} aria-label="Search facility">
-        <span aria-hidden="true">⌕</span>
-      </button>
+      <button className="reference-icon-button" type="button" aria-label="Notifications">♧</button>
+      <button className="reference-icon-button" type="button" aria-label="Help">?</button>
+      <button className="reference-user-button" type="button" aria-label="User profile">{brandMark || 'TS'}</button>
+      <button className="mobile-search-button" type="button" onClick={onOpenSearch} aria-label="Search facility">⌕</button>
     </header>
   );
 }
