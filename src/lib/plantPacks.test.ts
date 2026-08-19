@@ -50,15 +50,18 @@ describe('review patch and plant packs', () => {
   it('is called from the live Log, empty-area, and cabinet surfaces', () => {
     const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
     const dashboard = readFileSync(resolve(root, 'Dashboard.tsx'), 'utf8');
+    const inspector = readFileSync(resolve(root, 'dashboard', 'InspectorRail.tsx'), 'utf8');
+    const selectedAsset = readFileSync(resolve(root, 'dashboard', 'SelectedAssetPanel.tsx'), 'utf8');
     const cabinet = readFileSync(resolve(root, 'ControlCabinetView.tsx'), 'utf8');
     const css = readFileSync(resolve(root, 'dashboard.css'), 'utf8');
     const app = readFileSync(resolve(root, 'App.tsx'), 'utf8');
     const presentation = readFileSync(resolve(root, '..', 'presentation', 'index.html'), 'utf8');
-    expect(dashboard).toContain('graphPatchPreview');
-    expect(dashboard).toContain('graphPatchText');
-    expect(dashboard).toContain('exportAreaWalkPack');
-    expect(dashboard).toContain('data-testid="graph-patch-preview"');
-    expect(dashboard).toContain('data-testid="export-area-pack"');
+    expect(inspector).toContain('graphPatchPreview');
+    expect(inspector).toContain('graphPatchText');
+    expect(inspector).toContain('data-testid="graph-patch-preview"');
+    expect(selectedAsset).toContain('exportAreaWalkPack');
+    expect(selectedAsset).toContain('data-testid="export-area-pack"');
+    expect(selectedAsset).toContain('target="_blank"');
     expect(cabinet).toContain('cabinetPackageFor');
     expect(cabinet).toContain('data-testid="cabinet-package"');
     expect(cabinet).toContain('cabinet-back');
@@ -74,7 +77,6 @@ describe('review patch and plant packs', () => {
     expect(app).not.toContain('FilmTheater');
     expect(app).not.toContain('has-genie-dock');
     expect(dashboard).toContain('standalonePresentationHref');
-    expect(dashboard).toContain('target="_blank"');
     expect(dashboard).toContain('genieQueryFromSearch');
     expect(dashboard).toContain('...genieQueryFromSearch(location.search)');
     expect(presentation.match(/data-scene="\d+"/g)).toHaveLength(11);
