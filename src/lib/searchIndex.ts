@@ -32,7 +32,6 @@ export function buildSearchIndex(): SearchHit[] {
   for (const document of documents) {
     hits.push({ id: document.id, kind: 'document', title: document.title, subtitle: document.category, status: document.state, assetId: document.assetId, documentId: document.id });
   }
-  hits.push({ id: 'project-film', kind: 'film', title: 'Project film', subtitle: 'Narrated walkthrough · Tyler intro to Line 2', scene: 0 });
   for (const manual of productManuals) {
     hits.push({ id: manual.id, kind: 'manual', title: manual.title, subtitle: manual.excerpt, documentId: manual.id.startsWith('manual-pf4') ? 'doc-manual-pf4' : 'doc-manual-d700' });
   }
@@ -143,6 +142,5 @@ function gapScore(hit: SearchHit): number {
   const text = `${hit.title} ${hit.subtitle} ${hit.status ?? ''}`.toLowerCase();
   if (hit.status === 'FIELD_VERIFY' || text.includes('dest-unknown')) return 0;
   if (hit.kind === 'manual') return 1;
-  if (hit.kind === 'film') return 3;
   return 2;
 }
