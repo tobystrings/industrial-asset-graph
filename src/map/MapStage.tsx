@@ -1,5 +1,6 @@
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
 import DetailedBuildingLayout from './DetailedBuildingLayout';
+import './mapHonesty.css';
 
 export type MapMode = '2d';
 
