@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './dashboard.css';
 import './ui/system.css';
+import './ui/layout-repair.css';
 import './motion/tokens.css';
 import { GuideProvider } from './features/facility-guide';
 import { FacilityProvider } from './facility';
