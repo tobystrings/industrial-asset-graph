@@ -1,0 +1,160 @@
+:root {
+  --iag-bg: #08111d;
+  --iag-chrome: #0b1624;
+  --iag-chrome-2: #101e2d;
+  --iag-surface: #f6f8fb;
+  --iag-surface-2: #ffffff;
+  --iag-border: #d7dde5;
+  --iag-border-strong: #bcc7d3;
+  --iag-ink: #122033;
+  --iag-muted-ink: #657286;
+  --iag-blue: #1768b0;
+  --iag-blue-soft: #e9f2fb;
+  --iag-green: #2f8d48;
+  --iag-amber: #d9a617;
+  --iag-radius-sm: 7px;
+  --iag-radius-md: 10px;
+  --iag-shadow: 0 10px 28px rgba(7, 20, 34, .12);
+}
+
+/* Shared application chrome: flatter, denser, and closer to an engineering workstation. */
+.backdrop {
+  background: var(--iag-bg);
+  filter: none;
+}
+.backdrop::after {
+  background: radial-gradient(circle at 72% 16%, rgba(25, 103, 176, .12), transparent 34%), linear-gradient(180deg, #091522 0%, #07111d 100%);
+}
+
+.dashboard {
+  gap: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  grid-template-columns: 212px minmax(0, 1fr) minmax(330px, 372px);
+}
+
+.top-nav {
+  gap: 14px;
+  padding-left: 16px;
+  padding-right: 16px;
+  background: rgba(8, 18, 31, .96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  box-shadow: 0 3px 12px rgba(0,0,0,.18);
+}
+.brand-mark {
+  border-radius: 6px;
+  background: #f4f7fb;
+  color: #0c1b2b;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+}
+.brand strong { letter-spacing: .01em; }
+.brand em { color: #9fb0c2; letter-spacing: .1em; }
+.top-nav nav { margin-left: 6px; }
+.top-nav nav button {
+  min-height: 38px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #b8c5d3;
+}
+.top-nav nav button:hover { background: rgba(255,255,255,.07); }
+.top-nav nav .nav-active {
+  background: #153554;
+  box-shadow: inset 0 0 0 1px rgba(93, 168, 235, .25);
+}
+.film-link {
+  min-height: 38px;
+  border-radius: 6px;
+  padding: 0 12px;
+  background: #164d74;
+}
+.global-search input {
+  border-radius: 7px !important;
+  background: rgba(255,255,255,.055) !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+.facility-sidebar {
+  background: rgba(10, 23, 37, .96) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: var(--iag-radius-md) !important;
+  box-shadow: none !important;
+}
+.facility-sidebar section + section { border-top-color: rgba(255,255,255,.07) !important; }
+.facility-sidebar button {
+  border-radius: 6px !important;
+}
+.facility-sidebar .side-active,
+.facility-sidebar .side-selected {
+  background: #153554 !important;
+  box-shadow: inset 3px 0 0 #4f9be0;
+}
+
+.panel,
+.kpi-card,
+.document-directory {
+  border-radius: var(--iag-radius-md) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow: none !important;
+}
+.kpi-card {
+  background: rgba(11, 25, 40, .92) !important;
+}
+.kpi-card > b { font-variant-numeric: tabular-nums; }
+.kpi-bar { height: 3px !important; background: rgba(255,255,255,.08) !important; }
+
+.map-panel {
+  overflow: hidden;
+  background: var(--iag-surface) !important;
+  border-color: var(--iag-border-strong) !important;
+  box-shadow: var(--iag-shadow) !important;
+}
+.map-panel > .panel-heading {
+  min-height: 44px;
+  padding: 8px 12px !important;
+  background: #fff;
+  color: var(--iag-ink);
+  border-bottom: 1px solid var(--iag-border);
+}
+.map-panel > .panel-heading b { font-size: 15px; }
+.map-panel > .panel-heading small,
+.map-panel > .panel-heading .crumb { color: var(--iag-muted-ink) !important; }
+.map-panel .crumb button { color: var(--iag-blue) !important; }
+.kpi-compact span {
+  border-radius: 5px !important;
+  background: #eef2f6 !important;
+  color: #39485b !important;
+  border: 1px solid #d9e0e7;
+}
+
+.rail {
+  border-radius: var(--iag-radius-md) !important;
+  background: rgba(10, 22, 35, .96) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+.inspector-tabs button { border-radius: 5px !important; }
+.inspector-tabs button.active { background: #17436a !important; }
+
+.relationship-panel {
+  background: rgba(10, 22, 35, .95) !important;
+}
+.trace-node { border-radius: 6px !important; }
+
+/* Reduce visual noise: fewer floating/glass effects, more consistent controls. */
+button,
+input,
+select,
+textarea { outline-offset: 2px; }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #61a8e8;
+}
+.panel-title { letter-spacing: .08em !important; }
+
+@media (max-width: 1180px) {
+  .dashboard { grid-template-columns: 188px minmax(0, 1fr) minmax(310px, 350px); }
+  .top-nav { gap: 8px; }
+  .top-nav nav button { padding-inline: 9px; }
+}
