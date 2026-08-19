@@ -2,7 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import activeFacilityPackage from './activeFacility';
 import type { FacilityMapMarker, FacilityPackage } from './types';
 import type { FacilityAsset, RelationshipRecord } from '../types/facility';
+import { syncFacilityData } from '../facilityData';
 import {
+  deleteAttachment as removeAttachmentRecord,
   ensurePlantSeed,
   exportPlantBackup,
   importPlantBackup,
@@ -28,6 +30,7 @@ export interface FacilityEditorApi {
   saveMarker(marker: FacilityMapMarker): Promise<void>;
   deleteMarker(markerId: string): Promise<void>;
   addAttachment(assetId: string, file: File, verificationStatus?: 'VERIFIED' | 'FIELD_VERIFY'): Promise<AttachmentRecord>;
+  deleteAttachment(id: string): Promise<void>;
   attachments(assetId?: string): Promise<AttachmentRecord[]>;
   addObservation(input: Omit<ObservationRecord, 'id' | 'createdAt'>): Promise<ObservationRecord>;
   observations(assetId?: string): Promise<ObservationRecord[]>;
@@ -72,11 +75,13 @@ export function FacilityProvider({
     ensurePlantSeed(value)
       .then((stored) => {
         if (!alive) return;
+        syncFacilityData(stored);
         setPkg(stored);
         setReady(true);
       })
       .catch(() => {
         if (!alive) return;
+        syncFacilityData(value);
         setPkg(value);
         setReady(true);
       });
@@ -84,6 +89,7 @@ export function FacilityProvider({
   }, [value]);
 
   const commit = useCallback(async (next: FacilityPackage) => {
+    syncFacilityData(next);
     setPkg(next);
     await savePlant(next);
   }, []);
@@ -99,12 +105,13 @@ export function FacilityProvider({
         return area.id === asset.areaId ? { ...area, assetIds: [...ids, asset.id] } : { ...area, assetIds: ids };
       });
       const markers = [...(pkg.mapConfig?.markers ?? [])] as FacilityMapMarker[];
-      if (markerPosition) {
+      const existingMarker = markers.find((item) => item.assetId === asset.id);
+      if (markerPosition || existingMarker) {
         const marker: FacilityMapMarker = {
-          id: `PIN-${asset.id}`,
+          id: existingMarker?.id ?? `PIN-${asset.id}`,
           label: asset.name,
-          x: markerPosition.x,
-          y: markerPosition.y,
+          x: markerPosition?.x ?? existingMarker?.x ?? 50,
+          y: markerPosition?.y ?? existingMarker?.y ?? 50,
           tone: asset.type.toLowerCase().includes('cabinet') || asset.type.toLowerCase().includes('panel') ? 'cabinet' : asset.type.toLowerCase().includes('machine') || asset.type.toLowerCase().includes('conveyor') ? 'machine' : 'power',
           state: asset.verificationStatus === 'FIELD_VERIFY' ? 'FIELD_VERIFY' : 'LIVE',
           assetId: asset.id,
@@ -156,6 +163,9 @@ export function FacilityProvider({
       await putAttachment(record);
       return record;
     },
+    async deleteAttachment(id) {
+      await removeAttachmentRecord(id);
+    },
     attachments: listAttachments,
     async addObservation(input) {
       const record: ObservationRecord = { ...input, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
@@ -166,11 +176,14 @@ export function FacilityProvider({
     exportBackup: exportPlantBackup,
     async importBackup(backup, mode) {
       const next = await importPlantBackup(backup, mode);
+      syncFacilityData(next);
       setPkg(next);
     },
     async resetToBaseline() {
       await resetPlant(value);
-      setPkg(structuredClone(value));
+      const next = structuredClone(value);
+      syncFacilityData(next);
+      setPkg(next);
     },
   }), [ready, pkg, value, commit]);
 
