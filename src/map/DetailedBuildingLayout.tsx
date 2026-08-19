@@ -26,7 +26,6 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const { facility, areas, assets, mapConfig } = useFacility();
   const markers = (mapConfig?.markers ?? []) as FacilityMapMarker[];
   const pointers = useRef(new Map<number, { x: number; y: number }>());
-  const imageRef = useRef<HTMLImageElement | null>(null);
   const gesture = useRef<{ start: ViewTransform; origin: { x: number; y: number }; distance?: number }>({ start: { scale: 1, x: 0, y: 0 }, origin: { x: 0, y: 0 } });
   const [view, setView] = useState<ViewTransform>({ scale: 1, x: 0, y: 0 });
   const [gesturing, setGesturing] = useState(false);
@@ -104,9 +103,13 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Enter') return;
-    const button = (event.target as HTMLElement | null)?.closest('button') as HTMLButtonElement | null;
-    if (button && !button.disabled) { button.click(); event.preventDefault(); }
+    if (event.key === 'Enter') {
+      const button = (event.target as HTMLElement | null)?.closest('button') as HTMLButtonElement | null;
+      if (button && !button.disabled) {
+        button.click();
+        event.preventDefault();
+      }
+    }
   };
 
   const legendContent = <div className="legend-grid"><span><i className="swatch outline cabinet" />Control Cabinet</span><span><i className="swatch outline machine" />Major Machine / Equipment</span><span><i className="swatch power" />Electrical / Main Power</span><span><i className="swatch wall" />Walls / Boundaries</span><span><i className="truth-dot live" />Live record</span><span><i className="truth-dot verify" />Field verify</span><span><i className="truth-dot reference" />Reference only</span></div>;
@@ -128,7 +131,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
       <div className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" onClick={addAtClick}>
-            <img ref={imageRef} className="reference-plan-image" src={buildingLayoutImage} alt={`${facility.name} facility layout and asset graph`} draggable={false} onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}/>
+            <img className="reference-plan-image" src={buildingLayoutImage} alt={`${facility.name} facility layout and asset graph`} draggable={false} onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}/>
             {areas.map((area) => area.overlay ? <button key={area.id} type="button" className={`map-hotspot area ${selectedArea?.id === area.id ? 'selected' : ''}`} style={{ left: `${area.overlay.x}%`, top: `${area.overlay.y}%`, width: `${area.overlay.width}%`, height: `${area.overlay.height}%` }} onClick={(event) => { event.stopPropagation(); if (!editMode) onArea(area); }} aria-label={`Open ${area.name}`}/> : null)}
             {markers.map((marker) => {
               const asset = liveAsset(marker.assetId);
