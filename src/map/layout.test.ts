@@ -41,13 +41,15 @@ describe('schematic layout', () => {
     expect(mapModeFromQuery('')).toBe('2d');
     expect(mapModeFromQuery('?area=area-warehouse-f')).toBe('2d');
     expect(mapModeFromQuery('?map=2d')).toBe('2d');
-    const stage = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), 'MapStage.tsx'), 'utf8');
-    const dashboard = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../Dashboard.tsx'), 'utf8');
+    const base = dirname(fileURLToPath(import.meta.url));
+    const stage = readFileSync(resolve(base, 'MapStage.tsx'), 'utf8');
+    const dashboard = readFileSync(resolve(base, '../Dashboard.tsx'), 'utf8');
+    const topNav = readFileSync(resolve(base, '../dashboard/TopNav.tsx'), 'utf8');
     expect(stage).toContain('DetailedBuildingLayout');
     expect(stage).not.toContain('FacilityMap3D');
     expect(stage).not.toContain('lazy(');
     expect(dashboard).not.toContain('className="map-mode"');
-    expect(dashboard).toContain('aria-expanded={drawerOpen}');
+    expect(topNav).toContain('aria-expanded={drawerOpen}');
     expect(dashboard).toContain('setDrawerOpen((value) => !value)');
     expect(dashboard).not.toContain('setNavOpen((value) => !value)');
   });
