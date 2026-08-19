@@ -75,8 +75,8 @@ describe('viewport rebalance', () => {
     expect(css).toContain('.app-shell:has(.cabinet-page) .backdrop');
     expect(css).not.toContain('Open 3D');
     const html = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../index.html'), 'utf8');
-    expect(html).toContain('href="/manifest.webmanifest"');
-    expect(html).not.toContain('href="/industrial-asset-graph/manifest.webmanifest"');
+    expect(html).toContain('href="%BASE_URL%manifest.webmanifest"');
+    expect(html).not.toContain('href="/manifest.webmanifest"');
     expect(html).toContain('Industrial Asset Graph');
     expect(html).not.toContain('Plant Dependency Map');
     const presentation = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../presentation/index.html'), 'utf8');

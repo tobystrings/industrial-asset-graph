@@ -5,7 +5,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Validate the separation branch before merge.
 jobs:
   test-build:
     runs-on: ubuntu-latest
@@ -16,14 +15,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Test
         run: npm test
+
+      - name: Verify facility data
+        run: npm run verify:data
 
       - name: Build
         run: npm run build
