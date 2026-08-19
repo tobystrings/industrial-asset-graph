@@ -6,6 +6,7 @@ import type {
   FacilityAsset,
   RelationshipRecord,
   RevisionRecord,
+  VerificationState,
 } from '../types/facility';
 
 /**
@@ -31,6 +32,15 @@ export interface FacilityFeatureConfig {
   brandMark?: string;
 }
 
+export interface AssetSerialSource {
+  id: string;
+  assetId: string;
+  label: string;
+  value: string;
+  evidenceId: string;
+  verificationStatus: VerificationState;
+}
+
 /**
  * The contract between the reusable Industrial Asset Graph framework and a
  * facility-specific dataset. Keeping this boundary explicit lets a future
@@ -46,4 +56,5 @@ export interface FacilityPackage {
   documents: DocumentRecord[];
   evidence: EvidenceRecord[];
   revisions: RevisionRecord[];
+  assetSerialSources: AssetSerialSource[];
 }

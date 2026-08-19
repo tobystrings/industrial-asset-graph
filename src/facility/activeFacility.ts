@@ -1,5 +1,6 @@
 import {
   areas,
+  assetSerialSources,
   components,
   documents,
   evidence,
@@ -9,16 +10,10 @@ import {
   revisions,
 } from '../../facilities/lieb-foods/data';
 import { featureConfig } from '../../facilities/lieb-foods/config';
+import { demoFacilityPackage } from '../../facilities/demo-plant';
 import type { FacilityPackage } from './types';
 
-/**
- * Active facility package for the current deployment.
- *
- * Framework consumers receive customer data and runtime defaults through one
- * package boundary. Legacy data imports remain available temporarily through
- * src/facilityData.ts while the remaining consumers are migrated.
- */
-export const activeFacilityPackage: FacilityPackage = {
+export const liebFacilityPackage: FacilityPackage = {
   facility,
   featureConfig,
   areas,
@@ -28,6 +23,19 @@ export const activeFacilityPackage: FacilityPackage = {
   documents,
   evidence,
   revisions,
+  assetSerialSources,
 };
+
+export function selectFacilityPackage(id: string | undefined): FacilityPackage {
+  if (id === 'demo-plant') return demoFacilityPackage;
+  return liebFacilityPackage;
+}
+
+/**
+ * Facility package selected for this deployment. Lieb remains the default so
+ * current production behavior is unchanged; set VITE_FACILITY=demo-plant (or
+ * add another selector entry) to boot the same framework with another dataset.
+ */
+export const activeFacilityPackage = selectFacilityPackage(import.meta.env.VITE_FACILITY);
 
 export default activeFacilityPackage;
