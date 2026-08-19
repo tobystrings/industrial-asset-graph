@@ -1,36 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { areas, documents, evidence, facility, machines, revisions } from './facilityData';
+import { areas, evidence, facility, machines, revisions } from './facilityData';
 import { activeFacilityPackage } from './facility';
 import AssetDirectory from './AssetDirectory';
 import TopNav, { type WorkspaceTab } from './dashboard/TopNav';
 import FacilitySidebar from './dashboard/FacilitySidebar';
 import KpiStrip from './dashboard/KpiStrip';
 import InspectorRail from './dashboard/InspectorRail';
+import RelationshipsWorkspace from './dashboard/RelationshipsWorkspace';
+import DocumentsWorkspace from './dashboard/DocumentsWorkspace';
 import { cycleInspectorTab, parseInspectorTab, type InspectorTab } from './lib/boardChrome';
-import { documentSource } from './lib/documentCatalog';
 import { parseDeviceQuery, writeDeviceQuery } from './lib/deviceQuery';
 import { assetDocumentationCompleteness, documentedAssetCount, documentationCoveragePercent, openFieldItemCount, recordCount, verificationCounts } from './lib/facilityMetrics';
 import type { FilmCommand } from './lib/filmBridge';
 import { standalonePresentationHref } from './lib/filmGenie';
-import { renderMarkdown } from './lib/markdown';
 import { countAt } from './lib/motion';
 import { doorSheetCards, doorSheetText } from './lib/doorSheet';
 import { doorCodeCaption, hrefMatrixSvg } from './lib/hrefMatrix';
-import { unusedRelationshipCounts, suppliesHonesty } from './lib/relationshipHonesty';
 import { coverageSubtitle, queueCountLabel } from './lib/floorPass';
 import { todayWalkdownItems } from './lib/walkdownPrompts';
 import { searchCatalog, type SearchHit } from './lib/searchIndex';
 import { markerClass } from './lib/statusMark';
-import { componentBelongsToAsset, containedComponentIds, resolveTraceComponentId, traceHeadingFor, traceNodesFor } from './lib/tracePath';
+import { componentBelongsToAsset, resolveTraceComponentId, traceHeadingFor, traceNodesFor } from './lib/tracePath';
 import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
 import MapStage, { mapModeFromQuery, type MapMode } from './map/MapStage';
 import type { DocumentationState, FacilityArea, FacilityAsset, ReviewDecision, SystemKind, VerificationState } from './types/facility';
-
-const stateLabel: Record<string, string> = {
-  COMPLETE: 'Complete', REVIEW: 'Review', IN_PROGRESS: 'In progress', DRAFT: 'Draft', NOT_STARTED: 'Not started',
-  VERIFIED: 'Verified', FIELD_VERIFY: 'Field verify', INFERRED: 'Inferred', DISPUTED: 'Disputed', RETIRED: 'Retired',
-};
 
 const featureConfig = activeFacilityPackage.featureConfig;
 const featuredCabinetAssetId = featureConfig.featuredCabinetAssetId;
@@ -384,44 +378,39 @@ export default function Dashboard({
             recordCount={recordCount()}
           />
 
-          {workspaceTab === 'map' && <section className="map-panel panel enter" data-guide-target="facility-map" style={{ animationDelay: '80ms' }}>
-            <div className="panel-heading">
-              <b>Building layout</b>
-              <small className="crumb">{breadcrumb}{selectedArea && <button type="button" onClick={() => { setSelectedArea(null); setSelectedAsset(null); setFocusDevice(null); }}> · All areas</button>}</small>
-              <span className="kpi-compact" data-testid="kpi-compact"><span>{coverage}%</span><span>{fieldItems} field</span><span>{documentedAssetCount()} assets</span></span>
-            </div>
-            <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
-          </section>}
+          {workspaceTab === 'map' && (
+            <section className="map-panel panel enter" data-guide-target="facility-map" style={{ animationDelay: '80ms' }}>
+              <div className="panel-heading">
+                <b>Building layout</b>
+                <small className="crumb">{breadcrumb}{selectedArea && <button type="button" onClick={() => { setSelectedArea(null); setSelectedAsset(null); setFocusDevice(null); }}> · All areas</button>}</small>
+                <span className="kpi-compact" data-testid="kpi-compact"><span>{coverage}%</span><span>{fieldItems} field</span><span>{documentedAssetCount()} assets</span></span>
+              </div>
+              <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
+            </section>
+          )}
 
-          {workspaceTab === 'relationships' && <section className="relationship-panel panel enter" data-guide-target="relationships" style={{ animationDelay: '120ms' }}>
-            <div className="panel-heading"><b>Asset relationships</b><small data-testid="trace-heading">{traceHeading}</small><button className="relationship-more" type="button" onClick={() => setTraceOn(true)}>Trace</button></div>
-            <p className="unused-rels" data-testid="unused-rels">{Object.entries(unusedRelationshipCounts()).map(([type, count]) => <span key={type}>{type} {count}</span>)}<span>{suppliesHonesty().note}</span></p>
-            <div className={`relationship-flow scroll-pane${traceOn ? ' is-live' : ''}`} data-testid="relationship-flow" data-trace={selectedAsset?.id ?? selectedArea?.id ?? 'facility'} key={`${selectedAsset?.id ?? selectedArea?.id ?? 'facility'}:${focusDevice ?? ''}`}>
-              {nodes.map((node, index) => (
-                <span key={node.id} style={{ display: 'contents' }}>
-                  {index > 0 && <svg className="trace-connector" viewBox="0 0 28 8" aria-hidden="true"><line className="trace-line" x1="1" y1="4" x2="27" y2="4" /></svg>}
-                  <button type="button" className={`trace-node${node.id === selectedAsset?.id || node.id === selectedArea?.id || resolveTraceComponentId(focusDevice) === node.id ? ' is-current' : ''}`} style={{ animationDelay: `${index * 70}ms` }} onClick={() => {
-                    if (node.kind === 'area') {
-                      const area = areas.find((item) => item.id === node.id);
-                      if (area) selectArea(area);
-                      return;
-                    }
-                    const machine = machines.find((item) => item.id === node.id);
-                    if (machine) {
-                      selectAsset(machine);
-                      return;
-                    }
-                    if (node.kind === 'component') {
-                      setFocusDevice(node.id);
-                      const parsed = parseDeviceQuery(node.id);
-                      if (parsed) writeDeviceQuery(parsed.deviceId, { cabinet: false });
-                    }
-                  }}><small>{node.kind}</small>{node.label}</button>
-                </span>
-              ))}
-              {selectedAsset?.id === featuredCabinetAssetId && containedComponentIds(selectedAsset.id).length > 4 && <button className="relationship-more" onClick={onOpenCabinet}>+ more devices →</button>}
-            </div>
-          </section>}
+          {workspaceTab === 'relationships' && (
+            <RelationshipsWorkspace
+              nodes={nodes}
+              traceHeading={traceHeading}
+              traceOn={traceOn}
+              selectedAsset={selectedAsset}
+              selectedArea={selectedArea}
+              focusDevice={focusDevice}
+              featuredCabinetAssetId={featuredCabinetAssetId}
+              onTrace={() => setTraceOn(true)}
+              onArea={(areaId) => {
+                const area = areas.find((item) => item.id === areaId);
+                if (area) selectArea(area);
+              }}
+              onAsset={(assetId) => {
+                const asset = machines.find((item) => item.id === assetId);
+                if (asset) selectAsset(asset);
+              }}
+              onComponent={setFocusDevice}
+              onOpenCabinet={onOpenCabinet}
+            />
+          )}
         </>
       )}
 
@@ -436,18 +425,12 @@ export default function Dashboard({
       )}
 
       {view === 'documents' && (
-        <section className={`document-directory enter ${activeDocument ? 'has-preview' : ''}`} data-testid="documents-grouped" data-guide-target="documents">
-          <div className="document-browser scroll-pane">
-            <header className="document-directory-head"><div><p className="panel-title">Knowledge library</p><h1>Documents</h1><p>Grouped by the equipment they explain—not dumped into one flat list.</p></div><strong>{documents.length}<small>records</small></strong></header>
-            <div className="document-state-filters">{(['ALL', 'COMPLETE', 'REVIEW', 'IN_PROGRESS', 'DRAFT', 'NOT_STARTED'] as const).map((state) => <button key={state} type="button" className={docStateFilter === state ? 'selected' : ''} onClick={() => setDocStateFilter(state)}>{stateLabel[state] ?? state}</button>)}</div>
-            <div className="document-groups">{machines.map((asset) => {
-              const rows = documents.filter((item) => item.assetId === asset.id && (docStateFilter === 'ALL' || item.state === docStateFilter));
-              if (!rows.length) return null;
-              return <section key={asset.id} className="doc-group"><header><div><small>{asset.line}</small><h2>{asset.name}</h2><code>{asset.id}</code></div><span>{rows.length} {rows.length === 1 ? 'document' : 'documents'}</span></header><div className="doc-cards">{rows.slice().sort((left, right) => left.title.localeCompare(right.title)).map((item) => <button key={item.id} type="button" className={activeDocument === item.id ? 'selected' : ''} onClick={() => setActiveDocument(item.id)}><span><small>{item.category}</small><b>{item.title}</b></span><em>{stateLabel[item.state]}</em></button>)}</div></section>;
-            })}</div>
-          </div>
-          {activeDocument && <aside className="document-preview scroll-pane"><DocumentBody documentId={activeDocument} onClose={() => setActiveDocument(null)} /></aside>}
-        </section>
+        <DocumentsWorkspace
+          activeDocument={activeDocument}
+          docStateFilter={docStateFilter}
+          onDocument={setActiveDocument}
+          onDocStateFilter={setDocStateFilter}
+        />
       )}
 
       <InspectorRail
@@ -550,21 +533,6 @@ function DoorSheet({ onClose }: { onClose: () => void }) {
       <div className="panel-heading"><b>Control cabinet door sheet</b><button type="button" onClick={async () => { await navigator.clipboard.writeText(doorSheetText(cards)); }}>Copy links</button><button type="button" onClick={() => window.print()}>Print</button><button type="button" onClick={onClose}>Close</button></div>
       <p className="walkdown-hint">{doorCodeCaption()}</p>
       <ul className="door-cards">{cards.map((card) => <li key={card.deviceId}><div dangerouslySetInnerHTML={{ __html: hrefMatrixSvg(card.href) }} /><div><b>{card.label}</b><code>{card.href}</code></div></li>)}</ul>
-    </section>
-  );
-}
-
-function DocumentBody({ documentId, onClose }: { documentId: string; onClose: () => void }) {
-  const record = documents.find((item) => item.id === documentId);
-  if (!record) return null;
-  const source = documentSource(record.path) ?? `# ${record.title}\n\nDocument file is not in this build.`;
-  return (
-    <section className="document-detail">
-      <button type="button" onClick={onClose} aria-label="Close documentation detail">×</button>
-      <p className="panel-title">{record.category}</p>
-      <h3>{record.title}</h3>
-      <p>Status: <strong>{stateLabel[record.state]}</strong> · <span className={markerClass(record.verificationStatus)} /> {stateLabel[record.verificationStatus]}</p>
-      <div className="md-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(source) }} />
     </section>
   );
 }
