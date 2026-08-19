@@ -61,6 +61,7 @@ describe('review patch and plant packs', () => {
     expect(inspector).toContain('data-testid="graph-patch-preview"');
     expect(selectedAsset).toContain('exportAreaWalkPack');
     expect(selectedAsset).toContain('data-testid="export-area-pack"');
+    expect(selectedAsset).toContain('target="_blank"');
     expect(cabinet).toContain('cabinetPackageFor');
     expect(cabinet).toContain('data-testid="cabinet-package"');
     expect(cabinet).toContain('cabinet-back');
@@ -76,7 +77,6 @@ describe('review patch and plant packs', () => {
     expect(app).not.toContain('FilmTheater');
     expect(app).not.toContain('has-genie-dock');
     expect(dashboard).toContain('standalonePresentationHref');
-    expect(dashboard).toContain('target="_blank"');
     expect(dashboard).toContain('genieQueryFromSearch');
     expect(dashboard).toContain('...genieQueryFromSearch(location.search)');
     expect(presentation.match(/data-scene="\d+"/g)).toHaveLength(11);
