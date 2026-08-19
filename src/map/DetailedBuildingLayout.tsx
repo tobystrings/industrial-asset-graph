@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import { useFacility } from '../facility';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
+import buildingLayoutImage from './embeddedBuildingLayoutImage';
 import './detailedBuildingLayout.css';
+import './buildingLayoutImage.css';
 import '../ui/map-polish.css';
 
 type Props = {
@@ -15,7 +17,24 @@ type Props = {
 type ViewTransform = { scale: number; x: number; y: number };
 type MetaTab = 'legend' | 'cabinets' | 'areas' | 'notes';
 
-const markerWidth = (id: string) => id.length > 7 ? 68 : 60;
+type HotspotStyle = {
+  left: string;
+  top: string;
+  width: string;
+  height: string;
+};
+
+const AREA_HOTSPOTS: Record<string, HotspotStyle> = {
+  'Warehouse A': { left: '4.2%', top: '42.5%', width: '22%', height: '25.5%' },
+  'Warehouse F': { left: '31.9%', top: '45.8%', width: '16%', height: '20.7%' },
+  Freezers: { left: '74.1%', top: '8.6%', width: '21.3%', height: '34.2%' },
+};
+
+const ASSET_HOTSPOTS: Record<string, HotspotStyle> = {
+  'MCH-003': { left: '34.5%', top: '56.6%', width: '6.2%', height: '4.0%' },
+  'CAB-010': { left: '64.5%', top: '56.7%', width: '4.5%', height: '6.0%' },
+};
+
 const clampScale = (value: number) => Math.max(0.75, Math.min(3.2, Math.round(value * 100) / 100));
 const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
 const midpoint = (a: { x: number; y: number }, b: { x: number; y: number }) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
@@ -23,7 +42,6 @@ const midpoint = (a: { x: number; y: number }, b: { x: number; y: number }) => (
 export default function DetailedBuildingLayout({ selectedArea, selectedAsset, filters, onArea, onAsset }: Props) {
   const { facility, areas, assets, mapConfig } = useFacility();
   const markers = mapConfig?.markers ?? [];
-  const planWrapRef = useRef<HTMLDivElement>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ start: ViewTransform; origin: { x: number; y: number }; distance?: number }>({ start: { scale: 1, x: 0, y: 0 }, origin: { x: 0, y: 0 } });
   const [view, setView] = useState<ViewTransform>({ scale: 1, x: 0, y: 0 });
@@ -51,7 +69,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const pointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if ((event.target as Element).closest('.reference-marker')) return;
+    if ((event.target as Element).closest('.map-hotspot')) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     setGesturing(true);
@@ -133,6 +151,36 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
 
   const notes = <ul><li>This map merges the interior layout with the asset graph.</li><li>Existing boundaries, labels, and room names are preserved.</li><li>Reference-only tags are drawing context, not verified records.</li><li>Fire alarm assembly and ammonia shelter-in-place callouts are intentionally omitted.</li></ul>;
 
+  const areaHotspot = (label: string, area: FacilityArea | null) => area ? (
+    <button
+      key={label}
+      type="button"
+      className={`map-hotspot area ${selectedArea?.id === area.id ? 'selected' : ''}`}
+      style={AREA_HOTSPOTS[label]}
+      onClick={() => clickArea(area)}
+      aria-label={`Open ${label}`}
+      title={`Open ${label}`}
+    />
+  ) : null;
+
+  const assetHotspot = (markerId: string) => {
+    const marker = markers.find((item) => item.id === markerId);
+    const asset = marker ? liveAsset(marker.assetId) : null;
+    if (!marker || !asset || marker.state === 'REFERENCE' || !filters.has(asset.verificationStatus)) return null;
+    const selected = selectedAsset?.id === asset.id;
+    return (
+      <button
+        key={markerId}
+        type="button"
+        className={`map-hotspot asset ${marker.tone} ${selected ? 'selected' : ''}`}
+        style={ASSET_HOTSPOTS[markerId]}
+        onClick={() => activateMarker(markerId)}
+        aria-label={`${marker.id}: ${marker.label}`}
+        title={`${marker.id}: ${marker.label}`}
+      />
+    );
+  };
+
   return (
     <section className="reference-layout" aria-label="Building Layout">
       <header className="reference-layout-head">
@@ -150,7 +198,6 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
       <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
         <div
           className="reference-plan-wrap"
-          ref={planWrapRef}
           onPointerDown={pointerDown}
           onPointerMove={pointerMove}
           onPointerUp={pointerUp}
@@ -158,40 +205,19 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
           onWheel={wheelZoom}
         >
           <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
-            <svg className="reference-plan" viewBox="0 0 1210 525" role="img" aria-label={`${facility.name} detailed interior facility plan`}>
-              <rect className="sheet-bg" x="0" y="0" width="1210" height="525" />
-              <g className="zone-fills" aria-hidden="true">
-                <path className="production-fill" d="M300 18H704V286H300V245H286V208H300Z" /><rect className="cold-fill" x="704" y="75" width="141" height="211" />
-                <path className="cold-fill" d="M950 18H1083V286H950Z" /><path className="cold-fill" d="M1098 18H1184V286H1200V331H1098Z" /><path className="office-fill" d="M846 315H963V500H846Z" />
-              </g>
-              <g className="walls" aria-hidden="true">
-                <path className="outer" d="M24 18H300V18H704V18H950V18H1083V18H1184V18H1184V286H1200V331H1110V315H1040V286H950V315H846V500H704V500H596V500H372V500H300V493H24V286H286V245H300V18Z" />
-                <path d="M24 286H300M300 18V245M300 245H704M704 18V286M845 18V286M950 18V286M1083 18V286M1098 18V331" /><path d="M704 75H845M704 145H845M704 215H845" />
-                <path d="M396 18V74M504 18V74M396 74H704" /><path d="M381 112H593V194H381M407 112V194M450 112V194M493 112V194M536 112V194" />
-                <path d="M300 208H704M318 208V245M350 208V245M385 208V245M421 208V245M454 208V245M488 208V245M524 208V245M559 208V245M595 208V245M630 208V245M667 208V245" />
-                <path d="M300 286H704M300 315H596M596 315V500M372 315V500M372 315H596" /><path d="M300 315V405M300 438V493M300 405H348L372 428" />
-                <path d="M315 330H350V376H315ZM360 330H400V350H360ZM410 330H450V350H410ZM470 330H530V352H470" /><path d="M704 315H846M704 315V500M704 500H846" />
-                <path d="M846 315H963M963 315V500M846 500H963" /><path d="M865 325H948M865 356H948M865 387H948M865 418H948M865 449H948M882 315V483M912 315V483M938 315V483" />
-                <path d="M963 315H1110M963 331H1110M1040 286V331M1110 286V331M1000 300V331M1025 300V331M1060 300V331" /><path d="M92 190H150M92 190V245M150 190V245" />
-              </g>
-              <g className="doors" aria-hidden="true"><path d="M286 246h28M288 286h30M330 286h28M668 286h34M833 286h24M940 286h24M1030 286h26M1090 286h30" /><path d="M291 315h25M585 315h24M695 315h22M837 315h25" /><path d="M280 18h25M370 18h22M492 18h22M604 18h22M680 18h22M834 18h22M920 18h22M1068 18h22M1160 18h22" /></g>
-              <g className="labels">
-                <text x="112" y="109">Warehouse B</text><text x="400" y="63">Maintenance</text><text x="515" y="63">Engine Room</text><text x="397" y="104">Building C (Production)</text><text x="448" y="155">Cook Rooms</text>
-                <text x="744" y="116">Cooler 2</text><text x="744" y="184">Cooler 3</text><text x="744" y="253">Cooler 4</text><text x="865" y="123">Warehouse 5</text><text x="988" y="123">Freezer 7</text><text x="1116" y="123">Freezer 8</text>
-                <text x="108" y="374">Warehouse A</text><text x="420" y="400">Warehouse F</text><text x="739" y="400">Warehouse E</text><text x="858" y="514">Main Offices</text>
-              </g>
-              <g className="click-zones">
-                {warehouseA && <path d="M24 286H300V493H24Z" onClick={() => clickArea(warehouseA)} data-selected={selectedArea?.id === warehouseA.id || undefined} />}
-                {warehouseF && <path d="M372 315H596V500H372Z" onClick={() => clickArea(warehouseF)} data-selected={selectedArea?.id === warehouseF.id || undefined} />}
-                {freezers && <path d="M950 18H1083V286H950ZM1098 18H1184V286H1200V331H1098Z" onClick={() => clickArea(freezers)} data-selected={selectedArea?.id === freezers.id || undefined} />}
-              </g>
-              {markers.map((marker) => {
-                const asset = liveAsset(marker.assetId); const visibleLive = Boolean(asset && filters.has(asset.verificationStatus)); const selected = Boolean(asset && selectedAsset?.id === asset.id); const clickable = marker.state !== 'REFERENCE' && visibleLive; const width = markerWidth(marker.id);
-                return <g key={marker.id} className={`reference-marker ${marker.tone} state-${marker.state.toLowerCase()} ${selected ? 'selected' : ''}`} transform={`translate(${marker.x} ${marker.y})`} onClick={clickable ? () => activateMarker(marker.id) : undefined} onKeyDown={clickable ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activateMarker(marker.id); } } : undefined} role={clickable ? 'button' : undefined} tabIndex={clickable ? 0 : undefined} aria-label={`${marker.id}: ${marker.label}. ${marker.state.replace('_', ' ').toLowerCase()}.`}>
-                  <rect x={-width / 2} y={-13} width={width} height={26} rx="4" /><text textAnchor="middle" y="4">{marker.id}</text><title>{marker.label} — {marker.state === 'REFERENCE' ? 'reference only' : marker.state === 'FIELD_VERIFY' ? 'linked asset; physical position requires field verification' : 'live asset'}</title>
-                </g>;
-              })}
-            </svg>
+            <div className="reference-plan-image-stage">
+              <img
+                className="reference-plan-image"
+                src={buildingLayoutImage}
+                alt={`${facility.name} complete facility layout and asset graph with room labels, asset markers, legends, notes, and title block`}
+                draggable={false}
+              />
+              {areaHotspot('Warehouse A', warehouseA)}
+              {areaHotspot('Warehouse F', warehouseF)}
+              {areaHotspot('Freezers', freezers)}
+              {assetHotspot('MCH-003')}
+              {assetHotspot('CAB-010')}
+            </div>
           </div>
           <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button><button type="button" onClick={fitPlan}>Fit</button></div>
         </div>

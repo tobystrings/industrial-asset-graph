@@ -1,0 +1,72 @@
+.reference-plan-transform {
+  width: max-content;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.reference-plan-image-stage {
+  position: relative;
+  width: 1210px;
+  max-width: none;
+  background: #fff;
+  user-select: none;
+}
+
+.reference-plan-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  min-height: 0 !important;
+  max-height: none !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+.map-hotspot {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  transition: border-color .12s ease, background-color .12s ease, box-shadow .12s ease;
+}
+
+.map-hotspot:hover,
+.map-hotspot:focus-visible {
+  border-color: rgba(37, 99, 235, .72);
+  background: rgba(37, 99, 235, .08);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .82) inset;
+  outline: none;
+}
+
+.map-hotspot.asset {
+  border-radius: 4px;
+}
+
+.map-hotspot.selected {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, .12);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .88) inset;
+}
+
+.reference-drawing-sheet.is-editing .map-hotspot {
+  border-style: dashed;
+  border-color: rgba(37, 99, 235, .4);
+}
+
+@media print {
+  .reference-plan-transform,
+  .reference-plan-image-stage {
+    width: 100% !important;
+    transform: none !important;
+  }
+
+  .map-hotspot {
+    display: none;
+  }
+}
