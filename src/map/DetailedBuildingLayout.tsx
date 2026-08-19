@@ -251,7 +251,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
         </div>
         <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && <div>{cabinetDirectory}{machineDirectory}</div>}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>
 
-        <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{facility.location}</span></div><div><b>PLAN:</b><span>{mapConfig?.drawingId ?? 'unknown'}</span></div></footer>
+        <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{facility.location}</span></div></footer>
       </div>
     </section>
   );
