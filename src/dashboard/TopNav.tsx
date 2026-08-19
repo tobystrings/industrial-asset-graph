@@ -36,8 +36,9 @@ export default function TopNav({
       <button className="nav-toggle reference-menu-button" type="button" aria-label={drawerOpen ? 'Close facility menu' : 'Open facility menu'} aria-expanded={drawerOpen} onClick={onToggleDrawer}>☰</button>
       <div className="reference-breadcrumbs">
         <strong>{facilityName.toUpperCase()}</strong>
+        <small className="mobile-workspace-label">{workspaceLabel[workspaceTab]}</small>
         <span>/</span>
-        <span className="reference-breadcrumb-map">{workspaceLabel[workspaceTab].split(' / ')[0]}</span>
+        <span className="reference-breadcrumb-map" aria-current={workspaceTab === 'map' ? 'page' : undefined}>{workspaceLabel[workspaceTab].split(' / ')[0]}</span>
         {workspaceTab === 'map' && <><span>/</span><b>Building Layout</b></>}
       </div>
       <label className="global-search reference-search">
