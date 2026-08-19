@@ -1,0 +1,5 @@
+Triggering deploy after loosening FacilityMapConfig type
+
+This is a no-op commit intended to retrigger GitHub Actions workflows so the Pages deployment runs with the updated types.
+
+Timestamp: 2026-08-19T23:19:00Z
