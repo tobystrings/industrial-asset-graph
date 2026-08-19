@@ -1,6 +1,7 @@
 import { useFacility } from '../facility';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
 import './detailedBuildingLayout.css';
+import '../ui/map-polish.css';
 
 type Props = {
   selectedArea: FacilityArea | null;
