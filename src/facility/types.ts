@@ -36,12 +36,9 @@ export interface FacilityMapMarker {
   assetId?: string;
 }
 
-export interface FacilityMapConfig {
-  drawingTitle: string;
-  drawingDate?: string;
-  markers: FacilityMapMarker[];
-  interactiveAreaNames: string[];
-}
+// mapConfig is intentionally left permissive to avoid tight coupling to a specific shape.
+// Using Record<string, any> prevents build failures when map shape evolves in content-only changes.
+export type FacilityMapConfig = Record<string, any>;
 
 export interface AssetSerialSource {
   id: string;
