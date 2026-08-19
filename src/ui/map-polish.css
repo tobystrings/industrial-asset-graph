@@ -1,0 +1,134 @@
+.reference-layout {
+  min-width: 1180px;
+  padding: 10px 12px 14px;
+  background: #eef2f6;
+}
+.reference-layout-head {
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+.reference-layout-head h2 {
+  font-size: 24px;
+  letter-spacing: -.015em;
+}
+.reference-layout-head p {
+  margin-top: 2px;
+  color: #667487;
+  font-size: 13px;
+}
+.reference-layout-actions { gap: 8px; }
+.reference-layout-actions button {
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border-color: #c7d0da;
+  box-shadow: none;
+  font-size: 12px;
+}
+.reference-drawing-sheet {
+  border-color: #aeb9c5;
+  border-radius: 4px;
+  box-shadow: 0 3px 12px rgba(22, 34, 48, .08);
+}
+.reference-plan-wrap { padding: 5px 7px 2px; }
+.reference-plan {
+  min-height: 500px;
+  max-height: 66vh;
+}
+.reference-plan .walls path {
+  stroke: #222b33;
+  stroke-width: 1.35;
+}
+.reference-plan .walls .outer { stroke-width: 1.85; }
+.reference-plan .labels text {
+  fill: #121920;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.reference-plan .production-fill { fill: #f3f8ec; }
+.reference-plan .cold-fill { fill: #f0f6fb; }
+.reference-plan .office-fill { fill: #fff9ec; }
+.reference-marker { filter: none; }
+.reference-marker rect { stroke-width: .7; }
+.reference-marker text { font-size: 9px; letter-spacing: .01em; }
+.reference-marker.state-reference {
+  opacity: .42;
+}
+.reference-marker.state-reference rect {
+  fill: #7f91a2;
+  stroke: #5f7080;
+}
+.reference-marker.state-reference text { fill: #fff; }
+.reference-marker.state-field_verify {
+  opacity: .98;
+  cursor: pointer;
+}
+.reference-marker.state-field_verify rect {
+  stroke: #9a6b00;
+  stroke-width: 1.35;
+}
+.reference-marker.selected rect {
+  stroke: #e39a0a;
+  stroke-width: 3;
+}
+.reference-info-strip {
+  grid-template-columns: 1.05fr 1fr 1fr 1.1fr .95fr;
+  border-color: #b8c2cc;
+  background: #fff;
+}
+.reference-info-strip > section {
+  padding: 8px 10px;
+  border-right-color: #d4dbe2;
+}
+.reference-info-strip h3 {
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+.legend-grid span,
+.directory-row,
+.area-grid { font-size: 9.5px; }
+.directory-row { margin-bottom: 3px; }
+.directory-row .tag {
+  min-width: 54px;
+  border-radius: 2px;
+  font-size: 8.5px;
+}
+.directory-row span { min-width: 0; }
+.directory-row em {
+  float: right;
+  margin-left: 5px;
+  color: #7a8795;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .05em;
+}
+.truth-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.truth-dot.live { background: #2f8d48; }
+.truth-dot.verify { background: #d9a617; }
+.truth-dot.reference { background: #8b9aaa; }
+.notes-column li {
+  margin-bottom: 5px;
+  font-size: 9.5px;
+}
+.reference-title-block {
+  min-height: 58px;
+  border-top: 0;
+}
+.north-arrow { padding: 5px; }
+.north-arrow span { font-size: 25px; }
+.reference-title-block > div:last-child {
+  grid-template-columns: 54px minmax(150px, 260px);
+  padding: 6px 12px;
+  font-size: 9px;
+}
+
+@media (max-width: 1200px) {
+  .reference-layout { min-width: 1040px; }
+}
