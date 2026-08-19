@@ -1,4 +1,4 @@
-import { activeFacilityPackage } from './facility';
+import activeFacilityPackage from './facility/activeFacility';
 import type { FacilityPackage } from './facility/types';
 
 export function facilityDataFor(pkg: FacilityPackage) {
@@ -17,15 +17,31 @@ export function facilityDataFor(pkg: FacilityPackage) {
 
 const active = facilityDataFor(activeFacilityPackage);
 
-export const facility = active.facility;
-export const areas = active.areas;
-export const machines = active.machines;
-export const components = active.components;
-export const relationships = active.relationships;
-export const documents = active.documents;
-export const evidence = active.evidence;
-export const revisions = active.revisions;
-export const assetSerialSources = active.assetSerialSources;
+export let facility = active.facility;
+export const areas = [...active.areas];
+export const machines = [...active.machines];
+export const components = [...active.components];
+export const relationships = [...active.relationships];
+export const documents = [...active.documents];
+export const evidence = [...active.evidence];
+export const revisions = [...active.revisions];
+export const assetSerialSources = [...active.assetSerialSources];
+
+function replaceArray<T>(target: T[], source: T[]) {
+  target.splice(0, target.length, ...source);
+}
+
+export function syncFacilityData(pkg: FacilityPackage) {
+  facility = pkg.facility;
+  replaceArray(areas, pkg.areas);
+  replaceArray(machines, pkg.assets);
+  replaceArray(components, pkg.components);
+  replaceArray(relationships, pkg.relationships);
+  replaceArray(documents, pkg.documents);
+  replaceArray(evidence, pkg.evidence);
+  replaceArray(revisions, pkg.revisions);
+  replaceArray(assetSerialSources, pkg.assetSerialSources);
+}
 
 export const documentationPercent = (assetId: string) => {
   const required = documents.filter((item) => item.assetId === assetId && item.required);
