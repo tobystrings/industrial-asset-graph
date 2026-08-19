@@ -1,0 +1,12 @@
+.reference-marker.state-reference { opacity: .5; }
+.reference-marker.state-reference rect { fill: #f8fafc !important; stroke: #64748b !important; stroke-dasharray: 4 3; }
+.reference-marker.state-reference text { fill: #475569 !important; }
+.reference-marker.state-field_verify rect { stroke: #d97706 !important; stroke-width: 2.5 !important; }
+.reference-marker.state-live rect { stroke: #15803d !important; stroke-width: 2.5 !important; }
+.truth-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+.truth-dot.live { background: #15803d; }
+.truth-dot.verify { background: #d97706; }
+.truth-dot.reference { background: #94a3b8; }
+.directory-row em { margin-left: 6px; padding: 1px 4px; border-radius: 3px; background: #eef2f6; color: #64748b; font-size: 9px; font-style: normal; font-weight: 800; letter-spacing: .05em; }
+.reference-marker[role='button'] { cursor: pointer; }
+.reference-marker:not([role='button']) { cursor: default; }

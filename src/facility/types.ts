@@ -9,10 +9,6 @@ import type {
   VerificationState,
 } from '../types/facility';
 
-/**
- * Facility-neutral identity displayed by the platform shell.
- * Customer-specific values belong in the facility package, not framework code.
- */
 export interface FacilityIdentity {
   id: string;
   name: string;
@@ -20,16 +16,31 @@ export interface FacilityIdentity {
   location: string;
 }
 
-/**
- * Facility-specific runtime defaults. These IDs identify which records should
- * be highlighted by framework features without teaching framework code about
- * any particular customer's naming scheme.
- */
 export interface FacilityFeatureConfig {
   defaultAreaId: string;
   featuredCabinetAssetId: string;
   featuredMachineAssetId: string;
   brandMark?: string;
+}
+
+export type FacilityMapMarkerState = 'LIVE' | 'REFERENCE' | 'FIELD_VERIFY';
+export type FacilityMapMarkerTone = 'cabinet' | 'machine' | 'power';
+
+export interface FacilityMapMarker {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  tone: FacilityMapMarkerTone;
+  state: FacilityMapMarkerState;
+  assetId?: string;
+}
+
+export interface FacilityMapConfig {
+  drawingTitle: string;
+  drawingDate?: string;
+  markers: FacilityMapMarker[];
+  interactiveAreaNames: string[];
 }
 
 export interface AssetSerialSource {
@@ -41,14 +52,10 @@ export interface AssetSerialSource {
   verificationStatus: VerificationState;
 }
 
-/**
- * The contract between the reusable Industrial Asset Graph framework and a
- * facility-specific dataset. Keeping this boundary explicit lets a future
- * facility package replace Lieb data without changing framework behavior.
- */
 export interface FacilityPackage {
   facility: FacilityIdentity;
   featureConfig: FacilityFeatureConfig;
+  mapConfig?: FacilityMapConfig;
   areas: FacilityArea[];
   assets: FacilityAsset[];
   components: ComponentRecord[];
