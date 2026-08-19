@@ -1,0 +1,2 @@
+.dashboard.workspace-map .reference-layout-actions::after{display:none!important;content:none!important}
+.dashboard.workspace-map .reference-drawing-sheet.is-editing{outline:2px solid #2563EB;outline-offset:2px}
