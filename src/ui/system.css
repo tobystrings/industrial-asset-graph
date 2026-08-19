@@ -50,6 +50,9 @@
 }
 .brand strong { letter-spacing: .01em; }
 .brand em { color: #9fb0c2; letter-spacing: .1em; }
+.brand-copy { min-width: 0; }
+.mobile-workspace-label { display: none; }
+.mobile-search-button { display: none; }
 .top-nav nav { margin-left: 6px; }
 .top-nav nav button {
   min-height: 38px;
@@ -196,5 +199,99 @@ textarea:focus-visible {
   .dashboard { grid-template-columns: 188px minmax(0, 1fr) minmax(310px, 350px); }
   .top-nav { gap: 8px; }
   .top-nav nav button { padding-inline: 9px; }
+  .film-link-label { display: none; }
+  .film-link { padding: 0; width: 38px; flex: 0 0 38px; }
+  .global-search { width: min(230px, 22vw); }
   .relationship-summary .relationship-honesty { width: 100%; margin-left: 0; }
+}
+
+/* One navigation model per breakpoint: header on desktop, bottom bar + drawer on phones/tablets. */
+@media (max-width: 820px) {
+  .top-nav {
+    height: calc(58px + env(safe-area-inset-top));
+    min-height: calc(58px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 10px 0;
+    gap: 9px;
+  }
+  .dashboard {
+    padding-top: calc(64px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(66px + var(--genie-dock-height, 72px) + env(safe-area-inset-bottom)) !important;
+  }
+  .top-nav nav,
+  .top-nav nav.open,
+  .global-search { display: none !important; }
+  .nav-toggle {
+    display: grid !important;
+    place-items: center;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.09);
+  }
+  .brand { min-width: 0; flex: 1 1 auto; gap: 9px; }
+  .brand-mark { width: 34px; height: 34px; flex: 0 0 34px; }
+  .brand-copy { overflow: hidden; }
+  .brand strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+  .brand em { display: none !important; }
+  .mobile-workspace-label { display: block; margin-top: 3px; color: #8fa3b7; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+  .film-link { width: 40px; min-width: 40px; min-height: 40px; flex: 0 0 40px; border-radius: 7px; background: rgba(22,77,116,.72); }
+  .mobile-search-button {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 7px;
+    background: rgba(255,255,255,.07);
+    color: #dbe7f2;
+    font-size: 21px;
+  }
+  .facility-sidebar.open {
+    top: calc(58px + env(safe-area-inset-top)) !important;
+    bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    width: min(330px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px);
+    border-radius: 0 10px 10px 0 !important;
+    box-shadow: 18px 0 50px rgba(0,0,0,.38) !important;
+  }
+  body .bottom-nav {
+    height: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding: 5px 6px env(safe-area-inset-bottom) !important;
+    border-top: 1px solid rgba(255,255,255,.1) !important;
+    background: rgba(7,17,29,.98) !important;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 -8px 24px rgba(0,0,0,.24);
+  }
+  .bottom-nav button {
+    min-width: 0;
+    min-height: 49px;
+    gap: 3px;
+    border-radius: 7px !important;
+    color: #8fa3b7 !important;
+    font-size: 10px !important;
+    font-weight: 800;
+  }
+  .bottom-nav button i { font-size: 17px !important; line-height: 1; }
+  .bottom-nav button.active {
+    background: #153554 !important;
+    color: #f5f9fd !important;
+    box-shadow: inset 0 0 0 1px rgba(97,168,232,.18);
+  }
+  .facility-status { display: none !important; }
+}
+
+@media (max-width: 520px) {
+  .top-nav { padding-left: 8px; padding-right: 8px; gap: 7px; }
+  .nav-toggle,
+  .mobile-search-button,
+  .film-link { width: 38px; min-width: 38px; min-height: 38px; flex-basis: 38px; }
+  .brand-mark { width: 32px; height: 32px; flex-basis: 32px; }
+  .brand strong { font-size: 13px; }
+  .mobile-workspace-label { font-size: 9px; }
+  body .bottom-nav { padding-inline: 4px !important; }
+  .bottom-nav button { padding-inline: 2px !important; font-size: 9px !important; }
 }
