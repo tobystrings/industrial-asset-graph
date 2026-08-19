@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { areas, components, documentationPercent, documents, evidence, facility, machines, revisions } from './facilityData';
+import { activeFacilityPackage } from './facility';
 import DeviceIntel from './DeviceIntel';
 import AssetDirectory from './AssetDirectory';
 import FloorPacket from './FloorPacket';
@@ -36,6 +37,12 @@ const stateLabel: Record<string, string> = {
   COMPLETE: 'Complete', REVIEW: 'Review', IN_PROGRESS: 'In progress', DRAFT: 'Draft', NOT_STARTED: 'Not started',
   VERIFIED: 'Verified', FIELD_VERIFY: 'Field verify', INFERRED: 'Inferred', DISPUTED: 'Disputed', RETIRED: 'Retired',
 };
+
+const featureConfig = activeFacilityPackage.featureConfig;
+const featuredCabinetAssetId = featureConfig.featuredCabinetAssetId;
+const featuredMachineAssetId = featureConfig.featuredMachineAssetId;
+const defaultAreaId = featureConfig.defaultAreaId;
+const brandMark = featureConfig.brandMark ?? activeFacilityPackage.facility.name.slice(0, 2).toUpperCase();
 
 export type AppView = 'dashboard' | 'assets' | 'documents' | 'cabinet';
 type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents';
@@ -85,7 +92,7 @@ export default function Dashboard({
   const [navOpen, setNavOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>(
-    params.get('tab') ? parseInspectorTab(params.get('tab')) : (initialAsset?.id === 'L2-CC-001' ? 'intel' : parseInspectorTab(params.get('tab'))),
+    params.get('tab') ? parseInspectorTab(params.get('tab')) : (initialAsset?.id === featuredCabinetAssetId ? 'intel' : parseInspectorTab(params.get('tab'))),
   );
   const [phoneTab, setPhoneTab] = useState<'map' | 'find' | 'queue' | 'cabinet' | 'docs' | 'more'>(() => {
     const tab = phoneTabFromQuery(params.get('tab'), params.get('command'));
@@ -99,7 +106,7 @@ export default function Dashboard({
   const [systemKind, setSystemKind] = useState<SystemKind>('ALL');
   const [docStateFilter, setDocStateFilter] = useState<DocumentationState | 'ALL'>('ALL');
   const [packetOpen, setPacketOpen] = useState(false);
-  const [packetAsset, setPacketAsset] = useState('L2-CC-001');
+  const [packetAsset, setPacketAsset] = useState(featuredCabinetAssetId);
   const [focusCabinet, setFocusCabinet] = useState(params.get('focus') === 'cabinet');
   const [doorOpen, setDoorOpen] = useState(params.get('door') === '1');
   const [openUnknown, setOpenUnknown] = useState<string | null>(null);
@@ -220,31 +227,31 @@ export default function Dashboard({
 
   useEffect(() => {
     if (!pendingCommand) return;
-    const warehouse = areas.find((area) => area.id === 'area-warehouse-f') ?? null;
-    const cabinet = machines.find((item) => item.id === 'L2-CC-001') ?? null;
+    const defaultArea = areas.find((area) => area.id === defaultAreaId) ?? null;
+    const cabinet = machines.find((item) => item.id === featuredCabinetAssetId) ?? null;
     if (pendingCommand === 'map') {
-      setSelectedArea(warehouse);
+      setSelectedArea(defaultArea);
       setSelectedAsset(null);
       setMapMode('2d');
       setWorkspaceTab('map');
       onView('dashboard');
     }
     if (pendingCommand === '3d') {
-      setSelectedArea(warehouse);
+      setSelectedArea(defaultArea);
       setMapMode('2d');
       setWorkspaceTab('map');
       onView('dashboard');
     }
     if (pendingCommand === 'trace' && cabinet) {
       setSelectedAsset(cabinet);
-      setSelectedArea(warehouse);
+      setSelectedArea(defaultArea);
       setTraceOn(true);
       setWorkspaceTab('relationships');
       onView('dashboard');
     }
     if (pendingCommand === 'verify' && cabinet) {
       setSelectedAsset(cabinet);
-      setSelectedArea(warehouse);
+      setSelectedArea(defaultArea);
       setInspectorTab('capture');
       onView('dashboard');
     }
@@ -288,8 +295,8 @@ export default function Dashboard({
       const resolved = resolveTraceComponentId(current);
       return resolved && componentBelongsToAsset(resolved, asset.id) ? current : null;
     });
-    if (asset.id === 'L2-CC-001') setInspectorTab('intel');
-    if (asset.id === 'FG-L4-MTN-001') setInspectorTab('record');
+    if (asset.id === featuredCabinetAssetId) setInspectorTab('intel');
+    if (asset.id === featuredMachineAssetId) setInspectorTab('record');
     if (matchMedia('(max-width: 619px)').matches) setPhoneTab('find');
   };
 
@@ -326,7 +333,7 @@ export default function Dashboard({
     if (hit.documentId) {
       setActiveDocument(hit.documentId);
       onView('documents');
-    } else if (hit.kind === 'component' && hit.assetId === 'L2-CC-001') {
+    } else if (hit.kind === 'component' && hit.assetId === featuredCabinetAssetId) {
       onOpenCabinet();
     } else if (hit.kind === 'asset' || hit.kind === 'area') {
       onView('dashboard');
@@ -341,7 +348,7 @@ export default function Dashboard({
     <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${focusCabinet ? ' focus-cabinet' : ''}`}>
       <header className="top-nav">
         <button className="nav-toggle" type="button" aria-label="Open menu" aria-expanded={drawerOpen} onClick={() => setDrawerOpen((value) => !value)}>☰</button>
-        <div className="brand"><span className="brand-mark">JL</span><div><strong>J. Lieb Foods</strong><em>Industrial Asset Graph</em></div></div>
+        <div className="brand"><span className="brand-mark">{brandMark}</span><div><strong>{facility.name}</strong><em>Industrial Asset Graph</em></div></div>
         <nav className={navOpen ? 'open' : ''} aria-label="Primary">
           <button className={workspaceTab === 'map' ? 'nav-active' : ''} onClick={() => openWorkspace('map')}>Map</button>
           <button className={workspaceTab === 'assets' ? 'nav-active' : ''} onClick={() => openWorkspace('assets')}>Assets</button>
@@ -470,7 +477,7 @@ export default function Dashboard({
                   </button>
                 </span>
               ))}
-              {selectedAsset?.id === 'L2-CC-001' && containedComponentIds(selectedAsset.id).length > 4 && (
+              {selectedAsset?.id === featuredCabinetAssetId && containedComponentIds(selectedAsset.id).length > 4 && (
                 <button className="relationship-more" onClick={onOpenCabinet}>+ more devices →</button>
               )}
             </div>
@@ -483,7 +490,7 @@ export default function Dashboard({
           selectAsset(parent);
           setFocusDevice(item.id);
           const parsed = parseDeviceQuery(item.id);
-          if (parent.id === 'L2-CC-001') { if (parsed) writeDeviceQuery(parsed.deviceId); onOpenCabinet(); }
+          if (parent.id === featuredCabinetAssetId) { if (parsed) writeDeviceQuery(parsed.deviceId); onOpenCabinet(); }
           else onView('dashboard');
         }} />
       )}
@@ -718,7 +725,7 @@ function DoorSheet({ onClose }: { onClose: () => void }) {
   return (
     <section className="door-sheet" data-testid="door-sheet">
       <div className="panel-heading">
-        <b>Line 2 door sheet</b>
+        <b>Control cabinet door sheet</b>
         <button type="button" onClick={async () => { await navigator.clipboard.writeText(doorSheetText(cards)); }}>Copy links</button>
         <button type="button" onClick={() => window.print()}>Print</button>
         <button type="button" onClick={onClose}>Close</button>
@@ -818,7 +825,7 @@ function SelectedAssetPanel({
         ) : (
           <>
             <h2>{area ? `Select a machine in ${area.shortName}` : 'Select an asset'}</h2>
-            <p>{area ? 'Click FG-L4-MTN-001 or L2-CC-001 on the map. Capture stays empty until a machine is selected.' : 'Choose Warehouse F, then select the machine marker to open its evidence-aware documentation package.'}</p>
+            <p>{area ? 'Choose an asset marker on the map to open its evidence-aware documentation package.' : 'Choose an area, then select an asset marker to open its evidence-aware documentation package.'}</p>
             <div className="empty-chips"><span>Nameplate</span><span>Documents</span><span>Spare parts</span><span>Evidence</span></div>
           </>
         )}
@@ -829,6 +836,7 @@ function SelectedAssetPanel({
   const active = assetDocs.find((item) => item.id === activeDocument);
   const film = filmHonestyForAsset(asset.id);
   const parts = visiblePartsFor(asset.id);
+  const isFeaturedCabinet = asset.id === featuredCabinetAssetId;
   return (
     <aside className="asset-panel panel">
       <div className="asset-banner">
@@ -840,13 +848,13 @@ function SelectedAssetPanel({
         <span className="verification-badge"><StatusI status={asset.verificationStatus} /> {stateLabel[asset.verificationStatus]}</span>
       </div>
       <div className="asset-actions">
-        {asset.id === 'L2-CC-001' && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
-        {asset.id === 'L2-CC-001' && <button className="packet-btn" type="button" onClick={onFocusCabinet}>{focusCabinet ? 'Board' : 'At panel'}</button>}
+        {isFeaturedCabinet && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
+        {isFeaturedCabinet && <button className="packet-btn" type="button" onClick={onFocusCabinet}>{focusCabinet ? 'Board' : 'At panel'}</button>}
         <a className="film-chapter is-ghost" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer">
-          {film.kind === 'chapter' ? 'Presentation · L2 ↗' : 'Presentation ↗'}
+          {film.kind === 'chapter' ? 'Presentation ↗' : 'Presentation ↗'}
         </a>
         <button className="packet-btn" type="button" onClick={() => onPacket(asset.id)}>Packet</button>
-        {asset.id === 'L2-CC-001' && <button className="packet-btn" type="button" onClick={onDoorSheet}>Door</button>}
+        {isFeaturedCabinet && <button className="packet-btn" type="button" onClick={onDoorSheet}>Door</button>}
       </div>
       {tab === 'capture' && (
         <>
@@ -890,7 +898,7 @@ function SelectedAssetPanel({
       {tab === 'intel' && (
         <>
           <button className="ghost-trace" type="button" onClick={onTrace}>Trace path</button>
-          {asset.id === 'L2-CC-001' && <PlcRackView />}
+          {isFeaturedCabinet && <PlcRackView />}
           {asset.componentIds.some((id) => id.includes('VFD') || id.includes('SD')) && (
             <DeviceIntel
               deviceOrComponentId={focusDevice ?? asset.componentIds.find((id) => id.includes('VFD')) ?? asset.id}
@@ -911,7 +919,7 @@ function SelectedAssetPanel({
             </section>
           )}
           <dl className="identity-grid">
-            <FactRow label="Location" value={`${areas.find((item) => item.id === asset.areaId)?.name} / ${asset.line}`} status={asset.id === 'L2-CC-001' ? 'INFERRED' : 'VERIFIED'} note={asset.id === 'L2-CC-001' ? 'Area association is provisional.' : undefined} />
+            <FactRow label="Location" value={`${areas.find((item) => item.id === asset.areaId)?.name} / ${asset.line}`} status={isFeaturedCabinet ? 'INFERRED' : 'VERIFIED'} note={isFeaturedCabinet ? 'Area association is provisional.' : undefined} />
             <FactRow label="Asset type" value={asset.type} status="VERIFIED" />
             <FactRow label="Manufacturer" value={asset.manufacturer.value} status={asset.manufacturer.verificationStatus} note={asset.manufacturer.note} />
             <FactRow label="Model" value={asset.model.value} status={asset.model.verificationStatus} note={asset.model.note} />
