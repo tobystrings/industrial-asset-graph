@@ -7,14 +7,15 @@ import {
   machines,
   relationships,
   revisions,
-} from '../facilityData';
+} from '../../facilities/lieb-foods/data';
 import type { FacilityPackage } from './types';
 
 /**
- * Compatibility adapter for the current dataset.
+ * Active facility package for the current deployment.
  *
- * Commit 1 intentionally leaves facilityData.ts in place. Later migration
- * commits can move the customer records without changing framework consumers.
+ * The framework now reads Lieb data from the customer-specific package while
+ * legacy imports continue to work through src/facilityData.ts until the next
+ * migration step removes those direct dependencies.
  */
 export const activeFacilityPackage: FacilityPackage = {
   facility,
