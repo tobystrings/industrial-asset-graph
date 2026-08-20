@@ -1,4 +1,6 @@
 import { areas, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+import type { FacilityCabinetPackage, FacilityFeatureConfig } from '../facility/types';
 import { captureKitForArea } from './areaKit';
 import { exportReviewPack, type ReviewPack } from './reviewPack';
 import { loadWalkdownCaptures } from './walkdown';
@@ -28,25 +30,12 @@ export function areaWalkPackMachineIds(pack: AreaWalkPack): string[] {
   return pack.captures.map((item) => item.targetId).filter((id) => known.has(id));
 }
 
-export type CabinetPackage = {
-  id: string;
-  assetId: string;
-  drawing: string;
-  raster: string;
-  metadata: string;
-  destUnknown: true;
-};
+export type CabinetPackage = FacilityCabinetPackage;
 
-export function cabinetPackageFor(assetId: string): CabinetPackage | null {
-  if (assetId !== 'L2-CC-001') return null;
-  return {
-    id: 'pkg-l2-cc',
-    assetId: 'L2-CC-001',
-    drawing: 'assets/line2/control-cabinet/cabinet.svg',
-    raster: 'assets/line2/control-cabinet/cabinet.png',
-    metadata: 'assets/line2/control-cabinet/metadata.json',
-    destUnknown: true,
-  };
+export function cabinetPackageFor(assetId: string, config: FacilityFeatureConfig = activeFacilityPackage.featureConfig): CabinetPackage | null {
+  const packageConfig = config.cabinetPackage;
+  if (!packageConfig || assetId !== packageConfig.assetId) return null;
+  return packageConfig;
 }
 
 export function emptyAreaIds(): string[] {

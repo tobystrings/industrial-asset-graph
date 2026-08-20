@@ -32,9 +32,17 @@ npm run preview -- --host 127.0.0.1 --port 4174
 
 Open http://127.0.0.1:4174/industrial-asset-graph/ to test the production dashboard build.
 
+## In-app plant management
+
+Plant records can be managed directly in the application without editing source files. The field UI supports asset create/edit/delete, map placement, relationship editing, photos and PDFs, evidence state, field observations, facility/area/map administration, and local persistence in IndexedDB.
+
+**Plant Database** exports a portable `.iag` package. The package is ZIP-based and contains the graph and map configuration, observations, metadata, plus the actual locally attached PDFs, photos, and drawings. `.iag` files can be loaded in replace or merge mode on another workstation or tablet. Legacy `.iag.json` backups remain importable.
+
+The reusable application lives under `src/`; facility-specific seed content and packaged reference material live under `facilities/`. The bundled facility package is the first-use seed, while runtime field edits are stored and moved through the local plant database.
+
 ## Data boundaries
 
-Facility facts must be backed by accepted evidence or explicitly marked for field verification. Local drawings, photos, tags, CMMS exports, LOTO procedures, and field observations are controlled evidence and are not bundled into the public frontend.
+Facility facts must be backed by accepted evidence or explicitly marked for field verification. Local drawings, photos, tags, CMMS exports, LOTO procedures, and field observations are controlled evidence and are not bundled into the public frontend unless they are part of an intentionally packaged public facility reference.
 
 ## Checks
 
@@ -48,8 +56,8 @@ npm run test:visual
 
 ## Facility records and restricted evidence
 
-Typed facility records live in `src/facilityData.ts` with shared types in `src/types/facility.ts`. `npm run verify:data` validates facility identity, hierarchy, overlays, relationships, evidence references, revisions, and machine-document paths.
+Bundled facility records are loaded through the facility package layer with shared types in `src/types/facility.ts` and `src/facility/types.ts`. `npm run verify:data` validates facility identity, hierarchy, overlays, relationships, evidence references, revisions, and machine-document paths.
 
-Field photographs, PLC programs, credentials, and proprietary manuals are not bundled. The dashboard contains `LOCAL_ONLY` evidence metadata and preserves the existing browser hashing workflow for user-attached evidence.
+Field photographs, PLC programs, credentials, and proprietary manuals are not bundled. The dashboard contains `LOCAL_ONLY` evidence metadata and preserves local browser storage for user-attached evidence.
 
 The approved Line 2 cabinet reference render is retained as controlled drawing evidence. Cabinet geometry and visible labels are reproduced without inferred conductors, wiring, or hidden components.

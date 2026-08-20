@@ -16,11 +16,31 @@ export interface FacilityIdentity {
   location: string;
 }
 
+export interface FacilityCabinetPackage {
+  id: string;
+  assetId: string;
+  drawing: string;
+  raster: string;
+  pdf: string;
+  metadata: string;
+  destUnknown: boolean;
+}
+
+export interface FacilityDriveSlot {
+  index: number;
+  componentId: string;
+  cabinetDeviceId: string;
+  drawingLabel: string;
+  loadLabel: string | null;
+}
+
 export interface FacilityFeatureConfig {
   defaultAreaId: string;
   featuredCabinetAssetId: string;
   featuredMachineAssetId: string;
   brandMark?: string;
+  cabinetPackage?: FacilityCabinetPackage;
+  driveSlots?: FacilityDriveSlot[];
 }
 
 export type FacilityMapMarkerState = 'LIVE' | 'REFERENCE' | 'FIELD_VERIFY';
