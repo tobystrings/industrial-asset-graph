@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { useFacility, useFacilityEditor, type AttachmentRecord, type PlantBackup } from '../facility';
+import { useFacility, useFacilityEditor, type AttachmentRecord, type FacilityMapMarker, type PlantBackup } from '../facility';
 import { getAttachment } from '../facility/runtimeDb';
-import type { FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
+import type { DocumentationState, FacilityArea, FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
 import './plantManager.css';
 
-type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'database' | null;
+type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | null;
 type MapPoint = { x: number; y: number } | null;
 
 const relationshipLabels: { value: RelationshipType; label: string }[] = [
@@ -20,14 +20,19 @@ const relationshipLabels: { value: RelationshipType; label: string }[] = [
   { value: 'DOWNSTREAM_OF', label: 'Downstream Of' },
 ];
 
-function downloadBackup(backup: PlantBackup) {
-  const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+const documentationStates: DocumentationState[] = ['COMPLETE', 'REVIEW', 'IN_PROGRESS', 'DRAFT', 'NOT_STARTED'];
+
+function downloadFile(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `industrial-asset-graph-${new Date().toISOString().slice(0, 10)}.iag.json`;
+  link.download = name;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function safePlantFileName(name: string) {
+  return (name || 'plant').trim().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() || 'plant';
 }
 
 function AssetForm({ point, asset, onDone }: { point: MapPoint; asset?: FacilityAsset; onDone: () => void }) {
@@ -91,7 +96,7 @@ function AssetForm({ point, asset, onDone }: { point: MapPoint; asset?: Facility
     </div>
     <label>Description<textarea rows={3} value={description} onChange={(event) => setDescription(event.target.value)} /></label>
     <section className="iag-custom-fields"><div className="iag-section-head"><strong>Custom Attributes</strong><button type="button" onClick={() => setFacts((current) => [...current, { label: '', value: '' }])}>+ Add Field</button></div>{facts.map((fact, index) => <div className="iag-attribute-row" key={`${index}-${fact.label}`}><input placeholder="FLA / IP Address / Fuse" value={fact.label} onChange={(event) => setFacts((rows) => rows.map((row, i) => i === index ? { ...row, label: event.target.value } : row))}/><input placeholder="14.2 A / 192.168.1.50" value={fact.value} onChange={(event) => setFacts((rows) => rows.map((row, i) => i === index ? { ...row, value: event.target.value } : row))}/><button type="button" aria-label="Remove field" onClick={() => setFacts((rows) => rows.filter((_, i) => i !== index))}>×</button></div>)}</section>
-    <div className="iag-form-actions">{asset && <button className="danger" type="button" onClick={async () => { if (!confirm(`Delete ${asset.id} — ${asset.name}? Connected relationships, map pin and asset documents will also be removed.`)) return; await editor.deleteAsset(asset.id); onDone(); }}>Delete Asset</button>}<span className="iag-action-spacer"/><button type="button" onClick={onDone}>Cancel</button><button className="primary" type="submit">{asset ? 'Save Changes' : 'Save Asset'}</button></div>
+    <div className="iag-form-actions">{asset && <button className="danger" type="button" onClick={async () => { if (!confirm(`Delete ${asset.id} — ${asset.name}? Connected relationships, map pin, local evidence and asset documents will also be removed.`)) return; await editor.deleteAsset(asset.id); onDone(); }}>Delete Asset</button>}<span className="iag-action-spacer"/><button type="button" onClick={onDone}>Cancel</button><button className="primary" type="submit">{asset ? 'Save Changes' : 'Save Asset'}</button></div>
   </form>;
 }
 
@@ -169,6 +174,50 @@ function ObservationPanel() {
   return <div className="iag-editor-form"><label>Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label>Field Observation<textarea rows={4} value={text} onChange={(event) => setText(event.target.value)} placeholder="Breaker appears to feed VFD-04; panel schedule does not match field label."/></label><label>Evidence State<select value={status} onChange={(event) => setStatus(event.target.value as typeof status)}><option value="VERIFIED">Evidence Verified</option><option value="FIELD_VERIFY">Needs Field Verification</option><option value="INFERRED">Inferred</option><option value="DISPUTED">Disputed</option></select></label><button className="primary" type="button" disabled={!text.trim()} onClick={async () => { await editor.addObservation({ assetId, text: text.trim(), verificationStatus: status, createdBy: 'field-user' }); setText(''); await refresh(); }}>Log Observation</button><div className="iag-observation-list">{rows.map((row) => <article key={row.id}><strong>{row.verificationStatus.replace('_', ' ')}</strong><p>{row.text}</p><small>{new Date(row.createdAt).toLocaleString()} · {row.createdBy}</small></article>)}</div></div>;
 }
 
+function AreaEditor({ area, onClear }: { area?: FacilityArea; onClear: () => void }) {
+  const editor = useFacilityEditor();
+  const [message, setMessage] = useState('');
+  const [id, setId] = useState(area?.id ?? '');
+  const [name, setName] = useState(area?.name ?? '');
+  const [shortName, setShortName] = useState(area?.shortName ?? '');
+  const [status, setStatus] = useState<DocumentationState>(area?.status ?? 'NOT_STARTED');
+  const [x, setX] = useState(area?.overlay.x ?? 0);
+  const [y, setY] = useState(area?.overlay.y ?? 0);
+  const [width, setWidth] = useState(area?.overlay.width ?? 10);
+  const [height, setHeight] = useState(area?.overlay.height ?? 10);
+  return <form className="iag-setup-card" onSubmit={async (event) => { event.preventDefault(); await editor.saveArea({ id: id.trim(), name: name.trim(), shortName: shortName.trim() || name.trim(), status, overlay: { x, y, width, height }, assetIds: area?.assetIds ?? [] }); onClear(); }}><div className="iag-form-grid"><label>Area ID<input required disabled={Boolean(area)} value={id} onChange={(event) => setId(event.target.value)}/></label><label>Name<input required value={name} onChange={(event) => setName(event.target.value)}/></label><label>Short Name<input value={shortName} onChange={(event) => setShortName(event.target.value)}/></label><label>Documentation Status<select value={status} onChange={(event) => setStatus(event.target.value as DocumentationState)}>{documentationStates.map((value) => <option key={value} value={value}>{value.replaceAll('_', ' ')}</option>)}</select></label><label>Map X %<input type="number" min="0" max="100" step="0.1" value={x} onChange={(event) => setX(Number(event.target.value))}/></label><label>Map Y %<input type="number" min="0" max="100" step="0.1" value={y} onChange={(event) => setY(Number(event.target.value))}/></label><label>Width %<input type="number" min="0" max="100" step="0.1" value={width} onChange={(event) => setWidth(Number(event.target.value))}/></label><label>Height %<input type="number" min="0" max="100" step="0.1" value={height} onChange={(event) => setHeight(Number(event.target.value))}/></label></div>{message && <p className="iag-error">{message}</p>}<div className="iag-form-actions">{area && <button className="danger" type="button" onClick={async () => { if (!confirm(`Delete area ${area.name}?`)) return; try { await editor.deleteArea(area.id); onClear(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Area could not be deleted'); } }}>Delete Area</button>}<span className="iag-action-spacer"/><button type="button" onClick={onClear}>Cancel</button><button className="primary" type="submit">Save Area</button></div></form>;
+}
+
+function MapRecordEditor({ marker, onClear }: { marker?: FacilityMapMarker; onClear: () => void }) {
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  const [id, setId] = useState(marker?.id ?? '');
+  const [label, setLabel] = useState(marker?.label ?? '');
+  const [x, setX] = useState(marker?.x ?? 50);
+  const [y, setY] = useState(marker?.y ?? 50);
+  const [tone, setTone] = useState<FacilityMapMarker['tone']>(marker?.tone ?? 'power');
+  const [state, setState] = useState<FacilityMapMarker['state']>(marker?.state ?? 'REFERENCE');
+  const [assetId, setAssetId] = useState(marker?.assetId ?? '');
+  return <form className="iag-setup-card" onSubmit={async (event) => { event.preventDefault(); await editor.saveMarker({ id: id.trim() || `MAP-${crypto.randomUUID().slice(0, 8).toUpperCase()}`, label: label.trim() || id.trim(), x, y, tone, state, assetId: assetId || undefined }); onClear(); }}><div className="iag-form-grid"><label>Map Record ID<input disabled={Boolean(marker)} value={id} onChange={(event) => setId(event.target.value)} placeholder="Auto-generated if blank"/></label><label>Label<input required value={label} onChange={(event) => setLabel(event.target.value)}/></label><label>X %<input type="number" min="0" max="100" step="0.1" value={x} onChange={(event) => setX(Number(event.target.value))}/></label><label>Y %<input type="number" min="0" max="100" step="0.1" value={y} onChange={(event) => setY(Number(event.target.value))}/></label><label>Tone<select value={tone} onChange={(event) => setTone(event.target.value as FacilityMapMarker['tone'])}><option value="cabinet">Cabinet</option><option value="machine">Machine</option><option value="power">Power / Other</option></select></label><label>State<select value={state} onChange={(event) => setState(event.target.value as FacilityMapMarker['state'])}><option value="LIVE">Live</option><option value="FIELD_VERIFY">Field Verify</option><option value="REFERENCE">Reference Only</option></select></label><label>Linked Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}><option value="">No linked asset</option>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label></div><div className="iag-form-actions">{marker && <button className="danger" type="button" onClick={async () => { if (!confirm(`Delete map record ${marker.label}?`)) return; await editor.deleteMarker(marker.id); onClear(); }}>Delete Record</button>}<span className="iag-action-spacer"/><button type="button" onClick={onClear}>Cancel</button><button className="primary" type="submit">Save Map Record</button></div></form>;
+}
+
+function PlantSetupPanel() {
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  const [tab, setTab] = useState<'facility' | 'areas' | 'map'>('facility');
+  const [facilityName, setFacilityName] = useState(facility.facility.name);
+  const [location, setLocation] = useState(facility.facility.location);
+  const [facilityStatus, setFacilityStatus] = useState(facility.facility.status);
+  const [areaId, setAreaId] = useState<string | null>(null);
+  const [newArea, setNewArea] = useState(false);
+  const [markerId, setMarkerId] = useState<string | null>(null);
+  const [newMarker, setNewMarker] = useState(false);
+  const markers = (facility.mapConfig?.markers ?? []) as FacilityMapMarker[];
+  const selectedArea = facility.areas.find((item) => item.id === areaId);
+  const selectedMarker = markers.find((item) => item.id === markerId);
+  return <div className="iag-editor-form"><div className="iag-setup-tabs"><button className={tab === 'facility' ? 'active' : ''} type="button" onClick={() => setTab('facility')}>Facility</button><button className={tab === 'areas' ? 'active' : ''} type="button" onClick={() => setTab('areas')}>Areas</button><button className={tab === 'map' ? 'active' : ''} type="button" onClick={() => setTab('map')}>Map Records</button></div>{tab === 'facility' && <form className="iag-setup-card" onSubmit={async (event) => { event.preventDefault(); await editor.saveFacility({ ...facility.facility, name: facilityName.trim(), location: location.trim(), status: facilityStatus.trim() }); }}><label>Facility ID<input disabled value={facility.facility.id}/></label><label>Facility Name<input required value={facilityName} onChange={(event) => setFacilityName(event.target.value)}/></label><label>Location<input value={location} onChange={(event) => setLocation(event.target.value)}/></label><label>Status<input value={facilityStatus} onChange={(event) => setFacilityStatus(event.target.value)}/></label><button className="primary" type="submit">Save Facility</button></form>}{tab === 'areas' && <>{newArea || selectedArea ? <AreaEditor key={selectedArea?.id ?? 'new-area'} area={selectedArea} onClear={() => { setAreaId(null); setNewArea(false); }}/> : <><button className="primary" type="button" onClick={() => setNewArea(true)}>+ Add Area</button><div className="iag-manage-list">{facility.areas.map((area) => <button key={area.id} type="button" onClick={() => setAreaId(area.id)}><span><strong>{area.name}</strong><small>{area.id} · {area.status.replaceAll('_', ' ')}</small></span><b>Edit</b></button>)}</div></>}</>}{tab === 'map' && <>{newMarker || selectedMarker ? <MapRecordEditor key={selectedMarker?.id ?? 'new-marker'} marker={selectedMarker} onClear={() => { setMarkerId(null); setNewMarker(false); }}/> : <><button className="primary" type="button" onClick={() => setNewMarker(true)}>+ Add Map Record</button><div className="iag-manage-list">{markers.map((marker) => <button key={marker.id} type="button" onClick={() => setMarkerId(marker.id)}><span><strong>{marker.label}</strong><small>{marker.id} · {marker.state} · {marker.x.toFixed(1)}, {marker.y.toFixed(1)}</small></span><b>Edit</b></button>)}</div></>}</>}</div>;
+}
+
 function DatabasePanel({ onDone }: { onDone: () => void }) {
   const facility = useFacility();
   const editor = useFacilityEditor();
@@ -176,7 +225,7 @@ function DatabasePanel({ onDone }: { onDone: () => void }) {
   const [mode, setMode] = useState<'replace' | 'merge'>('replace');
   const [message, setMessage] = useState('');
   const stats = useMemo(() => ({ assets: facility.assets.length, relationships: facility.relationships.length, documents: facility.documents.length }), [facility]);
-  return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadBackup(await editor.exportBackup())}>Export Plant Database</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".json,.iag.json,application/json" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()) as PlantBackup; await editor.importBackup(parsed, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">All field edits are stored locally in this browser using IndexedDB. Export a plant database before clearing browser storage or moving to another tablet/workstation.</p></div>;
+  return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">The .iag file is a portable ZIP-based plant package containing the graph, map configuration, observations, metadata, PDFs, photos and drawings. Legacy .iag.json backups remain importable.</p></div>;
 }
 
 export default function PlantManager() {
@@ -199,12 +248,12 @@ export default function PlantManager() {
 
   useEffect(() => { window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: mapEdit })); }, [mapEdit]);
 
-  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'database' ? 'Plant Database' : '';
+  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : '';
   const close = () => { setPanel(null); setMapPoint(null); };
 
   return <>
-    <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? 'LOCAL DATABASE · SAVED' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
+    <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? 'LOCAL DATABASE · SAVED' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
     {mapEdit && <div className="iag-map-edit-banner">MAP EDIT MODE · Click the facility drawing to place a new asset <button type="button" onClick={() => setMapEdit(false)}>Done</button></div>}
-    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>}</aside></div>}
+    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>}</aside></div>}
   </>;
 }
