@@ -28,6 +28,9 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+html[data-iag-contrast="high"] { --text:#fff; --body:#fff; --muted:#e2e8f0; --label:#e2e8f0; --hair:rgba(255,255,255,.48); --hair-soft:rgba(255,255,255,.36); --glass-chrome:rgba(255,255,255,.14); --glass-panel:rgba(255,255,255,.17); }
+html[data-iag-motion="reduced"] { scroll-behavior:auto; }
+html[data-iag-motion="reduced"] *,html[data-iag-motion="reduced"] *::before,html[data-iag-motion="reduced"] *::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; }
 
 .scroll-pane,
 .rail,
