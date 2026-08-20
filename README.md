@@ -1,55 +1,33 @@
 # Industrial Asset Graph
 
-Evidence-aware J. Lieb facility knowledge dashboard for plant assets, machine documentation, relationships, and field-verification work. The interactive 2D building layout is the primary application.
+Industrial Asset Graph is a local-first facility knowledge system for equipment, electrical systems, controls, documents, evidence, procedures, relationships, and field observations.
 
-The **Control cabinets** workspace includes an interactive Line 2 Conveyor Control Cabinet drawing with searchable device groups, evidence-aware metadata, and downloadable SVG, PNG, PDF, and JSON records.
+## In-app plant management
 
-## Local setup
+The application can now manage plant records directly in the UI without editing source files:
 
-Requires Node.js 20+ and Python 3 with Playwright/Pillow only for the visual check.
+- create, edit, move, and delete assets
+- place graph-linked assets on the facility map
+- create and edit power, control, interlock, data, mechanical, upstream, and downstream relationships
+- attach photos, PDFs, drawings, manuals, and field evidence
+- log field observations with verification state
+- edit facility identity, areas, and map records
+- persist local edits in IndexedDB
+- export a portable `.iag` plant package
+- import a `.iag` package in replace or merge mode
+- restore the bundled facility baseline
 
-```powershell
-Set-Location C:\Users\ptoul\Downloads\industrial-asset-graph-main
-npm install
-```
+A `.iag` package is a ZIP-based portable plant database containing a manifest, graph/map data, observations, attachment metadata, and the actual uploaded files. Legacy `.iag.json` backups remain importable.
 
-On the Mac mini: `cd /Users/p/Downloads/industrial-asset-graph-main && npm install`
+## Facility separation
 
-## Development server
+Reusable application code lives under `src/`. Facility-specific seed data and packaged documentation live under `facilities/`. The active facility package seeds the local database on first use; after initialization, field changes are managed through the application and portable plant database rather than by editing facility source records.
 
-```powershell
-npm run dev -- --host 0.0.0.0 --port 4173
-```
+## Development
 
-Open http://127.0.0.1:4173/industrial-asset-graph/. Vite `base` is `/industrial-asset-graph/`. This mode rebuilds on file changes.
-
-## Fast local preview
-
-```powershell
-npm run build
-npm run preview -- --host 127.0.0.1 --port 4174
-```
-
-Open http://127.0.0.1:4174/industrial-asset-graph/ to test the production dashboard build.
-
-## Data boundaries
-
-Facility facts must be backed by accepted evidence or explicitly marked for field verification. Local drawings, photos, tags, CMMS exports, LOTO procedures, and field observations are controlled evidence and are not bundled into the public frontend.
-
-## Checks
-
-```powershell
+```bash
+npm ci
+npm test
 npm run verify:data
 npm run build
-npm run test:visual
 ```
-
-`npm run test:visual` validates Warehouse F and FG-L4-MTN-001 selection at 1366×768 and 1920×1080 and confirms no legacy 3D entry point is present.
-
-## Facility records and restricted evidence
-
-Typed facility records live in `src/facilityData.ts` with shared types in `src/types/facility.ts`. `npm run verify:data` validates facility identity, hierarchy, overlays, relationships, evidence references, revisions, and machine-document paths.
-
-Field photographs, PLC programs, credentials, and proprietary manuals are not bundled. The dashboard contains `LOCAL_ONLY` evidence metadata and preserves the existing browser hashing workflow for user-attached evidence.
-
-The approved Line 2 cabinet reference render is retained as controlled drawing evidence. Cabinet geometry and visible labels are reproduced without inferred conductors, wiring, or hidden components.
