@@ -22,6 +22,12 @@ function crc32(bytes: Uint8Array) {
 function put16(view: DataView, offset: number, value: number) { view.setUint16(offset, value, true); }
 function put32(view: DataView, offset: number, value: number) { view.setUint32(offset, value >>> 0, true); }
 
+function arrayBufferCopy(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 async function bytesOf(value: ArchiveValue): Promise<Uint8Array> {
   if (typeof value === 'string') return textEncoder.encode(value);
   if (value instanceof Uint8Array) return value;
@@ -98,7 +104,8 @@ export async function createStoredZip(entries: Array<{ name: string; data: Archi
   put32(endView, 12, centralSize);
   put32(endView, 16, centralOffset);
   put16(endView, 20, 0);
-  return new Blob([...locals, ...centrals, end], { type: 'application/vnd.industrial-asset-graph+zip' });
+  const parts: BlobPart[] = [...locals, ...centrals, end].map(arrayBufferCopy);
+  return new Blob(parts, { type: 'application/vnd.industrial-asset-graph+zip' });
 }
 
 export async function readStoredZip(file: Blob): Promise<Map<string, Blob>> {
@@ -123,7 +130,7 @@ export async function readStoredZip(file: Blob): Promise<Map<string, Blob>> {
     const dataEnd = dataStart + compressedSize;
     if (dataEnd > bytes.length) throw new Error('Invalid IAG archive: truncated entry');
     const name = textDecoder.decode(bytes.subarray(nameStart, nameStart + nameLength));
-    files.set(name, new Blob([bytes.slice(dataStart, dataEnd)]));
+    files.set(name, new Blob([arrayBufferCopy(bytes.subarray(dataStart, dataEnd))]));
     offset = dataEnd;
   }
 
