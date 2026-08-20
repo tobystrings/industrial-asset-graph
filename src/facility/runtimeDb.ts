@@ -1,4 +1,5 @@
 import type { FacilityPackage } from './types';
+import { createStoredZip, readStoredZip } from './iagArchive';
 
 const DB_NAME = 'industrial-asset-graph-runtime';
 const DB_VERSION = 1;
@@ -29,6 +30,7 @@ export interface ObservationRecord {
 }
 
 type ExportAttachment = Omit<AttachmentRecord, 'blob'> & { dataUrl: string };
+type ArchiveAttachment = Omit<AttachmentRecord, 'blob'> & { filePath: string };
 
 export interface PlantBackup {
   format: 'industrial-asset-graph';
@@ -37,6 +39,23 @@ export interface PlantBackup {
   plant: FacilityPackage;
   attachments: ExportAttachment[];
   observations: ObservationRecord[];
+}
+
+export interface IagArchiveManifest {
+  format: 'industrial-asset-graph';
+  archiveVersion: 1;
+  exportedAt: string;
+  facilityId: string;
+  facilityName: string;
+  counts: {
+    assets: number;
+    areas: number;
+    relationships: number;
+    documents: number;
+    evidence: number;
+    attachments: number;
+    observations: number;
+  };
 }
 
 function requestAsPromise<T>(request: IDBRequest<T>): Promise<T> {
@@ -185,6 +204,57 @@ function dataUrlToBlob(dataUrl: string): Blob {
   return new Blob([bytes], { type: mimeType });
 }
 
+function mergeById<T extends { id: string }>(left: T[], right: T[]) {
+  const map = new Map(left.map((item) => [item.id, item]));
+  right.forEach((item) => map.set(item.id, item));
+  return [...map.values()];
+}
+
+function mergePlant(current: FacilityPackage | null, incoming: FacilityPackage, mode: 'replace' | 'merge'): FacilityPackage {
+  if (mode !== 'merge' || !current) return structuredClone(incoming);
+  return {
+    ...current,
+    ...incoming,
+    facility: { ...current.facility, ...incoming.facility },
+    featureConfig: { ...current.featureConfig, ...incoming.featureConfig },
+    mapConfig: {
+      ...(current.mapConfig ?? {}),
+      ...(incoming.mapConfig ?? {}),
+      markers: mergeById(current.mapConfig?.markers ?? [], incoming.mapConfig?.markers ?? []),
+    },
+    areas: mergeById(current.areas, incoming.areas),
+    assets: mergeById(current.assets, incoming.assets),
+    components: mergeById(current.components, incoming.components),
+    relationships: mergeById(current.relationships, incoming.relationships),
+    documents: mergeById(current.documents, incoming.documents),
+    evidence: mergeById(current.evidence, incoming.evidence),
+    revisions: mergeById(current.revisions, incoming.revisions),
+    assetSerialSources: mergeById(current.assetSerialSources, incoming.assetSerialSources),
+  };
+}
+
+async function applyImportedPlant(
+  incoming: FacilityPackage,
+  attachments: AttachmentRecord[],
+  observations: ObservationRecord[],
+  mode: 'replace' | 'merge',
+): Promise<FacilityPackage> {
+  const current = await loadPlant();
+  const next = mergePlant(current, incoming, mode);
+  await savePlant(next);
+  const db = await openPlantDb();
+  const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
+  if (mode === 'replace') {
+    tx.objectStore(ATTACHMENT_STORE).clear();
+    tx.objectStore(OBSERVATION_STORE).clear();
+  }
+  for (const attachment of attachments) tx.objectStore(ATTACHMENT_STORE).put(attachment);
+  for (const observation of observations) tx.objectStore(OBSERVATION_STORE).put(observation);
+  await transactionDone(tx);
+  db.close();
+  return next;
+}
+
 export async function exportPlantBackup(): Promise<PlantBackup> {
   const plant = await loadPlant();
   if (!plant) throw new Error('No plant database is loaded');
@@ -206,41 +276,71 @@ export async function exportPlantBackup(): Promise<PlantBackup> {
 
 export async function importPlantBackup(backup: PlantBackup, mode: 'replace' | 'merge'): Promise<FacilityPackage> {
   if (backup?.format !== 'industrial-asset-graph' || backup.version !== 1) throw new Error('Unsupported Industrial Asset Graph backup');
-  const current = await loadPlant();
-  const incoming = structuredClone(backup.plant);
-  const mergeById = <T extends { id: string }>(left: T[], right: T[]) => {
-    const map = new Map(left.map((item) => [item.id, item]));
-    right.forEach((item) => map.set(item.id, item));
-    return [...map.values()];
-  };
-  const next = mode === 'merge' && current ? {
-    ...current,
-    ...incoming,
-    facility: { ...current.facility, ...incoming.facility },
-    featureConfig: { ...current.featureConfig, ...incoming.featureConfig },
-    mapConfig: { ...(current.mapConfig ?? {}), ...(incoming.mapConfig ?? {}) },
-    areas: mergeById(current.areas, incoming.areas),
-    assets: mergeById(current.assets, incoming.assets),
-    components: mergeById(current.components, incoming.components),
-    relationships: mergeById(current.relationships, incoming.relationships),
-    documents: mergeById(current.documents, incoming.documents),
-    evidence: mergeById(current.evidence, incoming.evidence),
-    revisions: mergeById(current.revisions, incoming.revisions),
-    assetSerialSources: mergeById(current.assetSerialSources, incoming.assetSerialSources),
-  } : incoming;
-  await savePlant(next);
-  const db = await openPlantDb();
-  const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
-  if (mode === 'replace') {
-    tx.objectStore(ATTACHMENT_STORE).clear();
-    tx.objectStore(OBSERVATION_STORE).clear();
-  }
-  for (const attachment of backup.attachments ?? []) {
+  const attachments: AttachmentRecord[] = (backup.attachments ?? []).map((attachment) => {
     const { dataUrl, ...metadata } = attachment;
-    tx.objectStore(ATTACHMENT_STORE).put({ ...metadata, blob: dataUrlToBlob(dataUrl) });
+    return { ...metadata, blob: dataUrlToBlob(dataUrl) };
+  });
+  return applyImportedPlant(structuredClone(backup.plant), attachments, backup.observations ?? [], mode);
+}
+
+function safeArchiveName(name: string) {
+  return name.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '_').replace(/^\.+/, '').slice(0, 140) || 'attachment';
+}
+
+export async function exportPlantArchive(): Promise<Blob> {
+  const plant = await loadPlant();
+  if (!plant) throw new Error('No plant database is loaded');
+  const [attachments, observations] = await Promise.all([listAttachments(), listObservations()]);
+  const exportedAt = new Date().toISOString();
+  const metadata: ArchiveAttachment[] = attachments.map(({ blob: _blob, ...attachment }) => ({
+    ...attachment,
+    filePath: `files/${attachment.id}/${safeArchiveName(attachment.name)}`,
+  }));
+  const manifest: IagArchiveManifest = {
+    format: 'industrial-asset-graph',
+    archiveVersion: 1,
+    exportedAt,
+    facilityId: plant.facility.id,
+    facilityName: plant.facility.name,
+    counts: {
+      assets: plant.assets.length,
+      areas: plant.areas.length,
+      relationships: plant.relationships.length,
+      documents: plant.documents.length,
+      evidence: plant.evidence.length,
+      attachments: attachments.length,
+      observations: observations.length,
+    },
+  };
+  const entries: Array<{ name: string; data: string | Blob }> = [
+    { name: 'manifest.json', data: JSON.stringify(manifest, null, 2) },
+    { name: 'data/plant.json', data: JSON.stringify(plant) },
+    { name: 'data/observations.json', data: JSON.stringify(observations) },
+    { name: 'data/attachments.json', data: JSON.stringify(metadata) },
+  ];
+  metadata.forEach((row, index) => entries.push({ name: row.filePath, data: attachments[index].blob }));
+  return createStoredZip(entries);
+}
+
+async function jsonEntry<T>(files: Map<string, Blob>, path: string): Promise<T> {
+  const entry = files.get(path);
+  if (!entry) throw new Error(`Invalid IAG archive: missing ${path}`);
+  return JSON.parse(await entry.text()) as T;
+}
+
+export async function importPlantArchive(file: Blob, mode: 'replace' | 'merge'): Promise<FacilityPackage> {
+  const files = await readStoredZip(file);
+  const manifest = await jsonEntry<IagArchiveManifest>(files, 'manifest.json');
+  if (manifest?.format !== 'industrial-asset-graph' || manifest.archiveVersion !== 1) throw new Error('Unsupported Industrial Asset Graph archive');
+  const plant = await jsonEntry<FacilityPackage>(files, 'data/plant.json');
+  const observations = files.has('data/observations.json') ? await jsonEntry<ObservationRecord[]>(files, 'data/observations.json') : [];
+  const metadata = files.has('data/attachments.json') ? await jsonEntry<ArchiveAttachment[]>(files, 'data/attachments.json') : [];
+  const attachments: AttachmentRecord[] = [];
+  for (const row of metadata) {
+    const entry = files.get(row.filePath);
+    if (!entry) throw new Error(`Invalid IAG archive: missing attachment ${row.name}`);
+    const { filePath: _filePath, ...record } = row;
+    attachments.push({ ...record, blob: new Blob([await entry.arrayBuffer()], { type: row.mimeType }) });
   }
-  for (const observation of backup.observations ?? []) tx.objectStore(OBSERVATION_STORE).put(observation);
-  await transactionDone(tx);
-  db.close();
-  return next;
+  return applyImportedPlant(plant, attachments, observations, mode);
 }
