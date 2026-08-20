@@ -3,8 +3,9 @@ import { useFacility, useFacilityEditor, type AttachmentRecord, type FacilityMap
 import { getAttachment } from '../facility/runtimeDb';
 import type { DocumentationState, FacilityArea, FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
 import './plantManager.css';
+import './changeControl.css';
 
-type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | null;
+type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | null;
 type MapPoint = { x: number; y: number } | null;
 
 const relationshipLabels: { value: RelationshipType; label: string }[] = [
@@ -171,7 +172,7 @@ function ObservationPanel() {
   const [rows, setRows] = useState<Awaited<ReturnType<typeof editor.observations>>>([]);
   const refresh = () => editor.observations(assetId).then(setRows);
   useEffect(() => { if (assetId) void refresh(); }, [assetId]);
-  return <div className="iag-editor-form"><label>Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label>Field Observation<textarea rows={4} value={text} onChange={(event) => setText(event.target.value)} placeholder="Breaker appears to feed VFD-04; panel schedule does not match field label."/></label><label>Evidence State<select value={status} onChange={(event) => setStatus(event.target.value as typeof status)}><option value="VERIFIED">Evidence Verified</option><option value="FIELD_VERIFY">Needs Field Verification</option><option value="INFERRED">Inferred</option><option value="DISPUTED">Disputed</option></select></label><button className="primary" type="button" disabled={!text.trim()} onClick={async () => { await editor.addObservation({ assetId, text: text.trim(), verificationStatus: status, createdBy: 'field-user' }); setText(''); await refresh(); }}>Log Observation</button><div className="iag-observation-list">{rows.map((row) => <article key={row.id}><strong>{row.verificationStatus.replace('_', ' ')}</strong><p>{row.text}</p><small>{new Date(row.createdAt).toLocaleString()} · {row.createdBy}</small></article>)}</div></div>;
+  return <div className="iag-editor-form"><label>Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label>Field Observation<textarea rows={4} value={text} onChange={(event) => setText(event.target.value)} placeholder="Breaker appears to feed VFD-04; panel schedule does not match field label."/></label><label>Evidence State<select value={status} onChange={(event) => setStatus(event.target.value as typeof status)}><option value="VERIFIED">Evidence Verified</option><option value="FIELD_VERIFY">Needs Field Verification</option><option value="INFERRED">Inferred</option><option value="DISPUTED">Disputed</option></select></label><button className="primary" type="button" disabled={!text.trim() || !editor.currentUser} onClick={async () => { if (!editor.currentUser) return; await editor.addObservation({ assetId, text: text.trim(), verificationStatus: status, createdBy: editor.currentUser.name }); setText(''); await refresh(); }}>Log Observation</button>{!editor.currentUser && <p className="iag-db-note">Identify yourself in Users before logging an observation.</p>}<div className="iag-observation-list">{rows.map((row) => <article key={row.id}><strong>{row.verificationStatus.replace('_', ' ')}</strong><p>{row.text}</p><small>{new Date(row.createdAt).toLocaleString()} · {row.createdBy}</small></article>)}</div></div>;
 }
 
 function AreaEditor({ area, onClear }: { area?: FacilityArea; onClear: () => void }) {
@@ -228,6 +229,35 @@ function DatabasePanel({ onDone }: { onDone: () => void }) {
   return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">The .iag file is a portable ZIP-based plant package containing the graph, map configuration, observations, metadata, PDFs, photos and drawings. Legacy .iag.json backups remain importable.</p></div>;
 }
 
+function UsersPanel() {
+  const editor = useFacilityEditor();
+  const [name, setName] = useState('');
+  const [passphrase, setPassphrase] = useState('');
+  const [message, setMessage] = useState('');
+  const isAdmin = editor.currentUser?.role === 'admin';
+  const identify = () => {
+    if (!name.trim()) { setMessage('Enter your name before proposing a change.'); return; }
+    editor.identifyTechnician(name);
+    setMessage('You are identified. Changes will be submitted for administrator approval.');
+  };
+  const admin = async () => {
+    if (passphrase.length < 12) { setMessage('Use an administrator passphrase of at least 12 characters.'); return; }
+    if (!editor.adminCredentialConfigured) { await editor.configureAdmin(passphrase); setMessage('Administrator credential created for this browser.'); }
+    else if (await editor.signInAdmin(passphrase)) setMessage('Administrator signed in.');
+    else setMessage('Administrator passphrase was not accepted.');
+    setPassphrase('');
+  };
+  return <div className="iag-editor-form iag-users-panel">
+    <section className="iag-user-card"><strong>{editor.currentUser ? editor.currentUser.name : 'No user identified'}</strong><span>{editor.currentUser ? editor.currentUser.role === 'admin' ? 'Administrator' : 'Technician — proposed changes require approval' : 'Identify yourself before editing plant or map records.'}</span>{editor.currentUser && <button type="button" onClick={() => editor.signOut()}>Sign out</button>}</section>
+    {!editor.currentUser && <><label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Technician name" autoComplete="name"/></label><button className="primary" type="button" onClick={identify}>Identify as technician</button></>}
+    {!isAdmin && <section className="iag-admin-login"><strong>{editor.adminCredentialConfigured ? 'Administrator sign-in' : 'Create administrator credential'}</strong><p>{editor.adminCredentialConfigured ? 'Enter the local administrator passphrase to review pending changes.' : 'This is a first-run, browser-local setup. Choose a strong passphrase; it is not shared with GitHub Pages or other devices.'}</p><label>Administrator passphrase<input type="password" value={passphrase} onChange={(event) => setPassphrase(event.target.value)} autoComplete="current-password"/></label><button type="button" onClick={() => void admin()}>{editor.adminCredentialConfigured ? 'Sign in as administrator' : 'Create administrator credential'}</button></section>}
+    {message && <p className="iag-db-note" role="status">{message}</p>}
+    {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Pending change requests</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & apply</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>)}</section>}
+    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Local activity log</strong><span>{editor.auditLog.length}</span></div>{editor.auditLog.length === 0 ? <p>No local activity has been recorded yet.</p> : editor.auditLog.slice(0, 12).map((event) => <article key={event.id}><strong>{event.action}</strong><small>{event.actor} · {new Date(event.at).toLocaleString()} · {event.detail}</small></article>)}</section>
+    <p className="iag-db-note">This change queue and administrator credential are local to this browser. Export the plant database for a portable record; a shared, tamper-resistant audit log requires a backend.</p>
+  </div>;
+}
+
 export default function PlantManager() {
   const facility = useFacility();
   const editor = useFacilityEditor();
@@ -248,12 +278,18 @@ export default function PlantManager() {
 
   useEffect(() => { window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: mapEdit })); }, [mapEdit]);
 
-  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : '';
+  useEffect(() => {
+    const handler = () => setPanel('users');
+    addEventListener('iag-open-users', handler);
+    return () => removeEventListener('iag-open-users', handler);
+  }, []);
+
+  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : '';
   const close = () => { setPanel(null); setMapPoint(null); };
 
   return <>
-    <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? 'LOCAL DATABASE · SAVED' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
+    <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? editor.currentUser ? `${editor.currentUser.name.toUpperCase()} · ${editor.currentUser.role === 'admin' ? 'ADMIN' : `${editor.pendingChanges.length} PENDING`}` : 'IDENTIFY TO EDIT' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => setPanel('users')}>Users</button><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
     {mapEdit && <div className="iag-map-edit-banner">MAP EDIT MODE · Click the facility drawing to place a new asset <button type="button" onClick={() => setMapEdit(false)}>Done</button></div>}
-    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>}</aside></div>}
+    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>}</aside></div>}
   </>;
 }

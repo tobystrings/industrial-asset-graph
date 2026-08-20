@@ -356,6 +356,7 @@ export default function Dashboard({
         onArea={selectArea}
         onOpenCabinet={() => { onOpenCabinet(); setDrawerOpen(false); }}
         onSystems={() => { setSystemKind('VFD'); onView('assets'); setDrawerOpen(false); }}
+        onUsers={() => { window.dispatchEvent(new CustomEvent('iag-open-users')); setDrawerOpen(false); }}
         onToggleFilter={(item) => {
           const next = new Set(filters);
           next.has(item) ? next.delete(item) : next.add(item);

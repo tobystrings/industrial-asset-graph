@@ -17,6 +17,7 @@ type Props = {
   onArea: (area: FacilityArea) => void;
   onOpenCabinet: () => void;
   onSystems: () => void;
+  onUsers: () => void;
   onToggleFilter: (state: VerificationState) => void;
 };
 
@@ -38,6 +39,7 @@ export default function FacilitySidebar({
   onWorkspace,
   onOpenCabinet,
   onSystems,
+  onUsers,
 }: Props) {
   return (
     <aside className={`facility-sidebar reference-sidebar ${drawerOpen ? 'open' : ''}`}>
@@ -68,7 +70,7 @@ export default function FacilitySidebar({
       ])}
       {group('ADMIN', [
         { icon: '⌂', label: 'Facilities' },
-        { icon: '♙', label: 'Users' },
+        { icon: '♙', label: 'Users', action: onUsers },
         { icon: '⚙', label: 'Settings' },
       ])}
 
