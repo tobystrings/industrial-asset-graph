@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useFacility, useFacilityEditor, type AttachmentRecord, type FacilityMapMarker, type PlantBackup } from '../facility';
 import { getAttachment } from '../facility/runtimeDb';
 import type { DocumentationState, FacilityArea, FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
+import { loadAppSettings, saveAppSettings, type AppSettings } from '../lib/appSettings';
 import './plantManager.css';
 import './changeControl.css';
 
-type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | null;
+type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | null;
 type MapPoint = { x: number; y: number } | null;
 
 const relationshipLabels: { value: RelationshipType; label: string }[] = [
@@ -258,6 +259,16 @@ function UsersPanel() {
   </div>;
 }
 
+function SettingsPanel() {
+  const [settings, setSettings] = useState<AppSettings>(() => loadAppSettings());
+  const update = (next: AppSettings) => { setSettings(next); saveAppSettings(next); };
+  return <div className="iag-editor-form iag-settings-panel">
+    <section className="iag-admin-login"><strong>Display & accessibility</strong><label>Contrast<select value={settings.contrast} onChange={(event) => update({ ...settings, contrast: event.target.value as AppSettings['contrast'] })}><option value="standard">Standard</option><option value="high">High contrast</option></select></label><label>Motion<select value={settings.motion} onChange={(event) => update({ ...settings, motion: event.target.value as AppSettings['motion'] })}><option value="system">Follow device setting</option><option value="reduced">Reduce animations</option></select></label></section>
+    <section className="iag-admin-login"><strong>Map behavior</strong><label>Default map zoom<select value={settings.mapZoom} onChange={(event) => update({ ...settings, mapZoom: Number(event.target.value) as AppSettings['mapZoom'] })}><option value={100}>100% · fit view</option><option value={125}>125% · closer</option><option value={150}>150% · detailed</option></select></label><label>Default map details<select value={settings.mapDetails} onChange={(event) => update({ ...settings, mapDetails: event.target.value as AppSettings['mapDetails'] })}><option value="legend">Legend</option><option value="cabinets">Asset directories</option><option value="areas">Areas</option><option value="notes">Notes</option></select></label></section>
+    <section className="iag-user-card"><strong>Local data & deployment</strong><span>Settings are saved in this browser. Plant records, evidence, review requests, and activity history remain managed through Plant Database and Users.</span><span>For shared settings or multi-device control, connect a backend before relying on this deployment operationally.</span></section>
+  </div>;
+}
+
 export default function PlantManager() {
   const facility = useFacility();
   const editor = useFacilityEditor();
@@ -276,6 +287,12 @@ export default function PlantManager() {
     return () => removeEventListener('iag-map-add-asset', handler);
   }, []);
 
+  useEffect(() => {
+    const handler = () => setPanel('settings');
+    addEventListener('iag-open-settings', handler);
+    return () => removeEventListener('iag-open-settings', handler);
+  }, []);
+
   useEffect(() => { window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: mapEdit })); }, [mapEdit]);
 
   useEffect(() => {
@@ -284,12 +301,12 @@ export default function PlantManager() {
     return () => removeEventListener('iag-open-users', handler);
   }, []);
 
-  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : '';
+  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : panel === 'settings' ? 'Settings' : '';
   const close = () => { setPanel(null); setMapPoint(null); };
 
   return <>
     <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? editor.currentUser ? `${editor.currentUser.name.toUpperCase()} · ${editor.currentUser.role === 'admin' ? 'ADMIN' : `${editor.pendingChanges.length} PENDING`}` : 'IDENTIFY TO EDIT' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => setPanel('users')}>Users</button><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
     {mapEdit && <div className="iag-map-edit-banner">MAP EDIT MODE · Click the facility drawing to place a new asset <button type="button" onClick={() => setMapEdit(false)}>Done</button></div>}
-    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>}</aside></div>}
+    {panel && <div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>}</aside></div>}
   </>;
 }

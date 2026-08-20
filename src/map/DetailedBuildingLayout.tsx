@@ -6,6 +6,7 @@ import buildingLayoutImage from './embeddedBuildingLayoutImage';
 import './detailedBuildingLayout.css';
 import './buildingLayoutImage.css';
 import '../ui/map-polish.css';
+import { loadAppSettings, type AppSettings } from '../lib/appSettings';
 
 type Props = {
   selectedArea: FacilityArea | null;
@@ -27,9 +28,9 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const markers = (mapConfig?.markers ?? []) as FacilityMapMarker[];
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ start: ViewTransform; origin: { x: number; y: number }; distance?: number }>({ start: { scale: 1, x: 0, y: 0 }, origin: { x: 0, y: 0 } });
-  const [view, setView] = useState<ViewTransform>({ scale: 1, x: 0, y: 0 });
+  const [view, setView] = useState<ViewTransform>(() => ({ scale: loadAppSettings().mapZoom / 100, x: 0, y: 0 }));
   const [gesturing, setGesturing] = useState(false);
-  const [metaTab, setMetaTab] = useState<MetaTab>('legend');
+  const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(false);
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
 
@@ -37,6 +38,16 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     const handler = (event: Event) => setEditMode(Boolean((event as CustomEvent<boolean>).detail));
     addEventListener('iag-map-edit-mode', handler);
     return () => removeEventListener('iag-map-edit-mode', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const settings = (event as CustomEvent<AppSettings>).detail;
+      setMetaTab(settings.mapDetails);
+      setView((current) => ({ ...current, scale: settings.mapZoom / 100 }));
+    };
+    addEventListener('iag-settings-changed', handler);
+    return () => removeEventListener('iag-settings-changed', handler);
   }, []);
 
   const liveAsset = (assetId?: string) => assetId ? assets.find((asset) => asset.id === assetId) ?? null : null;

@@ -10,7 +10,10 @@ import './ui/industrial-fixes.css';
 import './motion/tokens.css';
 import { GuideProvider } from './features/facility-guide';
 import { FacilityProvider } from './facility';
+import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
+
+applyAppSettings();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><FacilityProvider><GuideProvider><App /></GuideProvider></FacilityProvider></React.StrictMode>);
 

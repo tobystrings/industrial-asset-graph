@@ -18,6 +18,7 @@ type Props = {
   onOpenCabinet: () => void;
   onSystems: () => void;
   onUsers: () => void;
+  onSettings: () => void;
   onToggleFilter: (state: VerificationState) => void;
 };
 
@@ -40,6 +41,7 @@ export default function FacilitySidebar({
   onOpenCabinet,
   onSystems,
   onUsers,
+  onSettings,
 }: Props) {
   return (
     <aside className={`facility-sidebar reference-sidebar ${drawerOpen ? 'open' : ''}`}>
@@ -49,7 +51,6 @@ export default function FacilitySidebar({
       </div>
 
       {group('OVERVIEW', [
-        { icon: '⌂', label: 'Dashboard', action: () => onWorkspace('map') },
         { icon: '◫', label: 'Map', action: () => onWorkspace('map'), active: workspaceTab === 'map' },
       ])}
       {group('ASSETS', [
@@ -71,7 +72,7 @@ export default function FacilitySidebar({
       {group('ADMIN', [
         { icon: '⌂', label: 'Facilities' },
         { icon: '♙', label: 'Users', action: onUsers },
-        { icon: '⚙', label: 'Settings' },
+        { icon: '⚙', label: 'Settings', action: onSettings },
       ])}
 
       <button className="reference-collapse" type="button" aria-label="Collapse sidebar"><span aria-hidden="true">‹</span> Collapse</button>
