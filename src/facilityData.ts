@@ -33,6 +33,9 @@ function replaceArray<T>(target: T[], source: T[]) {
 
 export function syncFacilityData(pkg: FacilityPackage) {
   facility = pkg.facility;
+  activeFacilityPackage.facility = structuredClone(pkg.facility);
+  activeFacilityPackage.featureConfig = structuredClone(pkg.featureConfig);
+  activeFacilityPackage.mapConfig = pkg.mapConfig ? structuredClone(pkg.mapConfig) : undefined;
   replaceArray(areas, pkg.areas);
   replaceArray(machines, pkg.assets);
   replaceArray(components, pkg.components);

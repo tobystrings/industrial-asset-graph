@@ -3,35 +3,40 @@ import DeviceIntel from './DeviceIntel';
 import FloorPacket from './FloorPacket';
 import PlcRackView from './PlcRackView';
 import WalkdownForm from './WalkdownForm';
+import { useFacility } from './facility';
 import { destUnknownHighlight } from './lib/boardChrome';
 import { chipCountLabel } from './lib/hrefMatrix';
 import { intelFocusTitle, panToDeviceFromRects } from './lib/floorPass';
 import { subscribeViewport } from './lib/viewport';
 import { parseDeviceQuery, writeDeviceQuery } from './lib/deviceQuery';
-import { line2DriveInstances } from './lib/driveInstances';
-import { cabinetPackageFor } from './lib/plantPacks';
+import { configuredDriveInstances } from './lib/driveInstances';
+import { cabinetPackageFor, type CabinetPackage } from './lib/plantPacks';
 import { cabinetDeviceToComponent } from './productCatalog';
 
 type CabinetDevice = { id: string; label: string; type: string; verificationStatus: string; source: string; manufacturer?: string; model?: string; designation?: string; loadLabel?: string; voltage?: string; output?: string; rating?: string };
 type CabinetMetadata = { cabinet: { id: string; name: string; drawingNumber: string; revision: string; voltage: { value: string }; controlVoltage: { value: string }; assetId: { value: string | null; verificationStatus: string }; location: { value: string | null; verificationStatus: string }; panelSource: { value: string | null; verificationStatus: string }; notes: string[] }; devices: CabinetDevice[] };
 
-const LINE2_PACKAGE = cabinetPackageFor('L2-CC-001');
 const packageHref = (rel: string) => new URL(rel, document.baseURI).href;
-const assetUrl = (file: string) => {
-  if (LINE2_PACKAGE) {
-    if (file === 'cabinet.svg') return packageHref(LINE2_PACKAGE.drawing);
-    if (file === 'cabinet.png') return packageHref(LINE2_PACKAGE.raster);
-    if (file === 'metadata.json') return packageHref(LINE2_PACKAGE.metadata);
-  }
-  return packageHref(`assets/line2/control-cabinet/${file}`);
+const packageAssetUrl = (pkg: CabinetPackage | null, file: string) => {
+  if (!pkg) return packageHref(file);
+  const paths: Record<string, string> = {
+    'cabinet.svg': pkg.drawing,
+    'cabinet.png': pkg.raster,
+    'cabinet.pdf': pkg.pdf,
+    'metadata.json': pkg.metadata,
+  };
+  return packageHref(paths[file] ?? file);
 };
 const pretty = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
+  const { featureConfig } = useFacility();
+  const cabinetPackage = cabinetPackageFor(featureConfig.featuredCabinetAssetId, featureConfig);
+  const assetUrl = (file: string) => packageAssetUrl(cabinetPackage, file);
   const [metadata, setMetadata] = useState<CabinetMetadata | null>(null);
   const [svg, setSvg] = useState('');
   const requested = parseDeviceQuery(new URLSearchParams(location.search).get('device'));
-  const [selectedId, setSelectedId] = useState(requested?.deviceId ?? 'plc-micrologix-1400');
+  const [selectedId, setSelectedId] = useState(requested?.deviceId ?? '');
   const [query, setQuery] = useState('');
   const [packetOpen, setPacketOpen] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -55,7 +60,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
 
   const panToSelected = () => {
     const canvas = canvasRef.current;
-    const target = canvas?.querySelector<SVGGElement>(`[data-device-id="${CSS.escape(selectedId)}"]`);
+    const target = selectedId ? canvas?.querySelector<SVGGElement>(`[data-device-id="${CSS.escape(selectedId)}"]`) : null;
     if (!canvas || !target) return;
     try {
       const canvasBox = canvas.getBoundingClientRect();
@@ -68,22 +73,24 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
   };
 
   useEffect(() => {
+    if (!cabinetPackage) return;
     Promise.all([
-      fetch(assetUrl('metadata.json')).then((response) => response.json()),
-      fetch(assetUrl('cabinet.svg')).then((response) => response.text()),
-    ]).then(([data, drawing]) => {
+      fetch(packageAssetUrl(cabinetPackage, 'metadata.json')).then((response) => response.json()),
+      fetch(packageAssetUrl(cabinetPackage, 'cabinet.svg')).then((response) => response.text()),
+    ]).then(([data, drawing]: [CabinetMetadata, string]) => {
       setMetadata(data);
       setSvg(drawing);
+      setSelectedId((current) => current || data.devices[0]?.id || '');
     });
-  }, []);
+  }, [cabinetPackage?.id]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !svg) return;
     canvas.querySelectorAll('.is-selected').forEach((node) => node.classList.remove('is-selected'));
-    canvas.querySelector(`[data-device-id="${CSS.escape(selectedId)}"]`)?.classList.add('is-selected');
+    if (selectedId) canvas.querySelector(`[data-device-id="${CSS.escape(selectedId)}"]`)?.classList.add('is-selected');
     canvas.querySelectorAll('.is-dest-unknown').forEach((node) => node.classList.remove('is-dest-unknown'));
-    for (const slot of line2DriveInstances()) {
+    for (const slot of configuredDriveInstances()) {
       const mark = destUnknownHighlight(slot.cabinetDeviceId, slot.destId);
       if (mark) canvas.querySelector(`[data-device-id="${CSS.escape(slot.cabinetDeviceId)}"]`)?.classList.add(mark);
     }
@@ -169,7 +176,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <main className="cabinet-page" data-guide-target="cabinet" data-testid="cabinet-package" data-cabinet-package={LINE2_PACKAGE?.id} data-dest-unknown={LINE2_PACKAGE?.destUnknown ? 'true' : 'false'}>
+    <main className="cabinet-page" data-guide-target="cabinet" data-testid="cabinet-package" data-cabinet-package={cabinetPackage?.id} data-dest-unknown={cabinetPackage?.destUnknown ? 'true' : 'false'}>
       <header className="cabinet-header">
         <div>
           <button type="button" className="cabinet-back" onClick={onBack} aria-label="Facility dashboard">
@@ -178,7 +185,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
           </button>
           <div>
             <span>Control cabinet documentation</span>
-            <h1>{metadata?.cabinet.name ?? 'Line 2 Conveyor Control Cabinet'}</h1>
+            <h1>{metadata?.cabinet.name ?? 'Control Cabinet'}</h1>
           </div>
         </div>
         <nav aria-label="Cabinet downloads">
@@ -217,7 +224,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
           <div className="panel-heading">
             <div>
               <p className="panel-title">Interior layout</p>
-              <small>Drawing L2-CC-INT-001 · Rev A · Click any device · drag to pan · scroll to zoom</small>
+              <small>{metadata?.cabinet.drawingNumber ?? 'Cabinet drawing'} · {metadata?.cabinet.revision ? `Rev ${metadata.cabinet.revision} · ` : ''}Click any device · drag to pan · scroll to zoom</small>
             </div>
             <div className="cabinet-zoom">
               <button type="button" onClick={() => fitDrawing()} aria-label="Fit drawing">Fit</button>
@@ -225,9 +232,9 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
             </div>
           </div>
           {svg ? (
-            <div ref={canvasRef} className="cabinet-svg" onClick={selectFromDrawing} role="img" aria-label="Line 2 cabinet interior layout">
+            <div ref={canvasRef} className="cabinet-svg" onClick={selectFromDrawing} role="img" aria-label="Control cabinet interior layout">
               <div ref={stageRef} className="cabinet-svg-stage">
-                <img className="cabinet-raster" src={assetUrl('cabinet.png')} alt="Line 2 cabinet interior layout" draggable={false} />
+                <img className="cabinet-raster" src={assetUrl('cabinet.png')} alt="Control cabinet interior layout" draggable={false} />
                 <div className="cabinet-hit" dangerouslySetInnerHTML={{ __html: svg.replace(/<rect width="1600" height="1050" fill="#fff"\s*\/>/, '') }} />
               </div>
             </div>
@@ -259,7 +266,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
                 <DeviceIntel deviceOrComponentId={selected.id} onSelectDrive={(_, cabinetDeviceId) => selectDevice(cabinetDeviceId)} />
               )}
               <WalkdownForm targetId={cabinetDeviceToComponent[selected.id] ?? selected.id} promptSource={selected.loadLabel ?? selected.label} defaultField="note" />
-              {selected.id === 'plc-micrologix-1400' && <PlcRackView />}
+              {selected.type === 'PLC' && <PlcRackView />}
               <p className="cabinet-caution">Placement and visible labels follow the approved render. Wiring, load assignment, network topology, and hidden components are not inferred.</p>
             </>
           ) : <p>Select a cabinet device.</p>}
@@ -267,8 +274,8 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
             <p className="panel-title">Cabinet information</p>
             <div><span>Power</span><b>{metadata?.cabinet.voltage.value}</b></div>
             <div><span>Controls</span><b>{metadata?.cabinet.controlVoltage.value}</b></div>
-            <div><span>Asset ID</span><b className="field-verify">Field verify</b></div>
-            <div><span>Location</span><b className="field-verify">Field verify</b></div>
+            <div><span>Asset ID</span><b className="field-verify">{metadata?.cabinet.assetId.value ?? 'Field verify'}</b></div>
+            <div><span>Location</span><b className="field-verify">{metadata?.cabinet.location.value ?? 'Field verify'}</b></div>
           </section>
         </aside>
       </section>
