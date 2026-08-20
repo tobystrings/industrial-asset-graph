@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import activeFacilityPackage from './activeFacility';
-import type { FacilityMapMarker, FacilityPackage } from './types';
-import type { FacilityAsset, RelationshipRecord } from '../types/facility';
+import type { FacilityIdentity, FacilityMapMarker, FacilityPackage } from './types';
+import type { FacilityArea, FacilityAsset, RelationshipRecord } from '../types/facility';
 import { syncFacilityData } from '../facilityData';
 import {
   deleteAttachment as removeAttachmentRecord,
   ensurePlantSeed,
+  exportPlantArchive,
   exportPlantBackup,
+  importPlantArchive,
   importPlantBackup,
   listAttachments,
   listObservations,
@@ -23,6 +25,9 @@ const FacilityContext = createContext<FacilityPackage | null>(null);
 
 export interface FacilityEditorApi {
   ready: boolean;
+  saveFacility(facility: FacilityIdentity): Promise<void>;
+  saveArea(area: FacilityArea): Promise<void>;
+  deleteArea(areaId: string): Promise<void>;
   saveAsset(asset: FacilityAsset, marker?: { x: number; y: number }): Promise<void>;
   deleteAsset(assetId: string): Promise<void>;
   saveRelationship(relationship: RelationshipRecord): Promise<void>;
@@ -34,6 +39,8 @@ export interface FacilityEditorApi {
   attachments(assetId?: string): Promise<AttachmentRecord[]>;
   addObservation(input: Omit<ObservationRecord, 'id' | 'createdAt'>): Promise<ObservationRecord>;
   observations(assetId?: string): Promise<ObservationRecord[]>;
+  exportArchive(): Promise<Blob>;
+  importArchive(file: Blob, mode: 'replace' | 'merge'): Promise<void>;
   exportBackup(): Promise<PlantBackup>;
   importBackup(backup: PlantBackup, mode: 'replace' | 'merge'): Promise<void>;
   resetToBaseline(): Promise<void>;
@@ -96,6 +103,19 @@ export function FacilityProvider({
 
   const editor = useMemo<FacilityEditorApi>(() => ({
     ready,
+    async saveFacility(facility) {
+      await commit(stampRevision({ ...pkg, facility }, facility.id, 'Facility identity saved in application'));
+    },
+    async saveArea(area) {
+      const areas = pkg.areas.some((item) => item.id === area.id)
+        ? pkg.areas.map((item) => item.id === area.id ? area : item)
+        : [...pkg.areas, area];
+      await commit(stampRevision({ ...pkg, areas }, area.id, 'Facility area saved in application'));
+    },
+    async deleteArea(areaId) {
+      if (pkg.assets.some((asset) => asset.areaId === areaId)) throw new Error('Move or delete assets assigned to this area before deleting it.');
+      await commit(stampRevision({ ...pkg, areas: pkg.areas.filter((area) => area.id !== areaId) }, areaId, 'Facility area deleted in application'));
+    },
     async saveAsset(asset, markerPosition) {
       const assets = pkg.assets.some((item) => item.id === asset.id)
         ? pkg.assets.map((item) => item.id === asset.id ? asset : item)
@@ -129,9 +149,12 @@ export function FacilityProvider({
         components: pkg.components.filter((item) => item.parentId !== assetId),
         relationships: pkg.relationships.filter((item) => item.source !== assetId && item.target !== assetId),
         documents: pkg.documents.filter((item) => item.assetId !== assetId),
+        evidence: pkg.evidence.filter((item) => !item.pathOrUrl.includes(`/attachment/`) || !item.title.startsWith(`${assetId} · `)),
         areas: pkg.areas.map((area) => ({ ...area, assetIds: area.assetIds.filter((id) => id !== assetId) })),
         mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.assetId !== assetId) },
       };
+      const attached = await listAttachments(assetId);
+      for (const attachment of attached) await removeAttachmentRecord(attachment.id);
       await commit(stampRevision(next, assetId, 'Asset deleted in application'));
     },
     async saveRelationship(relationship) {
@@ -148,10 +171,10 @@ export function FacilityProvider({
       const index = markers.findIndex((item) => item.id === marker.id);
       if (index >= 0) markers[index] = marker;
       else markers.push(marker);
-      await commit({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers } });
+      await commit(stampRevision({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, marker.id, 'Map record saved in application'));
     },
     async deleteMarker(markerId) {
-      await commit({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.id !== markerId) } });
+      await commit(stampRevision({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.id !== markerId) } }, markerId, 'Map record deleted in application'));
     },
     async addAttachment(assetId, file, verificationStatus = 'FIELD_VERIFY') {
       const lower = file.name.toLowerCase();
@@ -161,10 +184,36 @@ export function FacilityProvider({
         blob: file, category, verificationStatus, createdAt: new Date().toISOString(),
       };
       await putAttachment(record);
+      const evidenceId = `EV-${record.id}`;
+      const evidence = [...pkg.evidence, {
+        id: evidenceId,
+        type: category === 'PHOTO' ? 'PHOTO' as const : category === 'DRAWING' ? 'DRAWING' as const : category === 'PDF' ? 'MANUAL' as const : 'OTHER' as const,
+        title: `${assetId} · ${file.name}`,
+        pathOrUrl: `indexeddb://attachment/${record.id}`,
+        access: 'LOCAL_ONLY' as const,
+      }];
+      const documents = category === 'PDF' || category === 'DRAWING' ? [...pkg.documents, {
+        id: `DOC-${record.id}`,
+        assetId,
+        category: category === 'PDF' ? 'Field document' : 'Drawing',
+        title: file.name,
+        path: `indexeddb://attachment/${record.id}`,
+        state: 'DRAFT' as const,
+        required: false,
+        verificationStatus,
+        evidenceIds: [evidenceId],
+      }] : pkg.documents;
+      await commit(stampRevision({ ...pkg, evidence, documents }, record.id, 'Local evidence attached in application'));
       return record;
     },
     async deleteAttachment(id) {
       await removeAttachmentRecord(id);
+      const uri = `indexeddb://attachment/${id}`;
+      await commit(stampRevision({
+        ...pkg,
+        evidence: pkg.evidence.filter((item) => item.pathOrUrl !== uri),
+        documents: pkg.documents.filter((item) => item.path !== uri),
+      }, id, 'Local evidence removed in application'));
     },
     attachments: listAttachments,
     async addObservation(input) {
@@ -173,6 +222,12 @@ export function FacilityProvider({
       return record;
     },
     observations: listObservations,
+    exportArchive: exportPlantArchive,
+    async importArchive(file, mode) {
+      const next = await importPlantArchive(file, mode);
+      syncFacilityData(next);
+      setPkg(next);
+    },
     exportBackup: exportPlantBackup,
     async importBackup(backup, mode) {
       const next = await importPlantBackup(backup, mode);
