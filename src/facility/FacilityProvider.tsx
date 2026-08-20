@@ -20,11 +20,35 @@ import {
   type ObservationRecord,
   type PlantBackup,
 } from './runtimeDb';
+import {
+  hasAdminCredential,
+  loadCurrentUser,
+  loadAuditEvents,
+  loadPendingChanges,
+  saveAuditEvents,
+  saveCurrentUser,
+  savePendingChanges,
+  setAdminPassphrase,
+  verifyAdminPassphrase,
+  type IagUser,
+  type AuditEvent,
+  type PendingChange,
+} from './changeControl';
 
 const FacilityContext = createContext<FacilityPackage | null>(null);
 
 export interface FacilityEditorApi {
   ready: boolean;
+  currentUser: IagUser | null;
+  pendingChanges: PendingChange[];
+  auditLog: AuditEvent[];
+  adminCredentialConfigured: boolean;
+  identifyTechnician(name: string): void;
+  configureAdmin(passphrase: string): Promise<void>;
+  signInAdmin(passphrase: string): Promise<boolean>;
+  signOut(): void;
+  approveChange(id: string): Promise<void>;
+  rejectChange(id: string): void;
   saveFacility(facility: FacilityIdentity): Promise<void>;
   saveArea(area: FacilityArea): Promise<void>;
   deleteArea(areaId: string): Promise<void>;
@@ -48,7 +72,7 @@ export interface FacilityEditorApi {
 
 const EditorContext = createContext<FacilityEditorApi | null>(null);
 
-function stampRevision(pkg: FacilityPackage, entityId: string, reason: string): FacilityPackage {
+function stampRevision(pkg: FacilityPackage, entityId: string, reason: string, changedBy: string, reviewState: 'DRAFT' | 'APPROVED' = 'DRAFT'): FacilityPackage {
   return {
     ...pkg,
     revisions: [
@@ -58,10 +82,10 @@ function stampRevision(pkg: FacilityPackage, entityId: string, reason: string): 
         entityId,
         fieldPath: '*',
         changedAt: new Date().toISOString(),
-        changedBy: 'in-app-editor',
+        changedBy,
         reason,
         evidenceIds: [],
-        reviewState: 'DRAFT',
+        reviewState,
       },
     ],
   };
@@ -76,6 +100,10 @@ export function FacilityProvider({
 }) {
   const [pkg, setPkg] = useState<FacilityPackage>(value);
   const [ready, setReady] = useState(false);
+  const [currentUser, setCurrentUser] = useState<IagUser | null>(() => loadCurrentUser());
+  const [pendingChanges, setPendingChanges] = useState<PendingChange[]>(() => loadPendingChanges());
+  const [auditLog, setAuditLog] = useState<AuditEvent[]>(() => loadAuditEvents());
+  const [adminCredentialConfigured, setAdminCredentialConfigured] = useState(() => hasAdminCredential());
 
   useEffect(() => {
     let alive = true;
@@ -101,20 +129,85 @@ export function FacilityProvider({
     await savePlant(next);
   }, []);
 
+  const savePending = useCallback((next: PendingChange[]) => {
+    setPendingChanges(next);
+    savePendingChanges(next);
+  }, []);
+
+  const appendAudit = useCallback((actor: string, action: string, detail: string) => {
+    const next = [{ id: crypto.randomUUID(), actor, action, detail, at: new Date().toISOString() }, ...auditLog];
+    setAuditLog(next);
+    saveAuditEvents(next);
+  }, [auditLog]);
+
+  const recordChange = useCallback(async (next: FacilityPackage, entityId: string, reason: string) => {
+    if (!currentUser?.name) throw new Error('Identify yourself before proposing a change.');
+    if (currentUser.role === 'admin') {
+      await commit(stampRevision(next, entityId, reason, currentUser.name, 'APPROVED'));
+      return;
+    }
+    savePending([...pendingChanges, {
+      id: crypto.randomUUID(), entityId, reason, proposedBy: currentUser.name,
+      proposedAt: new Date().toISOString(), next: structuredClone(next),
+    }]);
+    appendAudit(currentUser.name, 'Proposed change', `${reason} · ${entityId}`);
+  }, [appendAudit, commit, currentUser, pendingChanges, savePending]);
+
   const editor = useMemo<FacilityEditorApi>(() => ({
     ready,
+    currentUser,
+    pendingChanges,
+    auditLog,
+    adminCredentialConfigured,
+    identifyTechnician(name) {
+      const user: IagUser = { name: name.trim(), role: 'technician' };
+      setCurrentUser(user);
+      saveCurrentUser(user);
+      appendAudit(user.name, 'Identified as technician', 'Ready to submit changes for review');
+    },
+    async configureAdmin(passphrase) {
+      await setAdminPassphrase(passphrase);
+      const user: IagUser = { name: 'Administrator', role: 'admin' };
+      setAdminCredentialConfigured(true);
+      setCurrentUser(user);
+      saveCurrentUser(user);
+      appendAudit(user.name, 'Created administrator credential', 'Local browser credential created');
+    },
+    async signInAdmin(passphrase) {
+      if (!await verifyAdminPassphrase(passphrase)) return false;
+      const user: IagUser = { name: 'Administrator', role: 'admin' };
+      setCurrentUser(user);
+      saveCurrentUser(user);
+      appendAudit(user.name, 'Administrator signed in', 'Opened local review access');
+      return true;
+    },
+    signOut() { if (currentUser) appendAudit(currentUser.name, 'Signed out', 'Ended local session'); setCurrentUser(null); saveCurrentUser(null); },
+    async approveChange(id) {
+      if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required to approve changes.');
+      const change = pendingChanges.find((item) => item.id === id);
+      if (!change) return;
+      await commit(stampRevision(change.next, change.entityId, `${change.reason} (proposed by ${change.proposedBy}; approved)`, currentUser.name, 'APPROVED'));
+      savePending(pendingChanges.filter((item) => item.id !== id));
+      appendAudit(currentUser.name, 'Approved change', `${change.reason} · ${change.entityId} · proposed by ${change.proposedBy}`);
+    },
+    rejectChange(id) {
+      if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required to reject changes.');
+      const change = pendingChanges.find((item) => item.id === id);
+      savePending(pendingChanges.filter((item) => item.id !== id));
+      if (change) appendAudit(currentUser.name, 'Rejected change', `${change.reason} · ${change.entityId} · proposed by ${change.proposedBy}`);
+    },
     async saveFacility(facility) {
-      await commit(stampRevision({ ...pkg, facility }, facility.id, 'Facility identity saved in application'));
+      await recordChange({ ...pkg, facility }, facility.id, 'Facility identity saved in application');
     },
     async saveArea(area) {
       const areas = pkg.areas.some((item) => item.id === area.id)
         ? pkg.areas.map((item) => item.id === area.id ? area : item)
         : [...pkg.areas, area];
-      await commit(stampRevision({ ...pkg, areas }, area.id, 'Facility area saved in application'));
+      await recordChange({ ...pkg, areas }, area.id, 'Facility area saved in application');
     },
     async deleteArea(areaId) {
       if (pkg.assets.some((asset) => asset.areaId === areaId)) throw new Error('Move or delete assets assigned to this area before deleting it.');
-      await commit(stampRevision({ ...pkg, areas: pkg.areas.filter((area) => area.id !== areaId) }, areaId, 'Facility area deleted in application'));
+      await recordChange({ ...pkg, areas: pkg.areas.filter((area) => area.id !== areaId) }, areaId, 'Facility area deleted in application');
     },
     async saveAsset(asset, markerPosition) {
       const assets = pkg.assets.some((item) => item.id === asset.id)
@@ -140,7 +233,7 @@ export function FacilityProvider({
         if (index >= 0) markers[index] = { ...markers[index], ...marker };
         else markers.push(marker);
       }
-      await commit(stampRevision({ ...pkg, assets, areas, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, asset.id, 'Asset saved in application'));
+      await recordChange({ ...pkg, assets, areas, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, asset.id, 'Asset saved in application');
     },
     async deleteAsset(assetId) {
       const next: FacilityPackage = {
@@ -155,26 +248,26 @@ export function FacilityProvider({
       };
       const attached = await listAttachments(assetId);
       for (const attachment of attached) await removeAttachmentRecord(attachment.id);
-      await commit(stampRevision(next, assetId, 'Asset deleted in application'));
+      await recordChange(next, assetId, 'Asset deleted in application');
     },
     async saveRelationship(relationship) {
       const relationships = pkg.relationships.some((item) => item.id === relationship.id)
         ? pkg.relationships.map((item) => item.id === relationship.id ? relationship : item)
         : [...pkg.relationships, relationship];
-      await commit(stampRevision({ ...pkg, relationships }, relationship.id, 'Relationship saved in application'));
+      await recordChange({ ...pkg, relationships }, relationship.id, 'Relationship saved in application');
     },
     async deleteRelationship(relationshipId) {
-      await commit(stampRevision({ ...pkg, relationships: pkg.relationships.filter((item) => item.id !== relationshipId) }, relationshipId, 'Relationship deleted in application'));
+      await recordChange({ ...pkg, relationships: pkg.relationships.filter((item) => item.id !== relationshipId) }, relationshipId, 'Relationship deleted in application');
     },
     async saveMarker(marker) {
       const markers = [...(pkg.mapConfig?.markers ?? [])] as FacilityMapMarker[];
       const index = markers.findIndex((item) => item.id === marker.id);
       if (index >= 0) markers[index] = marker;
       else markers.push(marker);
-      await commit(stampRevision({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, marker.id, 'Map record saved in application'));
+      await recordChange({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, marker.id, 'Map record saved in application');
     },
     async deleteMarker(markerId) {
-      await commit(stampRevision({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.id !== markerId) } }, markerId, 'Map record deleted in application'));
+      await recordChange({ ...pkg, mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.id !== markerId) } }, markerId, 'Map record deleted in application');
     },
     async addAttachment(assetId, file, verificationStatus = 'FIELD_VERIFY') {
       const lower = file.name.toLowerCase();
@@ -203,17 +296,17 @@ export function FacilityProvider({
         verificationStatus,
         evidenceIds: [evidenceId],
       }] : pkg.documents;
-      await commit(stampRevision({ ...pkg, evidence, documents }, record.id, 'Local evidence attached in application'));
+      await recordChange({ ...pkg, evidence, documents }, record.id, 'Local evidence attached in application');
       return record;
     },
     async deleteAttachment(id) {
       await removeAttachmentRecord(id);
       const uri = `indexeddb://attachment/${id}`;
-      await commit(stampRevision({
+      await recordChange({
         ...pkg,
         evidence: pkg.evidence.filter((item) => item.pathOrUrl !== uri),
         documents: pkg.documents.filter((item) => item.path !== uri),
-      }, id, 'Local evidence removed in application'));
+      }, id, 'Local evidence removed in application');
     },
     attachments: listAttachments,
     async addObservation(input) {
@@ -240,7 +333,7 @@ export function FacilityProvider({
       syncFacilityData(next);
       setPkg(next);
     },
-  }), [ready, pkg, value, commit]);
+  }), [ready, pkg, value, commit, currentUser, pendingChanges, auditLog, adminCredentialConfigured, appendAudit, recordChange, savePending]);
 
   return (
     <FacilityContext.Provider value={pkg}>
