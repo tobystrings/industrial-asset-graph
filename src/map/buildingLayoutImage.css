@@ -23,6 +23,22 @@
   user-select: none;
 }
 
+/* Facility drawing correction: Cooler 2 and Cooler 3 are now one continuous cooler.
+   The legacy divider is baked into the reference image, so mask only that obsolete wall. */
+.layout-correction {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cooler-2-3-wall-removal {
+  left: 66.15%;
+  top: 14.7%;
+  width: .42%;
+  height: 20.1%;
+  background: #fff;
+}
+
 .map-hotspot {
   position: absolute;
   z-index: 2;
