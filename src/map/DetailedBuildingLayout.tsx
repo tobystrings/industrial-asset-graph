@@ -123,7 +123,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     }
   };
 
-  const legendContent = <div className="legend-grid"><span><i className="swatch outline cabinet" />Control Cabinet</span><span><i className="swatch outline machine" />Major Machine / Equipment</span><span><i className="swatch power" />Electrical / Main Power</span><span><i className="swatch wall" />Walls / Boundaries</span><span><i className="truth-dot live" />Live record</span><span><i className="truth-dot verify" />Field verify</span><span><i className="truth-dot reference" />Reference only</span></div>;
+  const legendContent = <div className="legend-grid"><span><i className="swatch outline cabinet" />Control Cabinet</span><span><i className="swatch outline machine" />Major Machine / Equipment</span><span><i className="swatch outline power" />Power Distribution</span></div>;
 
   const markerDirectory = (tone?: 'machine') => markers.filter((marker) => tone ? marker.tone === tone : marker.tone !== 'machine').map((marker) => {
     const asset = liveAsset(marker.assetId);
@@ -137,29 +137,29 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const notes = <ul><li>Map boundaries and labels remain drawing context.</li><li>Graph-linked pins are loaded from the editable plant database.</li><li>Use Map Edit to place new assets without editing source code.</li></ul>;
 
   return <section className="reference-layout" aria-label="Building Layout">
-    <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p>Interior layout merged with asset graph</p></div><div className="reference-layout-actions" aria-label="Map controls"><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit to Screen</button><button className="print-action" type="button" onClick={() => window.print()}>Print / PDF</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { const next = !editMode; setEditMode(next); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: next })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
+    <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2></div><div className="reference-layout-actions" aria-label="Map controls"><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit to Screen</button><button className="print-action" type="button" onClick={() => window.print()}>Print / PDF</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { const next = !editMode; setEditMode(next); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: next })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
     <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
       <div className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" onClick={addAtClick}>
             <img className="reference-plan-image" src={buildingLayoutImage} alt={`${facility.name} facility layout and asset graph`} draggable={false} onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}/>
-            {areas.map((area) => area.overlay ? <button key={area.id} type="button" className={`map-hotspot area ${selectedArea?.id === area.id ? 'selected' : ''}`} style={{ left: `${area.overlay.x}%`, top: `${area.overlay.y}%`, width: `${area.overlay.width}%`, height: `${area.overlay.height}%` }} onClick={(event) => { event.stopPropagation(); if (!editMode) onArea(area); }} aria-label={`Open ${area.name}`}/> : null)}
+            {areas.map((area) => area.overlay ? <button key={area.id} type="button" className={`map-hotspot area ${selectedArea?.id === area.id ? 'selected' : ''}`} style={{ left: `${area.overlay.x}%`, top: `${area.overlay.y}%`, width: `${area.overlay.width}%`, height: `${area.overlay.height}%` }} onClick={() => onArea(area)} aria-label={`Select ${area.name}`}><span><b>{area.shortName}</b></span></button> : null)}
             {markers.map((marker) => {
               const asset = liveAsset(marker.assetId);
               const selected = Boolean(asset && selectedAsset?.id === asset.id);
               const visible = marker.state === 'REFERENCE' || !asset || filters.has(asset.verificationStatus);
               if (!visible) return null;
-              return <button key={marker.id} type="button" className={`map-hotspot asset ${marker.tone} ${selected ? 'selected' : ''} ${marker.state === 'REFERENCE' ? 'reference-only' : ''}`} style={{ ...markerPosition(marker), width: marker.state === 'REFERENCE' ? '1.35%' : '2.1%', height: marker.state === 'REFERENCE' ? '2.1%' : '3.2%', transform: 'translate(-50%,-50%)' }} onClick={(event) => { event.stopPropagation(); activateMarker(marker); }} aria-label={`${marker.id}: ${marker.label}`} title={`${marker.id}: ${marker.label}`}/>;
+              return <button key={marker.id} type="button" className={`map-hotspot asset ${marker.tone} ${selected ? 'selected' : ''} ${marker.state === 'REFERENCE' ? 'reference-only' : ''}`} style={markerPosition(marker)} onClick={() => activateMarker(marker)} aria-label={marker.label}><span>{marker.id}</span></button>;
             })}
           </div>
         </div>
-        <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button></div>
+        <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button><button type="button" onClick={fitPlan}>Fit</button></div>
       </div>
-      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference-only tags</span>{editMode && <span><b>EDIT</b> click map to add asset</span>}</div>
+      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span></div>
       <div className="reference-info-strip"><section><h3>Legend</h3>{legendContent}</section><section><h3>Control Cabinets</h3>{cabinetDirectory}</section><section><h3>Major Machines / Equipment</h3>{machineDirectory}</section><section><h3>Areas</h3>{areaDirectory}</section><section><h3>Notes</h3>{notes}</section></div>
-      <div className="mobile-map-meta-tabs" role="tablist" aria-label="Map details">{(['legend','cabinets','areas','notes'] as MetaTab[]).map((tab) => <button key={tab} type="button" role="tab" aria-selected={metaTab === tab} className={metaTab === tab ? 'active' : ''} onClick={() => setMetaTab(tab)}>{tab}</button>)}</div>
-      <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && <div>{cabinetDirectory}{machineDirectory}</div>}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>
-      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{facility.location}</span></div></footer>
+      <div className="mobile-map-meta-tabs" role="tablist" aria-label="Map details">{(['legend','cabinets','areas','notes'] as MetaTab[]).map((tab) => <button key={tab} type="button" role="tab" aria-pressed={metaTab === tab} onClick={() => setMetaTab(tab)}>{tab}</button>)}</div>
+      <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && cabinetDirectory}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>
+      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{mapConfig?.drawingTitle ?? ''}</span></div></footer>
     </div>
   </section>;
 }
