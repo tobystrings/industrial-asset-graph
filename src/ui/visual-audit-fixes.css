@@ -1,0 +1,31 @@
+/* Visual-audit repairs: keep the desktop inspector inside its grid track. */
+.dashboard > .rail,
+.rail-body,
+.asset-panel,
+.walkdown-form,
+.walkdown-form label,
+.walkdown-more {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.walkdown-form input,
+.walkdown-form select,
+.walkdown-form input[type='file'] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.walkdown-form input[type='file'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.walkdown-form small,
+.walkdown-hint,
+.asset-panel p,
+.asset-panel span {
+  overflow-wrap: anywhere;
+}
