@@ -7,6 +7,7 @@ import './ui/layout-repair.css';
 import './ui/reference-shell.css';
 import './ui/industrial-design-system.css';
 import './ui/industrial-fixes.css';
+import './ui/visual-audit-fixes.css';
 import './motion/tokens.css';
 import { GuideProvider } from './features/facility-guide';
 import { FacilityProvider } from './facility';
