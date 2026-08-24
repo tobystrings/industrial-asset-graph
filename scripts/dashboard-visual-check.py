@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import subprocess
 import time
 from PIL import Image, ImageStat
@@ -6,7 +7,13 @@ from playwright.sync_api import sync_playwright
 
 output = Path('artifacts')
 output.mkdir(exist_ok=True)
-server = subprocess.Popen(['npm.cmd', 'run', 'preview', '--', '--host', '127.0.0.1', '--port', '4174'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
+npm = 'npm.cmd' if os.name == 'nt' else 'npm'
+server = subprocess.Popen(
+    [npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', '4174'],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.STDOUT,
+)
 
 def verify_pixels(path: Path) -> None:
     variation = max(ImageStat.Stat(Image.open(path).convert('RGB')).var)
@@ -15,7 +22,11 @@ def verify_pixels(path: Path) -> None:
 try:
     time.sleep(2)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, executable_path=r'C:\Program Files\Google\Chrome\Application\chrome.exe')
+        launch_args = {'headless': True}
+        chrome_path = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
+        if os.name == 'nt' and Path(chrome_path).exists():
+            launch_args['executable_path'] = chrome_path
+        browser = p.chromium.launch(**launch_args)
         errors = []
         for width, height in ((1366, 768), (1920, 1080)):
             page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1)
