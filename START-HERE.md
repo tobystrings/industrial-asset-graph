@@ -3,8 +3,9 @@
 This zip is **Industrial Asset Graph** (J. Lieb Foods). It is **not** Golfgold.
 
 1. Read **`AGENT-HANDOFF.md`** (full how-to, assets, honesty).
-2. Then **`AGENT-ENV.md`** (machine / SSH / paths).
-3. Run:
+2. Read **`docs/VISUAL-LAYOUT-CONTRACT.md`** before any UI/layout work. These rules are mandatory.
+3. Then **`AGENT-ENV.md`** (machine / SSH / paths).
+4. Run:
 
 ```bash
 cd <repo-root>
@@ -18,4 +19,14 @@ Open: **http://127.0.0.1:4173/industrial-asset-graph/**
 - Cabinet: `?view=cabinet`
 - Genie is the **bottom bar** unless you open Film / `?film=1`.
 
-`npm test` must pass. Do not add golfgold files. Do not invent dests, motors, or film audio.
+Before completing UI work, all of these must pass:
+
+```bash
+npm test
+npm run verify:data
+npm run verify:visual-contract
+npm run build
+npm run test:visual
+```
+
+Do not weaken visual checks to make CI pass. Do not add golfgold files. Do not invent dests, motors, or film audio.
