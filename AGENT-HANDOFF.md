@@ -2,8 +2,7 @@
 
 **Date:** 2026-08-14  
 **Product title:** Industrial Asset Graph (never “Plant Dependency Map”)  
-**This tree (Windows):** `C:\Users\tobys\Downloads\Telegram Desktop\industrial-asset-graph-working`  
-**Source zip:** `C:\Users\tobys\Desktop\LEIB FOODS\industrial-asset-graph-working(2).zip`
+**Repository root:** the directory containing this file
 
 This is the J. Lieb Foods **facility knowledge board**. It is not Golfgold, not a CMMS, not SCADA, not a digital twin. Do not import Desktop `golfgold/` assets.
 
@@ -16,7 +15,7 @@ This checkout runs **locally on Windows**. The former Mac mini, SSH, SMB, and Gr
 Requires Node.js 20+.
 
 ```bash
-cd "C:\Users\tobys\Downloads\Telegram Desktop\industrial-asset-graph-working"
+cd <repo-root>
 npm install
 npm run dev -- --host 0.0.0.0 --port 4173
 ```

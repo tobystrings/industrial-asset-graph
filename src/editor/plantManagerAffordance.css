@@ -1,0 +1,11 @@
+@media (max-width: 900px) {
+  .iag-manager-bar {
+    padding-right: 32px;
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .iag-manager-bar:hover,
+  .iag-manager-bar:focus-within {
+    mask-image: none;
+  }
+}

@@ -49,7 +49,7 @@ export default function App() {
     return () => removeEventListener('facility-guide-action', handler);
   }, [view, guide, featureConfig.featuredCabinetAssetId]);
   return (
-    <div className="app-shell">
+    <div className="app-shell has-manager-bar">
       <div className="backdrop" aria-hidden="true" />
       {view === 'cabinet'
         ? <ControlCabinetView onBack={() => changeView('dashboard')} />

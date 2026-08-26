@@ -62,7 +62,9 @@ export default function Dashboard({
   onPendingCommand?: (command: FilmCommand | null) => void;
 }) {
   const params = new URLSearchParams(location.search);
-  const initialAsset = machines.find((item) => item.id === params.get('asset')) ?? null;
+  const requestedAssetId = params.get('asset');
+  const initialAsset = machines.find((item) => item.id === requestedAssetId) ?? null;
+  const [unresolvedAssetId] = useState(() => requestedAssetId && !initialAsset ? requestedAssetId : null);
   const initialArea = areas.find((item) => item.id === params.get('area')) ?? (initialAsset ? areas.find((item) => item.id === initialAsset.areaId) : null) ?? null;
   const [selectedArea, setSelectedArea] = useState<FacilityArea | null>(initialArea);
   const [selectedAsset, setSelectedAsset] = useState<FacilityAsset | null>(initialAsset);
@@ -365,6 +367,7 @@ export default function Dashboard({
         }}
       />
       {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
+      {unresolvedAssetId && <div className="deep-link-warning" role="alert">Asset “{unresolvedAssetId}” was not found. Showing the facility board instead.</div>}
 
       {view === 'dashboard' && (
         <>

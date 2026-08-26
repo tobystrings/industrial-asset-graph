@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFacility } from '../facility';
 import type { FacilityMapMarker } from '../facility/types';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
@@ -19,7 +19,7 @@ type Props = {
 type ViewTransform = { scale: number; x: number; y: number };
 type MetaTab = 'legend' | 'cabinets' | 'areas' | 'notes';
 
-const clampScale = (value: number) => Math.max(0.75, Math.min(3.2, Math.round(value * 100) / 100));
+const clampScale = (value: number) => Math.max(0.2, Math.min(3.2, Math.round(value * 100) / 100));
 const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
 const midpoint = (a: { x: number; y: number }, b: { x: number; y: number }) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 
@@ -27,6 +27,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const { facility, areas, assets, mapConfig } = useFacility();
   const markers = (mapConfig?.markers ?? []) as FacilityMapMarker[];
   const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const planWrapRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<{ start: ViewTransform; origin: { x: number; y: number }; distance?: number }>({ start: { scale: 1, x: 0, y: 0 }, origin: { x: 0, y: 0 } });
   const [view, setView] = useState<ViewTransform>(() => ({ scale: loadAppSettings().mapZoom / 100, x: 0, y: 0 }));
   const [gesturing, setGesturing] = useState(false);
@@ -52,7 +53,20 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
 
   const liveAsset = (assetId?: string) => assetId ? assets.find((asset) => asset.id === assetId) ?? null : null;
   const actionableMarkers = markers.filter((marker) => marker.state !== 'REFERENCE' && liveAsset(marker.assetId));
-  const fitPlan = () => setView({ scale: 1, x: 0, y: 0 });
+  const fitPlan = useCallback(() => {
+    const availableWidth = Math.max(0, (planWrapRef.current?.clientWidth ?? 0) - 20);
+    const drawingWidth = naturalSize.width || Number(mapConfig?.drawingWidth) || 1210;
+    const scale = availableWidth ? clampScale(Math.min(1, availableWidth / drawingWidth)) : 1;
+    setView({ scale, x: 0, y: 0 });
+  }, [mapConfig?.drawingWidth, naturalSize.width]);
+
+  useEffect(() => {
+    if (!naturalSize.width || !planWrapRef.current) return;
+    fitPlan();
+    const observer = new ResizeObserver(fitPlan);
+    observer.observe(planWrapRef.current);
+    return () => observer.disconnect();
+  }, [fitPlan, naturalSize.width]);
   const zoomBy = (amount: number) => setView((current) => ({ ...current, scale: clampScale(current.scale + amount) }));
 
   const markerPosition = (marker: FacilityMapMarker) => {
@@ -139,7 +153,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   return <section className="reference-layout" aria-label="Building Layout">
     <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p>Interior layout merged with asset graph</p></div><div className="reference-layout-actions" aria-label="Map controls"><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit to Screen</button><button className="print-action" type="button" onClick={() => window.print()}>Print / PDF</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { const next = !editMode; setEditMode(next); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: next })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
     <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
-      <div className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
+      <div ref={planWrapRef} className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" onClick={addAtClick}>
             <img className="reference-plan-image" src={buildingLayoutImage} alt={`${facility.name} facility layout and asset graph`} draggable={false} onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}/>

@@ -63,8 +63,8 @@ describe('viewport rebalance', () => {
     expect(css).toContain('grid-template-columns: minmax(0, 1fr) minmax(0, 340px)');
     expect(css).toContain('.cabinet-workspace > * { min-width: 0; min-height: 0; }');
     expect(css).toContain("data-show='mini'");
-    expect(css).toContain('bottom: calc(148px + 36px + var(--genie-dock-height, 118px) + env(safe-area-inset-bottom))');
-    expect(css).toContain('bottom: calc(136px + 36px + var(--genie-dock-height, 118px) + env(safe-area-inset-bottom))');
+    expect(css).toContain('bottom: calc(148px + 36px + var(--genie-dock-height, 118px) + var(--manager-bar-height, 0px) + env(safe-area-inset-bottom))');
+    expect(css).toContain('bottom: calc(136px + 36px + var(--genie-dock-height, 118px) + var(--manager-bar-height, 0px) + env(safe-area-inset-bottom))');
     expect(css).toContain('var(--genie-ms');
     expect(css).toContain('.cabinet-detail .walkdown-form');
     expect(css).not.toContain('.cabinet-detail .photo-file');

@@ -215,7 +215,7 @@ textarea:focus-visible {
   }
   .dashboard {
     padding-top: calc(64px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(66px + var(--genie-dock-height, 72px) + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(66px + var(--genie-dock-height, 72px) + var(--manager-bar-height, 0px) + env(safe-area-inset-bottom)) !important;
   }
   .top-nav nav,
   .top-nav nav.open,
