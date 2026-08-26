@@ -39,23 +39,13 @@ export default function App() {
       const bottom = Number.parseFloat(getComputedStyle(bar).bottom) || 0;
       const reserve = Math.max(0, Math.ceil(barRect.height + bottom + 10));
       shell.style.setProperty('--manager-bar-height', `${reserve}px`);
-      shell.querySelectorAll<HTMLElement>('.dashboard.workspace-map.view-dashboard > .map-panel').forEach((panel) => {
-        const panelTop = panel.getBoundingClientRect().top;
-        const availableHeight = Math.max(160, Math.floor(barRect.top - panelTop - 8));
-        panel.style.setProperty('height', `${availableHeight}px`, 'important');
-        panel.style.setProperty('max-height', `${availableHeight}px`, 'important');
-      });
     };
-    const frame = requestAnimationFrame(measure);
+    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(bar);
-    const mutations = new MutationObserver(() => requestAnimationFrame(measure));
-    mutations.observe(shell, { childList: true, subtree: true });
     addEventListener('resize', measure);
     return () => {
-      cancelAnimationFrame(frame);
       observer.disconnect();
-      mutations.disconnect();
       removeEventListener('resize', measure);
     };
   }, []);
