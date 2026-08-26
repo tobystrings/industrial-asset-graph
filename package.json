@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:visual": "python scripts/dashboard-visual-check.py",
-    "verify:data": "tsx scripts/verify-facility.ts"
+    "verify:data": "tsx scripts/verify-facility.ts",
+    "verify:visual-contract": "python scripts/verify-visual-contract.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

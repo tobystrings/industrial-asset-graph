@@ -40,6 +40,9 @@ jobs:
       - name: Verify facility data
         run: npm run verify:data
 
+      - name: Verify permanent visual contract
+        run: npm run verify:visual-contract
+
       - name: Build
         run: npm run build
 
