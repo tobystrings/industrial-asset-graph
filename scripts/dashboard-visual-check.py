@@ -96,8 +96,14 @@ def audit_layout(page, boxes, width, height):
             'detail': f"document={metrics['scrollWidth']} body={metrics['bodyScrollWidth']} viewport={width}",
         })
 
+    sidebar = page.locator('.facility-sidebar').first
+    sidebar_open = sidebar.count() > 0 and sidebar.evaluate("el => el.classList.contains('open')")
+
     for name, box in boxes.items():
         if not box:
+            continue
+        # A closed navigation drawer is intentionally translated off-canvas.
+        if name == 'sidebar' and not sidebar_open:
             continue
         if box['x'] < -4 or box['x'] + box['width'] > width + 4:
             issues.append({'kind': 'offscreen-x', 'element': name, 'detail': box})
@@ -116,6 +122,16 @@ def audit_layout(page, boxes, width, height):
         area = overlap(boxes.get(left), boxes.get(right))
         if area > 8:
             issues.append({'kind': 'overlap', 'elements': [left, right], 'area': round(area, 1)})
+
+    # Fixed editing chrome must never cover the actual map or cabinet work surface.
+    for work_surface in ('map', 'cabinet-page'):
+        area = overlap(boxes.get('manager'), boxes.get(work_surface))
+        if area > 8:
+            issues.append({
+                'kind': 'content-occlusion',
+                'elements': ['manager', work_surface],
+                'area': round(area, 1),
+            })
 
     touch_issues = page.evaluate('''() => {
       const selectors = [
@@ -174,8 +190,8 @@ def annotate(source: Path, target: Path, boxes, issues):
         draw.rectangle((0, 0, min(image.width - 1, 900), 22), fill='#5b1116')
         draw.text((5, 5), f'ISSUES {len(issues)}  {summary}', fill='#ffffff')
     else:
-        draw.rectangle((0, 0, min(image.width - 1, 360), 22), fill='#0b5132')
-        draw.text((5, 5), 'NO AUTOMATED OVERLAP/OVERFLOW FINDINGS', fill='#ffffff')
+        draw.rectangle((0, 0, min(image.width - 1, 420), 22), fill='#0b5132')
+        draw.text((5, 5), 'NO AUTOMATED OVERLAP / OVERFLOW / OCCLUSION FINDINGS', fill='#ffffff')
     image.save(target)
 
 
@@ -228,7 +244,9 @@ try:
     (OUTPUT / 'layout-report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     serious = [
         issue for row in report for issue in row.get('issues', [])
-        if issue.get('kind') in {'horizontal-overflow', 'offscreen-x', 'offscreen-y', 'overlap'}
+        if issue.get('kind') in {
+            'horizontal-overflow', 'offscreen-x', 'offscreen-y', 'overlap', 'content-occlusion'
+        }
     ]
     print(f'Visual audit completed: {len(report)} states, {len(serious)} serious layout findings, {len(console_errors)} console errors.')
     if console_errors:
