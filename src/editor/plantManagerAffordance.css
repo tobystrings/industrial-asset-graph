@@ -1,9 +1,9 @@
-.dashboard.workspace-map.view-dashboard > .map-panel {
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .map-panel {
   height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
   max-height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
 }
 
-.facility-guide {
+.app-shell.has-manager-bar .facility-guide {
   bottom: calc(var(--manager-bar-height, 0px) + 10px) !important;
 }
 
@@ -47,7 +47,7 @@
     font-size: 12px;
   }
 
-  .facility-guide {
+  .app-shell.has-manager-bar .facility-guide {
     bottom: calc(var(--manager-bar-height, 0px) + 6px) !important;
   }
 }
