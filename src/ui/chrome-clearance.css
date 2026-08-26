@@ -1,9 +1,4 @@
-/* Final layout guard. Loaded last so fixed application chrome cannot be covered by legacy workspace rules. */
-.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .map-panel {
-  height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
-  max-height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
-}
-
+/* Final fixed-chrome guard. Loaded last so the guide cannot collide with Plant Manager. */
 .app-shell.has-manager-bar .facility-guide {
   bottom: calc(var(--manager-bar-height, 0px) + 10px) !important;
 }
