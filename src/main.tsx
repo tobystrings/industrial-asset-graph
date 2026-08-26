@@ -13,6 +13,7 @@ import { GuideProvider } from './features/facility-guide';
 import { FacilityProvider } from './facility';
 import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
+import './ui/responsive-chrome-fixes.css';
 
 applyAppSettings();
 

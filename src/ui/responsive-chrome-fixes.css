@@ -1,0 +1,128 @@
+/* Final responsive reconciliation.
+   Keeps fixed editor/guide chrome out of the primary work surface and aligns
+   the shell breakpoints so hidden navigation never leaves a dead sidebar gap. */
+
+:root {
+  --iag-manager-reserved: 80px;
+}
+
+/* Plant Manager is always one compact row. It may scroll horizontally on
+   narrower screens, but it must not grow vertically over the work surface. */
+.iag-manager-bar {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: calc(100vw - 24px) !important;
+  scrollbar-width: thin;
+}
+
+.iag-manager-bar button {
+  flex: 0 0 auto !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  white-space: nowrap !important;
+}
+
+/* The map gets a real viewport above Plant Manager instead of allowing a
+   fixed toolbar to cover drawing content. */
+.dashboard.workspace-map.view-dashboard {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+  padding-bottom: var(--iag-manager-reserved) !important;
+}
+
+.dashboard.workspace-map.view-dashboard > .map-panel {
+  height: calc(100dvh - var(--iag-header, 64px) - var(--iag-manager-reserved)) !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: auto !important;
+}
+
+/* Cabinet/detail workspaces also stay above the fixed editor bar. */
+.cabinet-page {
+  height: calc(100dvh - var(--iag-manager-reserved)) !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding-bottom: 20px !important;
+}
+
+/* The collapsed helper remains available without competing with the editor. */
+.facility-guide {
+  bottom: calc(var(--iag-manager-reserved) + 12px + env(safe-area-inset-bottom)) !important;
+}
+
+.facility-guide.is-collapsed .guide-launcher {
+  width: 48px !important;
+  height: 48px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.facility-guide.is-collapsed .guide-launcher span {
+  display: none !important;
+}
+
+/* Primary controls should be comfortable touch targets on tablets/phones. */
+.reference-menu-button,
+.reference-icon-button,
+.reference-user-button,
+.reference-topbar .mobile-search-button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+}
+
+.cabinet-header button,
+.cabinet-header a {
+  min-height: 44px !important;
+}
+
+/* reference-shell hides the drawer at 900px, while the later industrial
+   layer previously kept reserving a 220px sidebar until 767px. Reconcile
+   both systems at one breakpoint. */
+@media (max-width: 900px) {
+  :root {
+    --iag-sidebar: 0px;
+    --ref-sidebar: 0px;
+    --iag-header: 58px;
+    --ref-topbar: 58px;
+    --iag-manager-reserved: 80px;
+  }
+
+  .reference-topbar.top-nav {
+    left: 0 !important;
+  }
+
+  .dashboard.workspace-map.view-dashboard {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding: var(--iag-header) 0 var(--iag-manager-reserved) 0 !important;
+  }
+
+  .dashboard.workspace-map.view-dashboard > .map-panel {
+    width: 100% !important;
+    height: calc(100dvh - var(--iag-header) - var(--iag-manager-reserved)) !important;
+    min-height: 0 !important;
+  }
+
+  .dashboard.workspace-map .reference-layout {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .facility-guide {
+    right: 10px !important;
+    bottom: calc(var(--iag-manager-reserved) + 10px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .iag-manager-bar {
+    left: 10px !important;
+    right: 10px !important;
+    max-width: none !important;
+  }
+}

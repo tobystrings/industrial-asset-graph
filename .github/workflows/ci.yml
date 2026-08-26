@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dashboard-visual-audit
-          path: artifacts/*.png
+          path: artifacts/*
           if-no-files-found: warn
