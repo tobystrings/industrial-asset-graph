@@ -1,4 +1,25 @@
-/* Final fixed-chrome guard. Loaded last so the guide cannot collide with Plant Manager. */
+/* Final fixed-chrome layout guard. Loaded after legacy UI styles. */
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard {
+  height: var(--app-height, 100dvh) !important;
+  min-height: 0 !important;
+  padding-top: var(--ref-topbar, 62px) !important;
+  padding-bottom: var(--manager-bar-height, 0px) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-template-areas: 'map' !important;
+  overflow: hidden !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .map-panel {
+  grid-area: map !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
 .app-shell.has-manager-bar .facility-guide {
   bottom: calc(var(--manager-bar-height, 0px) + 10px) !important;
 }
