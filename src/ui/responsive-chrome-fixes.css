@@ -3,7 +3,7 @@
    the shell breakpoints so hidden navigation never leaves a dead sidebar gap. */
 
 :root {
-  --iag-manager-reserved: 78px;
+  --iag-manager-reserved: 80px;
 }
 
 /* Plant Manager is always one compact row. It may scroll horizontally on
