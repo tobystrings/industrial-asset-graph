@@ -1,3 +1,12 @@
+.dashboard.workspace-map.view-dashboard > .map-panel {
+  height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
+  max-height: calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - var(--manager-bar-height, 0px)) !important;
+}
+
+.facility-guide {
+  bottom: calc(var(--manager-bar-height, 0px) + 10px) !important;
+}
+
 @media (max-width: 900px) {
   .iag-manager-bar {
     padding-right: 10px;
@@ -36,5 +45,9 @@
     min-height: 40px;
     padding: 0 11px;
     font-size: 12px;
+  }
+
+  .facility-guide {
+    bottom: calc(var(--manager-bar-height, 0px) + 6px) !important;
   }
 }
