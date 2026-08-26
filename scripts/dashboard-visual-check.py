@@ -28,7 +28,7 @@ SELECTORS = {
     'top-nav': '.top-nav',
     'dashboard': '.dashboard',
     'map': '.map-panel',
-    'rail': '.rail',
+    'rail': '.dashboard .rail',
     'sidebar': '.facility-sidebar',
     'manager': '.iag-manager-bar',
     'film-genie': '.film-genie-root',
@@ -251,6 +251,7 @@ try:
     print(f'Visual audit completed: {len(report)} states, {len(serious)} serious layout findings, {len(console_errors)} console errors.')
     if console_errors:
         print('Browser console errors:', json.dumps(console_errors, indent=2))
+    assert not serious, f'Serious visual layout findings: {serious}'
     assert not console_errors, f'Browser console errors: {console_errors}'
 finally:
     server.terminate()
