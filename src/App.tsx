@@ -35,23 +35,25 @@ export default function App() {
       return;
     }
     const measure = () => {
-      const rect = bar.getBoundingClientRect();
+      const barRect = bar.getBoundingClientRect();
       const bottom = Number.parseFloat(getComputedStyle(bar).bottom) || 0;
-      const reserve = Math.max(0, Math.ceil(rect.height + bottom + 10));
+      const reserve = Math.max(0, Math.ceil(barRect.height + bottom + 10));
       shell.style.setProperty('--manager-bar-height', `${reserve}px`);
-      const mapHeight = `calc(var(--app-height, 100dvh) - var(--ref-topbar, 62px) - ${reserve}px)`;
       shell.querySelectorAll<HTMLElement>('.dashboard.workspace-map.view-dashboard > .map-panel').forEach((panel) => {
-        panel.style.setProperty('height', mapHeight, 'important');
-        panel.style.setProperty('max-height', mapHeight, 'important');
+        const panelTop = panel.getBoundingClientRect().top;
+        const availableHeight = Math.max(160, Math.floor(barRect.top - panelTop - 8));
+        panel.style.setProperty('height', `${availableHeight}px`, 'important');
+        panel.style.setProperty('max-height', `${availableHeight}px`, 'important');
       });
     };
-    measure();
+    const frame = requestAnimationFrame(measure);
     const observer = new ResizeObserver(measure);
     observer.observe(bar);
-    const mutations = new MutationObserver(measure);
+    const mutations = new MutationObserver(() => requestAnimationFrame(measure));
     mutations.observe(shell, { childList: true, subtree: true });
     addEventListener('resize', measure);
     return () => {
+      cancelAnimationFrame(frame);
       observer.disconnect();
       mutations.disconnect();
       removeEventListener('resize', measure);
