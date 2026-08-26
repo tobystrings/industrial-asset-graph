@@ -330,7 +330,7 @@ export default function Dashboard({
   const breadcrumb = [selectedArea?.name, selectedAsset?.id].filter(Boolean).join(' / ') || 'All documented areas';
 
   return (
-    <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${focusCabinet ? ' focus-cabinet' : ''}`}>
+    <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${drawerOpen ? ' drawer-open' : ''}${focusCabinet ? ' focus-cabinet' : ''}`}>
       <TopNav
         brandMark={brandMark}
         facilityName={facility.name}
