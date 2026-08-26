@@ -79,6 +79,14 @@ html,body,#root,.app-shell{background:#fff!important}
 .dashboard:not(.workspace-map){padding-left:calc(var(--ref-sidebar) + 12px)!important;padding-top:calc(var(--ref-topbar) + 12px)!important}
 .dashboard:not(.workspace-map) .facility-sidebar{display:none!important}
 
+@media(min-width:901px){
+  .dashboard:not(.drawer-open) .reference-topbar.top-nav{left:0!important}
+  .dashboard.workspace-map.view-dashboard:not(.drawer-open){padding-left:0!important}
+  .dashboard:not(.workspace-map):not(.drawer-open){padding-left:12px!important}
+  .dashboard .reference-topbar.top-nav,
+  .dashboard.workspace-map.view-dashboard{transition:left .2s ease,padding-left .2s ease}
+}
+
 @media(max-width:900px){
   :root{--ref-sidebar:0px;--ref-topbar:58px}
   .reference-sidebar.facility-sidebar{transform:translateX(-105%)!important;width:min(280px,84vw)!important;transition:transform .2s ease!important}
