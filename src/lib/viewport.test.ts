@@ -69,7 +69,7 @@ describe('viewport rebalance', () => {
     expect(css).toContain('.cabinet-detail .walkdown-form');
     expect(css).not.toContain('.cabinet-detail .photo-file');
     expect(css).toContain('.map-viewport { flex: 1; min-height: 0; display: flex; overflow: hidden; }');
-    expect(css).toContain('.map-mode {\n  position: static');
+    expect(css).toMatch(/\.map-mode \{\r?\n  position: static/);
     expect(css).toContain('.cabinet-device-list .panel-title');
     expect(css).toContain('.cabinet-hit text');
     expect(css).toContain('.app-shell:has(.cabinet-page) .backdrop');
