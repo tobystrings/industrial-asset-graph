@@ -4,6 +4,7 @@ import { getAttachment } from '../facility/runtimeDb';
 import type { DocumentationState, FacilityArea, FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
 import { loadAppSettings, saveAppSettings, type AppSettings } from '../lib/appSettings';
 import './plantManager.css';
+import './plantManagerAffordance.css';
 import './changeControl.css';
 
 type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | null;

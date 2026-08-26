@@ -7,7 +7,7 @@ This zip is **Industrial Asset Graph** (J. Lieb Foods). It is **not** Golfgold.
 3. Run:
 
 ```bash
-cd "C:\Users\tobys\Downloads\Telegram Desktop\industrial-asset-graph-working"
+cd <repo-root>
 npm install
 npm run dev -- --host 0.0.0.0 --port 4173
 ```

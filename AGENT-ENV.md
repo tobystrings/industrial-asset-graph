@@ -17,7 +17,7 @@ http://127.0.0.1:4173/industrial-asset-graph/?area=area-warehouse-f&map=2d&tab=d
 
 | Role | Path |
 |------|------|
-| Source of truth (this tree) | `C:\Users\tobys\Downloads\Telegram Desktop\industrial-asset-graph-working` |
+| Source of truth | Repository root (the directory containing this file) |
 | Dev server | Vite 6 · host `0.0.0.0` · port **4173** · `base: '/industrial-asset-graph/'` |
 | Runtime | Local Windows machine; Node.js 20+ |
 | Shell | PowerShell |
@@ -28,7 +28,7 @@ Any Golfgold checkout is a **different product**. Ignore it here.
 ## Start
 
 ```bash
-cd "C:\Users\tobys\Downloads\Telegram Desktop\industrial-asset-graph-working"
+cd <repo-root>
 npm install
 npm run dev -- --host 0.0.0.0 --port 4173
 npm test

@@ -9,11 +9,9 @@ The **Control cabinets** workspace includes an interactive Line 2 Conveyor Contr
 Requires Node.js 20+ and Python 3 with Playwright/Pillow only for the visual check.
 
 ```powershell
-Set-Location C:\Users\ptoul\Downloads\industrial-asset-graph-main
+Set-Location <repo-root>
 npm install
 ```
-
-On the Mac mini: `cd /Users/p/Downloads/industrial-asset-graph-main && npm install`
 
 ## Development server
 
