@@ -47,6 +47,10 @@ def assert_manager_geometry(page) -> None:
       if (!bar || !shell) return null;
       const rect = bar.getBoundingClientRect();
       const style = getComputedStyle(bar);
+      const mapPanel = document.querySelector('.dashboard.workspace-map.view-dashboard > .map-panel');
+      const mapRect = mapPanel?.getBoundingClientRect();
+      const launcher = document.querySelector('.guide-launcher');
+      const guideRect = launcher && getComputedStyle(launcher).display !== 'none' ? launcher.getBoundingClientRect() : null;
       return {
         left: rect.left,
         right: rect.right,
@@ -59,6 +63,8 @@ def assert_manager_geometry(page) -> None:
         cssBottom: parseFloat(style.bottom) || 0,
         overflowX: style.overflowX,
         maskImage: style.maskImage,
+        mapBottom: mapRect?.bottom ?? null,
+        guideBottom: guideRect?.bottom ?? null,
       };
     }''')
     assert metrics, 'Plant Manager toolbar did not render.'
@@ -71,6 +77,10 @@ def assert_manager_geometry(page) -> None:
         f"Reserved manager-bar space is too small. reserve={metrics['cssReserve']} "
         f"required>={minimum_reserve}; metrics={metrics}"
     )
+    if metrics['mapBottom'] is not None:
+        assert metrics['mapBottom'] <= metrics['top'] + 2, f"Map workspace is hidden behind manager toolbar: {metrics}"
+    if metrics['guideBottom'] is not None:
+        assert metrics['guideBottom'] <= metrics['top'] + 2, f"Facility Guide overlaps manager toolbar: {metrics}"
     if metrics['viewportWidth'] <= 900:
         assert metrics['overflowX'] in ('auto', 'scroll'), f"Mobile toolbar should scroll horizontally: {metrics}"
         assert metrics['maskImage'] in ('none', ''), f"Mobile toolbar must not hide controls behind a mask: {metrics}"
