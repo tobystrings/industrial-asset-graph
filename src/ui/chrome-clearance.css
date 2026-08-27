@@ -5,14 +5,19 @@
   padding-top: var(--ref-topbar, 62px) !important;
   padding-bottom: var(--manager-bar-height, 0px) !important;
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) clamp(310px, 31vw, 470px) !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   grid-template-rows: minmax(0, 1fr) !important;
-  grid-template-areas: 'map rail' !important;
+  grid-template-areas: 'map' !important;
   overflow: hidden !important;
 }
 
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard.map-inspector-open {
+  grid-template-columns: minmax(0, 1fr) clamp(310px, 31vw, 470px) !important;
+  grid-template-areas: 'map rail' !important;
+}
+
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail {
-  display: flex !important;
+  display: none !important;
   grid-area: rail !important;
   position: relative !important;
   inset: auto !important;
@@ -24,6 +29,10 @@
   border-radius: 0 !important;
   background: linear-gradient(180deg,#071a2d,#061522) !important;
   overflow: hidden !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard.map-inspector-open > .rail {
+  display: flex !important;
 }
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail .rail-chrome,
@@ -70,7 +79,19 @@
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-plan-image-stage,
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .facility-map-svg {
-  width: 1210px !important;
+  width: var(--facility-drawing-width, 1210px) !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions button[aria-label='Zoom out'],
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions button[aria-label='Zoom in'],
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions .map-zoom-readout {
+  display: inline-grid !important;
+  place-items: center;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-info-strip {
+  max-height: 132px !important;
+  overflow: auto !important;
 }
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .map-panel {
@@ -96,6 +117,29 @@
   .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard {
     grid-template-columns: minmax(0, 1fr) !important;
     grid-template-areas: 'map' !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard.map-inspector-open {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: 'map' !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions {
+    display: flex !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    padding-bottom: 3px !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions button,
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-layout-actions .map-zoom-readout {
+    display: inline-grid !important;
+    flex: 0 0 auto !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    place-items: center !important;
   }
 
   .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail {

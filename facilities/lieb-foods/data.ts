@@ -3,17 +3,21 @@ import { ComponentRecord, DocumentRecord, EvidenceRecord, FacilityArea, Facility
 export const facility = { id: 'facility-j-lieb', name: 'J. Lieb Foods', status: 'Normal', location: 'Facility layout — field documentation workspace' } as const;
 
 export const areas: FacilityArea[] = [
-  { id: 'area-b3', name: 'Building 3', shortName: 'B 3', status: 'IN_PROGRESS', overlay: { x: 15.2, y: 14.2, width: 22.1, height: 10.8 }, assetIds: [] },
-  { id: 'area-b2', name: 'Building 2', shortName: 'B 2', status: 'COMPLETE', overlay: { x: 15.2, y: 25, width: 22.1, height: 9.7 }, assetIds: [] },
-  { id: 'area-b1', name: 'Building 1', shortName: 'B 1', status: 'COMPLETE', overlay: { x: 15.2, y: 34.7, width: 22.1, height: 15.7 }, assetIds: [] },
-  { id: 'area-warehouse-a', name: 'Warehouse A', shortName: 'Warehouse A', status: 'IN_PROGRESS', overlay: { x: 6.6, y: 50.1, width: 30.1, height: 29.3 }, assetIds: [] },
-  { id: 'area-boiler-room', name: 'Boiler Room', shortName: 'Boiler Room', status: 'IN_PROGRESS', overlay: { x: 37.2, y: 50.5, width: 23.2, height: 7 }, assetIds: [] },
-  { id: 'area-warehouse-f', name: 'Warehouse F', shortName: 'Warehouse F', status: 'IN_PROGRESS', overlay: { x: 40.8, y: 57.5, width: 15.3, height: 18.6 }, assetIds: ['FG-L4-MTN-001', 'L2-CC-001'] },
-  { id: 'area-freezers', name: 'Freezers', shortName: 'Freezers', status: 'IN_PROGRESS', overlay: { x: 69, y: 14.6, width: 27.2, height: 36.2 }, assetIds: [] },
-  { id: 'area-dock-1', name: 'Dock 1', shortName: 'Dock 1', status: 'NOT_STARTED', overlay: { x: 37.2, y: 58, width: 3.7, height: 15 }, assetIds: [] },
-  { id: 'area-dock-6', name: 'Dock 6', shortName: 'Dock 6', status: 'IN_PROGRESS', overlay: { x: 73.1, y: 51, width: 4.3, height: 11 }, assetIds: [] },
-  { id: 'area-dock-7', name: 'Dock 7', shortName: 'Dock 7', status: 'COMPLETE', overlay: { x: 77.5, y: 51, width: 7.5, height: 11 }, assetIds: [] },
-  { id: 'area-dock-8', name: 'Dock 8', shortName: 'Dock 8', status: 'COMPLETE', overlay: { x: 85.1, y: 51, width: 11, height: 11 }, assetIds: [] },
+  { id: 'area-warehouse-b', name: 'Warehouse B', shortName: 'Warehouse B', status: 'IN_PROGRESS', overlay: { x: 7, y: 13.5, width: 20.5, height: 36 }, assetIds: [] },
+  { id: 'area-building-c', name: 'Building C (Production)', shortName: 'Building C', status: 'IN_PROGRESS', overlay: { x: 27.5, y: 16, width: 28.2, height: 33.5 }, assetIds: [] },
+  { id: 'area-maintenance', name: 'Maintenance', shortName: 'Maintenance', status: 'IN_PROGRESS', overlay: { x: 36.8, y: 16, width: 8.9, height: 6.5 }, assetIds: [] },
+  { id: 'area-engine-room', name: 'Engine Room', shortName: 'Engine Room', status: 'IN_PROGRESS', overlay: { x: 45.8, y: 16, width: 8.4, height: 6.5 }, assetIds: [] },
+  { id: 'area-cook-rooms', name: 'Cook Rooms', shortName: 'Cook Rooms', status: 'IN_PROGRESS', overlay: { x: 35.5, y: 31.5, width: 12.5, height: 7 }, assetIds: [] },
+  { id: 'area-cooler-2', name: 'Cooler 2', shortName: 'Cooler 2', status: 'IN_PROGRESS', overlay: { x: 55.7, y: 24, width: 10.8, height: 9 }, assetIds: [] },
+  { id: 'area-cooler-3', name: 'Cooler 3', shortName: 'Cooler 3', status: 'IN_PROGRESS', overlay: { x: 55.7, y: 33, width: 10.8, height: 8 }, assetIds: [] },
+  { id: 'area-cooler-4', name: 'Cooler 4', shortName: 'Cooler 4', status: 'IN_PROGRESS', overlay: { x: 55.7, y: 41, width: 10.8, height: 9 }, assetIds: [] },
+  { id: 'area-warehouse-5', name: 'Warehouse 5', shortName: 'Warehouse 5', status: 'IN_PROGRESS', overlay: { x: 66.6, y: 16, width: 8.7, height: 34 }, assetIds: [] },
+  { id: 'area-freezer-7', name: 'Freezer 7', shortName: 'Freezer 7', status: 'IN_PROGRESS', overlay: { x: 75.3, y: 16, width: 10.1, height: 34 }, assetIds: [] },
+  { id: 'area-freezer-8', name: 'Freezer 8', shortName: 'Freezer 8', status: 'IN_PROGRESS', overlay: { x: 86.5, y: 16, width: 10.5, height: 34 }, assetIds: [] },
+  { id: 'area-warehouse-a', name: 'Warehouse A', shortName: 'Warehouse A', status: 'IN_PROGRESS', overlay: { x: 4, y: 49.5, width: 22.5, height: 27.5 }, assetIds: [] },
+  { id: 'area-warehouse-f', name: 'Warehouse F', shortName: 'Warehouse F', status: 'IN_PROGRESS', overlay: { x: 32.5, y: 53, width: 16.5, height: 22 }, assetIds: ['FG-L4-MTN-001', 'L2-CC-001'] },
+  { id: 'area-warehouse-e', name: 'Warehouse E', shortName: 'Warehouse E', status: 'NOT_STARTED', overlay: { x: 55.7, y: 53, width: 11, height: 22 }, assetIds: [] },
+  { id: 'area-main-offices', name: 'Main Offices', shortName: 'Main Offices', status: 'IN_PROGRESS', overlay: { x: 66.7, y: 53, width: 8.5, height: 25 }, assetIds: [] },
 ];
 
 const fact = <T,>(value: T, evidenceIds: string[], unit?: string): { value: T; verificationStatus: 'VERIFIED'; evidenceIds: string[]; unit?: string } => ({ value, verificationStatus: 'VERIFIED', evidenceIds, unit });

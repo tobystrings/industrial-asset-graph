@@ -296,6 +296,10 @@ export default function Dashboard({
     setTraceOn(true);
     setDrawerOpen(false);
     if (matchMedia('(max-width: 619px)').matches) setPhoneTab('find');
+    const next = new URLSearchParams(location.search);
+    next.set('area', area.id);
+    next.delete('asset');
+    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
   const selectAsset = (asset: FacilityAsset) => {
@@ -310,6 +314,10 @@ export default function Dashboard({
     if (asset.id === featuredCabinetAssetId) setInspectorTab('intel');
     if (asset.id === featuredMachineAssetId) setInspectorTab('record');
     if (matchMedia('(max-width: 619px)').matches) setPhoneTab('find');
+    const next = new URLSearchParams(location.search);
+    next.set('asset', asset.id);
+    next.set('area', asset.areaId);
+    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
   const openWorkspace = (tab: WorkspaceTab) => {

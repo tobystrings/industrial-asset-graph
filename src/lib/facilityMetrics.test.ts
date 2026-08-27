@@ -8,7 +8,7 @@ describe('facilityMetrics', () => {
 
   it('reports facility-wide KPI counts from live data with no selection', () => {
     expect(machines.length).toBe(2);
-    expect(areas.length).toBe(11);
+    expect(areas.length).toBe(15);
     expect(documentedAssetCount()).toBe(2);
     expect(documentedAreaCount()).toBe(areas.filter((area) => area.assetIds.length > 0).length);
     expect(documentationCoveragePercent()).toBe(Math.round((documentedAreaCount() / areas.length) * 100));

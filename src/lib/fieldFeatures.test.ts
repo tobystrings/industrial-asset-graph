@@ -143,7 +143,7 @@ describe('field features on shipped helpers', () => {
   });
 
   it('gives empty areas a capture kit and documented areas none', () => {
-    const empty = captureKitForArea('area-dock-1');
+    const empty = captureKitForArea('area-warehouse-e');
     expect(empty?.kind).toBe('empty');
     expect(empty?.prompts.length).toBeGreaterThan(0);
     expect(captureKitForArea('area-warehouse-f')?.kind).toBe('has-assets');

@@ -30,16 +30,16 @@ describe('review patch and plant packs', () => {
   });
 
   it('exports an empty-area walk pack that does not create a machine', () => {
-    const dock = emptyAreaIds().find((id) => id === 'area-dock-1');
-    expect(dock).toBe('area-dock-1');
-    expect(captureKitForArea('area-dock-1')?.kind).toBe('empty');
-    recordWalkdownCapture({ targetId: 'area-dock-1', field: 'note', value: 'aisle photo', capturedBy: 'Don' });
-    const pack = exportAreaWalkPack('area-dock-1');
+    const dock = emptyAreaIds().find((id) => id === 'area-warehouse-e');
+    expect(dock).toBe('area-warehouse-e');
+    expect(captureKitForArea('area-warehouse-e')?.kind).toBe('empty');
+    recordWalkdownCapture({ targetId: 'area-warehouse-e', field: 'note', value: 'aisle photo', capturedBy: 'Don' });
+    const pack = exportAreaWalkPack('area-warehouse-e');
     expect(pack?.createsMachine).toBe(false);
     expect(pack?.inGraph).toBe(false);
-    expect(pack?.areaId).toBe('area-dock-1');
+    expect(pack?.areaId).toBe('area-warehouse-e');
     expect(areaWalkPackMachineIds(pack!)).toEqual([]);
-    expect(machines.some((item) => item.id === 'area-dock-1')).toBe(false);
+    expect(machines.some((item) => item.id === 'area-warehouse-e')).toBe(false);
     const cabinet = cabinetPackageFor('L2-CC-001');
     expect(cabinet?.assetId).toBe('L2-CC-001');
     expect(cabinet?.drawing).toContain('cabinet.svg');

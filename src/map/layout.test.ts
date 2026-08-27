@@ -28,10 +28,10 @@ describe('schematic layout', () => {
 
   it('keeps the legacy world projection deterministic for existing layout helpers', () => {
     const world = rectToWorld(schematicFor('area-warehouse-f'));
-    expect(world.x).toBeCloseTo(20);
-    expect(world.z).toBeCloseTo(60);
-    expect(world.width).toBe(30);
-    expect(world.depth).toBe(36);
+    expect(world.x).toBeCloseTo(40.75);
+    expect(world.z).toBeCloseTo(64);
+    expect(world.width).toBe(16.5);
+    expect(world.depth).toBe(22);
     expect(world.height).toBeGreaterThan(0);
   });
 

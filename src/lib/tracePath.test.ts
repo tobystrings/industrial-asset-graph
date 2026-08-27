@@ -19,9 +19,9 @@ describe('tracePath', () => {
     expect(l4Nodes.some((node) => node.id === 'FG-L4-MTN-001')).toBe(true);
     expect(l4Nodes.some((node) => node.id === 'L2-CC-001')).toBe(false);
     expect(traceHeadingFor(l4)).toContain('FG-L4-MTN-001');
-    const dock = areas.find((item) => item.id === 'area-dock-1')!;
+    const dock = areas.find((item) => item.id === 'area-warehouse-e')!;
     const dockNodes = traceNodesFor(null, { area: dock });
-    expect(dockNodes.map((node) => node.id)).toEqual(['area-dock-1']);
+    expect(dockNodes.map((node) => node.id)).toEqual(['area-warehouse-e']);
     expect(dockNodes.some((node) => node.id === 'L2-CC-001')).toBe(false);
     expect(traceHeadingFor(null, { area: dock }).toLowerCase()).toContain('no assets');
     const warehouse = areas.find((item) => item.id === 'area-warehouse-f')!;

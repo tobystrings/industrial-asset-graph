@@ -170,6 +170,28 @@ try:
                 screenshot(page, f'{label}-dashboard')
 
                 if label in REPRESENTATIVE_STATES:
+                    page.goto(f'{BASE}?area=area-building-c&map=2d&tab=overview', wait_until='networkidle')
+                    wait_for_dashboard(page)
+                    if label == 'phone-390x844':
+                        page.get_by_role('button', name='Close map inspector').click()
+                    layer_button = page.locator('.map-layer-control > button')
+                    layer_metrics = layer_button.evaluate("el => { const r = el.getBoundingClientRect(); return { display: getComputedStyle(el).display, width: r.width, height: r.height }; }")
+                    minimum_target = 40 if label == 'phone-390x844' else 36
+                    assert layer_metrics['display'] != 'none' and layer_metrics['width'] >= minimum_target and layer_metrics['height'] >= minimum_target, f'Layer control is not usable: {layer_metrics}'
+                    layer_button.evaluate('el => el.click()')
+                    page.get_by_text('Reference symbols', exact=True).click()
+                    assert page.locator('.svg-asset-marker.reference-only').count() == 13, 'Reference layer did not reveal all supplied map tags'
+                    page.locator('.map-toolbar-search input').fill('Warehouse E')
+                    page.locator('.map-search-results button').first.click()
+                    page.wait_for_timeout(250)
+                    assert 'area=area-warehouse-e' in page.url, 'Room search did not select the canonical Warehouse E state'
+                    screenshot(page, f'{label}-room-inspector')
+
+                    if label == 'phone-390x844':
+                        page.goto(f'{BASE}?area=area-warehouse-e&map=2d&tab=capture', wait_until='networkidle')
+                        wait_for_dashboard(page)
+                        screenshot(page, f'{label}-walkthrough')
+
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
 
@@ -184,7 +206,7 @@ try:
         assert not failures, 'Visual audit failures:\n' + '\n'.join(failures)
         print(
             'Responsive visual audit passed at 7 desktop/tablet/phone viewports; '
-            'representative manager, asset, document, map-edit, and cabinet states were captured.'
+            'representative room/asset inspector, mobile walkthrough, manager, document, map-edit, and cabinet states were captured.'
         )
 finally:
     server.terminate()

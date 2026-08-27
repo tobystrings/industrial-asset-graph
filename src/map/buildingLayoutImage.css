@@ -6,7 +6,7 @@
 
 .reference-plan-image-stage {
   position: relative;
-  width: 1210px;
+  width: var(--facility-drawing-width, 1210px);
   max-width: none;
   background: #fff;
   user-select: none;
@@ -14,9 +14,9 @@
 
 .facility-map-svg {
   display: block;
-  width: 1210px;
+  width: var(--facility-drawing-width, 1210px);
   height: auto;
-  aspect-ratio: 1210 / 525;
+  aspect-ratio: var(--facility-drawing-ratio, 1210 / 525);
   overflow: visible;
   background: #fff;
   touch-action: none;
@@ -26,9 +26,9 @@
 .svg-coordinate-grid text { fill: #0f766e; font: 800 11px ui-monospace, monospace; paint-order: stroke; stroke: rgba(255,255,255,.92); stroke-width: 3px; }
 .svg-zone { cursor: pointer; outline: none; }
 .svg-zone rect { fill: transparent; stroke: transparent; stroke-width: 2; vector-effect: non-scaling-stroke; transition: fill .12s ease, stroke .12s ease; }
-.svg-zone text { fill: transparent; font: 800 12px 'Source Sans 3', sans-serif; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: rgba(255,255,255,.92); stroke-width: 3px; }
+.svg-zone text { fill: transparent; font: 800 12px 'Source Sans 3', sans-serif; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: transparent; stroke-width: 3px; }
 .svg-zone:hover rect,.svg-zone:focus-visible rect { fill: rgba(37,99,235,.08); stroke: rgba(37,99,235,.78); }
-.svg-zone:hover text,.svg-zone:focus-visible text,.svg-zone.selected text { fill: #1e3a8a; }
+.svg-zone:hover text,.svg-zone:focus-visible text,.svg-zone.selected text { fill: #1e3a8a; stroke: rgba(255,255,255,.92); }
 .svg-zone.selected rect { fill: rgba(245,158,11,.12); stroke: #f59e0b; stroke-width: 3; }
 .svg-asset-marker { cursor: pointer; outline: none; }
 .svg-asset-marker rect { fill: #0f766e; stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
