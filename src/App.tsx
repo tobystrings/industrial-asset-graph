@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ControlCabinetView from './ControlCabinetView';
 import Dashboard, { type AppView } from './Dashboard';
 import { useFacility } from './facility';
@@ -15,6 +15,7 @@ function initialView(): AppView {
 }
 
 export default function App() {
+  const shellRef = useRef<HTMLDivElement>(null);
   const guide = useFacilityGuide();
   const { featureConfig } = useFacility();
   const params = new URLSearchParams(location.search);
@@ -25,6 +26,29 @@ export default function App() {
       : null,
   );
   useLayoutEffect(() => subscribeViewport(() => undefined), []);
+  useLayoutEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const bar = shell.querySelector<HTMLElement>('.iag-manager-bar');
+    if (!bar) {
+      shell.style.setProperty('--manager-bar-height', '0px');
+      return;
+    }
+    const measure = () => {
+      const barRect = bar.getBoundingClientRect();
+      const bottom = Number.parseFloat(getComputedStyle(bar).bottom) || 0;
+      const reserve = Math.max(0, Math.ceil(barRect.height + bottom + 10));
+      shell.style.setProperty('--manager-bar-height', `${reserve}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(bar);
+    addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      removeEventListener('resize', measure);
+    };
+  }, []);
   useEffect(() => {
     const page: GuidePage = view === 'dashboard' ? 'map' : view;
     guide.setContext({ page, assetId: view === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined });
@@ -49,7 +73,7 @@ export default function App() {
     return () => removeEventListener('facility-guide-action', handler);
   }, [view, guide, featureConfig.featuredCabinetAssetId]);
   return (
-    <div className="app-shell has-manager-bar">
+    <div ref={shellRef} className="app-shell has-manager-bar">
       <div className="backdrop" aria-hidden="true" />
       {view === 'cabinet'
         ? <ControlCabinetView onBack={() => changeView('dashboard')} />
