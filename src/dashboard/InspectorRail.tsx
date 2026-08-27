@@ -49,6 +49,7 @@ type Props = {
   focusDevice: string | null;
   todayIndex: number;
   onTodayIndex: (index: number) => void;
+  onAsset: (asset: FacilityAsset) => void;
   onTodayJump: (jump: ReturnType<typeof todayChipTarget>) => void;
   captureTick: number;
   reviewFilter: 'all' | ReviewDecision;
@@ -71,7 +72,7 @@ const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
   inspectorTab, onInspectorTab, nodes, filters, shownCounts, selectedAsset, selectedArea,
   activeDocument, onDocument, onOpenCabinet, packetOpen, packetAsset, onPacket, onClosePacket,
   focusCabinet, onFocusCabinet, onDoorSheet, onCapture, onTrace, openUnknown, onOpenUnknown,
-  focusDevice, todayIndex, onTodayIndex, onTodayJump, captureTick, reviewFilter, onReviewFilter,
+  focusDevice, todayIndex, onTodayIndex, onTodayJump, onAsset, captureTick, reviewFilter, onReviewFilter,
   lastKeepPatch, onLastKeepPatch, lastKeepSummary, onLastKeepSummary, lastPreviewPatch,
   onLastPreviewPatch, importNote, onImportNote, applyWarning, onApplyWarning, revisions, evidence,
 }, railRef) {
@@ -126,6 +127,7 @@ const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
             todayIndex={todayIndex}
             onTodayIndex={onTodayIndex}
             onTodayJump={onTodayJump}
+            onAsset={onAsset}
           />
         )}
 

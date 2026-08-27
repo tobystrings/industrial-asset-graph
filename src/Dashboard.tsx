@@ -506,6 +506,7 @@ export default function Dashboard({
             if (jump.openCabinet) onOpenCabinet();
           }
         }}
+        onAsset={selectAsset}
         captureTick={captureTick}
         reviewFilter={reviewFilter}
         onReviewFilter={setReviewFilter}

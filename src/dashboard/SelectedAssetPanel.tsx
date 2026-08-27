@@ -2,6 +2,7 @@ import DeviceIntel from '../DeviceIntel';
 import PlcRackView from '../PlcRackView';
 import WalkdownForm from '../WalkdownForm';
 import { activeFacilityPackage } from '../facility';
+import { useFacility } from '../facility';
 import { areas, documentationPercent, documents } from '../facilityData';
 import { captureKitForArea } from '../lib/areaKit';
 import type { InspectorTab } from '../lib/boardChrome';
@@ -64,13 +65,17 @@ export type SelectedAssetPanelProps = {
   focusDevice: string | null;
   todayIndex: number;
   onTodayIndex: (index: number) => void;
+  onAsset: (asset: FacilityAsset) => void;
 };
 
 export default function SelectedAssetPanel({
-  asset, area, activeDocument, onDocument, onOpenCabinet, onPacket, onFocusCabinet, onDoorSheet, focusCabinet, tab, onCapture, onTrace, openUnknown, onOpenUnknown, onTodayJump, focusDevice, todayIndex, onTodayIndex,
+  asset, area, activeDocument, onDocument, onOpenCabinet, onPacket, onFocusCabinet, onDoorSheet, focusCabinet, tab, onCapture, onTrace, openUnknown, onOpenUnknown, onTodayJump, focusDevice, todayIndex, onTodayIndex, onAsset,
 }: SelectedAssetPanelProps) {
+  const facility = useFacility();
   if (!asset) {
     const kit = area ? captureKitForArea(area.id) : null;
+    const areaAssets = area ? facility.assets.filter((item) => item.areaId === area.id) : [];
+    const mappedIds = new Set(((facility.mapConfig?.markers ?? []) as { assetId?: string; state?: string }[]).filter((item) => item.assetId && item.state !== 'REFERENCE').map((item) => item.assetId));
     return (
       <aside className="asset-panel panel empty-state">
         <p className="panel-title">Asset record</p>
@@ -106,8 +111,9 @@ export default function SelectedAssetPanel({
           </div>
         ) : (
           <>
-            <h2>{area ? `Select a machine in ${area.shortName}` : 'Select an asset'}</h2>
-            <p>{area ? 'Choose an asset marker on the map to open its evidence-aware documentation package.' : 'Choose an area, then select an asset marker to open its evidence-aware documentation package.'}</p>
+            <h2>{area ? area.name : 'Select an asset'}</h2>
+            <p>{area ? `${areaAssets.length} database asset${areaAssets.length === 1 ? '' : 's'} · ${areaAssets.filter((item) => mappedIds.has(item.id)).length} mapped · ${areaAssets.filter((item) => !mappedIds.has(item.id)).length} unmapped` : 'Choose an area, then select an asset marker to open its evidence-aware documentation package.'}</p>
+            {areaAssets.length > 0 && <div className="room-asset-list" aria-label={`${area?.name ?? 'Area'} asset list`}>{areaAssets.map((item) => <button key={item.id} type="button" onClick={() => onAsset(item)}><span><b>{item.id}</b><small>{item.name} · {item.type} · {item.line || 'No line'}</small></span><em>{item.verificationStatus.replace('_', ' ')} · {mappedIds.has(item.id) ? 'Mapped' : 'Unmapped'}</em></button>)}</div>}
             <div className="empty-chips"><span>Nameplate</span><span>Documents</span><span>Spare parts</span><span>Evidence</span></div>
           </>
         )}
