@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { areas, evidence, facility, machines, revisions } from './facilityData';
+import { areas, components, evidence, facility, machines, relationships, revisions } from './facilityData';
 import { activeFacilityPackage } from './facility';
 import AssetDirectory from './AssetDirectory';
 import TopNav, { type WorkspaceTab } from './dashboard/TopNav';
@@ -20,7 +20,8 @@ import { coverageSubtitle, queueCountLabel } from './lib/floorPass';
 import { todayWalkdownItems } from './lib/walkdownPrompts';
 import { searchCatalog, type SearchHit } from './lib/searchIndex';
 import { markerClass } from './lib/statusMark';
-import { componentBelongsToAsset, resolveTraceComponentId, traceHeadingFor, traceNodesFor } from './lib/tracePath';
+import { componentBelongsToAsset, resolveTraceComponentId, traceNodesFor } from './lib/tracePath';
+import { troubleshoot, type TroubleshootMode } from './lib/troubleshootGraph';
 import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
 import MapStage, { mapModeFromQuery, type MapMode } from './map/MapStage';
@@ -84,9 +85,13 @@ export default function Dashboard({
     return tab === 'map' && initialAsset ? 'find' : tab;
   });
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>(() => (
-    view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : params.get('command') === 'trace' ? 'relationships' : 'map'
+    view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : (params.get('command') === 'trace' || params.get('trace')) ? 'relationships' : 'map'
   ));
-  const [traceOn, setTraceOn] = useState(params.get('command') === 'trace');
+  const [traceOn, setTraceOn] = useState(params.get('command') === 'trace' || Boolean(params.get('trace')));
+  const [traceMode, setTraceMode] = useState<TroubleshootMode>(() => {
+    const value = params.get('trace');
+    return value === 'direct' || value === 'upstream' || value === 'downstream' || value === 'impact' || value === 'full' ? value : 'direct';
+  });
   const [mapMode, setMapMode] = useState<MapMode>(mapModeFromQuery(location.search));
   const [systemKind, setSystemKind] = useState<SystemKind>('ALL');
   const [docStateFilter, setDocStateFilter] = useState<DocumentationState | 'ALL'>('ALL');
@@ -118,11 +123,12 @@ export default function Dashboard({
       q: paletteOpen ? paletteQuery : null,
       device: view === 'cabinet' ? null : focusDevice,
       door: doorOpen,
+      trace: traceOn ? traceMode : null,
       ...genieQueryFromSearch(location.search),
     });
     history.replaceState(null, '', `${location.pathname}${search}`);
     localStorage.setItem('industrial-asset-selection', JSON.stringify({ area: selectedArea?.id, asset: selectedAsset?.id }));
-  }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen]);
+  }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen, workspaceTab, traceMode, traceOn]);
 
   useEffect(() => subscribeViewport((snap) => {
     if (snap.desktop) {
@@ -254,10 +260,20 @@ export default function Dashboard({
     () => traceNodesFor(selectedAsset, { area: selectedArea, componentId: focusDevice }),
     [selectedAsset, selectedArea, focusDevice],
   );
-  const traceHeading = useMemo(
-    () => traceHeadingFor(selectedAsset, { area: selectedArea, componentId: focusDevice }),
-    [selectedAsset, selectedArea, focusDevice],
+  const troubleshootReport = useMemo(
+    () => troubleshoot({ assets: machines, components, relationships }, selectedAsset?.id ?? '', traceMode),
+    [selectedAsset, traceMode],
   );
+
+  const changeTraceMode = (mode: TroubleshootMode) => {
+    setTraceMode(mode);
+    setTraceOn(true);
+    const next = new URLSearchParams(location.search);
+    if (selectedAsset) next.set('asset', selectedAsset.id);
+    next.set('trace', mode);
+    next.delete('command');
+    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
+  };
 
   const selectArea = (area: FacilityArea) => {
     setSelectedArea(area);
@@ -390,30 +406,28 @@ export default function Dashboard({
                 <small className="crumb">{breadcrumb}{selectedArea && <button type="button" onClick={() => { setSelectedArea(null); setSelectedAsset(null); setFocusDevice(null); }}> · All areas</button>}</small>
                 <span className="kpi-compact" data-testid="kpi-compact"><span>{coverage}%</span><span>{fieldItems} field</span><span>{documentedAssetCount()} assets</span></span>
               </div>
-              <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={selectArea} onAsset={selectAsset} />
+              <MapStage selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} traceAssetIds={traceOn ? troubleshootReport.highlightedEntityIds : undefined} onArea={selectArea} onAsset={selectAsset} />
             </section>
           )}
 
           {workspaceTab === 'relationships' && (
             <RelationshipsWorkspace
-              nodes={nodes}
-              traceHeading={traceHeading}
-              traceOn={traceOn}
+              report={troubleshootReport}
+              mode={traceMode}
               selectedAsset={selectedAsset}
-              selectedArea={selectedArea}
-              focusDevice={focusDevice}
-              featuredCabinetAssetId={featuredCabinetAssetId}
-              onTrace={() => setTraceOn(true)}
-              onArea={(areaId) => {
-                const area = areas.find((item) => item.id === areaId);
-                if (area) selectArea(area);
-              }}
+              onMode={changeTraceMode}
               onAsset={(assetId) => {
                 const asset = machines.find((item) => item.id === assetId);
                 if (asset) selectAsset(asset);
               }}
-              onComponent={setFocusDevice}
-              onOpenCabinet={onOpenCabinet}
+              onMap={() => setWorkspaceTab('map')}
+              onExit={() => {
+                setTraceOn(false);
+                setWorkspaceTab('map');
+                const next = new URLSearchParams(location.search);
+                next.delete('trace'); next.delete('command');
+                history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+              }}
             />
           )}
         </>

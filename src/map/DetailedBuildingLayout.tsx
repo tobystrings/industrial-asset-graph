@@ -12,6 +12,7 @@ type Props = {
   selectedArea: FacilityArea | null;
   selectedAsset: FacilityAsset | null;
   filters: Set<VerificationState>;
+  traceAssetIds?: Set<string>;
   onArea: (area: FacilityArea) => void;
   onAsset: (asset: FacilityAsset) => void;
 };
@@ -23,7 +24,7 @@ const clampScale = (value: number) => Math.max(0.2, Math.min(3.2, Math.round(val
 const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
 const midpoint = (a: { x: number; y: number }, b: { x: number; y: number }) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 
-export default function DetailedBuildingLayout({ selectedArea, selectedAsset, filters, onArea, onAsset }: Props) {
+export default function DetailedBuildingLayout({ selectedArea, selectedAsset, filters, traceAssetIds, onArea, onAsset }: Props) {
   const { facility, areas, assets, mapConfig } = useFacility();
   const markers = (mapConfig?.markers ?? []) as FacilityMapMarker[];
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -161,9 +162,11 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
             {markers.map((marker) => {
               const asset = liveAsset(marker.assetId);
               const selected = Boolean(asset && selectedAsset?.id === asset.id);
+              const traced = Boolean(asset && traceAssetIds?.has(asset.id));
+              const unrelated = Boolean(traceAssetIds?.size && asset && !traced);
               const visible = marker.state === 'REFERENCE' || !asset || filters.has(asset.verificationStatus);
               if (!visible) return null;
-              return <button key={marker.id} type="button" className={`map-hotspot asset ${marker.tone} ${selected ? 'selected' : ''} ${marker.state === 'REFERENCE' ? 'reference-only' : ''}`} style={markerPosition(marker)} onClick={() => activateMarker(marker)} aria-label={marker.label}><span>{marker.id}</span></button>;
+              return <button key={marker.id} type="button" className={`map-hotspot asset ${marker.tone} ${selected ? 'selected' : ''} ${traced ? 'trace-related' : ''} ${unrelated ? 'trace-unrelated' : ''} ${marker.state === 'REFERENCE' ? 'reference-only' : ''}`} style={markerPosition(marker)} onClick={() => activateMarker(marker)} aria-label={marker.label}><span>{marker.id}</span></button>;
             })}
           </div>
         </div>

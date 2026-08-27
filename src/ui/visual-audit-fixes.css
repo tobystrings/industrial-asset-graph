@@ -9,6 +9,29 @@
   max-width: 100%;
 }
 
+/* Troubleshoot mode owns the field workspace while active. */
+main.dashboard.workspace-relationships {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  grid-template-areas: 'map' !important;
+}
+main.dashboard.workspace-relationships > .relationship-panel {
+  grid-area: map !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  display: block !important;
+}
+main.dashboard.workspace-relationships > .kpi-row,
+main.dashboard.workspace-relationships > .rail { display: none !important; }
+
+@media (max-width: 520px) {
+  main.dashboard.workspace-relationships .troubleshoot-head > div { padding-right: 124px; }
+  main.dashboard.workspace-relationships .troubleshoot-head h1 { font-size: 23px; }
+  main.dashboard.workspace-relationships .trace-mode-picker { scrollbar-width: none; }
+  main.dashboard.workspace-relationships .trace-mode-picker::-webkit-scrollbar { display: none; }
+}
+
 .walkdown-form input,
 .walkdown-form select,
 .walkdown-form input[type='file'] {

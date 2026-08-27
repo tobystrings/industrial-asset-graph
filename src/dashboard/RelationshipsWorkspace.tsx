@@ -1,97 +1,57 @@
-import { containedComponentIds, resolveTraceComponentId, traceNodesFor } from '../lib/tracePath';
-import { parseDeviceQuery, writeDeviceQuery } from '../lib/deviceQuery';
-import { unusedRelationshipCounts, suppliesHonesty } from '../lib/relationshipHonesty';
-import type { FacilityArea, FacilityAsset } from '../types/facility';
+import { domainLabels } from '../lib/relationshipSemantics';
+import type { TroubleshootMode, TroubleshootReport } from '../lib/troubleshootGraph';
+import type { FacilityAsset } from '../types/facility';
 
-export default function RelationshipsWorkspace({
-  nodes,
-  traceHeading,
-  traceOn,
-  selectedAsset,
-  selectedArea,
-  focusDevice,
-  featuredCabinetAssetId,
-  onTrace,
-  onArea,
-  onAsset,
-  onComponent,
-  onOpenCabinet,
-}: {
-  nodes: ReturnType<typeof traceNodesFor>;
-  traceHeading: string;
-  traceOn: boolean;
+const modes: { id: TroubleshootMode; label: string; help: string }[] = [
+  { id: 'direct', label: 'Directly connected', help: 'One documented connection away' },
+  { id: 'upstream', label: 'What feeds this?', help: 'Documented upstream dependencies' },
+  { id: 'downstream', label: 'Show downstream', help: 'Equipment that follows or depends on this' },
+  { id: 'impact', label: 'Failure impact', help: 'What may be affected if this fails' },
+  { id: 'full', label: 'Full trace', help: 'All supported dependency domains' },
+];
+
+function confidenceText(status: string) {
+  if (status === 'VERIFIED') return 'Verified';
+  if (status === 'INFERRED') return 'Possible · inferred';
+  if (status === 'FIELD_VERIFY') return 'Needs field verification';
+  if (status === 'DISPUTED') return 'Disputed';
+  return status.toLowerCase().replaceAll('_', ' ');
+}
+
+export default function RelationshipsWorkspace({ report, mode, selectedAsset, onMode, onAsset, onMap, onExit }: {
+  report: TroubleshootReport;
+  mode: TroubleshootMode;
   selectedAsset: FacilityAsset | null;
-  selectedArea: FacilityArea | null;
-  focusDevice: string | null;
-  featuredCabinetAssetId: string;
-  onTrace: () => void;
-  onArea: (areaId: string) => void;
+  onMode: (mode: TroubleshootMode) => void;
   onAsset: (assetId: string) => void;
-  onComponent: (componentId: string) => void;
-  onOpenCabinet: () => void;
+  onMap: () => void;
+  onExit: () => void;
 }) {
-  const currentId = selectedAsset?.id ?? selectedArea?.id ?? 'facility';
-  const relationshipCounts = unusedRelationshipCounts();
-
   return (
-    <section className="relationship-panel panel enter" data-guide-target="relationships" style={{ animationDelay: '120ms' }}>
-      <div className="panel-heading relationship-heading">
-        <div><b>Asset relationships</b><small data-testid="trace-heading">{traceHeading}</small></div>
-        <span className={`trace-state ${traceOn ? 'active' : ''}`}>{traceOn ? 'Trace active' : 'Trace ready'}</span>
-        <button className="relationship-more" type="button" onClick={onTrace} aria-pressed={traceOn}>{traceOn ? 'Refresh trace' : 'Trace'}</button>
-      </div>
-      <div className="relationship-summary" aria-label="Relationship summary">
-        <span><b>{nodes.length}</b> nodes in current path</span>
-        {Object.entries(relationshipCounts).map(([type, count]) => <span key={type}>{type} <b>{count}</b></span>)}
-        <span className="relationship-honesty">{suppliesHonesty().note}</span>
-      </div>
-      <div
-        className={`relationship-flow scroll-pane${traceOn ? ' is-live' : ''}`}
-        data-testid="relationship-flow"
-        data-trace={currentId}
-        key={`${currentId}:${focusDevice ?? ''}`}
-        aria-label={`Relationship path for ${currentId}`}
-      >
-        {nodes.map((node, index) => {
-          const current = node.id === selectedAsset?.id || node.id === selectedArea?.id || resolveTraceComponentId(focusDevice) === node.id;
-          return (
-            <span key={node.id} style={{ display: 'contents' }}>
-              {index > 0 && (
-                <svg className="trace-connector" viewBox="0 0 28 8" aria-hidden="true">
-                  <line className="trace-line" x1="1" y1="4" x2="27" y2="4" />
-                </svg>
-              )}
-              <button
-                type="button"
-                className={`trace-node${current ? ' is-current' : ''}`}
-                aria-current={current ? 'true' : undefined}
-                aria-label={`${node.kind}: ${node.label}${current ? ', current selection' : ''}`}
-                style={{ animationDelay: `${index * 70}ms` }}
-                onClick={() => {
-                  if (node.kind === 'area') return onArea(node.id);
-                  if (node.kind === 'asset') return onAsset(node.id);
-                  if (node.kind === 'component') {
-                    onComponent(node.id);
-                    const parsed = parseDeviceQuery(node.id);
-                    if (parsed) writeDeviceQuery(parsed.deviceId, { cabinet: false });
-                  }
-                }}
-              >
-                <small>{node.kind}</small>{node.label}
-              </button>
-            </span>
-          );
-        })}
-        {!nodes.length && (
-          <div className="relationship-empty" role="status">
-            <b>No relationship path is available for this selection.</b>
-            <span>Select an area, asset, or device with graph relationships and trace again.</span>
-          </div>
-        )}
-        {selectedAsset?.id === featuredCabinetAssetId && containedComponentIds(selectedAsset.id).length > 4 && (
-          <button className="relationship-more relationship-more-devices" type="button" onClick={onOpenCabinet}>Open full cabinet device list →</button>
-        )}
-      </div>
+    <section className="relationship-panel troubleshoot-panel panel enter" data-guide-target="relationships" data-testid="troubleshoot-mode">
+      <header className="troubleshoot-head">
+        <div><small>Troubleshoot / Impact Mode</small><h1>{selectedAsset?.name ?? 'Select an asset'}</h1><code>{selectedAsset?.id ?? 'No asset selected'}</code></div>
+        <div className="troubleshoot-head-actions"><button type="button" onClick={onMap}>View on map</button><button className="troubleshoot-exit" type="button" onClick={onExit}>Clear / Exit</button></div>
+      </header>
+      {!selectedAsset ? <div className="relationship-empty" role="status"><b>Select an asset to troubleshoot.</b><span>Only documented plant relationships will be shown.</span></div> : <>
+        <nav className="trace-mode-picker" aria-label="Troubleshooting question">
+          {modes.map((item) => <button key={item.id} type="button" className={mode === item.id ? 'selected' : ''} aria-pressed={mode === item.id} title={item.help} onClick={() => onMode(item.id)}>{item.label}</button>)}
+        </nav>
+        <div className="troubleshoot-summary" role="status"><b>{report.results.length}</b> documented {report.results.length === 1 ? 'dependency' : 'dependencies'}<span>{report.highlightedRelationshipIds.size} relationships in trace</span><span>No undocumented connection is implied.</span></div>
+        <div className="troubleshoot-results">
+          {report.groups.map((group) => <section className="dependency-group" key={group.domain}>
+            <header><div><small>{domainLabels[group.domain]}</small><h2>{group.label}</h2></div><b>{group.results.length}</b></header>
+            <div className="dependency-cards">
+              {group.results.map((result) => <article key={`${group.domain}:${result.entity.id}`} className={`dependency-card confidence-${result.confidence.toLowerCase()}`}>
+                <button type="button" disabled={result.entity.kind !== 'asset'} onClick={() => onAsset(result.entity.id)}><span><small>{result.entity.kind}</small><b>{result.entity.label}</b><code>{result.entity.id}</code></span><em>{confidenceText(result.confidence)}</em></button>
+                <details><summary>Why is this included?</summary><ol>{result.path.map((step) => <li key={step.relationship.id}><code>{step.from}</code><span> {step.label} → </span><code>{step.to}</code><small>{confidenceText(step.relationship.verificationStatus)}</small></li>)}</ol></details>
+              </article>)}
+            </div>
+          </section>)}
+          {!report.results.length && <div className="relationship-empty" role="status"><b>No documented relationships match this question.</b><span>This is a documentation state, not proof that no dependency exists.</span></div>}
+          <section className="documentation-gaps"><header><small>Documentation Gaps</small><h2>Where the known graph ends</h2></header><ul>{report.gaps.map((gap) => <li key={gap.message}><b>{gap.at}</b><span>{gap.message}</span></li>)}</ul></section>
+        </div>
+      </>}
     </section>
   );
 }

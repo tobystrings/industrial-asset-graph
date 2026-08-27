@@ -21,8 +21,9 @@ describe('live workspace ux pass', () => {
     expect(docs).toContain('No documents match this status.');
     expect(docs).toContain('Clear filter');
     expect(docs).toContain('aria-pressed');
-    expect(relationships).toContain('Trace active');
-    expect(relationships).toContain('No relationship path is available for this selection.');
-    expect(relationships).toContain('aria-current');
+    expect(relationships).toContain('Troubleshoot / Impact Mode');
+    expect(relationships).toContain('No documented relationships match this question.');
+    expect(relationships).toContain('aria-pressed');
+    expect(relationships).toContain('Why is this included?');
   });
 });

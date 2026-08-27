@@ -13,19 +13,21 @@ export default function MapStage({
   selectedArea,
   selectedAsset,
   filters,
+  traceAssetIds,
   onArea,
   onAsset,
 }: {
   selectedArea: FacilityArea | null;
   selectedAsset: FacilityAsset | null;
   filters: Set<VerificationState>;
+  traceAssetIds?: Set<string>;
   onArea: (area: FacilityArea) => void;
   onAsset: (asset: FacilityAsset) => void;
 }) {
   return (
     <div className="map-stage detailed-map-stage">
       <div className="map-viewport detailed-map-viewport" data-mode="2d">
-        <DetailedBuildingLayout selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} onArea={onArea} onAsset={onAsset} />
+        <DetailedBuildingLayout selectedArea={selectedArea} selectedAsset={selectedAsset} filters={filters} traceAssetIds={traceAssetIds} onArea={onArea} onAsset={onAsset} />
       </div>
     </div>
   );

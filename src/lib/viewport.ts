@@ -107,6 +107,7 @@ export function dashboardSearch(state: {
   q?: string | null;
   device?: string | null;
   door?: boolean;
+  trace?: string | null;
 } & GenieQueryCarry): string {
   const next = new URLSearchParams();
   if (state.view && state.view !== 'dashboard') next.set('view', state.view);
@@ -119,6 +120,7 @@ export function dashboardSearch(state: {
   if (state.q) next.set('q', state.q);
   if (state.device) next.set('device', state.device);
   if (state.door) next.set('door', '1');
+  if (state.trace) next.set('trace', state.trace);
   if (state.film === '1') next.set('film', '1');
   if (state.motion === 'full' || state.motion === 'reduce') next.set('motion', state.motion);
   if (state.hold === 'mini') next.set('hold', 'mini');
