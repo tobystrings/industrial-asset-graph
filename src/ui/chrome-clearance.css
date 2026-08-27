@@ -5,10 +5,72 @@
   padding-top: var(--ref-topbar, 62px) !important;
   padding-bottom: var(--manager-bar-height, 0px) !important;
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-columns: minmax(0, 1fr) clamp(310px, 31vw, 470px) !important;
   grid-template-rows: minmax(0, 1fr) !important;
-  grid-template-areas: 'map' !important;
+  grid-template-areas: 'map rail' !important;
   overflow: hidden !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail {
+  display: flex !important;
+  grid-area: rail !important;
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-left: 1px solid #1d3b55 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(180deg,#071a2d,#061522) !important;
+  overflow: hidden !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail .rail-chrome,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail .rail-body {
+  background: transparent !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail h1,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail h2,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail h3,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail b,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail strong,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail p,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail span,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail small {
+  color: #e8f1f8 !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close {
+  position: absolute;
+  z-index: 3;
+  right: 8px;
+  top: 7px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close:hover,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close:focus-visible {
+  background: rgba(255,255,255,.12);
+  outline: 2px solid #38bdf8;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-plan-wrap {
+  min-height: clamp(300px, 48vh, 560px) !important;
+}
+
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-plan-image-stage,
+.app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .facility-map-svg {
+  width: 1210px !important;
 }
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .map-panel {
@@ -27,5 +89,35 @@
 @media (max-width: 619px), (max-width: 900px) and (max-height: 500px) {
   .app-shell.has-manager-bar .facility-guide {
     bottom: calc(var(--manager-bar-height, 0px) + 6px) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: 'map' !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail {
+    display: none !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard.map-inspector-open > .rail {
+    display: flex !important;
+    position: fixed !important;
+    z-index: 80 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: var(--manager-bar-height, 0px) !important;
+    width: 100vw !important;
+    height: min(52dvh, 470px) !important;
+    border: 1px solid #24445f !important;
+    border-radius: 18px 18px 0 0 !important;
+    box-shadow: 0 -18px 55px rgba(2,8,23,.45) !important;
+  }
+
+  .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-plan-wrap {
+    min-height: clamp(230px, 43dvh, 390px) !important;
   }
 }

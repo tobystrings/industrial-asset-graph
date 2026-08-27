@@ -66,6 +66,7 @@ type Props = {
   onApplyWarning: (value: string | null) => void;
   revisions: Revision[];
   evidence: EvidenceLike[];
+  onCloseMapInspector?: () => void;
 };
 
 const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
@@ -74,13 +75,14 @@ const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
   focusCabinet, onFocusCabinet, onDoorSheet, onCapture, onTrace, openUnknown, onOpenUnknown,
   focusDevice, todayIndex, onTodayIndex, onTodayJump, onAsset, captureTick, reviewFilter, onReviewFilter,
   lastKeepPatch, onLastKeepPatch, lastKeepSummary, onLastKeepSummary, lastPreviewPatch,
-  onLastPreviewPatch, importNote, onImportNote, applyWarning, onApplyWarning, revisions, evidence,
+  onLastPreviewPatch, importNote, onImportNote, applyWarning, onApplyWarning, revisions, evidence, onCloseMapInspector,
 }, railRef) {
   const selectedFactTotal = totalTrackedFacts(selectedAsset);
 
   return (
     <div className={`rail tab-${inspectorTab}`} data-testid="inspector-rail">
       <div className="rail-chrome">
+        {onCloseMapInspector && <button className="map-inspector-close" type="button" aria-label="Close map inspector" onClick={onCloseMapInspector}>×</button>}
         <div className="phone-trace" data-testid="phone-trace">{nodes.map((node) => <span key={node.id}>{node.label}</span>)}</div>
         <div className="inspector-tabs" data-testid="inspector-tabs">
           {INSPECTOR_TABS.map((tab) => (

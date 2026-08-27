@@ -78,6 +78,7 @@ export default function Dashboard({
   const [paletteIndex, setPaletteIndex] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mapInspectorDismissed, setMapInspectorDismissed] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>(
     params.get('tab') ? parseInspectorTab(params.get('tab')) : (initialAsset?.id === featuredCabinetAssetId ? 'intel' : parseInspectorTab(params.get('tab'))),
   );
@@ -285,6 +286,7 @@ export default function Dashboard({
   };
 
   const selectArea = (area: FacilityArea) => {
+    setMapInspectorDismissed(false);
     setSelectedArea(area);
     setActiveDocument(null);
     if (!area.assetIds.includes(selectedAsset?.id ?? '')) {
@@ -297,6 +299,7 @@ export default function Dashboard({
   };
 
   const selectAsset = (asset: FacilityAsset) => {
+    setMapInspectorDismissed(false);
     setSelectedAsset(asset);
     setSelectedArea(areas.find((area) => area.id === asset.areaId) ?? null);
     setTraceOn(true);
@@ -356,7 +359,7 @@ export default function Dashboard({
   const breadcrumb = [selectedArea?.name, selectedAsset?.id].filter(Boolean).join(' / ') || 'All documented areas';
 
   return (
-    <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${drawerOpen ? ' drawer-open' : ''}${focusCabinet ? ' focus-cabinet' : ''}`}>
+    <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${drawerOpen ? ' drawer-open' : ''}${focusCabinet ? ' focus-cabinet' : ''}${workspaceTab === 'map' && (selectedArea || selectedAsset) && !mapInspectorDismissed ? ' map-inspector-open' : ''}`}>
       <TopNav
         brandMark={brandMark}
         facilityName={facility.name}
@@ -522,6 +525,7 @@ export default function Dashboard({
         onApplyWarning={setApplyWarning}
         revisions={revisions}
         evidence={evidence}
+        onCloseMapInspector={workspaceTab === 'map' ? () => setMapInspectorDismissed(true) : undefined}
       />
 
       <footer className="facility-status">
