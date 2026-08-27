@@ -14,6 +14,13 @@ describe('schematic layout', () => {
     expect(Object.keys(schematicLayout).sort()).toEqual(areas.map((area) => area.id).sort());
   });
 
+  it('uses polygon hit geometry for irregular rooms from the supplied plan', () => {
+    for (const id of ['area-building-c', 'area-freezer-8', 'area-warehouse-f', 'area-warehouse-e', 'area-main-offices']) {
+      const area = areas.find((item) => item.id === id);
+      expect(area?.overlay.polygon?.length, id).toBeGreaterThanOrEqual(6);
+    }
+  });
+
   it('keeps schematic rectangles inside the 0–100 map and non-overlapping enough to click', () => {
     const placed = allSchematicAreas();
     for (const { area, rect } of placed) {
@@ -28,9 +35,9 @@ describe('schematic layout', () => {
 
   it('keeps the legacy world projection deterministic for existing layout helpers', () => {
     const world = rectToWorld(schematicFor('area-warehouse-f'));
-    expect(world.x).toBeCloseTo(40.75);
+    expect(world.x).toBeCloseTo(39.4);
     expect(world.z).toBeCloseTo(64);
-    expect(world.width).toBe(16.5);
+    expect(world.width).toBe(19.2);
     expect(world.depth).toBe(22);
     expect(world.height).toBeGreaterThan(0);
   });

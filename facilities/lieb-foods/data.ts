@@ -4,7 +4,7 @@ export const facility = { id: 'facility-j-lieb', name: 'J. Lieb Foods', status: 
 
 export const areas: FacilityArea[] = [
   { id: 'area-warehouse-b', name: 'Warehouse B', shortName: 'Warehouse B', status: 'IN_PROGRESS', overlay: { x: 7, y: 13.5, width: 20.5, height: 36 }, assetIds: [] },
-  { id: 'area-building-c', name: 'Building C (Production)', shortName: 'Building C', status: 'IN_PROGRESS', overlay: { x: 27.5, y: 16, width: 28.2, height: 33.5 }, assetIds: [] },
+  { id: 'area-building-c', name: 'Building C (Production)', shortName: 'Building C', status: 'IN_PROGRESS', overlay: { x: 27.5, y: 16, width: 28.2, height: 33.5, polygon: [{ x: 27.5, y: 16 }, { x: 55.7, y: 16 }, { x: 55.7, y: 49.5 }, { x: 27.5, y: 49.5 }, { x: 27.5, y: 43 }, { x: 24.2, y: 43 }, { x: 24.2, y: 20 }, { x: 27.5, y: 20 }] }, assetIds: [] },
   { id: 'area-maintenance', name: 'Maintenance', shortName: 'Maintenance', status: 'IN_PROGRESS', overlay: { x: 36.8, y: 16, width: 8.9, height: 6.5 }, assetIds: [] },
   { id: 'area-engine-room', name: 'Engine Room', shortName: 'Engine Room', status: 'IN_PROGRESS', overlay: { x: 45.8, y: 16, width: 8.4, height: 6.5 }, assetIds: [] },
   { id: 'area-cook-rooms', name: 'Cook Rooms', shortName: 'Cook Rooms', status: 'IN_PROGRESS', overlay: { x: 35.5, y: 31.5, width: 12.5, height: 7 }, assetIds: [] },
@@ -13,11 +13,11 @@ export const areas: FacilityArea[] = [
   { id: 'area-cooler-4', name: 'Cooler 4', shortName: 'Cooler 4', status: 'IN_PROGRESS', overlay: { x: 55.7, y: 41, width: 10.8, height: 9 }, assetIds: [] },
   { id: 'area-warehouse-5', name: 'Warehouse 5', shortName: 'Warehouse 5', status: 'IN_PROGRESS', overlay: { x: 66.6, y: 16, width: 8.7, height: 34 }, assetIds: [] },
   { id: 'area-freezer-7', name: 'Freezer 7', shortName: 'Freezer 7', status: 'IN_PROGRESS', overlay: { x: 75.3, y: 16, width: 10.1, height: 34 }, assetIds: [] },
-  { id: 'area-freezer-8', name: 'Freezer 8', shortName: 'Freezer 8', status: 'IN_PROGRESS', overlay: { x: 86.5, y: 16, width: 10.5, height: 34 }, assetIds: [] },
+  { id: 'area-freezer-8', name: 'Freezer 8', shortName: 'Freezer 8', status: 'IN_PROGRESS', overlay: { x: 86.5, y: 16, width: 10.5, height: 34, polygon: [{ x: 86.5, y: 16 }, { x: 96.8, y: 16 }, { x: 96.8, y: 31.5 }, { x: 99, y: 31.5 }, { x: 99, y: 50 }, { x: 86.5, y: 50 }] }, assetIds: [] },
   { id: 'area-warehouse-a', name: 'Warehouse A', shortName: 'Warehouse A', status: 'IN_PROGRESS', overlay: { x: 4, y: 49.5, width: 22.5, height: 27.5 }, assetIds: [] },
-  { id: 'area-warehouse-f', name: 'Warehouse F', shortName: 'Warehouse F', status: 'IN_PROGRESS', overlay: { x: 32.5, y: 53, width: 16.5, height: 22 }, assetIds: ['FG-L4-MTN-001', 'L2-CC-001'] },
-  { id: 'area-warehouse-e', name: 'Warehouse E', shortName: 'Warehouse E', status: 'NOT_STARTED', overlay: { x: 55.7, y: 53, width: 11, height: 22 }, assetIds: [] },
-  { id: 'area-main-offices', name: 'Main Offices', shortName: 'Main Offices', status: 'IN_PROGRESS', overlay: { x: 66.7, y: 53, width: 8.5, height: 25 }, assetIds: [] },
+  { id: 'area-warehouse-f', name: 'Warehouse F', shortName: 'Warehouse F', status: 'IN_PROGRESS', overlay: { x: 29.8, y: 53, width: 19.2, height: 22, polygon: [{ x: 32.5, y: 53 }, { x: 49, y: 53 }, { x: 49, y: 75 }, { x: 29.8, y: 75 }, { x: 29.8, y: 70 }, { x: 27.8, y: 68 }, { x: 27.8, y: 57 }, { x: 32.5, y: 57 }] }, assetIds: ['FG-L4-MTN-001', 'L2-CC-001'] },
+  { id: 'area-warehouse-e', name: 'Warehouse E', shortName: 'Warehouse E', status: 'NOT_STARTED', overlay: { x: 55.7, y: 53, width: 11, height: 22, polygon: [{ x: 55.7, y: 53 }, { x: 66.7, y: 53 }, { x: 66.7, y: 73 }, { x: 65, y: 73 }, { x: 65, y: 75 }, { x: 55.7, y: 75 }] }, assetIds: [] },
+  { id: 'area-main-offices', name: 'Main Offices', shortName: 'Main Offices', status: 'IN_PROGRESS', overlay: { x: 66.7, y: 53, width: 9.5, height: 25, polygon: [{ x: 66.7, y: 53 }, { x: 76.2, y: 53 }, { x: 76.2, y: 58 }, { x: 74.5, y: 58 }, { x: 74.5, y: 76 }, { x: 72.5, y: 78 }, { x: 66.7, y: 78 }] }, assetIds: [] },
 ];
 
 const fact = <T,>(value: T, evidenceIds: string[], unit?: string): { value: T; verificationStatus: 'VERIFIED'; evidenceIds: string[]; unit?: string } => ({ value, verificationStatus: 'VERIFIED', evidenceIds, unit });

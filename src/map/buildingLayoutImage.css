@@ -25,11 +25,11 @@
 .svg-coordinate-grid line { stroke: rgba(13, 148, 136, .28); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .svg-coordinate-grid text { fill: #0f766e; font: 800 11px ui-monospace, monospace; paint-order: stroke; stroke: rgba(255,255,255,.92); stroke-width: 3px; }
 .svg-zone { cursor: pointer; outline: none; }
-.svg-zone rect { fill: transparent; stroke: transparent; stroke-width: 2; vector-effect: non-scaling-stroke; transition: fill .12s ease, stroke .12s ease; }
+.svg-zone rect,.svg-zone polygon { fill: transparent; stroke: transparent; stroke-width: 2; vector-effect: non-scaling-stroke; transition: fill .12s ease, stroke .12s ease; }
 .svg-zone text { fill: transparent; font: 800 12px 'Source Sans 3', sans-serif; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: transparent; stroke-width: 3px; }
-.svg-zone:hover rect,.svg-zone:focus-visible rect { fill: rgba(37,99,235,.08); stroke: rgba(37,99,235,.78); }
+.svg-zone:hover rect,.svg-zone:hover polygon,.svg-zone:focus-visible rect,.svg-zone:focus-visible polygon { fill: rgba(37,99,235,.08); stroke: rgba(37,99,235,.78); }
 .svg-zone:hover text,.svg-zone:focus-visible text,.svg-zone.selected text { fill: #1e3a8a; stroke: rgba(255,255,255,.92); }
-.svg-zone.selected rect { fill: rgba(245,158,11,.12); stroke: #f59e0b; stroke-width: 3; }
+.svg-zone.selected rect,.svg-zone.selected polygon { fill: rgba(245,158,11,.12); stroke: #f59e0b; stroke-width: 3; }
 .svg-asset-marker { cursor: pointer; outline: none; }
 .svg-asset-marker rect { fill: #0f766e; stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .svg-asset-marker.cabinet rect { fill: #1267b5; }

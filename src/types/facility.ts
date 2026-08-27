@@ -3,7 +3,7 @@ export type DocumentationState = 'COMPLETE' | 'REVIEW' | 'IN_PROGRESS' | 'DRAFT'
 export type RelationshipType = 'LOCATED_IN' | 'CONTAINS' | 'FEEDS' | 'CONTROLS' | 'SENSES' | 'SUPPLIES' | 'ISOLATES' | 'INTERLOCKS_WITH' | 'UPSTREAM_OF' | 'DOWNSTREAM_OF' | 'SENDS_DATA_TO' | 'MECHANICALLY_DRIVES' | 'HAS_DOCUMENT' | 'SUPPORTED_BY_EVIDENCE';
 
 export interface VerifiedFact<T> { value: T | null; verificationStatus: VerificationState; evidenceIds: string[]; unit?: string; note?: string; }
-export interface AreaOverlay { x: number; y: number; width: number; height: number; }
+export interface AreaOverlay { x: number; y: number; width: number; height: number; polygon?: Array<{ x: number; y: number }>; }
 export interface FacilityArea { id: string; name: string; shortName: string; status: DocumentationState; overlay: AreaOverlay; assetIds: string[]; }
 export interface EvidenceRecord { id: string; type: 'PHOTO' | 'NAMEPLATE' | 'DRAWING' | 'MANUAL' | 'FIELD_TEST' | 'CMMS_RECORD' | 'OTHER'; title: string; pathOrUrl: string; access: 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED'; }
 export interface DocumentRecord { id: string; assetId: string; category: string; title: string; path: string; state: DocumentationState; required: boolean; verificationStatus: VerificationState; evidenceIds: string[]; }
