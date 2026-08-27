@@ -52,6 +52,7 @@ export default function FacilitySidebar({
 
       {group('OVERVIEW', [
         { icon: '◫', label: 'Map', action: () => onWorkspace('map'), active: workspaceTab === 'map' },
+        { icon: '✎', label: 'Field walkdown', action: () => onWorkspace('field'), active: workspaceTab === 'field' },
       ])}
       {group('ASSETS', [
         { icon: '⌘', label: 'Equipment', action: () => onWorkspace('assets') },

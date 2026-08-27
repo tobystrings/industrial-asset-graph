@@ -1,4 +1,4 @@
-export type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents';
+export type WorkspaceTab = 'map' | 'assets' | 'relationships' | 'documents' | 'field';
 
 type Props = {
   brandMark: string;
@@ -19,6 +19,7 @@ const workspaceLabel: Record<WorkspaceTab, string> = {
   assets: 'Assets',
   relationships: 'Relationships',
   documents: 'Documents',
+  field: 'Field Documentation',
 };
 
 export default function TopNav({

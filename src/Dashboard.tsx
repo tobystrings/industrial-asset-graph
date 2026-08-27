@@ -8,6 +8,7 @@ import KpiStrip from './dashboard/KpiStrip';
 import InspectorRail from './dashboard/InspectorRail';
 import RelationshipsWorkspace from './dashboard/RelationshipsWorkspace';
 import DocumentsWorkspace from './dashboard/DocumentsWorkspace';
+import FieldDocumentationWorkspace from './dashboard/FieldDocumentationWorkspace';
 import { cycleInspectorTab, parseInspectorTab, type InspectorTab } from './lib/boardChrome';
 import { parseDeviceQuery, writeDeviceQuery } from './lib/deviceQuery';
 import { assetDocumentationCompleteness, documentedAssetCount, documentationCoveragePercent, openFieldItemCount, recordCount, verificationCounts } from './lib/facilityMetrics';
@@ -85,7 +86,7 @@ export default function Dashboard({
     return tab === 'map' && initialAsset ? 'find' : tab;
   });
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>(() => (
-    view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : (params.get('command') === 'trace' || params.get('trace')) ? 'relationships' : 'map'
+    params.get('field') === '1' ? 'field' : view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : (params.get('command') === 'trace' || params.get('trace')) ? 'relationships' : 'map'
   ));
   const [traceOn, setTraceOn] = useState(params.get('command') === 'trace' || Boolean(params.get('trace')));
   const [traceMode, setTraceMode] = useState<TroubleshootMode>(() => {
@@ -304,7 +305,8 @@ export default function Dashboard({
     setWorkspaceTab(tab);
     setNavOpen(false);
     setDrawerOpen(false);
-    if (tab === 'assets') onView('assets');
+    if (tab === 'field') { onView('dashboard'); setSelectedAsset((current) => current ?? machines[0] ?? null); }
+    else if (tab === 'assets') onView('assets');
     else if (tab === 'documents') onView('documents');
     else {
       if (tab === 'relationships') setTraceOn(true);
@@ -430,6 +432,7 @@ export default function Dashboard({
               }}
             />
           )}
+          {workspaceTab === 'field' && <FieldDocumentationWorkspace selectedAsset={selectedAsset} onAsset={selectAsset} onChanged={() => setCaptureTick((value) => value + 1)} onExit={() => setWorkspaceTab('map')} />}
         </>
       )}
 
