@@ -69,7 +69,7 @@ export default function Dashboard({
   const [unresolvedAssetId] = useState(() => requestedAssetId && !initialAsset ? requestedAssetId : null);
   const initialArea = areas.find((item) => item.id === params.get('area')) ?? (initialAsset ? areas.find((item) => item.id === initialAsset.areaId) : null) ?? null;
   const [selectedArea, setSelectedArea] = useState<FacilityArea | null>(initialArea);
-  const [selectedAsset, setSelectedAsset] = useState<FacilityAsset | null>(initialAsset);
+  const [selectedAsset, setSelectedAsset] = useState<FacilityAsset | null>(initialAsset ?? (params.get('field') === '1' ? machines[0] ?? null : null));
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(new Set<VerificationState>(['VERIFIED', 'FIELD_VERIFY', 'INFERRED', 'DISPUTED', 'RETIRED']));
   const [activeDocument, setActiveDocument] = useState<string | null>(params.get('doc'));
@@ -128,6 +128,11 @@ export default function Dashboard({
       ...genieQueryFromSearch(location.search),
     });
     history.replaceState(null, '', `${location.pathname}${search}`);
+    if (workspaceTab === 'field') {
+      const fieldParams = new URLSearchParams(location.search);
+      fieldParams.set('field', '1');
+      history.replaceState(null, '', `${location.pathname}?${fieldParams.toString()}${location.hash}`);
+    }
     localStorage.setItem('industrial-asset-selection', JSON.stringify({ area: selectedArea?.id, asset: selectedAsset?.id }));
   }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen, workspaceTab, traceMode, traceOn]);
 
@@ -142,6 +147,9 @@ export default function Dashboard({
     if (view === 'assets') setWorkspaceTab('assets');
     if (view === 'documents') setWorkspaceTab('documents');
   }, [view]);
+  useEffect(() => {
+    if (workspaceTab === 'field' && !selectedAsset && machines[0]) setSelectedAsset(machines[0]);
+  }, [workspaceTab, selectedAsset]);
 
   useEffect(() => {
     const handler = (event: Event) => {
