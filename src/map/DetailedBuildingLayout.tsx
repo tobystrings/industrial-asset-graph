@@ -23,6 +23,7 @@ type MetaTab = 'legend' | 'cabinets' | 'areas' | 'notes';
 const clampScale = (value: number) => Math.max(0.2, Math.min(3.2, Math.round(value * 100) / 100));
 const distance = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
 const midpoint = (a: { x: number; y: number }, b: { x: number; y: number }) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+export const mapCoordinateLabel = (x: number, y: number) => `${String.fromCharCode(65 + Math.max(0, Math.min(25, Math.floor(x / (100 / 26)))))}${Math.max(1, Math.min(20, Math.floor(y / 5) + 1))}`;
 
 export default function DetailedBuildingLayout({ selectedArea, selectedAsset, filters, traceAssetIds, onArea, onAsset }: Props) {
   const { facility, areas, assets, mapConfig } = useFacility();
@@ -34,6 +35,8 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [gesturing, setGesturing] = useState(false);
   const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(false);
+  const [gridOpen, setGridOpen] = useState(false);
+  const [gridPoint, setGridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -125,7 +128,9 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     const rect = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width * 100;
     const y = (event.clientY - rect.top) / rect.height * 100;
-    window.dispatchEvent(new CustomEvent('iag-map-add-asset', { detail: { x, y } }));
+    const point = { x, y, label: mapCoordinateLabel(x, y) };
+    setGridPoint(point);
+    window.dispatchEvent(new CustomEvent('iag-map-add-asset', { detail: point }));
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -152,12 +157,13 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const notes = <ul><li>Map boundaries and labels remain drawing context.</li><li>Graph-linked pins are loaded from the editable plant database.</li><li>Use Map Edit to place new assets without editing source code.</li></ul>;
 
   return <section className="reference-layout" aria-label="Building Layout">
-    <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2></div><div className="reference-layout-actions" aria-label="Map controls"><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button className="print-action" type="button" onClick={() => window.print()}>Print / PDF</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { const next = !editMode; setEditMode(next); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: next })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
+    <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p className="map-honesty-note">Equipment locations are not field verified unless explicitly marked.</p></div><div className="reference-layout-actions" aria-label="Map controls"><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" aria-pressed={gridOpen} onClick={() => setGridOpen((open) => !open)}>Grid {gridOpen ? 'on' : 'off'}</button><button className="print-action" type="button" onClick={() => window.print()}>Print / PDF</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { const next = !editMode; setEditMode(next); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: next })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
     <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
       <div ref={planWrapRef} className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" onClick={addAtClick}>
             <img className="reference-plan-image" src={buildingLayoutImage} alt={`${facility.name} facility layout and asset graph`} draggable={false} onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}/>
+            {gridOpen && <div className="map-coordinate-grid" aria-label="Technician placement coordinate grid">{Array.from({ length: 26 }, (_, index) => <span key={`col-${index}`} className="grid-col-label" style={{ left: `${(index + .5) * (100 / 26)}%` }}>{String.fromCharCode(65 + index)}</span>)}{Array.from({ length: 20 }, (_, index) => <span key={`row-${index}`} className="grid-row-label" style={{ top: `${(index + .5) * 5}%` }}>{index + 1}</span>)}</div>}
             {areas.map((area) => area.overlay ? <button key={area.id} type="button" className={`map-hotspot area ${selectedArea?.id === area.id ? 'selected' : ''}`} style={{ left: `${area.overlay.x}%`, top: `${area.overlay.y}%`, width: `${area.overlay.width}%`, height: `${area.overlay.height}%` }} onClick={() => onArea(area)} aria-label={`Select ${area.name}`}><span><b>{area.shortName}</b></span></button> : null)}
             {markers.map((marker) => {
               const asset = liveAsset(marker.assetId);
@@ -172,7 +178,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
         </div>
         <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button><button type="button" onClick={fitPlan}>Fit</button></div>
       </div>
-      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span></div>
+      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span>{gridPoint && <span>Selected coordinate <b>{gridPoint.label}</b> · {gridPoint.x.toFixed(1)}%, {gridPoint.y.toFixed(1)}%</span>}</div>
       <div className="reference-info-strip"><section><h3>Legend</h3>{legendContent}</section><section><h3>Control Cabinets</h3>{cabinetDirectory}</section><section><h3>Major Machines / Equipment</h3>{machineDirectory}</section><section><h3>Areas</h3>{areaDirectory}</section><section><h3>Notes</h3>{notes}</section></div>
       <div className="mobile-map-meta-tabs" role="tablist" aria-label="Map details">{(['legend','cabinets','areas','notes'] as MetaTab[]).map((tab) => <button key={tab} type="button" role="tab" aria-pressed={metaTab === tab} onClick={() => setMetaTab(tab)}>{tab}</button>)}</div>
       <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && cabinetDirectory}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>

@@ -54,6 +54,8 @@ export interface FacilityMapMarker {
   tone: FacilityMapMarkerTone;
   state: FacilityMapMarkerState;
   assetId?: string;
+  /** Optional provenance for audits; missing means legacy/reference content. */
+  placementSource?: 'REFERENCE_DRAWING' | 'TECHNICIAN' | 'VERIFIED_RECORD';
 }
 
 // mapConfig is intentionally left permissive to avoid tight coupling to a specific shape.

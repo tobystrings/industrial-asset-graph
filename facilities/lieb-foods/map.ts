@@ -7,7 +7,9 @@ export const mapConfig: FacilityMapConfig = {
   markers: [
     { id: 'MCH-001', label: 'Production Line 1', x: 394, y: 140, tone: 'machine', state: 'REFERENCE' },
     { id: 'MCH-002', label: 'Production Line 2', x: 510, y: 140, tone: 'machine', state: 'REFERENCE' },
-    { id: 'MCH-003', label: 'Warehouse F Primary Equipment', x: 448, y: 438, tone: 'machine', state: 'FIELD_VERIFY', assetId: 'FG-L4-MTN-001' },
+    // The supplied drawing is reference context only. Do not ship a computer-generated
+    // equipment location as a live/field-verification marker.
+    { id: 'MCH-003', label: 'Warehouse F Primary Equipment', x: 448, y: 438, tone: 'machine', state: 'REFERENCE' },
   ],
 };
 

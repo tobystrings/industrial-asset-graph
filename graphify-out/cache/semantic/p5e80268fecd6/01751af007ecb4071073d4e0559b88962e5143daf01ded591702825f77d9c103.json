@@ -1,0 +1,1 @@
+{"nodes": [{"id": "public_assets_facility_guide_guide_idle_png", "label": "Guide Idle Fallback Image", "file_type": "image", "source_file": "public/assets/facility-guide/guide-idle.png", "rationale": "Still-image fallback for the facility guide character."}], "edges": [], "hyperedges": []}
