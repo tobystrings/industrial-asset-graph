@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { INITIAL_ADMIN_PIN, setAdminPassphrase, verifyAdminPassphrase } from './changeControl';
+import { ensureInitialAdminPin, INITIAL_ADMIN_PIN, setAdminPassphrase, verifyAdminPassphrase } from './changeControl';
 
 describe('admin PIN foundation', () => {
   beforeEach(() => {
@@ -16,5 +16,11 @@ describe('admin PIN foundation', () => {
   it('rejects non-four-digit credentials when configuring', async () => {
     await expect(setAdminPassphrase('12345')).rejects.toThrow(/exactly 4/);
     await expect(setAdminPassphrase('12ab')).rejects.toThrow(/exactly 4/);
+  });
+  it('migrates an existing browser credential to the initial PIN once', async () => {
+    await setAdminPassphrase('9999');
+    await ensureInitialAdminPin();
+    expect(await verifyAdminPassphrase(INITIAL_ADMIN_PIN)).toBe(true);
+    expect(await verifyAdminPassphrase('9999')).toBe(false);
   });
 });

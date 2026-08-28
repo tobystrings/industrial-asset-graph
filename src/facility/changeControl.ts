@@ -3,6 +3,7 @@ import type { MutationOperation, SyncEntityType } from './syncContract';
 
 const IDENTITY_KEY = 'iag-change-control-user';
 const ADMIN_HASH_KEY = 'iag-change-control-admin-hash';
+const ADMIN_PIN_VERSION_KEY = 'iag-admin-pin-version';
 const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
 // Static GitHub Pages cannot keep a secret. This value is a functional demo
@@ -79,6 +80,7 @@ export async function verifyAdminPassphrase(passphrase: string): Promise<boolean
 }
 
 export async function ensureInitialAdminPin(): Promise<void> {
-  if (typeof localStorage === 'undefined' || hasAdminCredential()) return;
+  if (typeof localStorage === 'undefined' || localStorage.getItem(ADMIN_PIN_VERSION_KEY) === '1') return;
   await setAdminPassphrase(INITIAL_ADMIN_PIN);
+  localStorage.setItem(ADMIN_PIN_VERSION_KEY, '1');
 }
