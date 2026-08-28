@@ -5,6 +5,9 @@ const IDENTITY_KEY = 'iag-change-control-user';
 const ADMIN_HASH_KEY = 'iag-change-control-admin-hash';
 const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
+// Static GitHub Pages cannot keep a secret. This value is a functional demo
+// credential only; production deployments must replace verification server-side.
+export const INITIAL_ADMIN_PIN = '5652';
 
 export type IagUser = { id: string; name: string; role: 'technician' | 'admin' };
 export type PendingChange = {
@@ -64,11 +67,18 @@ async function digest(value: string): Promise<string> {
 
 export async function setAdminPassphrase(passphrase: string) {
   if (typeof localStorage === 'undefined') return;
+  if (!/^\d{4}$/.test(passphrase)) throw new Error('Administrator PIN must be exactly 4 numeric digits.');
   localStorage.setItem(ADMIN_HASH_KEY, await digest(passphrase));
 }
 
 export async function verifyAdminPassphrase(passphrase: string): Promise<boolean> {
   if (typeof localStorage === 'undefined') return false;
+  if (!/^\d{4}$/.test(passphrase)) return false;
   const expected = localStorage.getItem(ADMIN_HASH_KEY);
   return Boolean(expected) && expected === await digest(passphrase);
+}
+
+export async function ensureInitialAdminPin(): Promise<void> {
+  if (typeof localStorage === 'undefined' || hasAdminCredential()) return;
+  await setAdminPassphrase(INITIAL_ADMIN_PIN);
 }

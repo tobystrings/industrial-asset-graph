@@ -30,6 +30,7 @@ import {
   loadPendingChanges,
   saveAuditEvents,
   saveCurrentUser,
+  ensureInitialAdminPin,
   savePendingChanges,
   setAdminPassphrase,
   verifyAdminPassphrase,
@@ -162,6 +163,10 @@ export function FacilityProvider({
   const pendingRef = useRef(pendingChanges);
 
   const apiUrl = ((import.meta as ImportMeta & { env?: { VITE_IAG_API_URL?: string } }).env?.VITE_IAG_API_URL ?? '').trim();
+
+  useEffect(() => {
+    void ensureInitialAdminPin().then(() => setAdminCredentialConfigured(true));
+  }, []);
 
   useEffect(() => {
     let alive = true;
