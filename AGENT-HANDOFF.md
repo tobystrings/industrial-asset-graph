@@ -52,6 +52,9 @@ Checks:
 ```bash
 npm test
 npm run verify:data
+npm run verify:visual-contract
+npm run build
+npm run test:visual
 ```
 
 Vite `base` is **`/industrial-asset-graph/`**. Opening `/` without that prefix is the wrong app.
@@ -184,3 +187,9 @@ Golfgold / Foursomes, new film audio, invented dests/motors/LOTO, 3D/orbital map
 Source only: `src/`, `public/`, `presentation/`, `presentation-wow/`, `docs/`, `scripts/`, `github/`, config, this handoff. **No** `node_modules`, **no** `dist`, **no** golfgold.
 
 After unzip: `npm install` then `npm run dev -- --host 0.0.0.0 --port 4173`.
+
+## Current persistence and review architecture
+
+The active browser package is schema-v2 and is runtime-validated at load/import boundaries. IndexedDB remains the offline cache and mutation outbox; `FacilityProvider` exposes truthful local, pending, syncing, conflict, and synced states. The outbox transport excludes LOCAL_ONLY evidence at the boundary. A PostgreSQL-backed HTTP adapter is available under `server/` for local integration, with transactional optimistic concurrency, idempotent mutation IDs, audit revisions, and tombstone deletes. The public/GitHub Pages build intentionally remains seeded/local when `VITE_IAG_API_URL` is absent.
+
+Plant Manager separates draft/observation capture from submitted review and canonical approval. Conflicts show current and proposed values before an explicit resolution. Data Health reports validation separately from documentation coverage and lists next verification targets without manufacturing plant facts. Browser evidence attachments remain LOCAL_ONLY until a deliberate future promotion workflow exists.

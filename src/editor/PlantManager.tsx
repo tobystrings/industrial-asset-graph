@@ -2,13 +2,16 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useFacility, useFacilityEditor, type AttachmentRecord, type FacilityMapMarker, type PlantBackup } from '../facility';
 import { getAttachment } from '../facility/runtimeDb';
+import type { PendingChange } from '../facility/changeControl';
+import { validateFacilityPackage } from '../facility/schema';
+import { previewBulkImport, type ImportPreview } from '../facility/bulkImport';
 import type { DocumentationState, FacilityArea, FacilityAsset, RelationshipRecord, RelationshipType, VerificationState } from '../types/facility';
 import { loadAppSettings, saveAppSettings, type AppSettings } from '../lib/appSettings';
 import './plantManager.css';
 import './plantManagerAffordance.css';
 import './changeControl.css';
 
-type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | null;
+type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | 'conflicts' | 'health' | 'import' | null;
 type MapPoint = { x: number; y: number } | null;
 
 const relationshipLabels: { value: RelationshipType; label: string }[] = [
@@ -37,6 +40,19 @@ function downloadFile(blob: Blob, name: string) {
 
 function safePlantFileName(name: string) {
   return (name || 'plant').trim().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() || 'plant';
+}
+
+function reviewValue(pkg: ReturnType<typeof useFacility>, change: PendingChange, proposed: boolean): Record<string, unknown> | null {
+  if (proposed && change.operation === 'DELETE') return null;
+  if (proposed && change.value) return change.value;
+  const source = proposed ? change.next : pkg;
+  if (change.entityType === 'facility' || source.facility.id === change.entityId) return source.facility as unknown as Record<string, unknown>;
+  for (const collection of [source.areas, source.assets, source.components, source.relationships, source.documents, source.evidence]) {
+    const item = collection.find((row) => row.id === change.entityId);
+    if (item) return item as unknown as Record<string, unknown>;
+  }
+  const marker = ((source.mapConfig?.markers ?? []) as FacilityMapMarker[]).find((item) => item.id === change.entityId);
+  return marker ? marker as unknown as Record<string, unknown> : null;
 }
 
 function AssetForm({ point, asset, onDone }: { point: MapPoint; asset?: FacilityAsset; onDone: () => void }) {
@@ -124,6 +140,8 @@ function RelationshipPanel() {
   const [target, setTarget] = useState(facility.assets[1]?.id ?? facility.assets[0]?.id ?? '');
   const [type, setType] = useState<RelationshipType>('FEEDS');
   const [verificationStatus, setVerificationStatus] = useState<VerificationState>('FIELD_VERIFY');
+  const [evidenceId, setEvidenceId] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (!editing) return;
@@ -131,18 +149,20 @@ function RelationshipPanel() {
     setTarget(editing.target);
     setType(editing.type);
     setVerificationStatus(editing.verificationStatus);
+    setEvidenceId(editing.evidenceIds[0] ?? '');
   }, [editingId]);
 
-  const reset = () => { setEditingId(null); setType('FEEDS'); setVerificationStatus('FIELD_VERIFY'); };
+  const reset = () => { setEditingId(null); setType('FEEDS'); setVerificationStatus('FIELD_VERIFY'); setEvidenceId(''); setMessage(''); };
   const save = async (event: FormEvent) => {
     event.preventDefault();
-    if (!source || !target || source === target) return;
-    await editor.saveRelationship({ id: editing?.id ?? crypto.randomUUID(), source, target, type, verificationStatus, evidenceIds: editing?.evidenceIds ?? [] });
+    if (!source || !target || source === target) { setMessage('Choose two different documented endpoints.'); return; }
+    if (verificationStatus === 'VERIFIED' && !evidenceId) { setMessage('VERIFIED relationships require an evidence reference.'); return; }
+    await editor.saveRelationship({ id: editing?.id ?? crypto.randomUUID(), source, target, type, verificationStatus, evidenceIds: evidenceId ? [evidenceId] : [] });
     reset();
   };
   const name = (id: string) => facility.assets.find((asset) => asset.id === id)?.name ?? id;
 
-  return <div className="iag-editor-form"><form className="iag-relationship-form" onSubmit={save}><label>Source Asset<select value={source} onChange={(event) => setSource(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><div className="iag-relationship-arrow">↓</div><label>Relationship<select value={type} onChange={(event) => setType(event.target.value as RelationshipType)}>{relationshipLabels.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}</select></label><div className="iag-relationship-arrow">↓</div><label>Destination Asset<select value={target} onChange={(event) => setTarget(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label>Verification<select value={verificationStatus} onChange={(event) => setVerificationStatus(event.target.value as VerificationState)}><option value="VERIFIED">Evidence Verified</option><option value="FIELD_VERIFY">Needs Field Verification</option><option value="INFERRED">Inferred</option><option value="DISPUTED">Disputed</option></select></label><div className="iag-form-actions">{editing && <button type="button" onClick={reset}>Cancel Edit</button>}<button className="primary" type="submit">{editing ? 'Save Connection' : 'Create Connection'}</button></div></form><section><div className="iag-section-head"><strong>Existing Connections</strong><span>{facility.relationships.length}</span></div><div className="iag-relationship-list">{facility.relationships.map((row) => <article key={row.id}><button className="iag-relationship-main" type="button" onClick={() => setEditingId(row.id)}><strong>{name(row.source)}</strong><span>{relationshipLabels.find((item) => item.value === row.type)?.label ?? row.type}</span><strong>{name(row.target)}</strong><small>{row.verificationStatus.replace('_', ' ')}</small></button><button className="iag-row-delete" type="button" aria-label={`Delete relationship ${row.id}`} onClick={async () => { if (!confirm('Delete this connection?')) return; await editor.deleteRelationship(row.id); if (editingId === row.id) reset(); }}>×</button></article>)}</div></section></div>;
+  return <div className="iag-editor-form"><form className="iag-relationship-form" onSubmit={save}><label>Source Asset<select value={source} onChange={(event) => setSource(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><div className="iag-relationship-arrow">↓</div><label>Relationship<select value={type} onChange={(event) => setType(event.target.value as RelationshipType)}>{relationshipLabels.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}</select></label><div className="iag-relationship-arrow">↓</div><label>Destination Asset<select value={target} onChange={(event) => setTarget(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label>Verification<select value={verificationStatus} onChange={(event) => setVerificationStatus(event.target.value as VerificationState)}><option value="VERIFIED">Evidence Verified</option><option value="FIELD_VERIFY">Needs Field Verification</option><option value="INFERRED">Inferred</option><option value="DISPUTED">Disputed</option></select></label><label>Evidence / provenance<select value={evidenceId} onChange={(event) => setEvidenceId(event.target.value)}><option value="">No evidence attached — keep unverified</option>{facility.evidence.map((item) => <option key={item.id} value={item.id}>{item.id} — {item.title} — {item.access}</option>)}</select></label>{message && <p className="iag-error" role="alert">{message}</p>}<div className="iag-form-actions">{editing && <button type="button" onClick={reset}>Cancel Edit</button>}<button className="primary" type="submit">{editing ? 'Save Connection' : 'Create Connection'}</button></div></form><section><div className="iag-section-head"><strong>Existing Connections</strong><span>{facility.relationships.length}</span></div><div className="iag-relationship-list">{facility.relationships.map((row) => <article key={row.id}><button className="iag-relationship-main" type="button" onClick={() => setEditingId(row.id)}><strong>{name(row.source)}</strong><span>{relationshipLabels.find((item) => item.value === row.type)?.label ?? row.type}</span><strong>{name(row.target)}</strong><small>{row.verificationStatus.replace('_', ' ')} · {row.evidenceIds.length} evidence reference(s)</small></button><button className="iag-row-delete" type="button" aria-label={`Delete relationship ${row.id}`} onClick={async () => { if (!confirm('Delete this connection?')) return; await editor.deleteRelationship(row.id); if (editingId === row.id) reset(); }}>×</button></article>)}</div></section></div>;
 }
 
 function EvidencePanel() {
@@ -163,7 +183,7 @@ function EvidencePanel() {
     setViewer({ url: URL.createObjectURL(record.blob), name: record.name, mimeType: record.mimeType });
   };
 
-  return <div className="iag-editor-form"><label>Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label className="iag-inline-check"><input type="checkbox" checked={verifiedUpload} onChange={(event) => setVerifiedUpload(event.target.checked)}/> Evidence verified in field</label><label className="iag-file-drop">Add photo, PDF, schematic or datasheet<input type="file" multiple accept="image/*,.pdf,.svg,.dxf,.dwg" onChange={async (event) => { const input = event.currentTarget; const files = [...(input.files ?? [])]; for (const file of files) await editor.addAttachment(assetId, file, verifiedUpload ? 'VERIFIED' : 'FIELD_VERIFY'); await refresh(); input.value = ''; }} /></label><div className="iag-evidence-list">{rows.length ? rows.map((row) => <div className="iag-evidence-row" key={row.id}><button className="iag-evidence-open" type="button" onClick={() => void open(row.id)}><strong>{row.name}</strong><span>{row.category} · {(row.size / 1024).toFixed(0)} KB · {row.verificationStatus === 'VERIFIED' ? 'VERIFIED' : 'FIELD VERIFY'}</span></button><button className="iag-row-delete" type="button" onClick={async () => { if (!confirm(`Remove ${row.name}?`)) return; await editor.deleteAttachment(row.id); await refresh(); }}>×</button></div>) : <p>No local evidence attached yet.</p>}</div>{viewer && <div className="iag-file-viewer"><header><strong>{viewer.name}</strong><button type="button" onClick={() => { URL.revokeObjectURL(viewer.url); setViewer(null); }}>Close</button></header>{viewer.mimeType === 'application/pdf' ? <iframe src={viewer.url} title={viewer.name}/> : <img src={viewer.url} alt={viewer.name}/>}</div>}</div>;
+  return <div className="iag-editor-form"><label>Asset<select value={assetId} onChange={(event) => setAssetId(event.target.value)}>{facility.assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.id} — {asset.name}</option>)}</select></label><label className="iag-inline-check"><input type="checkbox" checked={verifiedUpload} onChange={(event) => setVerifiedUpload(event.target.checked)}/> Evidence verified in field</label><label className="iag-file-drop">Add photo, PDF, schematic or datasheet<input type="file" multiple accept="image/*,.pdf,.svg,.dxf,.dwg" onChange={async (event) => { const input = event.currentTarget; const files = [...(input.files ?? [])]; for (const file of files) await editor.addAttachment(assetId, file, verifiedUpload ? 'VERIFIED' : 'FIELD_VERIFY'); await refresh(); input.value = ''; }} /></label><p className="iag-db-note">New attachments are LOCAL_ONLY and will not upload automatically.</p><div className="iag-evidence-list">{rows.length ? rows.map((row) => <div className="iag-evidence-row" key={row.id}><button className="iag-evidence-open" type="button" onClick={() => void open(row.id)}><strong>{row.name}</strong><span>{row.category} · {(row.size / 1024).toFixed(0)} KB · {row.verificationStatus === 'VERIFIED' ? 'VERIFIED' : 'FIELD VERIFY'} · {row.access} — will not upload</span></button><button className="iag-row-delete" type="button" onClick={async () => { if (!confirm(`Remove ${row.name}?`)) return; await editor.deleteAttachment(row.id); await refresh(); }}>×</button></div>) : <p>No local evidence attached yet.</p>}</div>{viewer && <div className="iag-file-viewer"><header><strong>{viewer.name}</strong><button type="button" onClick={() => { URL.revokeObjectURL(viewer.url); setViewer(null); }}>Close</button></header>{viewer.mimeType === 'application/pdf' ? <iframe src={viewer.url} title={viewer.name}/> : <img src={viewer.url} alt={viewer.name}/>}</div>}</div>;
 }
 
 function ObservationPanel() {
@@ -229,11 +249,12 @@ function DatabasePanel({ onDone }: { onDone: () => void }) {
   const [mode, setMode] = useState<'replace' | 'merge'>('replace');
   const [message, setMessage] = useState('');
   const stats = useMemo(() => ({ assets: facility.assets.length, relationships: facility.relationships.length, documents: facility.documents.length }), [facility]);
-  return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">The .iag file is a portable ZIP-based plant package containing the graph, map configuration, observations, metadata, PDFs, photos and drawings. Legacy .iag.json backups remain importable.</p></div>;
+  return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">Archive v2 contains the transport-eligible graph, map configuration, observations, and metadata. LOCAL_ONLY and RESTRICTED evidence files are excluded. Archive v1 and legacy JSON backups remain importable.</p></div>;
 }
 
 function UsersPanel() {
   const editor = useFacilityEditor();
+  const facility = useFacility();
   const [name, setName] = useState('');
   const [passphrase, setPassphrase] = useState('');
   const [message, setMessage] = useState('');
@@ -255,9 +276,9 @@ function UsersPanel() {
     {!editor.currentUser && <><label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Technician name" autoComplete="name"/></label><button className="primary" type="button" onClick={identify}>Identify as technician</button></>}
     {!isAdmin && <section className="iag-admin-login"><strong>{editor.adminCredentialConfigured ? 'Administrator sign-in' : 'Create administrator credential'}</strong><p>{editor.adminCredentialConfigured ? 'Enter the local administrator passphrase to review pending changes.' : 'This is a first-run, browser-local setup. Choose a strong passphrase; it is not shared with GitHub Pages or other devices.'}</p><label>Administrator passphrase<input type="password" value={passphrase} onChange={(event) => setPassphrase(event.target.value)} autoComplete="current-password"/></label><button type="button" onClick={() => void admin()}>{editor.adminCredentialConfigured ? 'Sign in as administrator' : 'Create administrator credential'}</button></section>}
     {message && <p className="iag-db-note" role="status">{message}</p>}
-    {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Pending change requests</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & apply</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>)}</section>}
+    {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Submitted for review</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => { const current = reviewValue(facility, change, false); const proposed = reviewValue(facility, change, true); return <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div className="iag-review-diff"><label>Current canonical value<pre>{JSON.stringify(current, null, 2)}</pre></label><label>{change.operation === 'DELETE' ? 'Proposed deletion' : 'Proposed value'}<pre>{change.operation === 'DELETE' ? 'DELETE — tombstone after approval' : JSON.stringify(proposed, null, 2)}</pre></label></div><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & promote to canonical</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>; })}</section>}
     <section className="iag-pending-changes"><div className="iag-section-head"><strong>Local activity log</strong><span>{editor.auditLog.length}</span></div>{editor.auditLog.length === 0 ? <p>No local activity has been recorded yet.</p> : editor.auditLog.slice(0, 12).map((event) => <article key={event.id}><strong>{event.action}</strong><small>{event.actor} · {new Date(event.at).toLocaleString()} · {event.detail}</small></article>)}</section>
-    <p className="iag-db-note">This change queue and administrator credential are local to this browser. Export the plant database for a portable record; a shared, tamper-resistant audit log requires a backend.</p>
+    <p className="iag-db-note">The administrator credential is local development access, not production security. Approved mutations enter the persistent sync outbox; the shared backend retains its own canonical revision history.</p>
   </div>;
 }
 
@@ -271,12 +292,62 @@ function SettingsPanel() {
   </div>;
 }
 
+function DataHealthPanel() {
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  const validate = () => { try { validateFacilityPackage(facility); return { state: 'Valid' as const, detail: 'Schema and relationship endpoints passed runtime validation.', at: new Date().toISOString() }; } catch (error) { return { state: 'Errors' as const, detail: error instanceof Error ? error.message : 'Validation failed.', at: new Date().toISOString() }; } };
+  const [validation, setValidation] = useState(validate);
+  const verifyRelationships = facility.relationships.filter((item) => item.verificationStatus === 'FIELD_VERIFY');
+  const disputedRelationships = facility.relationships.filter((item) => item.verificationStatus === 'DISPUTED');
+  const disputedFacts = facility.assets.flatMap((asset) => [asset.manufacturer, asset.model, asset.serialNumber, ...asset.facts.map((item) => item.value)]).filter((fact) => fact.verificationStatus === 'DISPUTED');
+  const unknowns = facility.assets.flatMap((asset) => asset.unknowns.map((unknown) => ({ asset, unknown })));
+  const localEvidence = facility.evidence.filter((item) => item.access === 'LOCAL_ONLY');
+  const lowCoverageAreas = facility.areas
+    .map((area) => ({ area, assets: facility.assets.filter((asset) => asset.areaId === area.id) }))
+    .filter(({ assets }) => assets.length === 0 || assets.some((asset) => asset.verificationStatus !== 'VERIFIED'));
+  return <div className="iag-editor-form iag-health-panel">
+    <section className="iag-user-card"><div className="iag-section-head"><strong>Data validation</strong><span>{validation.state}</span></div><p>{validation.detail}</p><small>Last run {new Date(validation.at).toLocaleString()}</small><button type="button" onClick={() => setValidation(validate())}>Run verification</button></section>
+    <section className="iag-user-card"><strong>Documentation and graph coverage</strong><dl className="iag-health-counts"><div><dt>Documented assets</dt><dd>{facility.assets.length}</dd></div><div><dt>Verified relationships</dt><dd>{facility.relationships.filter((item) => item.verificationStatus === 'VERIFIED').length}</dd></div><div><dt>Relationships needing field verification</dt><dd>{verifyRelationships.length}</dd></div><div><dt>Disputed relationships</dt><dd>{disputedRelationships.length}</dd></div><div><dt>Disputed facts</dt><dd>{disputedFacts.length}</dd></div><div><dt>Open asset unknowns</dt><dd>{unknowns.length}</dd></div><div><dt>Conflicts awaiting review</dt><dd>{editor.sync.conflicts.length}</dd></div><div><dt>Pending local mutations</dt><dd>{editor.queuedMutationCount}</dd></div><div><dt>LOCAL_ONLY evidence records</dt><dd>{localEvidence.length}</dd></div></dl><small>Counts are shown directly; no composite health score is inferred.</small></section>
+    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Next verification targets</strong><span>{unknowns.length + verifyRelationships.length + disputedRelationships.length + lowCoverageAreas.length}</span></div>{lowCoverageAreas.map(({ area, assets }) => <article key={`area:${area.id}`}><strong>{area.name}</strong><small>{assets.length ? `${assets.length} documented asset(s); review FIELD_VERIFY records` : 'No documented assets; start field verification'}</small></article>)}{unknowns.map(({ asset, unknown }) => <article key={`${asset.id}:${unknown}`}><strong>{asset.id}</strong><small>{unknown}</small></article>)}{verifyRelationships.map((relationship) => <article key={relationship.id}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · FIELD_VERIFY · {relationship.evidenceIds.length} evidence reference(s)</small></article>)}{disputedRelationships.map((relationship) => <article key={relationship.id}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · DISPUTED · review evidence before promotion</small></article>)}</section>
+  </div>;
+}
+
+function BulkImportPanel() {
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  const [raw, setRaw] = useState('');
+  const [acceptMetadata, setAcceptMetadata] = useState(false);
+  const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [message, setMessage] = useState('');
+  const refresh = (text: string, accept = acceptMetadata) => setPreview(previewBulkImport(text, facility, { acceptVerificationMetadata: accept }));
+  const blocked = !preview || preview.records.length === 0 || preview.errors.length > 0 || preview.unresolved.length > 0 || preview.duplicates.length > 0 || !editor.currentUser;
+  const submit = async () => {
+    if (!preview || blocked) return;
+    for (const record of preview.records) {
+      if (record.kind === 'asset') await editor.saveAsset(record.value);
+      else await editor.saveRelationship(record.value);
+    }
+    setMessage(`${preview.records.length} record${preview.records.length === 1 ? '' : 's'} ${editor.currentUser?.role === 'admin' ? 'approved locally and queued for sync' : 'submitted for review'}.`);
+  };
+  return <div className="iag-editor-form iag-import-panel">
+    <p className="iag-db-note">CSV import supports asset and relationship records. Preview must resolve every reference before submission. Verification defaults to FIELD_VERIFY.</p>
+    <label className="iag-file-drop">Choose CSV file<input type="file" accept=".csv,text/csv" onChange={async (event) => { const file = event.currentTarget.files?.[0]; if (!file) return; const text = await file.text(); setRaw(text); refresh(text); }} /></label>
+    <label className="iag-inline-check"><input type="checkbox" checked={acceptMetadata} onChange={(event) => { const checked = event.target.checked; setAcceptMetadata(checked); if (raw) refresh(raw, checked); }} />Deliberately accept verificationStatus metadata from this trusted import</label>
+    {preview && <><section className="iag-user-card"><strong>Import preview</strong><dl className="iag-health-counts"><div><dt>Create</dt><dd>{preview.creates}</dd></div><div><dt>Update</dt><dd>{preview.updates}</dd></div><div><dt>Unresolved</dt><dd>{preview.unresolved.length}</dd></div><div><dt>Duplicates</dt><dd>{preview.duplicates.length}</dd></div><div><dt>Validation errors</dt><dd>{preview.errors.length}</dd></div></dl></section>
+      {[...preview.errors, ...preview.unresolved, ...preview.duplicates].length > 0 && <section className="iag-pending-changes"><strong>Resolve before submission</strong>{[...preview.errors, ...preview.unresolved, ...preview.duplicates].map((issue, index) => <article key={`${issue.row}:${index}`}><strong>Row {issue.row || 'header'}</strong><small>{issue.message}</small></article>)}</section>}
+      <section className="iag-pending-changes"><div className="iag-section-head"><strong>Validated records</strong><span>{preview.records.length}</span></div>{preview.records.map((record) => <article key={`${record.row}:${record.value.id}`}><strong>{record.value.id}</strong><small>{record.kind} · {record.action} · {record.value.verificationStatus}</small></article>)}</section>
+      <button className="primary" type="button" disabled={blocked} onClick={() => void submit()}>{editor.currentUser?.role === 'admin' ? 'Approve import and queue canonical changes' : 'Submit import for review'}</button></>}
+    {!editor.currentUser && <p className="iag-db-note">Identify yourself in Users before submitting an import.</p>}{message && <p role="status" className="iag-db-note">{message}</p>}
+  </div>;
+}
+
 export default function PlantManager() {
   const facility = useFacility();
   const editor = useFacilityEditor();
   const [panel, setPanel] = useState<Panel>(null);
   const [mapPoint, setMapPoint] = useState<MapPoint>(null);
   const [mapEdit, setMapEdit] = useState(false);
+  const previousFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -303,12 +374,34 @@ export default function PlantManager() {
     return () => removeEventListener('iag-open-users', handler);
   }, []);
 
-  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : panel === 'settings' ? 'Settings' : '';
+  useEffect(() => {
+    if (!panel) return;
+    previousFocus.current = document.activeElement as HTMLElement | null;
+    const timer = window.setTimeout(() => (document.querySelector('.iag-editor-panel > header button[aria-label="Close"]') as HTMLButtonElement | null)?.focus(), 0);
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setPanel(null); };
+    document.addEventListener('keydown', onKeyDown);
+    return () => { window.clearTimeout(timer); document.removeEventListener('keydown', onKeyDown); previousFocus.current?.focus(); };
+  }, [panel]);
+
+  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : panel === 'settings' ? 'Settings' : panel === 'conflicts' ? 'Resolve Sync Conflict' : panel === 'health' ? 'Data & Graph Health' : panel === 'import' ? 'Structured Import' : '';
+  const syncLabel = editor.sync.phase === 'LOCAL_ONLY' ? `Saved locally · ${editor.queuedMutationCount}` : editor.sync.phase === 'OFFLINE' ? `Offline · ${editor.queuedMutationCount} waiting` : editor.sync.phase === 'PENDING' ? `${editor.queuedMutationCount} waiting to sync` : editor.sync.phase === 'SYNCING' ? 'Syncing' : editor.sync.phase === 'CONFLICT' ? `${editor.sync.conflicts.length} conflict${editor.sync.conflicts.length === 1 ? '' : 's'}` : editor.sync.phase === 'ERROR' ? 'Sync failed · retry' : 'Synced';
   const close = () => { setPanel(null); setMapPoint(null); };
 
   return <>
-    <div className="iag-manager-bar" aria-label="Plant editing tools"><span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? editor.currentUser ? `${editor.currentUser.name.toUpperCase()} · ${editor.currentUser.role === 'admin' ? 'ADMIN' : `${editor.pendingChanges.length} PENDING`}` : 'IDENTIFY TO EDIT' : 'OPENING DATABASE…'}</span><button type="button" onClick={() => setPanel('users')}>Users</button><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button></div>
+    <div className="iag-manager-bar" aria-label="Plant editing tools">
+      <span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? editor.currentUser ? `${editor.currentUser.name.toUpperCase()} · ${editor.currentUser.role === 'admin' ? 'ADMIN' : `${editor.pendingChanges.length} PENDING`}` : 'IDENTIFY TO EDIT' : 'OPENING DATABASE…'}</span>
+      <button type="button" aria-label={syncLabel.toUpperCase()} title={editor.sync.error ?? `${editor.queuedMutationCount} queued mutation(s)`} onClick={() => editor.sync.phase === 'CONFLICT' ? setPanel('conflicts') : void editor.syncNow()} disabled={editor.sync.phase === 'SYNCING'}>{syncLabel.toUpperCase()}</button><span className="sr-only" role="status" aria-live="polite">Synchronization status: {syncLabel}</span>
+      <button type="button" onClick={() => setPanel('users')}>Users</button><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => setMapEdit((value) => !value)}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button><button type="button" onClick={() => setPanel('import')}>Bulk Import</button><button type="button" onClick={() => setPanel('health')}>Data Health</button>
+    </div>
     {mapEdit && <div className="iag-map-edit-banner">MAP EDIT MODE · Click the facility drawing to place a new asset <button type="button" onClick={() => setMapEdit(false)}>Done</button></div>}
-    {panel && typeof document !== 'undefined' && createPortal(<div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>}</aside></div>, document.body)}
+    {panel && typeof document !== 'undefined' && createPortal(<div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" role="dialog" aria-modal="true" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>} {panel === 'conflicts' && <ConflictsPanel/>} {panel === 'health' && <DataHealthPanel/>} {panel === 'import' && <BulkImportPanel/>}</aside></div>, document.body)}
   </>;
+}
+
+function ConflictsPanel() {
+  const editor = useFacilityEditor();
+  return <div className="iag-editor-form iag-users-panel">
+    <p className="iag-db-note">Conflicting canonical edits are never overwritten automatically. Compare the server value with the proposed value before resolving.</p>
+    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Conflicts requiring review</strong><span>{editor.sync.conflicts.length}</span></div>{editor.sync.conflicts.map((conflict) => <article key={conflict.mutationId}><strong>{conflict.entityId}</strong><small>Attempted revision {conflict.baseVersion} · canonical revision {conflict.currentVersion}</small><label>Current canonical value<pre>{JSON.stringify(conflict.currentValue ?? null, null, 2)}</pre></label><label>Proposed value<pre>{JSON.stringify(conflict.attemptedValue ?? null, null, 2)}</pre></label><div><button type="button" onClick={() => void editor.resolveConflict(conflict.mutationId, 'KEEP_CANONICAL')}>Keep canonical</button><button className="primary" type="button" onClick={() => void editor.resolveConflict(conflict.mutationId, 'APPLY_PROPOSED')}>Re-submit proposed value</button></div></article>)}</section>
+  </div>;
 }

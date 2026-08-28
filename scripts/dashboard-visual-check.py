@@ -100,16 +100,50 @@ def close_editor(page) -> None:
 
 
 def exercise_manager_states(page, label: str) -> None:
+    page.evaluate('''() => {
+      localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'visual-reviewer', name: 'Visual Test Reviewer', role: 'admin' }));
+      localStorage.setItem('iag-change-control-pending-changes', JSON.stringify([{
+        id: 'visual-test-review', entityId: 'L2-CC-001', reason: 'Synthetic visual diff fixture',
+        proposedBy: 'Visual Test Technician', proposedAt: '2026-08-27T00:00:00Z', basePackageRevision: 1,
+        entityType: 'asset', operation: 'UPSERT',
+        value: { id: 'L2-CC-001', name: 'Synthetic proposed visual test', verificationStatus: 'FIELD_VERIFY', evidenceIds: [] },
+        next: {}
+      }]));
+    }''')
+    page.reload(wait_until='networkidle')
+    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
     manager = page.locator('.iag-manager-bar')
 
     manager.get_by_role('button', name='Users', exact=True).click()
     page.locator('.iag-editor-panel').wait_for(state='visible')
     screenshot(page, f'{label}-users')
     close_editor(page)
+    page.evaluate("() => { localStorage.removeItem('iag-change-control-user'); localStorage.removeItem('iag-change-control-pending-changes'); }")
+    page.reload(wait_until='networkidle')
+    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
+    manager = page.locator('.iag-manager-bar')
 
     manager.get_by_role('button', name='Manage', exact=True).click()
     page.locator('.iag-editor-panel').wait_for(state='visible')
     screenshot(page, f'{label}-manage-assets')
+    close_editor(page)
+
+    manager.get_by_role('button', name='Data Health', exact=True).click()
+    page.get_by_role('heading', name='Data & Graph Health').wait_for(state='visible')
+    screenshot(page, f'{label}-data-health')
+    close_editor(page)
+
+    manager.get_by_role('button', name='Bulk Import', exact=True).click()
+    page.get_by_role('heading', name='Structured Import').wait_for(state='visible')
+    csv = 'recordType,id,name,type,areaId,source,target,relationshipType,verificationStatus\nasset,SYNTHETIC-IMPORT-TEST,Synthetic Import Test,Motor,area-warehouse-f,,,,VERIFIED\nrelationship,SYNTHETIC-REL-TEST,,,,L2-CC-001,SYNTHETIC-IMPORT-TEST,CONTROLS,VERIFIED'
+    page.locator('.iag-import-panel input[type="file"]').set_input_files(files=[{'name': 'synthetic-visual-test.csv', 'mimeType': 'text/csv', 'buffer': csv.encode('utf-8')}])
+    page.get_by_text('Validated records', exact=True).wait_for(state='visible')
+    screenshot(page, f'{label}-bulk-import-preview')
+    close_editor(page)
+
+    manager.get_by_role('button', name='Connect', exact=True).click()
+    page.get_by_role('heading', name='Connections').wait_for(state='visible')
+    screenshot(page, f'{label}-relationship-authoring')
     close_editor(page)
 
     manager.get_by_role('button', name='Map Edit', exact=True).click()
@@ -117,6 +151,39 @@ def exercise_manager_states(page, label: str) -> None:
     screenshot(page, f'{label}-map-edit')
     manager.get_by_role('button', name='Map Edit', exact=True).click()
     page.locator('.iag-map-edit-banner').wait_for(state='hidden')
+
+    page.evaluate('''() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('industrial-asset-graph-runtime', 2);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('mutation-outbox', 'readwrite');
+        tx.objectStore('mutation-outbox').put({
+          mutationId: 'visual-test-conflict', entityId: 'SYNTHETIC-VISUAL-TEST', entityType: 'asset',
+          actorId: 'visual-test', clientId: 'visual-test', baseVersion: 1, operation: 'UPSERT',
+          createdAt: '2026-08-27T00:00:00Z', reviewState: 'CONFLICT',
+          value: { name: 'Proposed test value', verificationStatus: 'FIELD_VERIFY' },
+          conflict: { baseVersion: 1, currentVersion: 2, attemptedValue: { name: 'Proposed test value', verificationStatus: 'FIELD_VERIFY' }, currentValue: { name: 'Canonical test value', verificationStatus: 'VERIFIED' } }
+        });
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => reject(tx.error);
+      };
+    })''')
+    page.reload(wait_until='networkidle')
+    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
+    conflict_button = page.locator('.iag-manager-bar button').filter(has_text='CONFLICT').first
+    conflict_button.wait_for(state='visible', timeout=10000)
+    conflict_button.click()
+    page.get_by_role('heading', name='Resolve Sync Conflict').wait_for(state='visible')
+    screenshot(page, f'{label}-sync-conflict')
+    close_editor(page)
+    page.evaluate('''() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('industrial-asset-graph-runtime', 2);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => { const db = request.result; const tx = db.transaction('mutation-outbox', 'readwrite'); tx.objectStore('mutation-outbox').delete('visual-test-conflict'); tx.oncomplete = () => { db.close(); resolve(); }; tx.onerror = () => reject(tx.error); };
+    })''')
+    page.reload(wait_until='networkidle')
+    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
 
 
 def exercise_workspace_states(page, label: str) -> None:

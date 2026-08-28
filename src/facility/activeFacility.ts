@@ -15,6 +15,9 @@ import { demoFacilityPackage } from '../../facilities/demo-plant';
 import type { FacilityPackage } from './types';
 
 export const liebFacilityPackage: FacilityPackage = {
+  schemaVersion: 2,
+  packageRevision: 1,
+  entityVersions: {},
   facility,
   featureConfig,
   mapConfig,

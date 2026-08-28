@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: industrial_asset_graph
+      POSTGRES_USER: iag
+      POSTGRES_PASSWORD: iag-development-only
+    ports:
+      - "54329:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iag -d industrial_asset_graph"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - iag-postgres:/var/lib/postgresql/data
+      - ./server/migrations:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  iag-postgres:

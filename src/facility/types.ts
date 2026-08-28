@@ -72,6 +72,9 @@ export interface AssetSerialSource {
 }
 
 export interface FacilityPackage {
+  schemaVersion: 2;
+  packageRevision: number;
+  entityVersions: Record<string, number>;
   facility: FacilityIdentity;
   featureConfig: FacilityFeatureConfig;
   mapConfig?: FacilityMapConfig;

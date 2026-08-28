@@ -1,6 +1,9 @@
 import type { FacilityPackage } from '../../src/facility/types';
 
 export const demoFacilityPackage: FacilityPackage = {
+  schemaVersion: 2,
+  packageRevision: 1,
+  entityVersions: {},
   facility: {
     id: 'facility-demo',
     name: 'Demo Plant',

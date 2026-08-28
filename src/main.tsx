@@ -11,13 +11,14 @@ import './ui/visual-audit-fixes.css';
 import './motion/tokens.css';
 import { GuideProvider } from './features/facility-guide';
 import { FacilityProvider } from './facility';
+import AppErrorBoundary from './ui/AppErrorBoundary';
 import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
 import './ui/chrome-clearance.css';
 
 applyAppSettings();
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><FacilityProvider><GuideProvider><App /></GuideProvider></FacilityProvider></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AppErrorBoundary><FacilityProvider><GuideProvider><App /></GuideProvider></FacilityProvider></AppErrorBoundary></React.StrictMode>);
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
   navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, { updateViaCache: 'none' }).catch(() => undefined);

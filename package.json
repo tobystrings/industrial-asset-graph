@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && npm run typecheck:server && vite build",
+    "typecheck:server": "tsc -p tsconfig.server.json",
+    "backend:dev": "tsx watch server/api.ts",
+    "backend:start": "tsx server/api.ts",
+    "test:backend:live": "pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/live-integration-check.ps1",
     "preview": "vite preview",
     "test": "vitest run",
     "test:visual": "python scripts/dashboard-visual-check.py",
@@ -13,17 +17,17 @@
     "verify:visual-contract": "python scripts/verify-visual-contract.py"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.8",
-    "@react-three/fiber": "^9.7.0",
+    "pg": "^8.23.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "three": "^0.185.1"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@types/three": "^0.177.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "fake-indexeddb": "^6.2.5",
     "tsx": "^4.20.5",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",

@@ -1,17 +1,22 @@
 import type { FacilityPackage } from './types';
+import type { MutationOperation, SyncEntityType } from './syncContract';
 
 const IDENTITY_KEY = 'iag-change-control-user';
 const ADMIN_HASH_KEY = 'iag-change-control-admin-hash';
 const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
 
-export type IagUser = { name: string; role: 'technician' | 'admin' };
+export type IagUser = { id: string; name: string; role: 'technician' | 'admin' };
 export type PendingChange = {
   id: string;
   entityId: string;
   reason: string;
   proposedBy: string;
   proposedAt: string;
+  basePackageRevision?: number;
+  entityType?: SyncEntityType;
+  operation?: MutationOperation;
+  value?: Record<string, unknown>;
   next: FacilityPackage;
 };
 export type AuditEvent = { id: string; actor: string; action: string; detail: string; at: string };
@@ -26,7 +31,11 @@ function write(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function loadCurrentUser(): IagUser | null { return read<IagUser | null>(IDENTITY_KEY, null); }
+export function loadCurrentUser(): IagUser | null {
+  const user = read<Partial<IagUser> | null>(IDENTITY_KEY, null);
+  if (!user?.name || (user.role !== 'technician' && user.role !== 'admin')) return null;
+  return { id: user.id ?? `legacy-${user.role}-${user.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, name: user.name, role: user.role };
+}
 export function saveCurrentUser(user: IagUser | null) {
   if (typeof localStorage === 'undefined') return;
   if (user) write(IDENTITY_KEY, user); else localStorage.removeItem(IDENTITY_KEY);
@@ -36,6 +45,16 @@ export function savePendingChanges(changes: PendingChange[]) { write(CHANGES_KEY
 export function loadAuditEvents(): AuditEvent[] { return read<AuditEvent[]>(AUDIT_KEY, []); }
 export function saveAuditEvents(events: AuditEvent[]) { write(AUDIT_KEY, events.slice(0, 100)); }
 export function hasAdminCredential(): boolean { return typeof localStorage !== 'undefined' && Boolean(localStorage.getItem(ADMIN_HASH_KEY)); }
+
+export function clientIdentity(): string {
+  const key = 'iag-change-control-client-id';
+  if (typeof localStorage === 'undefined') return 'server-render-client';
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(key, id);
+  return id;
+}
 
 async function digest(value: string): Promise<string> {
   const bytes = new TextEncoder().encode(value);

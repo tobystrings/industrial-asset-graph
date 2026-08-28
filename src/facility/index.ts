@@ -2,4 +2,10 @@ export { activeFacilityPackage, liebFacilityPackage, selectFacilityPackage } fro
 export { FacilityProvider, useFacility, useFacilityEditor } from './FacilityProvider';
 export type { FacilityEditorApi } from './FacilityProvider';
 export type { AttachmentRecord, IagArchiveManifest, ObservationRecord, PlantBackup } from './runtimeDb';
+export { listQueuedMutations, queueMutation, replaceQueuedMutations } from './runtimeDb';
 export type { AssetSerialSource, FacilityFeatureConfig, FacilityIdentity, FacilityMapMarker, FacilityMapMarkerState, FacilityMapMarkerTone, FacilityPackage } from './types';
+export { FACILITY_SCHEMA_VERSION, loadFacilityPackage, migrateFacilityPackage, validateFacilityPackage } from './schema';
+export { CanonicalMutationService, eligibleMutations, isTransportEligible, replayMutationQueue } from './syncContract';
+export type { MutationResult, ReplayResult, ReviewState, SyncMutation } from './syncContract';
+export { HttpSyncTransport, syncMutationQueue } from './syncClient';
+export type { SyncPhase, SyncSummary, SyncTransport } from './syncClient';
