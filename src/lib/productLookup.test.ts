@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 import { ioSignals, productFamilies, productManuals } from '../productCatalog';
 import {
   familyForComponent,

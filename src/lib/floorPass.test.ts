@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { areas, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines } = activeFacilityPackage;
 import { applyKeepDecision } from './reviewPack';
 import { applyKeptCapture, recordWalkdownCapture, resetWalkdownStore } from './walkdown';
 import { todayWalkdownItems } from './walkdownPrompts';

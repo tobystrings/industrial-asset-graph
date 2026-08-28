@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { facilityRegistry } from '../../facilities/registry';
 import { loadFacilityPackage } from './schema';
 import { requestedFacilityId } from './activeFacility';
+import { createFacilityRegistry } from './registry';
 
 describe('facility pack registry', () => {
   it('loads J. Lieb through the composed registry', () => expect(facilityRegistry.load('lieb-foods').facility.id).toBe('facility-j-lieb'));
@@ -23,5 +24,9 @@ describe('facility pack registry', () => {
     expect(requestedFacilityId('?facilityId=test-facility', 'lieb-foods')).toBe('test-facility');
     expect(requestedFacilityId('', 'lieb-foods')).toBe('lieb-foods');
     expect(requestedFacilityId('', undefined)).toBeUndefined();
+  });
+  it('rejects a package whose canonical facility identity mismatches its registration', () => {
+    const registry = createFacilityRegistry({ bad: { facilityId: 'expected-id', load: () => facilityRegistry.load('test-facility') } }, 'bad');
+    expect(() => registry.load('bad')).toThrow(/identity mismatch/);
   });
 });

@@ -1,4 +1,5 @@
-import { areas } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas } = activeFacilityPackage;
 import type { AreaOverlay } from '../types/facility';
 
 /** Schematic 1e layout. UI positions only — not surveyed floor coordinates. */

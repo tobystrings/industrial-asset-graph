@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import WalkdownForm from '../WalkdownForm';
 import { useFacilityEditor } from '../facility';
-import { areas, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines } = activeFacilityPackage;
 import { useFacility } from '../facility';
 import { relationshipSemantics, type RelationshipDomain } from '../lib/relationshipSemantics';
 import type { RelationshipType } from '../types/facility';

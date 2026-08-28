@@ -1,4 +1,5 @@
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 
 const RACK_TYPES = new Set(['PLC', 'DIGITAL_INPUT', 'DIGITAL_OUTPUT', 'ANALOG_INPUT', 'ANALOG_OUTPUT', 'RELAY_OUTPUT']);
 

@@ -1,4 +1,5 @@
-import { documents } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { documents } = activeFacilityPackage;
 import { capturedPlantFacts } from './walkdown';
 import { reconnectAfterFault, resolveComponentId } from './productLookup';
 import type { IoSignalRecord } from '../types/facility';

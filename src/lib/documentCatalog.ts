@@ -1,4 +1,5 @@
-import { documents } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { documents } = activeFacilityPackage;
 
 const modules = import.meta.glob('../../docs/**/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 

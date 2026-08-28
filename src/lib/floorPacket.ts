@@ -1,4 +1,5 @@
-import { components, documents, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components, documents, assets: machines } = activeFacilityPackage;
 import { ioSignals } from '../productCatalog';
 import { line2DriveInstances } from './driveInstances';
 

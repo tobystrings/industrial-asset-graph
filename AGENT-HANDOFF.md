@@ -70,7 +70,7 @@ Evidence-aware dashboard for **J. Lieb Foods**:
 - Building layout (fixed bird's-eye **2D** schematic)
 - Inspector: Capture / Intel / Record / Docs / Log
 - Line 2 Conveyor Control Cabinet drawing (SVG + PNG + PDF + JSON)
-- Local walkdown / Keep review (never auto-merges into `facilityData`)
+- Local walkdown / Keep review (never auto-merges into canonical facility-pack truth)
 - Project film **Genie** as a **dock bar by default** (native MP3 clock). Mini card only when the user opens the film.
 
 Phone: Map / Find / Queue / Cabinet. ☰ opens the **area drawer only** (Documents and Control cabinets live in that drawer).
@@ -108,7 +108,7 @@ Key source:
 | `src/FilmTheater.tsx` | Genie mini → dock, native MP3 clock |
 | `src/map/MapStage.tsx` | 2D-only building-layout stage; legacy map queries normalize to 2D |
 | `src/map/BlueprintMap.tsx` | 2D schematic |
-| `src/facilityData.ts` | Typed facility records |
+| `facilities/lieb-foods/` | J. Lieb facility-package records |
 | `src/lib/viewport.ts` | `dashboardSearch` + `genieQueryFromSearch` |
 | `src/lib/filmGenie.ts` | Hold-mini, collapse, actions |
 | `src/lib/relationshipHonesty.ts` | Unused-rel counts |

@@ -3,7 +3,13 @@ import PlcRackView from '../PlcRackView';
 import WalkdownForm from '../WalkdownForm';
 import { activeFacilityPackage } from '../facility';
 import { useFacility } from '../facility';
-import { areas, documentationPercent, documents } from '../facilityData';
+const { areas, documents } = activeFacilityPackage;
+const documentationPercent = (assetId: string) => {
+  const required = documents.filter((item) => item.assetId === assetId && item.required);
+  if (!required.length) return 0;
+  const weights = { COMPLETE: 1, REVIEW: .8, IN_PROGRESS: .5, DRAFT: .25, NOT_STARTED: 0 } as const;
+  return Math.round(required.reduce((sum, item) => sum + weights[item.state], 0) / required.length * 100);
+};
 import { captureKitForArea } from '../lib/areaKit';
 import type { InspectorTab } from '../lib/boardChrome';
 import { documentSource } from '../lib/documentCatalog';

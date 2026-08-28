@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { areas, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines } = activeFacilityPackage;
 import { documentedAreaCount, documentedAssetCount, documentationCoveragePercent, factSources, filterAssets, isDimmed, graphFieldItemCount, openFieldItemCount, recordCount, totalTrackedFacts, verificationCounts } from './facilityMetrics';
 import { resetWalkdownStore } from './walkdown';
 

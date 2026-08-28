@@ -104,7 +104,7 @@ export function setReviewDecision(captureId: string, review: ReviewDecision): Wa
   return items[index];
 }
 
-/** Overlay dest/motor/recovery only after keep + this call. Does not write facilityData. */
+/** Overlay dest/motor/recovery only after keep + this call. Does not write canonical facility-pack truth. */
 export function applyKeptCapture(captureId: string): WalkdownCapture | null {
   const items = loadWalkdownCaptures();
   const index = items.findIndex((item) => item.id === captureId);

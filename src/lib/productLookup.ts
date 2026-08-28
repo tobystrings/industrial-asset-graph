@@ -1,4 +1,5 @@
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 import { cabinetDeviceToComponent, ioSignals, productFamilies, productManuals } from '../productCatalog';
 import type { IoSignalRecord, ManualRecord, ProductFamily, ProductParam, RelationshipType, TerminalLegend } from '../types/facility';
 

@@ -1,4 +1,5 @@
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 import { cabinetDeviceToComponent } from '../productCatalog';
 
 export type DeviceQuery = {

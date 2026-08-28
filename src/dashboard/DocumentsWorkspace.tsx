@@ -1,4 +1,5 @@
-import { documents, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { documents, assets: machines } = activeFacilityPackage;
 import { documentSource } from '../lib/documentCatalog';
 import { renderMarkdown } from '../lib/markdown';
 import { markerClass } from '../lib/statusMark';

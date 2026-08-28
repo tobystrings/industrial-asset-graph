@@ -1,4 +1,5 @@
-import { assetSerialSources } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { assetSerialSources } = activeFacilityPackage;
 import type { SerialSource } from '../types/facility';
 
 export function serialSourcesFor(assetId: string): SerialSource[] {

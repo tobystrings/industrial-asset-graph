@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { areas, machines, relationships } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines, relationships } = activeFacilityPackage;
 import { appHrefForFilmCommand, appQueryForFilmCommand, filmCues, filmEmbedSrc, filmLiveCommandForScene, parseFilmMessage } from './filmBridge';
 
 describe('filmBridge', () => {

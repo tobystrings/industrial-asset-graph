@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 import { doorSheetCards, doorSheetText } from './doorSheet';
 import { evidenceFingerprint } from './evidenceHash';
 import { filmHonestyForAsset } from './filmBridge';

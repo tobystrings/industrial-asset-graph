@@ -1,4 +1,5 @@
-import { areas, documents, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, documents, assets: machines } = activeFacilityPackage;
 import { line2DriveInstances } from './driveInstances';
 import { serialSourcesDisagree } from './serialSources';
 import type { WalkdownField } from '../types/facility';

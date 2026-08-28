@@ -1,6 +1,8 @@
 import { accessSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { areas, components, documents, evidence, machines, relationships, revisions } from '../src/facilityData';
+import { buildLiebFoodsPackage } from '../facilities/lieb-foods';
+
+const { areas, components, documents, evidence, assets: machines, relationships, revisions } = buildLiebFoodsPackage();
 
 const verificationStates = new Set(['VERIFIED', 'FIELD_VERIFY', 'INFERRED', 'DISPUTED', 'RETIRED']);
 const allRecords = [...areas, ...machines, ...components, ...documents, ...evidence, ...relationships, ...revisions];

@@ -1,4 +1,5 @@
-import { areas } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas } = activeFacilityPackage;
 
 export type AreaCaptureKit = {
   areaId: string;

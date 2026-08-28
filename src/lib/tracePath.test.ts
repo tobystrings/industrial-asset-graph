@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { areas, components, facility, machines, relationships } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, components, facility, assets: machines, relationships } = activeFacilityPackage;
 import { containedComponentIds, relationshipIdsFor, traceHeadingFor, traceNodesFor } from './tracePath';
 
 describe('tracePath', () => {

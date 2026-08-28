@@ -2,7 +2,7 @@
 
 ## Current system
 
-The React application reads a `FacilityPackage` selected in `activeFacility.ts`. `FacilityProvider` seeds or loads that package from IndexedDB, updates the compatibility exports in `facilityData.ts`, and exposes editor operations. Plant Manager writes are either committed locally by an administrator or stored as technician proposals in browser local storage. Walkdown Keep/review is a separate local capture path and intentionally does not mutate canonical facility data.
+The React application reads the canonical `FacilityPackage` selected in `activeFacility.ts`. `FacilityProvider` seeds or loads that package from facility-scoped IndexedDB, synchronizes the stable selected-package object, and exposes editor operations. Plant Manager writes are either committed locally by an administrator or stored as technician proposals in facility-scoped browser storage. Walkdown Keep/review is a separate local capture path and intentionally does not mutate canonical facility data.
 
 IndexedDB `runtimeDb.ts` owns the active plant, binary attachments, and observations. `.iag` archives are stored ZIP files containing a manifest, plant JSON, observations, attachment metadata, and attachment blobs. Legacy JSON backups remain a separate compatible import path. The current merge is ID-based replacement and is backup/import behavior, not multi-user synchronization.
 

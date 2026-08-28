@@ -1,4 +1,5 @@
-import { components, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components, assets: machines } = activeFacilityPackage;
 import type { ComponentRecord, FacilityAsset, SystemKind } from '../types/facility';
 
 const TYPE_MAP: Record<Exclude<SystemKind, 'ALL'>, string[]> = {

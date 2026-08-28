@@ -1,4 +1,5 @@
-import { areas, components, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, components, assets: machines } = activeFacilityPackage;
 import { line2DriveInstances } from './driveInstances';
 import { resolveComponentId } from './productLookup';
 import type { WalkdownCapture, WalkdownField } from '../types/facility';

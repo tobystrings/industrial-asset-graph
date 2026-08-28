@@ -49,7 +49,7 @@ export function importReviewPackResult(pack: ReviewPack): { added: number; skipp
   return { added, skipped };
 }
 
-/** Merge imported captures into local store. Never writes facilityData. */
+/** Merge imported captures into local store. Never writes canonical facility-pack truth. */
 export function importReviewPack(pack: ReviewPack): number {
   return importReviewPackResult(pack).added;
 }

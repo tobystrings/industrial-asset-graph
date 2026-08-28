@@ -18,6 +18,8 @@ An unset selection intentionally defaults to `lieb-foods` for backward compatibi
 
 Facility identity is the persistence namespace. Runtime IndexedDB databases and facility review/audit local-storage keys are separated by `facility.id`. Existing unscoped J. Lieb review state is read once into the J. Lieb namespace; it is never migrated into another facility.
 
-Facility packages may import shared contracts from `src/facility` and `src/types`. Generic `src/` modules may not import `facilities/lieb-foods` or depend on J. Lieb identifiers. `src/facilityData.ts` remains a compatibility-only projection of the selected package while older feature helpers are migrated to explicit package inputs; it contains no independent facility facts.
+Facility packages may import shared contracts from `src/facility` and `src/types`. Generic `src/` modules may not import `facilities/lieb-foods` or depend on J. Lieb identifiers. Runtime consumers read the selected canonical package from `activeFacility.ts`; `FacilityProvider` keeps that package synchronized with facility-scoped persistence. There is no parallel compatibility projection.
+
+Every registry entry declares both its public selection key and canonical `facility.id`. Loading validates schema structure, duplicate IDs, asset/area/component/document/evidence references, map bindings, required feature configuration, and registry identity. Invalid packages fail with an actionable error.
 
 `facilities/test-facility` is deliberately synthetic and exists only to prove portability and isolation. It is not plant truth.

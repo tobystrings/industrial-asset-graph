@@ -27,7 +27,8 @@ import {
   railBodyScrolls,
   railColumnWidth,
 } from './boardChrome';
-import { areas } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas } = activeFacilityPackage;
 
 describe('board chrome helpers', () => {
   it('maps query tabs onto overview / capture / intel / record / docs / activity', () => {

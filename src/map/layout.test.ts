@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { areas } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas } = activeFacilityPackage;
 import { mapModeFromQuery } from './MapStage';
 import { allSchematicAreas, layoutCompleteness, rectToWorld, schematicFor, schematicLayout } from './layout';
 

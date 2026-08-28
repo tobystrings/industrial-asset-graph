@@ -1,4 +1,5 @@
-import { areas, components, documents, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, components, documents, assets: machines } = activeFacilityPackage;
 import { ioSignals, productManuals } from '../productCatalog';
 import { documentSource } from './documentCatalog';
 import { faultCardFor } from './faultCard';

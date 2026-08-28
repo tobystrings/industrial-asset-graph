@@ -1,8 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import activeFacilityPackage from './activeFacility';
+import activeFacilityPackage, { syncActiveFacilityPackage } from './activeFacility';
 import type { FacilityIdentity, FacilityMapMarker, FacilityPackage } from './types';
 import type { FacilityArea, FacilityAsset, RelationshipRecord } from '../types/facility';
-import { syncFacilityData } from '../facilityData';
 import {
   deleteAttachment as removeAttachmentRecord,
   ensurePlantSeed,
@@ -173,7 +172,7 @@ export function FacilityProvider({
     ensurePlantSeed(value)
       .then((stored) => {
         if (!alive) return;
-        syncFacilityData(stored);
+        syncActiveFacilityPackage(stored);
         setPkg(stored);
         pkgRef.current = stored;
         setReady(true);
@@ -185,7 +184,7 @@ export function FacilityProvider({
       })
       .catch(() => {
         if (!alive) return;
-        syncFacilityData(value);
+        syncActiveFacilityPackage(value);
         setPkg(value);
         setReady(true);
       });
@@ -193,7 +192,7 @@ export function FacilityProvider({
   }, [apiUrl, value]);
 
   const commit = useCallback(async (next: FacilityPackage) => {
-    syncFacilityData(next);
+    syncActiveFacilityPackage(next);
     pkgRef.current = next;
     setPkg(next);
     await savePlant(next, next.facility.id);
@@ -457,21 +456,21 @@ export function FacilityProvider({
     exportArchive: () => exportPlantArchive(pkg.facility.id),
     async importArchive(file, mode) {
       const next = await importPlantArchive(file, mode, pkg.facility.id);
-      syncFacilityData(next);
+      syncActiveFacilityPackage(next);
       pkgRef.current = next;
       setPkg(next);
     },
     exportBackup: () => exportPlantBackup(pkg.facility.id),
     async importBackup(backup, mode) {
       const next = await importPlantBackup(backup, mode, pkg.facility.id);
-      syncFacilityData(next);
+      syncActiveFacilityPackage(next);
       pkgRef.current = next;
       setPkg(next);
     },
     async resetToBaseline() {
       await resetPlant(value);
       const next = structuredClone(value);
-      syncFacilityData(next);
+      syncActiveFacilityPackage(next);
       pkgRef.current = next;
       setPkg(next);
     },

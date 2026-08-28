@@ -1,5 +1,5 @@
-import { components } from '../facilityData';
 import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 import { capturedPlantFacts } from './walkdown';
 import type { DriveInstance } from '../types/facility';
 

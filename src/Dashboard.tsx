@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { areas, components, evidence, facility, machines, relationships, revisions } from './facilityData';
+const { areas, components, evidence, facility, assets: machines, relationships, revisions } = activeFacilityPackage;
 import { activeFacilityPackage } from './facility';
 import AssetDirectory from './AssetDirectory';
 import TopNav, { type WorkspaceTab } from './dashboard/TopNav';

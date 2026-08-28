@@ -1,5 +1,12 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { areas, documentationPercent, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, documents, assets: machines } = activeFacilityPackage;
+const documentationPercent = (assetId: string) => {
+  const required = documents.filter((item) => item.assetId === assetId && item.required);
+  if (!required.length) return 0;
+  const weights = { COMPLETE: 1, REVIEW: .8, IN_PROGRESS: .5, DRAFT: .25, NOT_STARTED: 0 } as const;
+  return Math.round(required.reduce((sum, item) => sum + weights[item.state], 0) / required.length * 100);
+};
 import { parseDeviceQuery } from './deviceQuery';
 import { filmChapterForAsset } from './filmBridge';
 import { doorCodeCaption, hrefMatrix, hrefMatrixSvg, intelSectionsCollapsed, intelSectionsDefaultOpen, walkdownMoreDefaultOpen, chipCountLabel, chipPeekMinVisible } from './hrefMatrix';

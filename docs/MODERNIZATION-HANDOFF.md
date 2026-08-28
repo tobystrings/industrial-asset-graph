@@ -45,7 +45,7 @@ Read these first:
 | `src/App.tsx` | Two views only: `dashboard` \| `cabinet` via `?view=` |
 | `src/Dashboard.tsx` | Entire dashboard, ~47 dense lines, dead nav |
 | `src/ControlCabinetView.tsx` | SVG cabinet + device list |
-| `src/facilityData.ts` | 11 areas, **2 assets**, ~20 components, typed relationships |
+| `facilities/lieb-foods/` | J. Lieb facility package: areas, **2 assets**, components, documents, maps, and typed relationships |
 | `src/types/facility.ts` | Source of truth for verification / graph types |
 | `src/dashboard.css` | One 90-line global stylesheet, industrial dark |
 | `index.html` | Title still **Plant Dependency Map**; **no font load** |
@@ -574,7 +574,7 @@ Windows on the same LAN: `http://192.168.4.40:4173/industrial-asset-graph/`.
 - Match existing style: no unused deps if CSS/SVG will do. Allowed adds: a markdown parser if F3 needs it (`marked` is enough).
 - Keep `documentationPercent`, verification enums, and `LOCAL_ONLY` access flags.
 - Machine marker positions stay **unverified** until a fact says otherwise.
-- Do not expand `facilityData.ts` with fake assets to make the map look full.
+- Do not expand facility packages with fake assets to make the map look full.
 - Do not change presentation audio, cue timings, or narration copy except the F9 “open in app” control.
 - `scripts/dashboard-visual-check.py` asserts Warehouse F selection and “no legacy 3D entry.” Update selectors if you change class names; do not delete the check.
 

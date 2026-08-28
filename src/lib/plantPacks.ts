@@ -1,5 +1,5 @@
-import { areas, machines } from '../facilityData';
 import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines } = activeFacilityPackage;
 import type { FacilityCabinetPackage, FacilityFeatureConfig } from '../facility/types';
 import { captureKitForArea } from './areaKit';
 import { exportReviewPack, type ReviewPack } from './reviewPack';

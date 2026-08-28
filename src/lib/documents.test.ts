@@ -2,7 +2,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { documents } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { documents } = activeFacilityPackage;
 import { renderMarkdown } from './markdown';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../');

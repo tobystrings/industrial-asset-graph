@@ -46,6 +46,33 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
   for (const evidence of pkg.evidence!) {
     if (!['PUBLIC_APP', 'LOCAL_ONLY', 'RESTRICTED'].includes(evidence.access)) throw new Error(`Evidence ${evidence.id} has an invalid access state.`);
   }
+  const areaIds = new Set(pkg.areas!.map((area) => area.id));
+  const assetIds = new Set(pkg.assets!.map((asset) => asset.id));
+  const componentIds = new Set(pkg.components!.map((component) => component.id));
+  const evidenceIds = new Set(pkg.evidence!.map((evidence) => evidence.id));
+  if (!pkg.featureConfig || !areaIds.has(pkg.featureConfig.defaultAreaId)) throw new Error('Facility default area must reference an existing area.');
+  for (const featured of [pkg.featureConfig.featuredCabinetAssetId, pkg.featureConfig.featuredMachineAssetId]) {
+    if (featured && !assetIds.has(featured)) throw new Error(`Featured asset does not exist: ${featured}`);
+  }
+  for (const area of pkg.areas!) for (const assetId of area.assetIds) if (!assetIds.has(assetId)) throw new Error(`Area ${area.id} references missing asset ${assetId}.`);
+  for (const asset of pkg.assets!) {
+    if (asset.facilityId !== pkg.facility.id) throw new Error(`Asset ${asset.id} belongs to ${asset.facilityId}, not ${pkg.facility.id}.`);
+    if (!areaIds.has(asset.areaId)) throw new Error(`Asset ${asset.id} references missing area ${asset.areaId}.`);
+    for (const componentId of asset.componentIds) if (!componentIds.has(componentId)) throw new Error(`Asset ${asset.id} references missing component ${componentId}.`);
+  }
+  for (const component of pkg.components!) {
+    if (!assetIds.has(component.parentId)) throw new Error(`Component ${component.id} references missing parent asset ${component.parentId}.`);
+    for (const evidenceId of component.evidenceIds) if (!evidenceIds.has(evidenceId)) throw new Error(`Component ${component.id} references missing evidence ${evidenceId}.`);
+  }
+  for (const document of pkg.documents!) {
+    if (!assetIds.has(document.assetId)) throw new Error(`Document ${document.id} references missing asset ${document.assetId}.`);
+    for (const evidenceId of document.evidenceIds) if (!evidenceIds.has(evidenceId)) throw new Error(`Document ${document.id} references missing evidence ${evidenceId}.`);
+  }
+  for (const relationship of pkg.relationships!) for (const evidenceId of relationship.evidenceIds) if (!evidenceIds.has(evidenceId)) throw new Error(`Relationship ${relationship.id} references missing evidence ${evidenceId}.`);
+  for (const marker of (pkg.mapConfig?.markers ?? []) as Array<{ id?: string; assetId?: string; areaId?: string }>) {
+    if (marker.assetId && !assetIds.has(marker.assetId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing asset ${marker.assetId}.`);
+    if (marker.areaId && !areaIds.has(marker.areaId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing area ${marker.areaId}.`);
+  }
 }
 
 export function loadFacilityPackage(input: unknown): FacilityPackage {

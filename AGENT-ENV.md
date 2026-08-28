@@ -40,7 +40,7 @@ Open `http://127.0.0.1:4173/industrial-asset-graph/`. Production-shaped preview:
 
 - Unused relationship types stay count **0**: `FEEDS`, `CONTROLS`, `SENSES`, `INTERLOCKS_WITH` (also `SUPPLIES` / `UPSTREAM_OF` unused).
 - Trace only `LOCATED_IN` / `CONTAINS` / `SUPPORTED_BY_EVIDENCE`.
-- Walkdown / Keep is local-only. Keep never writes `facilityData`. Dest / motor / recovery overlay only after explicit **Apply**.
+- Walkdown / Keep is local-only. Keep never writes canonical facility-pack truth. Dest / motor / recovery overlay only after explicit **Apply**.
 - Do not invent machines, surveyed coordinates, Line 2 `FEEDS`, wiring, LOTO steps, or motor HP.
 - L2 film chapter is scene **5** or `path=line2`. L4 is **intro-only**. Do not regenerate film MP3s.
 - The building layout is the fixed bird's-eye **2D schematic only**. There is no orbital 3D mode or map-mode toggle.

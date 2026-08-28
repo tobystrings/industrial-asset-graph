@@ -1,4 +1,5 @@
-import { areas, components, evidence, facility, machines, relationships } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, components, evidence, facility, assets: machines, relationships } = activeFacilityPackage;
 import { parseDeviceQuery } from './deviceQuery';
 import type { FacilityArea, FacilityAsset } from '../types/facility';
 

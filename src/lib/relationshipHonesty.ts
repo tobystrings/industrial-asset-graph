@@ -1,4 +1,5 @@
-import { relationships } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { relationships } = activeFacilityPackage;
 import type { RelationshipType } from '../types/facility';
 
 export const UNUSED_RELATIONSHIP_TYPES = ['FEEDS', 'CONTROLS', 'SENSES', 'INTERLOCKS_WITH', 'SUPPLIES', 'UPSTREAM_OF'] as const satisfies readonly RelationshipType[];

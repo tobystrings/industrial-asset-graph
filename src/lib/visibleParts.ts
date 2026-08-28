@@ -1,4 +1,5 @@
-import { components } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { components } = activeFacilityPackage;
 
 export type VisiblePart = {
   id: string;

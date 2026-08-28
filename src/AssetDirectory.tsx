@@ -1,4 +1,5 @@
-import { areas, components, machines } from './facilityData';
+import activeFacilityPackage from './facility/activeFacility';
+const { areas, components, assets: machines } = activeFacilityPackage;
 import { SYSTEM_KINDS, componentsInSystem, machinesInSystem } from './lib/systemKinds';
 import StatusMark from './StatusMark';
 import type { ComponentRecord, FacilityAsset, SystemKind } from './types/facility';

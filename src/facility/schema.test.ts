@@ -19,4 +19,18 @@ describe('facility schema migration', () => {
     invalid.relationships.push({ id: 'bad', source: 'missing', target: 'also-missing', type: 'FEEDS', verificationStatus: 'FIELD_VERIFY', evidenceIds: [] });
     expect(() => loadFacilityPackage(invalid)).toThrow(/unresolved endpoint/);
   });
+
+  it('rejects duplicate IDs and broken facility references', () => {
+    const duplicate = structuredClone(liebFacilityPackage);
+    duplicate.assets.push(structuredClone(duplicate.assets[0]));
+    expect(() => loadFacilityPackage(duplicate)).toThrow(/duplicate entity ID/);
+
+    const wrongFacility = structuredClone(liebFacilityPackage);
+    wrongFacility.assets[0].facilityId = 'facility-other';
+    expect(() => loadFacilityPackage(wrongFacility)).toThrow(/belongs to facility-other/);
+
+    const brokenMarker = structuredClone(liebFacilityPackage);
+    brokenMarker.mapConfig = { ...(brokenMarker.mapConfig ?? {}), markers: [{ id: 'bad-marker', assetId: 'missing-asset' }] };
+    expect(() => loadFacilityPackage(brokenMarker)).toThrow(/Map marker bad-marker references missing asset/);
+  });
 });

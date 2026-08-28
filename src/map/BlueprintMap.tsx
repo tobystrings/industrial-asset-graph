@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { areas, machines } from '../facilityData';
+import activeFacilityPackage from '../facility/activeFacility';
+const { areas, assets: machines } = activeFacilityPackage;
 import { markerClass } from '../lib/statusMark';
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
 
