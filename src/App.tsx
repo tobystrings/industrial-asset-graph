@@ -72,6 +72,17 @@ export default function App() {
     addEventListener('facility-guide-action', handler);
     return () => removeEventListener('facility-guide-action', handler);
   }, [view, guide, featureConfig.featuredCabinetAssetId]);
+  useEffect(() => {
+    const handler = () => {
+      changeView('dashboard');
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent('facility-guide-workspace', { detail: 'map' }));
+        window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true }));
+      });
+    };
+    addEventListener('iag-open-map-editor', handler);
+    return () => removeEventListener('iag-open-map-editor', handler);
+  });
   return (
     <div ref={shellRef} className="app-shell has-manager-bar">
       <div className="backdrop" aria-hidden="true" />

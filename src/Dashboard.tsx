@@ -116,6 +116,7 @@ export default function Dashboard({
   useEffect(() => {
     const search = dashboardSearch({
       view,
+      facilityId: new URLSearchParams(location.search).get('facilityId'),
       area: selectedArea?.id,
       asset: selectedAsset?.id,
       doc: activeDocument,
@@ -156,9 +157,21 @@ export default function Dashboard({
     const handler = (event: Event) => {
       const tab = (event as CustomEvent<WorkspaceTab>).detail;
       if (tab === 'relationships') { setWorkspaceTab('relationships'); setTraceOn(true); }
+      if (tab === 'map') { setWorkspaceTab('map'); setTraceOn(false); }
     };
     addEventListener('facility-guide-workspace', handler);
     return () => removeEventListener('facility-guide-workspace', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      if (!(event as CustomEvent<boolean>).detail) return;
+      setSelectedArea(null);
+      setSelectedAsset(null);
+      setFocusDevice(null);
+    };
+    addEventListener('iag-map-edit-mode', handler);
+    return () => removeEventListener('iag-map-edit-mode', handler);
   }, []);
 
   useEffect(() => {

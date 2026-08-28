@@ -98,6 +98,7 @@ export function genieQueryFromSearch(search: string | URLSearchParams = typeof l
 
 export function dashboardSearch(state: {
   view: string;
+  facilityId?: string | null;
   area?: string | null;
   asset?: string | null;
   doc?: string | null;
@@ -110,6 +111,7 @@ export function dashboardSearch(state: {
   trace?: string | null;
 } & GenieQueryCarry): string {
   const next = new URLSearchParams();
+  if (state.facilityId) next.set('facilityId', state.facilityId);
   if (state.view && state.view !== 'dashboard') next.set('view', state.view);
   if (state.area) next.set('area', state.area);
   if (state.asset) next.set('asset', state.asset);

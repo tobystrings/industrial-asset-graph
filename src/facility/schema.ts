@@ -1,5 +1,6 @@
 import type { FacilityPackage } from './types';
 import type { VerificationState } from '../types/facility';
+import type { FacilityMapAnnotation, FacilityMapWall } from './types';
 
 export const FACILITY_SCHEMA_VERSION = 2 as const;
 export type LegacyFacilityPackage = Omit<FacilityPackage, 'schemaVersion' | 'packageRevision' | 'entityVersions'> & {
@@ -55,6 +56,11 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
     if (featured && !assetIds.has(featured)) throw new Error(`Featured asset does not exist: ${featured}`);
   }
   for (const area of pkg.areas!) for (const assetId of area.assetIds) if (!assetIds.has(assetId)) throw new Error(`Area ${area.id} references missing asset ${assetId}.`);
+  for (const area of pkg.areas!) {
+    const overlay = area.overlay;
+    if (![overlay.x, overlay.y, overlay.width, overlay.height].every(Number.isFinite) || overlay.x < 0 || overlay.y < 0 || overlay.width <= 0 || overlay.height <= 0 || overlay.x + overlay.width > 100 || overlay.y + overlay.height > 100) throw new Error(`Area ${area.id} has invalid map geometry.`);
+    if (overlay.polygon && (overlay.polygon.length < 3 || overlay.polygon.some((point) => !Number.isFinite(point.x) || !Number.isFinite(point.y) || point.x < 0 || point.x > 100 || point.y < 0 || point.y > 100))) throw new Error(`Area ${area.id} has an invalid polygon.`);
+  }
   for (const asset of pkg.assets!) {
     if (asset.facilityId !== pkg.facility.id) throw new Error(`Asset ${asset.id} belongs to ${asset.facilityId}, not ${pkg.facility.id}.`);
     if (!areaIds.has(asset.areaId)) throw new Error(`Asset ${asset.id} references missing area ${asset.areaId}.`);
@@ -73,6 +79,12 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
     if (marker.assetId && !assetIds.has(marker.assetId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing asset ${marker.assetId}.`);
     if (marker.areaId && !areaIds.has(marker.areaId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing area ${marker.areaId}.`);
   }
+  const mapIds = new Set<string>();
+  for (const object of [...(pkg.mapConfig?.walls ?? []) as FacilityMapWall[], ...(pkg.mapConfig?.annotations ?? []) as FacilityMapAnnotation[]]) {
+    if (!object.id || mapIds.has(object.id)) throw new Error(`Missing or duplicate map object ID: ${object.id || '(empty)'}.`);
+    mapIds.add(object.id);
+  }
+  for (const wall of (pkg.mapConfig?.walls ?? []) as FacilityMapWall[]) if (wall.points.length < 2 || wall.points.some((point) => !Number.isFinite(point.x) || !Number.isFinite(point.y) || point.x < 0 || point.x > 100 || point.y < 0 || point.y > 100)) throw new Error(`Wall ${wall.id} has invalid geometry.`);
 }
 
 export function loadFacilityPackage(input: unknown): FacilityPackage {

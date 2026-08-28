@@ -19,7 +19,8 @@ describe('viewport rebalance', () => {
   });
 
   it('rebuilds dashboard search without dropping tab/asset and without inventing device', () => {
-    const query = dashboardSearch({ view: 'dashboard', area: 'area-warehouse-f', asset: 'L2-CC-001', tab: 'intel' });
+    const query = dashboardSearch({ view: 'dashboard', facilityId: 'test-facility', area: 'area-warehouse-f', asset: 'L2-CC-001', tab: 'intel' });
+    expect(query).toContain('facilityId=test-facility');
     expect(query).toContain('asset=L2-CC-001');
     expect(query).toContain('tab=intel');
     expect(query).not.toContain('device=');

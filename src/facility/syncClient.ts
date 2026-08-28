@@ -1,5 +1,5 @@
 import { isTransportEligible, type MutationResult, type SyncMutation } from './syncContract';
-import type { FacilityPackage } from './types';
+import type { FacilityMapMarker, FacilityPackage } from './types';
 import type { SyncEntityType } from './syncContract';
 
 export type CanonicalEntityEnvelope = { entityId: string; entityType: SyncEntityType; version: number; value?: Record<string, unknown>; deleted: boolean; updatedAt: string; updatedBy: string };
@@ -55,8 +55,14 @@ export function applyCanonicalEntities(pkg: FacilityPackage, entities: Canonical
     else if (entity.entityType === 'document') next.documents = entity.deleted ? next.documents.filter((item) => item.id !== entity.entityId) : upsert(next.documents, value as unknown as FacilityPackage['documents'][number]);
     else if (entity.entityType === 'evidence') next.evidence = entity.deleted ? next.evidence.filter((item) => item.id !== entity.entityId) : upsert(next.evidence, value as unknown as FacilityPackage['evidence'][number]);
     else if (entity.entityType === 'map_marker') {
-      const markers = [...((next.mapConfig?.markers ?? []) as Array<{ id: string }>)] as Array<{ id: string }>;
-      next.mapConfig = { ...(next.mapConfig ?? {}), markers: entity.deleted ? markers.filter((item) => item.id !== entity.entityId) : upsert(markers, value as { id: string }) };
+      const markers = [...(next.mapConfig?.markers ?? [])];
+      next.mapConfig = { ...(next.mapConfig ?? {}), markers: entity.deleted ? markers.filter((item) => item.id !== entity.entityId) : upsert(markers, value as unknown as FacilityMapMarker) };
+    }
+    else if (entity.entityType === 'map_config' && !entity.deleted) {
+      const payload = value as unknown as Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'>;
+      next.areas = structuredClone(payload.areas);
+      next.assets = structuredClone(payload.assets);
+      next.mapConfig = structuredClone(payload.mapConfig ?? {});
     }
   }
   next.packageRevision += entities.length;

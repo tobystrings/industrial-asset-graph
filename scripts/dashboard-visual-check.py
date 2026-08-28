@@ -146,11 +146,17 @@ def exercise_manager_states(page, label: str) -> None:
     screenshot(page, f'{label}-relationship-authoring')
     close_editor(page)
 
+    page.evaluate("() => localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'visual-map-admin', name: 'Visual Map Admin', role: 'admin' }))")
+    page.reload(wait_until='networkidle')
+    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
+    manager = page.locator('.iag-manager-bar')
     manager.get_by_role('button', name='Map Edit', exact=True).click()
     page.locator('.iag-map-edit-banner').wait_for(state='visible')
+    page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
     manager.get_by_role('button', name='Map Edit', exact=True).click()
     page.locator('.iag-map-edit-banner').wait_for(state='hidden')
+    page.evaluate("() => localStorage.removeItem('iag-change-control-user')")
 
     page.evaluate('''() => new Promise((resolve, reject) => {
       const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);

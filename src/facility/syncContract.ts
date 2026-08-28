@@ -1,6 +1,6 @@
 import type { FacilityPackage } from './types';
 
-export type SyncEntityType = 'facility' | 'area' | 'asset' | 'component' | 'relationship' | 'document' | 'evidence' | 'map_marker';
+export type SyncEntityType = 'facility' | 'area' | 'asset' | 'component' | 'relationship' | 'document' | 'evidence' | 'map_marker' | 'map_config';
 export type MutationOperation = 'UPSERT' | 'DELETE';
 export type ReviewState = 'LOCAL_DRAFT' | 'PENDING_SYNC' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'CONFLICT';
 

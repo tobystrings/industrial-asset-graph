@@ -4,7 +4,7 @@ export type RelationshipType = 'LOCATED_IN' | 'CONTAINS' | 'FEEDS' | 'CONTROLS' 
 
 export interface VerifiedFact<T> { value: T | null; verificationStatus: VerificationState; evidenceIds: string[]; unit?: string; note?: string; }
 export interface AreaOverlay { x: number; y: number; width: number; height: number; polygon?: Array<{ x: number; y: number }>; }
-export interface FacilityArea { id: string; name: string; shortName: string; status: DocumentationState; overlay: AreaOverlay; assetIds: string[]; }
+export interface FacilityArea { id: string; name: string; shortName: string; status: DocumentationState; overlay: AreaOverlay; assetIds: string[]; notes?: string; visible?: boolean; }
 export interface EvidenceRecord { id: string; type: 'PHOTO' | 'NAMEPLATE' | 'DRAWING' | 'MANUAL' | 'FIELD_TEST' | 'CMMS_RECORD' | 'OTHER'; title: string; pathOrUrl: string; access: 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED'; }
 export interface DocumentRecord { id: string; assetId: string; category: string; title: string; path: string; state: DocumentationState; required: boolean; verificationStatus: VerificationState; evidenceIds: string[]; }
 export interface FacilityAsset {

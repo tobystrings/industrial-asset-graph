@@ -40,6 +40,7 @@ import {
 } from './changeControl';
 import type { MutationOperation, SyncEntityType } from './syncContract';
 import { applyCanonicalEntities, HttpSyncTransport, syncMutationQueue, type SyncSummary } from './syncClient';
+import { validateFacilityPackage } from './schema';
 
 const FacilityContext = createContext<FacilityPackage | null>(null);
 
@@ -68,6 +69,7 @@ export interface FacilityEditorApi {
   deleteRelationship(relationshipId: string): Promise<void>;
   saveMarker(marker: FacilityMapMarker): Promise<void>;
   deleteMarker(markerId: string): Promise<void>;
+  saveMapDraft(next: Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'>, summary: string[]): Promise<void>;
   addAttachment(assetId: string, file: File, verificationStatus?: 'VERIFIED' | 'FIELD_VERIFY'): Promise<AttachmentRecord>;
   deleteAttachment(id: string): Promise<void>;
   attachments(assetId?: string): Promise<AttachmentRecord[]>;
@@ -132,6 +134,7 @@ export function applyReviewedChange(current: FacilityPackage, proposed: Facility
     const next = descriptor.operation === 'DELETE' ? markers.filter((item) => item.id !== entityId) : upsert(markers, ((proposed.mapConfig?.markers ?? []) as FacilityMapMarker[]).find((item) => item.id === entityId)!);
     return { ...current, mapConfig: { ...(current.mapConfig ?? {}), markers: next } };
   }
+  if (descriptor.entityType === 'map_config') return { ...current, areas: proposed.areas, assets: proposed.assets, mapConfig: proposed.mapConfig };
   if (descriptor.entityType === 'component') return { ...current, components: descriptor.operation === 'DELETE' ? current.components.filter((item) => item.id !== entityId) : upsert(current.components, proposed.components.find((item) => item.id === entityId)!) };
   if (descriptor.entityType === 'document') return { ...current, documents: descriptor.operation === 'DELETE' ? current.documents.filter((item) => item.id !== entityId) : upsert(current.documents, proposed.documents.find((item) => item.id === entityId)!) };
   if (descriptor.entityType === 'evidence') {
@@ -339,6 +342,14 @@ export function FacilityProvider({
     async deleteArea(areaId) {
       if (pkg.assets.some((asset) => asset.areaId === areaId)) throw new Error('Move or delete assets assigned to this area before deleting it.');
       await recordChange({ ...pkg, areas: pkg.areas.filter((area) => area.id !== areaId) }, areaId, 'Facility area deleted in application', { entityType: 'area', operation: 'DELETE' });
+    },
+    async saveMapDraft(next, summary) {
+      if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required for structural map editing.');
+      const proposed = { ...pkgRef.current, areas: structuredClone(next.areas), assets: structuredClone(next.assets), mapConfig: structuredClone(next.mapConfig ?? {}) };
+      validateFacilityPackage(proposed);
+      const entityId = `map-config:${pkgRef.current.facility.id}`;
+      await recordChange(proposed, entityId, summary.length ? `Map editor: ${summary.join('; ')}` : 'Map editor changes saved', { entityType: 'map_config', operation: 'UPSERT', value: { areas: proposed.areas, assets: proposed.assets, mapConfig: proposed.mapConfig } as unknown as Record<string, unknown> });
+      appendAudit(currentUser.name, 'Saved structural map changes', summary.join('; ') || 'Map draft committed');
     },
     async saveAsset(asset, markerPosition) {
       const assets = pkg.assets.some((item) => item.id === asset.id)
