@@ -91,7 +91,7 @@ $env:VITE_IAG_WRITE_TOKEN='replace-with-a-local-secret'
 npm run dev -- --host 0.0.0.0 --port 4173
 ```
 
-`VITE_IAG_WRITE_TOKEN` is suitable only for a trusted local development session because Vite variables are visible to the browser; use an authenticated gateway or identity provider for shared/production deployments. The static Admin Portal PIN (`5652`) is intentionally stable across browser storage clears and devices, but is not a secret until server-side verification replaces it.
+`VITE_IAG_WRITE_TOKEN` is suitable only for a trusted local development session because Vite variables are visible to the browser; use an authenticated gateway or identity provider for shared/production deployments. The static Admin Portal PIN (`1234`) is intentionally stable across browser storage clears and devices, but is not a secret until server-side verification replaces it.
 
 The API listens only on loopback by default. Its development identity is carried by mutation actor/client IDs and is not production authentication or authorization. Do not expose it outside a trusted development machine without adding authenticated transport, authorization, secrets management, TLS, and deployment-specific CORS controls.
 

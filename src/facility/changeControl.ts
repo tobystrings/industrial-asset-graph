@@ -8,7 +8,7 @@ const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
 // Static GitHub Pages cannot keep a secret. This value is a functional demo
 // credential only; production deployments must replace verification server-side.
-export const INITIAL_ADMIN_PIN = '5652';
+export const INITIAL_ADMIN_PIN = '1234';
 
 export type IagUser = { id: string; name: string; role: 'technician' | 'admin' };
 export type PendingChange = {
