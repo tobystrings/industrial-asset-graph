@@ -11,7 +11,7 @@ The dependency boundary is:
 1. Create `facilities/<facility-id>/index.ts` and export a function returning a valid `FacilityPackage`.
 2. Keep all facility-specific names, IDs, maps, relationships, documents, evidence, media paths, and display configuration inside that folder.
 3. Register the loader in `facilities/registry.ts`.
-4. Select it with `VITE_FACILITY=<facility-id>`.
+4. Select it at build time with `VITE_FACILITY=<facility-id>`, or at runtime with `?facilityId=<facility-id>`.
 5. Run `npm test`, `npm run verify:data`, `npm run verify:visual-contract`, `npm run build`, and `npm run test:visual`.
 
 An unset selection intentionally defaults to `lieb-foods` for backward compatibility. An explicit unknown ID is an error and must never silently load J. Lieb.

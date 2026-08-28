@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { facilityRegistry } from '../../facilities/registry';
 import { loadFacilityPackage } from './schema';
+import { requestedFacilityId } from './activeFacility';
 
 describe('facility pack registry', () => {
   it('loads J. Lieb through the composed registry', () => expect(facilityRegistry.load('lieb-foods').facility.id).toBe('facility-j-lieb'));
@@ -17,5 +18,10 @@ describe('facility pack registry', () => {
   it('validates registered facility packages at the schema boundary', () => {
     expect(loadFacilityPackage(facilityRegistry.load('lieb-foods')).facility.id).toBe('facility-j-lieb');
     expect(loadFacilityPackage(facilityRegistry.load('test-facility')).facility.id).toBe('facility-synthetic-test');
+  });
+  it('resolves URL selection ahead of the deployment default', () => {
+    expect(requestedFacilityId('?facilityId=test-facility', 'lieb-foods')).toBe('test-facility');
+    expect(requestedFacilityId('', 'lieb-foods')).toBe('lieb-foods');
+    expect(requestedFacilityId('', undefined)).toBeUndefined();
   });
 });
