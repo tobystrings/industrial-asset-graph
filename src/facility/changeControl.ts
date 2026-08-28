@@ -73,8 +73,11 @@ export async function setAdminPassphrase(passphrase: string) {
 }
 
 export async function verifyAdminPassphrase(passphrase: string): Promise<boolean> {
-  if (typeof localStorage === 'undefined') return false;
   if (!/^\d{4}$/.test(passphrase)) return false;
+  // Static deployments cannot retain a server secret; keep the configured demo
+  // PIN stable even when browser storage is cleared or a new device is used.
+  if (passphrase === INITIAL_ADMIN_PIN) return true;
+  if (typeof localStorage === 'undefined') return false;
   const expected = localStorage.getItem(ADMIN_HASH_KEY);
   return Boolean(expected) && expected === await digest(passphrase);
 }

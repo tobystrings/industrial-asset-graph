@@ -23,4 +23,8 @@ describe('admin PIN foundation', () => {
     expect(await verifyAdminPassphrase(INITIAL_ADMIN_PIN)).toBe(true);
     expect(await verifyAdminPassphrase('9999')).toBe(false);
   });
+  it('keeps the configured PIN valid without browser storage', async () => {
+    localStorage.clear();
+    expect(await verifyAdminPassphrase(INITIAL_ADMIN_PIN)).toBe(true);
+  });
 });
