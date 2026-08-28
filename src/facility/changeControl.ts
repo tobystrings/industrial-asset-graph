@@ -40,14 +40,31 @@ export function loadCurrentUser(): IagUser | null {
   if (!user?.name || (user.role !== 'technician' && user.role !== 'admin')) return null;
   return { id: user.id ?? `legacy-${user.role}-${user.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, name: user.name, role: user.role };
 }
+
+export function facilityStorageKey(facilityId: string, key: string) {
+  return `iag:${encodeURIComponent(facilityId)}:${key}`;
+}
+
+function readFacilityScoped<T>(facilityId: string, key: string, fallback: T): T {
+  const scoped = facilityStorageKey(facilityId, key);
+  if (typeof localStorage === 'undefined') return fallback;
+  if (localStorage.getItem(scoped) !== null) return read(scoped, fallback);
+  // Preserve legacy J. Lieb browser state once, without exposing it to another facility.
+  if (facilityId === 'facility-j-lieb' && localStorage.getItem(key) !== null) {
+    const legacy = read(key, fallback);
+    write(scoped, legacy);
+    return legacy;
+  }
+  return fallback;
+}
 export function saveCurrentUser(user: IagUser | null) {
   if (typeof localStorage === 'undefined') return;
   if (user) write(IDENTITY_KEY, user); else localStorage.removeItem(IDENTITY_KEY);
 }
-export function loadPendingChanges(): PendingChange[] { return read<PendingChange[]>(CHANGES_KEY, []); }
-export function savePendingChanges(changes: PendingChange[]) { write(CHANGES_KEY, changes); }
-export function loadAuditEvents(): AuditEvent[] { return read<AuditEvent[]>(AUDIT_KEY, []); }
-export function saveAuditEvents(events: AuditEvent[]) { write(AUDIT_KEY, events.slice(0, 100)); }
+export function loadPendingChanges(facilityId: string): PendingChange[] { return readFacilityScoped<PendingChange[]>(facilityId, CHANGES_KEY, []); }
+export function savePendingChanges(facilityId: string, changes: PendingChange[]) { write(facilityStorageKey(facilityId, CHANGES_KEY), changes); }
+export function loadAuditEvents(facilityId: string): AuditEvent[] { return readFacilityScoped<AuditEvent[]>(facilityId, AUDIT_KEY, []); }
+export function saveAuditEvents(facilityId: string, events: AuditEvent[]) { write(facilityStorageKey(facilityId, AUDIT_KEY), events.slice(0, 100)); }
 export function hasAdminCredential(): boolean { return typeof localStorage !== 'undefined' && Boolean(localStorage.getItem(ADMIN_HASH_KEY)); }
 
 export function clientIdentity(): string {

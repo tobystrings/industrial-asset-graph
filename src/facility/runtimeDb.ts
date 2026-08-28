@@ -3,7 +3,7 @@ import { createStoredZip, readStoredZip } from './iagArchive';
 import { loadFacilityPackage } from './schema';
 import type { SyncMutation } from './syncContract';
 
-const DB_NAME = 'industrial-asset-graph-runtime';
+const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
 const DB_VERSION = 2;
 const PLANT_STORE = 'plant';
 const ATTACHMENT_STORE = 'attachments';
@@ -77,9 +77,13 @@ function transactionDone(tx: IDBTransaction): Promise<void> {
   });
 }
 
-export function openPlantDb(): Promise<IDBDatabase> {
+export function facilityDatabaseName(facilityId?: string): string {
+  return facilityId ? `${LEGACY_DB_NAME}--${encodeURIComponent(facilityId)}` : LEGACY_DB_NAME;
+}
+
+export function openPlantDb(facilityId?: string): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    const request = indexedDB.open(facilityDatabaseName(facilityId), DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(PLANT_STORE)) db.createObjectStore(PLANT_STORE);
@@ -102,7 +106,7 @@ export function openPlantDb(): Promise<IDBDatabase> {
 }
 
 export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPackage> {
-  const db = await openPlantDb();
+  const db = await openPlantDb(seed.facility.id);
   const tx = db.transaction(PLANT_STORE, 'readwrite');
   const store = tx.objectStore(PLANT_STORE);
   const existing = await requestAsPromise(store.get(ACTIVE_KEY)) as FacilityPackage | undefined;
@@ -110,12 +114,12 @@ export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPa
   await transactionDone(tx);
   db.close();
   const loaded = loadFacilityPackage(existing ?? seed);
-  if (existing && existing.schemaVersion !== loaded.schemaVersion) await savePlant(loaded);
+  if (existing && existing.schemaVersion !== loaded.schemaVersion) await savePlant(loaded, seed.facility.id);
   return loaded;
 }
 
-export async function loadPlant(): Promise<FacilityPackage | null> {
-  const db = await openPlantDb();
+export async function loadPlant(facilityId?: string): Promise<FacilityPackage | null> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(PLANT_STORE, 'readonly');
   const result = await requestAsPromise(tx.objectStore(PLANT_STORE).get(ACTIVE_KEY)) as FacilityPackage | undefined;
   await transactionDone(tx);
@@ -123,8 +127,8 @@ export async function loadPlant(): Promise<FacilityPackage | null> {
   return result ? loadFacilityPackage(result) : null;
 }
 
-export async function savePlant(pkg: FacilityPackage): Promise<void> {
-  const db = await openPlantDb();
+export async function savePlant(pkg: FacilityPackage, facilityId = pkg.facility.id): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(PLANT_STORE, 'readwrite');
   tx.objectStore(PLANT_STORE).put(structuredClone(pkg), ACTIVE_KEY);
   await transactionDone(tx);
@@ -132,7 +136,7 @@ export async function savePlant(pkg: FacilityPackage): Promise<void> {
 }
 
 export async function resetPlant(seed: FacilityPackage): Promise<void> {
-  const db = await openPlantDb();
+  const db = await openPlantDb(seed.facility.id);
   const tx = db.transaction([PLANT_STORE, ATTACHMENT_STORE, OBSERVATION_STORE, MUTATION_STORE], 'readwrite');
   tx.objectStore(PLANT_STORE).put(structuredClone(seed), ACTIVE_KEY);
   tx.objectStore(ATTACHMENT_STORE).clear();
@@ -142,24 +146,24 @@ export async function resetPlant(seed: FacilityPackage): Promise<void> {
   db.close();
 }
 
-export async function putAttachment(record: AttachmentRecord): Promise<void> {
-  const db = await openPlantDb();
+export async function putAttachment(record: AttachmentRecord, facilityId?: string): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
   tx.objectStore(ATTACHMENT_STORE).put(record);
   await transactionDone(tx);
   db.close();
 }
 
-export async function deleteAttachment(id: string): Promise<void> {
-  const db = await openPlantDb();
+export async function deleteAttachment(id: string, facilityId?: string): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
   tx.objectStore(ATTACHMENT_STORE).delete(id);
   await transactionDone(tx);
   db.close();
 }
 
-export async function listAttachments(assetId?: string): Promise<AttachmentRecord[]> {
-  const db = await openPlantDb();
+export async function listAttachments(assetId?: string, facilityId?: string): Promise<AttachmentRecord[]> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readonly');
   const store = tx.objectStore(ATTACHMENT_STORE);
   const request = assetId ? store.index('assetId').getAll(assetId) : store.getAll();
@@ -169,8 +173,8 @@ export async function listAttachments(assetId?: string): Promise<AttachmentRecor
   return rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function getAttachment(id: string): Promise<AttachmentRecord | null> {
-  const db = await openPlantDb();
+export async function getAttachment(id: string, facilityId?: string): Promise<AttachmentRecord | null> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readonly');
   const row = await requestAsPromise(tx.objectStore(ATTACHMENT_STORE).get(id)) as (Omit<AttachmentRecord, 'access'> & { access?: AttachmentRecord['access'] }) | undefined;
   await transactionDone(tx);
@@ -178,16 +182,16 @@ export async function getAttachment(id: string): Promise<AttachmentRecord | null
   return row ? { ...row, access: row.access ?? 'LOCAL_ONLY' } : null;
 }
 
-export async function putObservation(record: ObservationRecord): Promise<void> {
-  const db = await openPlantDb();
+export async function putObservation(record: ObservationRecord, facilityId?: string): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(OBSERVATION_STORE, 'readwrite');
   tx.objectStore(OBSERVATION_STORE).put(record);
   await transactionDone(tx);
   db.close();
 }
 
-export async function listObservations(assetId?: string): Promise<ObservationRecord[]> {
-  const db = await openPlantDb();
+export async function listObservations(assetId?: string, facilityId?: string): Promise<ObservationRecord[]> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(OBSERVATION_STORE, 'readonly');
   const store = tx.objectStore(OBSERVATION_STORE);
   const request = assetId ? store.index('assetId').getAll(assetId) : store.getAll();
@@ -197,16 +201,16 @@ export async function listObservations(assetId?: string): Promise<ObservationRec
   return rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function queueMutation(mutation: SyncMutation): Promise<void> {
-  const db = await openPlantDb();
+export async function queueMutation(mutation: SyncMutation, facilityId?: string): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(MUTATION_STORE, 'readwrite');
   tx.objectStore(MUTATION_STORE).put(structuredClone(mutation));
   await transactionDone(tx);
   db.close();
 }
 
-export async function listQueuedMutations(): Promise<SyncMutation[]> {
-  const db = await openPlantDb();
+export async function listQueuedMutations(facilityId?: string): Promise<SyncMutation[]> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(MUTATION_STORE, 'readonly');
   const rows = await requestAsPromise(tx.objectStore(MUTATION_STORE).getAll()) as SyncMutation[];
   await transactionDone(tx);
@@ -214,8 +218,8 @@ export async function listQueuedMutations(): Promise<SyncMutation[]> {
   return rows.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
-export async function replaceQueuedMutations(mutations: SyncMutation[]): Promise<void> {
-  const db = await openPlantDb();
+export async function replaceQueuedMutations(mutations: SyncMutation[], facilityId?: string): Promise<void> {
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction(MUTATION_STORE, 'readwrite');
   const store = tx.objectStore(MUTATION_STORE);
   store.clear();
@@ -296,11 +300,13 @@ async function applyImportedPlant(
   attachments: AttachmentRecord[],
   observations: ObservationRecord[],
   mode: 'replace' | 'merge',
+  facilityId: string,
 ): Promise<FacilityPackage> {
-  const current = await loadPlant();
+  if (incoming.facility.id !== facilityId) throw new Error(`Facility archive mismatch: expected ${facilityId}, received ${incoming.facility.id}`);
+  const current = await loadPlant(facilityId);
   const next = mergePlant(current, incoming, mode);
-  await savePlant(next);
-  const db = await openPlantDb();
+  await savePlant(next, facilityId);
+  const db = await openPlantDb(facilityId);
   const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
   if (mode === 'replace') {
     tx.objectStore(ATTACHMENT_STORE).clear();
@@ -313,10 +319,10 @@ async function applyImportedPlant(
   return next;
 }
 
-export async function exportPlantBackup(): Promise<PlantBackup> {
-  const plant = await loadPlant();
+export async function exportPlantBackup(facilityId?: string): Promise<PlantBackup> {
+  const plant = await loadPlant(facilityId);
   if (!plant) throw new Error('No plant database is loaded');
-  const [allAttachments, observations] = await Promise.all([listAttachments(), listObservations()]);
+  const [allAttachments, observations] = await Promise.all([listAttachments(undefined, facilityId), listObservations(undefined, facilityId)]);
   const plantForExport = portablePlantPackage(plant);
   const attachments = allAttachments.filter((item) => item.access === 'PUBLIC_APP');
   const encoded: ExportAttachment[] = [];
@@ -334,23 +340,23 @@ export async function exportPlantBackup(): Promise<PlantBackup> {
   };
 }
 
-export async function importPlantBackup(backup: PlantBackup, mode: 'replace' | 'merge'): Promise<FacilityPackage> {
+export async function importPlantBackup(backup: PlantBackup, mode: 'replace' | 'merge', facilityId = backup.plant.facility.id): Promise<FacilityPackage> {
   if (backup?.format !== 'industrial-asset-graph' || ![1, 2].includes(backup.version)) throw new Error('Unsupported Industrial Asset Graph backup');
   const attachments: AttachmentRecord[] = (backup.attachments ?? []).map((attachment) => {
     const { dataUrl, ...metadata } = attachment;
     return { ...metadata, blob: dataUrlToBlob(dataUrl) };
   });
-  return applyImportedPlant(loadFacilityPackage(backup.plant), attachments, backup.observations ?? [], mode);
+  return applyImportedPlant(loadFacilityPackage(backup.plant), attachments, backup.observations ?? [], mode, facilityId);
 }
 
 function safeArchiveName(name: string) {
   return name.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '_').replace(/^\.+/, '').slice(0, 140) || 'attachment';
 }
 
-export async function exportPlantArchive(): Promise<Blob> {
-  const plant = await loadPlant();
+export async function exportPlantArchive(facilityId?: string): Promise<Blob> {
+  const plant = await loadPlant(facilityId);
   if (!plant) throw new Error('No plant database is loaded');
-  const [allAttachments, observations] = await Promise.all([listAttachments(), listObservations()]);
+  const [allAttachments, observations] = await Promise.all([listAttachments(undefined, facilityId), listObservations(undefined, facilityId)]);
   const plantForExport = portablePlantPackage(plant);
   const attachments = allAttachments.filter((item) => item.access === 'PUBLIC_APP');
   const exportedAt = new Date().toISOString();
@@ -390,7 +396,7 @@ async function jsonEntry<T>(files: Map<string, Blob>, path: string): Promise<T> 
   return JSON.parse(await entry.text()) as T;
 }
 
-export async function importPlantArchive(file: Blob, mode: 'replace' | 'merge'): Promise<FacilityPackage> {
+export async function importPlantArchive(file: Blob, mode: 'replace' | 'merge', facilityId?: string): Promise<FacilityPackage> {
   const files = await readStoredZip(file);
   const manifest = await jsonEntry<IagArchiveManifest>(files, 'manifest.json');
   if (manifest?.format !== 'industrial-asset-graph' || ![1, 2].includes(manifest.archiveVersion)) throw new Error('Unsupported Industrial Asset Graph archive');
@@ -404,5 +410,5 @@ export async function importPlantArchive(file: Blob, mode: 'replace' | 'merge'):
     const { filePath: _filePath, ...record } = row;
     attachments.push({ ...record, blob: new Blob([await entry.arrayBuffer()], { type: row.mimeType }) });
   }
-  return applyImportedPlant(plant, attachments, observations, mode);
+  return applyImportedPlant(plant, attachments, observations, mode, facilityId ?? plant.facility.id);
 }

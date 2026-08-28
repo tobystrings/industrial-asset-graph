@@ -7,7 +7,7 @@ import { exportPlantArchive, importPlantArchive, resetPlant } from './runtimeDb'
 describe('.iag archive compatibility', () => {
   it('exports archive v2 with schema-v2 plant data', async () => {
     await resetPlant(demoFacilityPackage);
-    const archive = await exportPlantArchive();
+    const archive = await exportPlantArchive(demoFacilityPackage.facility.id);
     const files = await readStoredZip(archive);
     const manifest = JSON.parse(await files.get('manifest.json')!.text());
     const plant = JSON.parse(await files.get('data/plant.json')!.text());
@@ -23,7 +23,7 @@ describe('.iag archive compatibility', () => {
       { name: 'data/observations.json', data: '[]' },
       { name: 'data/attachments.json', data: '[]' },
     ]);
-    const imported = await importPlantArchive(archive, 'replace');
+    const imported = await importPlantArchive(archive, 'replace', demoFacilityPackage.facility.id);
     expect(imported.schemaVersion).toBe(2);
     expect(imported.assets).toEqual(demoFacilityPackage.assets);
   });

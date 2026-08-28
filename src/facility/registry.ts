@@ -1,24 +1,23 @@
-import { demoFacilityPackage } from '../../facilities/demo-plant';
-import { buildLiebFoodsPackage } from '../../facilities/lieb-foods';
 import type { FacilityPackage } from './types';
 
 /** The application-facing registry. Facility packs are replaceable providers. */
 export type FacilityPackLoader = () => FacilityPackage;
 
-const registry = new Map<string, FacilityPackLoader>([
-  ['lieb-foods', buildLiebFoodsPackage],
-  ['demo-plant', () => demoFacilityPackage],
-]);
+export function createFacilityRegistry(entries: Record<string, FacilityPackLoader>, defaultId: string) {
+  const registry = new Map(Object.entries(entries));
+  if (!registry.has(defaultId)) throw new Error(`Default facility pack is not registered: ${defaultId}`);
 
-export function registerFacilityPack(id: string, loader: FacilityPackLoader) {
-  if (!id.trim()) throw new Error('Facility pack id is required.');
-  registry.set(id, loader);
+  return {
+    register(id: string, loader: FacilityPackLoader) {
+      if (!id.trim()) throw new Error('Facility pack id is required.');
+      registry.set(id, loader);
+    },
+    load(id: string | undefined): FacilityPackage {
+      const key = id === undefined || id.trim() === '' ? defaultId : id;
+      const loader = registry.get(key);
+      if (!loader) throw new Error(`Unknown facility pack: ${key}. Registered facilities: ${[...registry.keys()].join(', ')}`);
+      return structuredClone(loader());
+    },
+    ids() { return [...registry.keys()]; },
+  };
 }
-
-export function loadFacilityPack(id: string | undefined): FacilityPackage {
-  const key = id && registry.has(id) ? id : 'lieb-foods';
-  const loader = registry.get(key)!;
-  return structuredClone(loader());
-}
-
-export function registeredFacilityIds() { return [...registry.keys()]; }

@@ -154,8 +154,8 @@ export function FacilityProvider({
   const [pkg, setPkg] = useState<FacilityPackage>(value);
   const [ready, setReady] = useState(false);
   const [currentUser, setCurrentUser] = useState<IagUser | null>(() => loadCurrentUser());
-  const [pendingChanges, setPendingChanges] = useState<PendingChange[]>(() => loadPendingChanges());
-  const [auditLog, setAuditLog] = useState<AuditEvent[]>(() => loadAuditEvents());
+  const [pendingChanges, setPendingChanges] = useState<PendingChange[]>(() => loadPendingChanges(value.facility.id));
+  const [auditLog, setAuditLog] = useState<AuditEvent[]>(() => loadAuditEvents(value.facility.id));
   const [adminCredentialConfigured, setAdminCredentialConfigured] = useState(() => hasAdminCredential());
   const [sync, setSync] = useState<SyncSummary>({ phase: 'LOCAL_ONLY', accepted: [], conflicts: [], retained: [] });
   const [queuedMutationCount, setQueuedMutationCount] = useState(0);
@@ -177,7 +177,7 @@ export function FacilityProvider({
         setPkg(stored);
         pkgRef.current = stored;
         setReady(true);
-        void listQueuedMutations().then((items) => {
+        void listQueuedMutations(value.facility.id).then((items) => {
           const conflicts = items.filter((item) => item.reviewState === 'CONFLICT' && item.conflict).map((item) => ({ status: 'conflict' as const, mutationId: item.mutationId, entityId: item.entityId, ...item.conflict! }));
           setQueuedMutationCount(items.length);
           setSync((state) => ({ ...state, phase: conflicts.length ? 'CONFLICT' : apiUrl ? items.some((item) => item.reviewState !== 'LOCAL_DRAFT') ? 'PENDING' : 'SYNCED' : 'LOCAL_ONLY', conflicts, retained: items }));
@@ -196,20 +196,20 @@ export function FacilityProvider({
     syncFacilityData(next);
     pkgRef.current = next;
     setPkg(next);
-    await savePlant(next);
+    await savePlant(next, next.facility.id);
   }, []);
 
   const savePending = useCallback((next: PendingChange[]) => {
     pendingRef.current = next;
     setPendingChanges(next);
-    savePendingChanges(next);
-  }, []);
+    savePendingChanges(pkg.facility.id, next);
+  }, [pkg.facility.id]);
 
   const appendAudit = useCallback((actor: string, action: string, detail: string) => {
     const next = [{ id: crypto.randomUUID(), actor, action, detail, at: new Date().toISOString() }, ...auditLog];
     setAuditLog(next);
-    saveAuditEvents(next);
-  }, [auditLog]);
+    saveAuditEvents(pkg.facility.id, next);
+  }, [auditLog, pkg.facility.id]);
 
   const commitCanonical = useCallback(async (next: FacilityPackage, entityId: string, reason: string, actor: IagUser, descriptor: ChangeDescriptor) => {
     const latest = pkgRef.current;
@@ -220,21 +220,21 @@ export function FacilityProvider({
     const evidenceAccess = descriptor.entityType === 'evidence' && typeof descriptor.value?.access === 'string'
       ? [descriptor.value.access as 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED']
       : evidenceIds.map((id) => latest.evidence.find((item) => item.id === id)?.access ?? 'RESTRICTED');
-    await queueMutation({ mutationId: crypto.randomUUID(), entityId, entityType: descriptor.entityType, actorId: actor.id, clientId: clientIdentity(), baseVersion, operation: descriptor.operation, createdAt: new Date().toISOString(), reviewState: 'APPROVED', value: descriptor.value, evidenceAccess });
-    const queued = await listQueuedMutations();
+    await queueMutation({ mutationId: crypto.randomUUID(), entityId, entityType: descriptor.entityType, actorId: actor.id, clientId: clientIdentity(), baseVersion, operation: descriptor.operation, createdAt: new Date().toISOString(), reviewState: 'APPROVED', value: descriptor.value, evidenceAccess }, latest.facility.id);
+    const queued = await listQueuedMutations(latest.facility.id);
     setQueuedMutationCount(queued.length);
     setSync((state) => ({ ...state, phase: apiUrl ? 'PENDING' : 'LOCAL_ONLY', retained: queued }));
   }, [apiUrl, commit]);
 
   const syncNow = useCallback(async () => {
-    const queue = await listQueuedMutations();
+    const queue = await listQueuedMutations(pkg.facility.id);
     setQueuedMutationCount(queue.length);
     if (!apiUrl) { setSync({ phase: 'LOCAL_ONLY', accepted: [], conflicts: [], retained: queue }); return; }
     if (typeof navigator !== 'undefined' && !navigator.onLine) { setSync({ phase: 'OFFLINE', accepted: [], conflicts: [], retained: queue }); return; }
     setSync({ phase: 'SYNCING', accepted: [], conflicts: [], retained: queue });
     const transport = new HttpSyncTransport(apiUrl, fetch, import.meta.env.VITE_IAG_WRITE_TOKEN);
     const result = await syncMutationQueue(pkg.facility.id, queue, transport);
-    await replaceQueuedMutations(result.retained);
+    await replaceQueuedMutations(result.retained, pkg.facility.id);
     setQueuedMutationCount(result.retained.length);
     setSync(result);
     try {
@@ -252,13 +252,13 @@ export function FacilityProvider({
   }, [apiUrl, commit, pkg]);
 
   const resolveConflict = useCallback(async (mutationId: string, action: 'KEEP_CANONICAL' | 'APPLY_PROPOSED') => {
-    const queue = await listQueuedMutations();
+    const queue = await listQueuedMutations(pkg.facility.id);
     const original = queue.find((item) => item.mutationId === mutationId);
     const conflict = sync.conflicts.find((item) => item.mutationId === mutationId);
     if (!original || !conflict) return;
     const retained = queue.filter((item) => item.mutationId !== mutationId);
     if (action === 'APPLY_PROPOSED') retained.push({ ...original, mutationId: crypto.randomUUID(), baseVersion: conflict.currentVersion, createdAt: new Date().toISOString(), reviewState: 'APPROVED' });
-    await replaceQueuedMutations(retained);
+    await replaceQueuedMutations(retained, pkg.facility.id);
     setQueuedMutationCount(retained.length);
     setSync({ phase: apiUrl && retained.some((item) => item.reviewState !== 'LOCAL_DRAFT') ? 'PENDING' : 'LOCAL_ONLY', accepted: [], conflicts: [], retained });
     appendAudit(currentUser?.name ?? 'Reviewer', action === 'APPLY_PROPOSED' ? 'Conflict proposed for resolution' : 'Conflict resolved with canonical value', `${original.entityId} · server revision ${conflict.currentVersion}`);
@@ -378,8 +378,8 @@ export function FacilityProvider({
         areas: pkg.areas.map((area) => ({ ...area, assetIds: area.assetIds.filter((id) => id !== assetId) })),
         mapConfig: { ...(pkg.mapConfig ?? {}), markers: ((pkg.mapConfig?.markers ?? []) as FacilityMapMarker[]).filter((item) => item.assetId !== assetId) },
       };
-      const attached = await listAttachments(assetId);
-      for (const attachment of attached) await removeAttachmentRecord(attachment.id);
+      const attached = await listAttachments(assetId, pkg.facility.id);
+      for (const attachment of attached) await removeAttachmentRecord(attachment.id, pkg.facility.id);
       await recordChange(next, assetId, 'Asset deleted in application', { entityType: 'asset', operation: 'DELETE' });
     },
     async saveRelationship(relationship) {
@@ -415,7 +415,7 @@ export function FacilityProvider({
         id: crypto.randomUUID(), assetId, name: file.name, mimeType: file.type || 'application/octet-stream', size: file.size,
         blob: file, category, verificationStatus, access: 'LOCAL_ONLY', createdAt: new Date().toISOString(),
       };
-      await putAttachment(record);
+      await putAttachment(record, pkg.facility.id);
       const evidenceId = `EV-${record.id}`;
       const evidence = [...pkg.evidence, {
         id: evidenceId,
@@ -439,7 +439,7 @@ export function FacilityProvider({
       return record;
     },
     async deleteAttachment(id) {
-      await removeAttachmentRecord(id);
+      await removeAttachmentRecord(id, pkg.facility.id);
       const uri = `indexeddb://attachment/${id}`;
       await recordChange({
         ...pkg,
@@ -447,23 +447,23 @@ export function FacilityProvider({
         documents: pkg.documents.filter((item) => item.path !== uri),
       }, id, 'Local evidence removed in application', { entityType: 'evidence', operation: 'DELETE', value: { access: 'LOCAL_ONLY' } });
     },
-    attachments: listAttachments,
+    attachments: (assetId) => listAttachments(assetId, pkg.facility.id),
     async addObservation(input) {
       const record: ObservationRecord = { ...input, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
-      await putObservation(record);
+      await putObservation(record, pkg.facility.id);
       return record;
     },
-    observations: listObservations,
-    exportArchive: exportPlantArchive,
+    observations: (assetId) => listObservations(assetId, pkg.facility.id),
+    exportArchive: () => exportPlantArchive(pkg.facility.id),
     async importArchive(file, mode) {
-      const next = await importPlantArchive(file, mode);
+      const next = await importPlantArchive(file, mode, pkg.facility.id);
       syncFacilityData(next);
       pkgRef.current = next;
       setPkg(next);
     },
-    exportBackup: exportPlantBackup,
+    exportBackup: () => exportPlantBackup(pkg.facility.id),
     async importBackup(backup, mode) {
-      const next = await importPlantBackup(backup, mode);
+      const next = await importPlantBackup(backup, mode, pkg.facility.id);
       syncFacilityData(next);
       pkgRef.current = next;
       setPkg(next);

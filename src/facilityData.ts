@@ -1,6 +1,12 @@
 import activeFacilityPackage from './facility/activeFacility';
 import type { FacilityPackage } from './facility/types';
 
+/**
+ * @deprecated Compatibility projection for legacy J. Lieb-era feature helpers.
+ * New generic runtime code must consume FacilityPackage through FacilityProvider
+ * or accept facility-derived inputs explicitly. This module owns no facility facts.
+ */
+
 export function facilityDataFor(pkg: FacilityPackage) {
   return {
     facility: pkg.facility,

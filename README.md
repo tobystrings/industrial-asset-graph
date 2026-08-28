@@ -40,6 +40,8 @@ The reusable application lives under `src/`; facility-specific seed content and 
 
 ## Data boundaries
 
+Facility packaging, selection, persistence isolation, and instructions for adding another site are documented in [docs/FACILITY-PACKS.md](docs/FACILITY-PACKS.md).
+
 Facility facts must be backed by accepted evidence or explicitly marked for field verification. Local drawings, photos, tags, CMMS exports, LOTO procedures, and field observations are controlled evidence and are not bundled into the public frontend unless they are part of an intentionally packaged public facility reference.
 
 ## Checks

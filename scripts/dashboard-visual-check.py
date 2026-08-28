@@ -153,7 +153,7 @@ def exercise_manager_states(page, label: str) -> None:
     page.locator('.iag-map-edit-banner').wait_for(state='hidden')
 
     page.evaluate('''() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('industrial-asset-graph-runtime', 2);
+      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         const db = request.result;
@@ -178,7 +178,7 @@ def exercise_manager_states(page, label: str) -> None:
     screenshot(page, f'{label}-sync-conflict')
     close_editor(page)
     page.evaluate('''() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('industrial-asset-graph-runtime', 2);
+      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
       request.onerror = () => reject(request.error);
       request.onsuccess = () => { const db = request.result; const tx = db.transaction('mutation-outbox', 'readwrite'); tx.objectStore('mutation-outbox').delete('visual-test-conflict'); tx.oncomplete = () => { db.close(); resolve(); }; tx.onerror = () => reject(tx.error); };
     })''')
