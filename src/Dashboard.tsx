@@ -25,6 +25,7 @@ import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
 import MapStage, { mapModeFromQuery, type MapMode } from './map/MapStage';
 import type { DocumentationState, FacilityArea, FacilityAsset, ReviewDecision, SystemKind, VerificationState } from './types/facility';
+import { navigate, type PageId } from './navigation/pages';
 
 const DocumentsWorkspace = lazy(() => import('./dashboard/DocumentsWorkspace'));
 const FieldDocumentationWorkspace = lazy(() => import('./dashboard/FieldDocumentationWorkspace'));
@@ -56,13 +57,15 @@ function useCount(target: number) {
 }
 
 export default function Dashboard({
-  view, onView, onOpenCabinet, pendingCommand, onPendingCommand,
+  view, onView, onOpenCabinet, pendingCommand, onPendingCommand, pageMode, onRecord,
 }: {
   view: AppView;
   onView: (view: AppView) => void;
   onOpenCabinet: () => void;
   pendingCommand?: FilmCommand | null;
   onPendingCommand?: (command: FilmCommand | null) => void;
+  pageMode?: PageId;
+  onRecord?: (id: string) => void;
 }) {
   const params = new URLSearchParams(location.search);
   const requestedAssetId = params.get('asset');
@@ -88,7 +91,7 @@ export default function Dashboard({
     return tab === 'map' && initialAsset ? 'find' : tab;
   });
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>(() => (
-    params.get('field') === '1' ? 'field' : view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : (params.get('command') === 'trace' || params.get('trace')) ? 'relationships' : 'map'
+    pageMode === 'field' || params.get('field') === '1' ? 'field' : view === 'assets' ? 'assets' : view === 'documents' ? 'documents' : pageMode === 'relationships' || (params.get('command') === 'trace' || params.get('trace')) ? 'relationships' : 'map'
   ));
   const [traceOn, setTraceOn] = useState(params.get('command') === 'trace' || Boolean(params.get('trace')));
   const [traceMode, setTraceMode] = useState<TroubleshootMode>(() => {
@@ -117,6 +120,7 @@ export default function Dashboard({
   useEffect(() => {
     const search = dashboardSearch({
       view,
+      page: pageMode,
       facilityId: new URLSearchParams(location.search).get('facilityId'),
       area: selectedArea?.id,
       asset: selectedAsset?.id,
@@ -138,6 +142,12 @@ export default function Dashboard({
     }
     localStorage.setItem('industrial-asset-selection', JSON.stringify({ area: selectedArea?.id, asset: selectedAsset?.id }));
   }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen, workspaceTab, traceMode, traceOn]);
+
+  useEffect(() => {
+    if (pageMode !== 'map' || params.get('edit') !== '1') return;
+    const frame = requestAnimationFrame(() => dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true })));
+    return () => { cancelAnimationFrame(frame); dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: false })); };
+  }, []);
 
   useEffect(() => subscribeViewport((snap) => {
     if (snap.desktop) {
@@ -406,7 +416,7 @@ export default function Dashboard({
 
   return (
     <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${drawerOpen ? ' drawer-open' : ''}${focusCabinet ? ' focus-cabinet' : ''}${workspaceTab === 'map' && (selectedArea || selectedAsset) && !mapInspectorDismissed ? ' map-inspector-open' : ''}`}>
-      <TopNav
+      {!pageMode && <><TopNav
         brandMark={brandMark}
         facilityName={facility.name}
         workspaceTab={workspaceTab}
@@ -443,12 +453,12 @@ export default function Dashboard({
           setFilters(next);
         }}
       />
-      {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
+      {drawerOpen && <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />}</>}
       {unresolvedAssetId && <div className="deep-link-warning" role="alert">Asset “{unresolvedAssetId}” was not found. Showing the facility board instead.</div>}
 
       {view === 'dashboard' && (
         <>
-          <KpiStrip
+          {!pageMode && <KpiStrip
             coverage={coverage}
             coverageDisplay={coverageN}
             coverageSubtitle={`${coverageSubtitle()} · ${assetDocumentationCompleteness().map((item) => `${item.assetId} ${item.percent}%`).join(' · ')}`}
@@ -458,9 +468,9 @@ export default function Dashboard({
             documentedAssets={documentedAssetCount()}
             documentedDisplay={assetN}
             recordCount={recordCount()}
-          />
+          />}
 
-          {workspaceTab === 'map' && (
+          {workspaceTab === 'map' && pageMode !== 'asset' && pageMode !== 'area' && (
             <section className="map-panel panel enter" data-guide-target="facility-map" style={{ animationDelay: '80ms' }}>
               <div className="panel-heading">
                 <b>Building layout</b>
@@ -481,8 +491,9 @@ export default function Dashboard({
                 const asset = machines.find((item) => item.id === assetId);
                 if (asset) selectAsset(asset);
               }}
-              onMap={() => setWorkspaceTab('map')}
+              onMap={() => pageMode ? navigate('map') : setWorkspaceTab('map')}
               onExit={() => {
+                if (pageMode) { navigate('map'); return; }
                 setTraceOn(false);
                 setWorkspaceTab('map');
                 const next = new URLSearchParams(location.search);
@@ -491,12 +502,12 @@ export default function Dashboard({
               }}
             />
           )}
-          {workspaceTab === 'field' && <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading field documentation workspace…</section>}><FieldDocumentationWorkspace selectedAsset={selectedAsset} onAsset={selectAsset} onChanged={() => setCaptureTick((value) => value + 1)} onExit={() => setWorkspaceTab('map')} /></Suspense>}
+          {workspaceTab === 'field' && <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading field documentation workspace…</section>}><FieldDocumentationWorkspace selectedAsset={selectedAsset} onAsset={selectAsset} onChanged={() => setCaptureTick((value) => value + 1)} onExit={() => pageMode ? navigate('home') : setWorkspaceTab('map')} /></Suspense>}
         </>
       )}
 
       {view === 'assets' && (
-        <AssetDirectory systemKind={systemKind} onSystemKind={setSystemKind} query={query} onQuery={setQuery} onAsset={(asset) => { selectAsset(asset); setWorkspaceTab('map'); setInspectorTab('record'); onView('dashboard'); }} onDevice={(item, parent) => {
+        <AssetDirectory systemKind={systemKind} onSystemKind={setSystemKind} query={query} onQuery={setQuery} onAsset={(asset) => { if (onRecord) { onRecord(asset.id); return; } selectAsset(asset); setWorkspaceTab('map'); setInspectorTab('record'); onView('dashboard'); }} onDevice={(item, parent) => {
           selectAsset(parent);
           setFocusDevice(item.id);
           const parsed = parseDeviceQuery(item.id);
@@ -509,12 +520,13 @@ export default function Dashboard({
         <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading document workspace…</section>}><DocumentsWorkspace
           activeDocument={activeDocument}
           docStateFilter={docStateFilter}
-          onDocument={setActiveDocument}
+          onDocument={id => pageMode ? navigate('documents', id ? {doc:id} : {}) : setActiveDocument(id)}
           onDocStateFilter={setDocStateFilter}
         /></Suspense>
       )}
 
-      <InspectorRail
+      {pageMode === 'map' && (selectedArea || selectedAsset) && <section className="map-selection-card"><div><small>Selected {selectedAsset ? 'equipment' : 'area'}</small><h2>{selectedAsset?.name ?? selectedArea?.name}</h2></div><button type="button" onClick={() => selectedAsset ? navigate('asset',{asset:selectedAsset.id,tab:'record'}) : navigate('area',{area:selectedArea!.id,tab:'record'})}>Open details →</button><button type="button" aria-label="Clear map selection" onClick={() => { setSelectedAsset(null); setSelectedArea(null); }}>×</button></section>}
+      {(!pageMode || pageMode === 'asset' || pageMode === 'area') && <InspectorRail
         ref={railRef}
         inspectorTab={inspectorTab}
         onInspectorTab={setInspectorTab}
@@ -524,7 +536,7 @@ export default function Dashboard({
         selectedAsset={selectedAsset}
         selectedArea={selectedArea}
         activeDocument={activeDocument}
-        onDocument={setActiveDocument}
+        onDocument={id => pageMode ? navigate('documents', id ? {doc:id} : {}) : setActiveDocument(id)}
         onOpenCabinet={onOpenCabinet}
         packetOpen={packetOpen}
         packetAsset={packetAsset}
@@ -534,7 +546,7 @@ export default function Dashboard({
         onFocusCabinet={() => setFocusCabinet((value) => !value)}
         onDoorSheet={() => setDoorOpen(true)}
         onCapture={() => setCaptureTick((value) => value + 1)}
-        onTrace={() => { setTraceOn(true); setInspectorTab('intel'); }}
+        onTrace={() => { if (pageMode) { navigate('relationships', selectedAsset ? {asset:selectedAsset.id} : {}); return; } setTraceOn(true); setInspectorTab('intel'); }}
         openUnknown={openUnknown}
         onOpenUnknown={setOpenUnknown}
         focusDevice={focusDevice}
@@ -573,10 +585,10 @@ export default function Dashboard({
         onApplyWarning={setApplyWarning}
         revisions={revisions}
         evidence={evidence}
-        onCloseMapInspector={workspaceTab === 'map' ? () => setMapInspectorDismissed(true) : undefined}
-      />
+        onCloseMapInspector={!pageMode && workspaceTab === 'map' ? () => setMapInspectorDismissed(true) : undefined}
+      />}
 
-      <footer className="facility-status">
+      {!pageMode && <><footer className="facility-status">
         <span><i className={markerClass('COMPLETE')} /> Facility status · {facility.status}</span>
         <span>Documented assets <b>{machines.length}</b></span>
         <span>{queueCountLabel(selectedAsset)}</span>
@@ -589,7 +601,7 @@ export default function Dashboard({
         <button className={phoneTab === 'queue' ? 'active' : ''} onClick={() => { setPhoneTab('queue'); setInspectorTab('capture'); }}><i aria-hidden="true">☰</i>Queue</button>
         <button className={phoneTab === 'docs' ? 'active' : ''} onClick={() => { setPhoneTab('docs'); openWorkspace('documents'); }}><i aria-hidden="true">▤</i>Docs</button>
         <button className={phoneTab === 'more' ? 'active' : ''} onClick={() => { setPhoneTab('more'); setDrawerOpen(true); }}><i aria-hidden="true">•••</i>More</button>
-      </nav>
+      </nav></>}
 
       {doorOpen && <DoorSheet onClose={() => setDoorOpen(false)} />}
       {paletteOpen && (

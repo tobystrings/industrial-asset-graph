@@ -1,113 +1,42 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
 import Dashboard, { type AppView } from './Dashboard';
 import { useFacility, useFacilityEditor } from './facility';
-import PlantManager from './editor/PlantManager';
+import { ManagerPage } from './editor/PlantManager';
 import './editor/plantManagerCrud.css';
-import type { FilmCommand } from './lib/filmBridge';
 import { subscribeViewport } from './lib/viewport';
-import { FacilityGuide, guideDialogue, useFacilityGuide, type GuideActionId, type GuidePage } from './features/facility-guide';
-
+import { FacilityGuide, useFacilityGuide, type GuideActionId } from './features/facility-guide';
+import AppShell, { HomePage, MorePage, PageLink } from './navigation/AppShell';
+import { navigate, readPage, type PageId } from './navigation/pages';
+import AccountSecurity from './auth/AccountSecurity';
 const ControlCabinetView = lazy(() => import('./ControlCabinetView'));
 
-function initialView(): AppView {
-  const value = new URLSearchParams(location.search).get('view');
-  if (value === 'cabinet' || value === 'assets' || value === 'documents') return value;
-  return 'dashboard';
-}
-
 export default function App() {
-  const shellRef = useRef<HTMLDivElement>(null);
-  const guide = useFacilityGuide();
+  const [route, setRoute] = useState(() => ({ page: readPage(location.search), key: 0 }));
+  const [mapPoint, setMapPoint] = useState<{x:number;y:number} | null>(null);
+  const { ready, currentUser } = useFacilityEditor();
   const { featureConfig } = useFacility();
-  const { ready } = useFacilityEditor();
-  const params = new URLSearchParams(location.search);
-  const [view, setView] = useState<AppView>(initialView);
-  const [pendingCommand, setPendingCommand] = useState<FilmCommand | null>(
-    params.get('command') === 'verify' || params.get('command') === 'trace' || params.get('command') === '3d' || params.get('command') === 'map'
-      ? params.get('command') as FilmCommand
-      : null,
-  );
+  const guide = useFacilityGuide();
+  const page = route.page;
   useLayoutEffect(() => subscribeViewport(() => undefined), []);
   useEffect(() => {
-    const onPopState = () => setView(initialView());
-    addEventListener('popstate', onPopState);
-    return () => removeEventListener('popstate', onPopState);
-  }, []);
-  useLayoutEffect(() => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    const bar = shell.querySelector<HTMLElement>('.iag-manager-bar');
-    if (!bar) {
-      shell.style.setProperty('--manager-bar-height', '0px');
-      return;
-    }
-    const measure = () => {
-      const barRect = bar.getBoundingClientRect();
-      const bottom = Number.parseFloat(getComputedStyle(bar).bottom) || 0;
-      const reserve = Math.max(0, Math.ceil(barRect.height + bottom + 10));
-      shell.style.setProperty('--manager-bar-height', `${reserve}px`);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(bar);
-    addEventListener('resize', measure);
-    return () => {
-      observer.disconnect();
-      removeEventListener('resize', measure);
-    };
-  }, []);
-  useEffect(() => {
-    const page: GuidePage = view === 'dashboard' ? 'map' : view;
-    guide.setContext({ page, assetId: view === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined });
-  }, [view, featureConfig.featuredCabinetAssetId]);
-  const changeView = (next: AppView) => {
-    setView(next);
-    const nextParams = new URLSearchParams(location.search);
-    if (next === 'dashboard') nextParams.delete('view');
-    else nextParams.set('view', next);
-    history.pushState(null, '', `${location.pathname}${nextParams.size ? `?${nextParams}` : ''}`);
-  };
-  useEffect(() => {
-    const handler = (event: Event) => {
-      const action = (event as CustomEvent<GuideActionId>).detail;
-      if (action === 'open-cabinet') { changeView('cabinet'); guide.show(guideDialogue.cabinet()); return; }
-      if (action === 'show-map') { changeView('dashboard'); guide.show(guideDialogue.map()); return; }
-      if (action === 'show-assets') { changeView('assets'); guide.show(guideDialogue.assets({ page: 'assets' })); return; }
-      if (action === 'show-relationships') { changeView('dashboard'); window.dispatchEvent(new CustomEvent('facility-guide-workspace', { detail: 'relationships' })); guide.show(guideDialogue.relationships({ page: 'relationships', assetId: view === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined })); return; }
-      if (action === 'show-documents') { changeView('documents'); guide.show(guideDialogue.documents()); }
-    };
-    addEventListener('facility-guide-action', handler);
-    return () => removeEventListener('facility-guide-action', handler);
-  }, [view, guide, featureConfig.featuredCabinetAssetId]);
-  useEffect(() => {
-    const handler = () => {
-      changeView('dashboard');
-      requestAnimationFrame(() => {
-        window.dispatchEvent(new CustomEvent('facility-guide-workspace', { detail: 'map' }));
-        window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true }));
-      });
-    };
-    addEventListener('iag-open-map-editor', handler);
-    return () => removeEventListener('iag-open-map-editor', handler);
-  });
-  return (
-    <div ref={shellRef} className="app-shell has-manager-bar">
-      <div className="backdrop" aria-hidden="true" />
-      {!ready ? <main className="workspace-loading" role="status">Loading local facility records…</main> : view === 'cabinet'
-        ? <Suspense fallback={<main className="iag-cabinet-loading" aria-live="polite">Loading control cabinet workspace…</main>}><ControlCabinetView onBack={() => changeView('dashboard')} /></Suspense>
-        : (
-          <Dashboard
-            view={view}
-            onView={changeView}
-            onOpenCabinet={() => {
-              changeView('cabinet');
-            }}
-            pendingCommand={pendingCommand}
-            onPendingCommand={setPendingCommand}
-          />
-        )}
-      <PlantManager />
-      <FacilityGuide />
-    </div>
-  );
+    const pop = () => setRoute(old => ({ page: readPage(location.search), key: old.key + 1 }));
+    const account = () => navigate('account'); const settings = () => navigate('settings');
+    const mapEdit = () => { if (currentUser?.role !== 'admin') { navigate('account'); return; } navigate('map', { edit: '1' }); };
+    const addAsset = (event: Event) => { setMapPoint((event as CustomEvent<{x:number;y:number}>).detail); navigate('assetAdd'); };
+    const action = (event: Event) => { const id = (event as CustomEvent<GuideActionId>).detail; const target = ({'open-cabinet':'cabinet','show-map':'map','show-assets':'assets','show-relationships':'relationships','show-documents':'documents'} as Record<string,PageId>)[id]; if (target) navigate(target); };
+    const shortcut = (event: KeyboardEvent) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); navigate('more'); } };
+    const entries: [string, EventListener][] = [['popstate',pop],['iag-open-users',account],['iag-open-settings',settings],['iag-open-map-editor',mapEdit],['iag-map-add-asset',addAsset],['facility-guide-action',action],['keydown',shortcut as EventListener]];
+    entries.forEach(([event,fn]) => addEventListener(event,fn));
+    return () => entries.forEach(([event,fn]) => removeEventListener(event,fn));
+  }, [currentUser?.role]);
+  useEffect(() => { guide.setContext({ page: page === 'cabinet' ? 'cabinet' : page === 'assets' || page === 'documents' || page === 'relationships' ? page : 'map', assetId: page === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined }); }, [page, featureConfig.featuredCabinetAssetId]);
+  const view: AppView = page === 'assets' || page === 'documents' ? page : 'dashboard';
+  const dashboardPage = ['map','assets','asset','area','documents','field','relationships'].includes(page);
+  const changeView = (next: AppView) => navigate(next === 'dashboard' ? 'map' : next);
+  return <AppShell page={page} navigationKey={route.key}>
+    {!ready ? <main className="workspace-loading" role="status">Loading local facility records…</main> :
+    <Suspense fallback={<main className="workspace-loading" role="status">Opening page…</main>}>
+      {page === 'home' ? <HomePage/> : page === 'more' ? <MorePage/> : page === 'account' ? <main className="account-page"><AccountSecurity/></main> : page === 'help' ? <main className="help-page"><section className="destination-card"><h2>Project tour</h2><p>Watch the existing narrated facility tour at your own pace.</p><a className="page-primary" href={`${import.meta.env.BASE_URL}presentation/`} target="_blank" rel="noreferrer">Open project tour ↗</a></section><section className="destination-card"><h2>Facility guide</h2><p>Open the guide for help finding your next task.</p><FacilityGuide/></section><PageLink page="field">Open field documentation →</PageLink></main> : page === 'cabinet' ? <ControlCabinetView key={route.key} onBack={() => navigate('assets')}/> : dashboardPage ? <Dashboard key={`${page}-${route.key}`} pageMode={page} view={view} onView={changeView} onOpenCabinet={() => navigate('cabinet',{device:new URLSearchParams(location.search).get('device') ?? ''})} onRecord={id => navigate('asset',{asset:id,tab:'record'})}/> : <ManagerPage key={page} page={page} point={mapPoint} onDone={() => { setMapPoint(null); navigate('more'); }}/>}
+    </Suspense>}
+  </AppShell>;
 }

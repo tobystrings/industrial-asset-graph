@@ -59,7 +59,7 @@ def sign_in(page, username=False):
     page.get_by_label('Username or email', exact=True).fill('visual-reviewer' if username else EMAIL)
     page.get_by_label('Password', exact=True).fill(PASSWORD)
     page.get_by_role('button', name='Sign in', exact=True).click()
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=30000)
+    page.locator('.app-pages').wait_for(state='visible', timeout=30000)
 
 def exercise_login(page, label, base, screenshot, state):
     # A legacy local admin record must NOT grant access, even on a deep link.
@@ -69,7 +69,7 @@ def exercise_login(page, label, base, screenshot, state):
     page.reload(wait_until='networkidle')
     print(f'{label}: waiting for login heading', flush=True)
     page.get_by_role('heading', name='Welcome back').wait_for(state='visible')
-    assert page.locator('.iag-manager-bar').count() == 0
+    assert page.locator('.app-pages').count() == 0
     assert page.locator('.dashboard').count() == 0
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
     screenshot(page, f'{label}-login')
@@ -82,11 +82,11 @@ def exercise_login(page, label, base, screenshot, state):
     page.get_by_role('button', name='Back to sign in', exact=False).click()
     sign_in(page, username=True)
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible')
+    page.locator('.app-pages').wait_for(state='visible')
     if label in {'laptop-1366x768', 'phone-390x844'}:
         page.goto(base+'?auth=reset', wait_until='networkidle')
         page.get_by_role('heading', name='Set a new password').wait_for()
-        assert page.locator('.iag-manager-bar').count()==0
+        assert page.locator('.app-pages').count()==0
         page.locator('input#auth-password').fill(PASSWORD)
         page.get_by_label('Confirm new password', exact=True).fill(PASSWORD+'mismatch')
         page.get_by_role('button', name='Save new password').click()
@@ -95,10 +95,10 @@ def exercise_login(page, label, base, screenshot, state):
         screenshot(page, f'{label}-password-reset')
         page.get_by_label('Confirm new password', exact=True).fill(PASSWORD)
         page.get_by_role('button', name='Save new password').click()
-        page.locator('.iag-manager-bar').wait_for(state='visible')
+        page.locator('.app-pages').wait_for(state='visible')
         assert state['password_updates']==[PASSWORD]
         assert 'auth=reset' not in page.url
-        page.locator('.iag-manager-bar').get_by_role('button',name='Users',exact=True).click()
+        page.goto(base+'?page=account', wait_until='networkidle')
         page.get_by_role('region',name='Account security').get_by_role('button',name='Sign out',exact=True).click()
         page.get_by_role('heading',name='Welcome back').wait_for()
         assert state['logouts']==1
@@ -116,23 +116,23 @@ def exercise_rejected_auth(browser, base, screenshot):
         page.get_by_label('Password', exact=True).fill('wrong-password')
         page.get_by_role('button', name='Sign in', exact=True).click()
         page.get_by_role('alert').filter(has_text='Unable to sign in').wait_for()
-        assert page.locator('.iag-manager-bar').count()==0
+        assert page.locator('.app-pages').count()==0
         screenshot(page, 'phone-auth-rejected-password')
         page.get_by_role('button', name='Use a passkey').click()
         page.get_by_role('alert').filter(has_text='Passkey sign-in').wait_for()
-        assert page.locator('.iag-manager-bar').count()==0
+        assert page.locator('.app-pages').count()==0
         state['role']='technician'
         sign_in(page)
         page.evaluate("() => localStorage.setItem('iag-change-control-user', JSON.stringify({id:'forged',name:'Forged admin',role:'admin'}))")
         page.reload(wait_until='networkidle')
-        page.locator('.iag-manager-bar').wait_for(state='visible')
-        page.locator('.iag-manager-bar').get_by_role('button', name='Users', exact=True).click()
+        page.locator('.app-pages').wait_for(state='visible')
+        page.goto(base+'?page=review', wait_until='networkidle')
         page.locator('.iag-user-card').get_by_text('Technician — proposed changes require approval', exact=True).wait_for()
         assert page.get_by_label('Administrator PIN').count()==0
         state['authenticated']=False
         page.reload(wait_until='networkidle')
         page.get_by_role('heading', name='Welcome back').wait_for()
-        assert page.locator('.iag-manager-bar').count()==0
+        assert page.locator('.app-pages').count()==0
         screenshot(page, 'phone-auth-revoked-session')
     finally:
         page.close()

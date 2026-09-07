@@ -1,7 +1,7 @@
 # Industrial Asset Graph — agent handoff
 
-**Date:** 2026-08-14  
-**Product title:** Industrial Asset Graph (never “Plant Dependency Map”)  
+**Date:** 2026-09-07
+**Product title:** Industrial Asset Graph (never “Plant Dependency Map”)
 **Repository root:** the directory containing this file
 
 This is the J. Lieb Foods **facility knowledge board**. It is not Golfgold, not a CMMS, not SCADA, not a digital twin. Do not import Desktop `golfgold/` assets.
@@ -20,7 +20,7 @@ npm install
 npm run dev -- --host 0.0.0.0 --port 4173
 ```
 
-**Board (required base path):**  
+**Board (required base path):**
 http://127.0.0.1:4173/industrial-asset-graph/
 
 The building layout is the fixed bird's-eye **2D schematic only**. Legacy `map=3d` links are normalized to `map=2d`.
@@ -29,11 +29,15 @@ Useful URLs:
 
 | What | URL |
 |------|-----|
-| Default board (2D) | `/industrial-asset-graph/` |
+| Home (after login) | `/industrial-asset-graph/` |
+| Assets | `/industrial-asset-graph/?page=assets` |
+| Documents | `/industrial-asset-graph/?page=documents` |
+| Field documentation | `/industrial-asset-graph/?page=field` |
+| All tools | `/industrial-asset-graph/?page=more` |
 | Bird's-eye schematic | `/industrial-asset-graph/?map=2d` |
 | Line 2 cabinet | `/industrial-asset-graph/?view=cabinet` |
 | Intel on L2 cabinet | `/industrial-asset-graph/?asset=L2-CC-001&tab=intel` |
-| Hold Genie mini | `/industrial-asset-graph/?film=1` |
+| Help / guide | `/industrial-asset-graph/?page=help` |
 | Reduced motion | `?motion=reduce` (0 ms) |
 | Full motion | `?motion=full` |
 | Standalone film | `/industrial-asset-graph/presentation/` |
@@ -71,9 +75,9 @@ Evidence-aware dashboard for **J. Lieb Foods**:
 - Inspector: Capture / Intel / Record / Docs / Log
 - Line 2 Conveyor Control Cabinet drawing (SVG + PNG + PDF + JSON)
 - Local walkdown / Keep review (never auto-merges into canonical facility-pack truth)
-- Project film **Genie** as a **dock bar by default** (native MP3 clock). Mini card only when the user opens the film.
+- Facility guide on a dedicated Help page; the project film opens from there without occupying every workspace.
 
-Phone: Map / Find / Queue / Cabinet. ☰ opens the **area drawer only** (Documents and Control cabinets live in that drawer).
+Phone: Home / Map / Assets / Docs / More. Each task is a separate page, with navigation in a reserved bottom row and a single scrolling content region. Map selections open dedicated area or asset records. Field documentation separates Checklist, Connections, and Evidence. See `src/navigation/` for route metadata, shared shell, and responsive styles. Browser back/forward and legacy deep links remain supported.
 
 ---
 
@@ -87,7 +91,7 @@ Phone: Map / Find / Queue / Cabinet. ☰ opens the **area drawer only** (Documen
 - L2 film chapter is scene **5** or `path=line2`. L4 (`FG-L4-MTN-001`) is **intro-only**.
 - **Do not regenerate film MP3s.**
 - **No 3D map or map-mode toggle.** The building layout stays on the fixed bird's-eye 2D schematic.
-- Genie is a dock / mini player, not a modal sheet or iframe theater.
+- The guide is confined to Help; do not restore a global guide or manager dock.
 - `LOCAL_ONLY` evidence is not bundled.
 
 `docs/MODERNIZATION-HANDOFF.md` is stale. This file is current.
@@ -102,7 +106,8 @@ Key source:
 
 | Path | Role |
 |------|------|
-| `src/App.tsx` | View + always-mounted FilmTheater |
+| `src/App.tsx` | Dedicated page routing and authenticated workspace selection |
+| `src/navigation/` | Shareable page URLs, app shell, Home, More, responsive page styles |
 | `src/Dashboard.tsx` | Board, inspector, URL `replaceState` |
 | `src/ControlCabinetView.tsx` | Line 2 cabinet package |
 | `src/FilmTheater.tsx` | Genie mini → dock, native MP3 clock |
@@ -153,17 +158,16 @@ Empty areas (Dock 1, etc.) have **capture kits only**. Export area walk pack doe
 
 ---
 
-## Genie / film
+## Film assets and legacy player
 
-- Always mounted. **Default is the dock bar**, not the mini card. No autoplay on load.
-- Mini player only when the user **opens** the film (Film button, Continue tour, chapter, `?film=1` / `?hold=mini`). Escape returns to the bar.
-- `?view=film` is treated as `film=1`. It must **not** overwrite `view=assets` / `view=documents` / `view=cabinet`.
+- The app no longer mounts a global film dock. Help links to the standalone presentation. No autoplay on app load.
+- Legacy `?film=1` links resolve to Help. Preserve the film assets and standalone presentation.
 - Clock source: `complete-project-film.mp3` (~8:51). Ken Burns off on cabinet stills and when reduced-motion.
 - Reduced-motion present/collapse = **0 ms**.
 
 ---
 
-## Recent behavior (2026-08-14)
+## Historical behavior (2026-08-14; navigation superseded by September page redesign)
 
 - Collapsible Intel / PLC rack / walkdown More start **expanded**; user can collapse (useState + onToggle).
 - Cabinet drawing is clipped to its grid cell; inspector is opaque; dock does not cover Save on desktop/tablet.

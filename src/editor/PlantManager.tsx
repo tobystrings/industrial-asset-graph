@@ -12,6 +12,7 @@ import './plantManagerAffordance.css';
 import './changeControl.css';
 import PrivateAssetImport from './PrivateAssetImport';
 import AccountSecurity from '../auth/AccountSecurity';
+import type { PageId } from '../navigation/pages';
 
 type Panel = 'overview' | 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | 'conflicts' | 'health' | 'import' | null;
 type MapPoint = { x: number; y: number } | null;
@@ -255,7 +256,7 @@ function DatabasePanel({ onDone }: { onDone: () => void }) {
 return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">Archive v2 contains the transport-eligible graph, map configuration, observations, and metadata. LOCAL_ONLY and RESTRICTED evidence files are excluded. Archive v1 and legacy JSON backups remain importable.</p><PrivateAssetImport/></div>;
 }
 
-function UsersPanel() {
+function UsersPanel({ account = true }: { account?: boolean }) {
   const editor = useFacilityEditor();
   const facility = useFacility();
   const isAdmin = editor.currentUser?.role === 'admin';
@@ -263,7 +264,7 @@ function UsersPanel() {
   return <div className="iag-editor-form iag-users-panel">
     <section className="iag-user-card"><strong>{editor.currentUser ? editor.currentUser.name : 'No user identified'}</strong><span>{editor.currentUser ? editor.currentUser.role === 'admin' ? 'Administrator' : 'Technician — proposed changes require approval' : 'Identify yourself before editing plant or map records.'}</span></section>
     <section className="iag-review-summary" aria-label="Review summary"><div><b>{editor.pendingChanges.length}</b><span>Pending review</span></div><div><b>{editor.sync.conflicts.length}</b><span>Conflicts</span></div><div><b>{editor.queuedMutationCount}</b><span>Queued sync</span></div></section>
-    <AccountSecurity/>
+    {account && <AccountSecurity/>}
     <div className="iag-review-group-label">Decision queue</div>
     {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Submitted for review</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => { const current = reviewValue(facility, change, false); const proposed = reviewValue(facility, change, true); return <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div className="iag-review-diff"><label>Current canonical value<pre>{JSON.stringify(current, null, 2)}</pre></label><label>{change.operation === 'DELETE' ? 'Proposed deletion' : 'Proposed value'}<pre>{change.operation === 'DELETE' ? 'DELETE — tombstone after approval' : JSON.stringify(proposed, null, 2)}</pre></label></div><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & promote to canonical</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>; })}</section>}
     <div className="iag-review-group-label">Activity</div>
@@ -466,6 +467,23 @@ export default function PlantManager() {
     {mapEdit && <div className="iag-map-edit-banner">MAP / AREA EDIT · Draft changes are not saved until approved <button type="button" onClick={() => setMapEdit(false)}>Exit</button></div>}
     {panel && typeof document !== 'undefined' && createPortal(<div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" role="dialog" aria-modal="true" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><div className="iag-panel-header-actions">{panel !== 'overview' && <button type="button" className="iag-panel-home" aria-label="Return to Command Center" onClick={() => setPanel('overview')}>Command Center</button>}<button type="button" aria-label="Close" onClick={close}>×</button></div></header>{panel === 'overview' && <CommandCenterPanel onOpen={setPanel}/>} {panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>} {panel === 'conflicts' && <ConflictsPanel/>} {panel === 'health' && <DataHealthPanel/>} {panel === 'import' && <BulkImportPanel/>}</aside></div>, document.body)}
   </>;
+}
+
+export function ManagerPage({ page, point, onDone }: { page: PageId; point: MapPoint; onDone: () => void }) {
+  return <main className="manager-page">
+    {page === 'assetAdd' && <AssetForm point={point} onDone={onDone}/>}
+    {page === 'manage' && <ManageAssets onDone={onDone}/>}
+    {page === 'connection' && <RelationshipPanel/>}
+    {page === 'evidence' && <EvidencePanel/>}
+    {page === 'observation' && <ObservationPanel/>}
+    {page === 'setup' && <PlantSetupPanel/>}
+    {page === 'database' && <DatabasePanel onDone={onDone}/>}
+    {page === 'review' && <UsersPanel account={false}/>}
+    {page === 'settings' && <SettingsPanel/>}
+    {page === 'conflicts' && <ConflictsPanel/>}
+    {page === 'health' && <DataHealthPanel/>}
+    {page === 'import' && <BulkImportPanel/>}
+  </main>;
 }
 
 function ConflictsPanel() {

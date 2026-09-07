@@ -7,6 +7,7 @@ import io
 import zipfile
 import hashlib
 import socket
+import urllib.request
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
@@ -50,62 +51,39 @@ def screenshot(page, name: str) -> Path:
 
 
 def assert_manager_geometry(page) -> None:
-    metrics = page.evaluate('''() => {
-      const bar = document.querySelector('.iag-manager-bar');
-      const shell = document.querySelector('.app-shell');
-      if (!bar || !shell) return null;
-      const rect = bar.getBoundingClientRect();
-      const style = getComputedStyle(bar);
-      const mapPanel = document.querySelector('.dashboard.workspace-map.view-dashboard > .map-panel');
-      const mapRect = mapPanel?.getBoundingClientRect();
-      const launcher = document.querySelector('.guide-launcher');
-      const guideRect = launcher && getComputedStyle(launcher).display !== 'none' ? launcher.getBoundingClientRect() : null;
-      return {
-        left: rect.left,
-        right: rect.right,
-        top: rect.top,
-        bottomEdge: rect.bottom,
-        height: rect.height,
-        viewportWidth: innerWidth,
-        viewportHeight: innerHeight,
-        cssReserve: parseFloat(getComputedStyle(shell).getPropertyValue('--manager-bar-height')) || 0,
-        cssBottom: parseFloat(style.bottom) || 0,
-        overflowX: style.overflowX,
-        maskImage: style.maskImage,
-        mapBottom: mapRect?.bottom ?? null,
-        guideBottom: guideRect?.bottom ?? null,
-      };
-    }''')
-    assert metrics, 'Plant Manager toolbar did not render.'
-    assert metrics['left'] >= -1, f"Manager bar starts outside viewport: {metrics}"
-    assert metrics['right'] <= metrics['viewportWidth'] + 1, f"Manager bar extends outside viewport: {metrics}"
-    assert metrics['top'] >= 0, f"Manager bar starts above viewport: {metrics}"
-    assert metrics['bottomEdge'] <= metrics['viewportHeight'] + 1, f"Manager bar extends below viewport: {metrics}"
-    minimum_reserve = metrics['height'] + max(0, metrics['cssBottom']) + 8
-    assert metrics['cssReserve'] + 3 >= minimum_reserve, (
-        f"Reserved manager-bar space is too small. reserve={metrics['cssReserve']} "
-        f"required>={minimum_reserve}; metrics={metrics}"
-    )
-    if metrics['mapBottom'] is not None:
-        assert metrics['mapBottom'] <= metrics['top'] + 2, f"Map workspace is hidden behind manager toolbar: {metrics}"
-    if metrics['guideBottom'] is not None:
-        assert metrics['guideBottom'] <= metrics['top'] + 2, f"Facility Guide overlaps manager toolbar: {metrics}"
-    if metrics['viewportWidth'] <= 900:
-        assert metrics['overflowX'] in ('auto', 'scroll'), f"Mobile toolbar should scroll horizontally: {metrics}"
-        assert metrics['maskImage'] in ('none', ''), f"Mobile toolbar must not hide controls behind a mask: {metrics}"
+    metrics = page.evaluate("""() => {
+      const nav = document.querySelector('.page-navigation').getBoundingClientRect();
+      const header = document.querySelector('.page-header').getBoundingClientRect();
+      const content = document.querySelector('.page-scroll').getBoundingClientRect();
+      return {nav: {top:nav.top,bottom:nav.bottom,left:nav.left,right:nav.right},headerBottom:header.bottom,
+        content:{top:content.top,bottom:content.bottom},width:innerWidth,height:innerHeight,
+        horizontalOverflow:document.documentElement.scrollWidth>innerWidth+1,
+        contentOverflow:document.querySelector('.page-scroll').scrollWidth>document.querySelector('.page-scroll').clientWidth+1,
+        targets:[...document.querySelectorAll('.page-navigation a')].map(e=>{const r=e.getBoundingClientRect();return {width:r.width,height:r.height}}),
+        legacy:document.querySelectorAll('.iag-manager-bar,.reference-topbar,.bottom-nav').length};
+    }""")
+    assert metrics['legacy']==0, f'Obsolete stacked navigation returned: {metrics}'
+    assert not metrics['horizontalOverflow'] and not metrics['contentOverflow'], f'Page has horizontal overflow: {metrics}'
+    assert metrics['nav']['left']>=0 and metrics['nav']['right']<=metrics['width']+1, f'Navigation extends outside viewport: {metrics}'
+    assert metrics['nav']['top']>=0 and metrics['nav']['bottom']<=metrics['height']+1, f'Navigation is clipped: {metrics}'
+    assert metrics['content']['top']>=metrics['headerBottom']-1, f'Header covers workspace content: {metrics}'
+    assert metrics['content']['bottom']<=metrics['nav']['top']+1 or metrics['content']['top']>=metrics['nav']['bottom']-1, f'Navigation covers workspace content: {metrics}'
+    assert all(t['width']>=44 and t['height']>=44 for t in metrics['targets']), f'Navigation touch targets are too small: {metrics}'
+
+
+def open_page(page, route):
+    page.goto(f'{BASE}?page={route}', wait_until='networkidle')
+    page.locator('.page-navigation').wait_for(state='visible')
 
 
 def wait_for_dashboard(page) -> None:
     page.locator('section.reference-layout[aria-label="Building Layout"]').wait_for(state='visible', timeout=30000)
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
     page.wait_for_timeout(250)
 
 
 def close_editor(page) -> None:
-    panel = page.locator('.iag-editor-panel')
-    if panel.count() and panel.is_visible():
-        panel.locator('header button[aria-label="Close"]').click()
-        panel.wait_for(state='hidden')
+    open_page(page, 'map')
 
 
 def exercise_manager_states(page, label: str) -> None:
@@ -120,60 +98,60 @@ def exercise_manager_states(page, label: str) -> None:
       }]));
     }''')
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
-    manager = page.locator('.iag-manager-bar')
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
 
-    manager.get_by_role('button', name='Open Genie command center').click()
-    page.get_by_role('heading', name='Command Center').wait_for(state='visible')
+
+    open_page(page, 'more')
+    page.get_by_role('heading', name='More', exact=True).wait_for(state='visible')
     screenshot(page, f'{label}-command-center')
     close_editor(page)
 
-    manager.get_by_role('button', name='Users', exact=True).click()
-    page.locator('.iag-editor-panel').wait_for(state='visible')
+    open_page(page, 'account')
+    page.locator('.page-workspace').wait_for(state='visible')
     account_label_color = page.locator('.account-security label').evaluate('el => getComputedStyle(el).color')
     assert account_label_color == 'rgb(22, 51, 62)', f'Account label loses contrast: {account_label_color}'
     screenshot(page, f'{label}-users')
     close_editor(page)
     page.evaluate("() => { localStorage.removeItem('iag-change-control-user'); localStorage.removeItem('iag-change-control-pending-changes'); }")
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
-    manager = page.locator('.iag-manager-bar')
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
 
-    manager.get_by_role('button', name='Manage', exact=True).click()
-    page.locator('.iag-editor-panel').wait_for(state='visible')
-    page.get_by_role('button', name='Return to Command Center', exact=True).wait_for(state='visible')
+
+    open_page(page, 'manage')
+    page.locator('.page-workspace').wait_for(state='visible')
+    page.get_by_role('link', name='← More', exact=True).wait_for(state='visible')
     screenshot(page, f'{label}-manage-assets')
     close_editor(page)
 
-    manager.get_by_role('button', name='Data Health', exact=True).click()
-    page.get_by_role('heading', name='Data & Graph Health').wait_for(state='visible')
+    open_page(page, 'health')
+    page.get_by_role('heading', name='Data health').wait_for(state='visible')
     screenshot(page, f'{label}-data-health')
     close_editor(page)
 
-    manager.get_by_role('button', name='Bulk Import', exact=True).click()
-    page.get_by_role('heading', name='Structured Import').wait_for(state='visible')
+    open_page(page, 'import')
+    page.get_by_role('heading', name='Import records').wait_for(state='visible')
     csv = 'recordType,id,name,type,areaId,source,target,relationshipType,verificationStatus\nasset,SYNTHETIC-IMPORT-TEST,Synthetic Import Test,Motor,area-warehouse-f,,,,VERIFIED\nrelationship,SYNTHETIC-REL-TEST,,,,L2-CC-001,SYNTHETIC-IMPORT-TEST,CONTROLS,VERIFIED'
     page.locator('.iag-import-panel input[type="file"]').set_input_files(files=[{'name': 'synthetic-visual-test.csv', 'mimeType': 'text/csv', 'buffer': csv.encode('utf-8')}])
     page.get_by_text('Validated records', exact=True).wait_for(state='visible')
     screenshot(page, f'{label}-bulk-import-preview')
     close_editor(page)
 
-    manager.get_by_role('button', name='Connect', exact=True).click()
+    open_page(page, 'connection')
     page.get_by_role('heading', name='Connections').wait_for(state='visible')
     screenshot(page, f'{label}-relationship-authoring')
     close_editor(page)
 
     page.evaluate("() => localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'visual-map-admin', name: 'Visual Map Admin', role: 'admin' }))")
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
-    manager = page.locator('.iag-manager-bar')
-    manager.get_by_role('button', name='Map Edit', exact=True).click()
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
+
+    page.get_by_role('button', name='Edit map', exact=True).click()
     # The authenticated network fixture supplies the admin role. Local PINs never grant access.
-    page.locator('.iag-map-edit-banner').wait_for(state='visible')
+    page.locator('.map-editor-shell').wait_for(state='visible')
     page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
-    manager.get_by_role('button', name='Map Edit', exact=True).click()
-    page.locator('.iag-map-edit-banner').wait_for(state='hidden')
+    page.get_by_role('button', name='Cancel / Exit', exact=True).click()
+    page.locator('.map-editor-shell').wait_for(state='hidden')
     page.evaluate("() => localStorage.removeItem('iag-change-control-user')")
 
     page.evaluate('''() => new Promise((resolve, reject) => {
@@ -194,11 +172,9 @@ def exercise_manager_states(page, label: str) -> None:
       };
     })''')
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
-    conflict_button = page.locator('.iag-manager-bar button:visible').filter(has_text='CONFLICT').first
-    conflict_button.wait_for(state='visible', timeout=10000)
-    conflict_button.click()
-    page.get_by_role('heading', name='Resolve Sync Conflict').wait_for(state='visible')
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
+    open_page(page, 'conflicts')
+    page.get_by_role('heading', name='Resolve sync conflicts').wait_for(state='visible')
     screenshot(page, f'{label}-sync-conflict')
     close_editor(page)
     page.evaluate('''() => new Promise((resolve, reject) => {
@@ -207,29 +183,28 @@ def exercise_manager_states(page, label: str) -> None:
       request.onsuccess = () => { const db = request.result; const tx = db.transaction('mutation-outbox', 'readwrite'); tx.objectStore('mutation-outbox').delete('visual-test-conflict'); tx.oncomplete = () => { db.close(); resolve(); }; tx.onerror = () => reject(tx.error); };
     })''')
     page.reload(wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
+    page.locator('.page-navigation').wait_for(state='visible', timeout=10000)
 
 
 def exercise_workspace_states(page, label: str) -> None:
     page.goto(f'{BASE}?view=assets', wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible')
+    page.locator('.page-navigation').wait_for(state='visible')
     screenshot(page, f'{label}-assets')
     assert_manager_geometry(page)
 
     page.goto(f'{BASE}?view=documents', wait_until='networkidle')
-    page.locator('.iag-manager-bar').wait_for(state='visible')
+    page.locator('.page-navigation').wait_for(state='visible')
     screenshot(page, f'{label}-documents')
     assert_manager_geometry(page)
-    recent_assets = page.locator('.recent-workspace-trail .recent-workspace-tab').filter(has_text='Assets').first
-    if recent_assets.is_visible():
-        recent_assets.locator('button').first.click()
-        page.wait_for_function("() => new URLSearchParams(location.search).get('view') === 'assets'")
-        page.locator('.iag-manager-bar').wait_for(state='visible')
-        assert 'view=assets' in page.url, f'Recent workspace did not restore assets state: {page.url}'
+    page.get_by_role('navigation', name='Main navigation').get_by_role('link',name='Assets',exact=True).click()
+    page.wait_for_url('**page=assets*')
+    page.go_back(wait_until='networkidle')
+    assert 'view=documents' in page.url, f'Back did not restore documents: {page.url}'
+    assert_manager_geometry(page)
 
     page.goto(f'{BASE}?view=cabinet', wait_until='networkidle')
     page.get_by_role('heading', name='Line 2 Conveyor Control Cabinet').wait_for(state='visible', timeout=30000)
-    page.locator('.iag-manager-bar').wait_for(state='visible')
+    page.locator('.page-navigation').wait_for(state='visible')
     screenshot(page, f'{label}-control-cabinet')
     assert_manager_geometry(page)
 
@@ -270,7 +245,7 @@ def exercise_private_asset_package(page, label: str) -> None:
         output = Path(os.environ['IAG_PRIVATE_VISUAL_OUTPUT'])
         output.mkdir(parents=True,exist_ok=True)
     try:
-        page.locator('.iag-manager-bar').get_by_role('button',name='Plant Database',exact=True).click()
+        open_page(page, 'database')
         section = page.get_by_role('region',name='Private asset package')
         with page.expect_download() as backup:
             section.locator('input[type=file]').first.set_input_files(upload)
@@ -318,7 +293,7 @@ def exercise_private_asset_package(page, label: str) -> None:
                 page.wait_for_function("kind => { const e=document.querySelector('.local-document-preview '+kind); return kind==='img' ? e.complete && e.naturalWidth>0 : e.readyState>=1; }",arg=element,timeout=30000)
                 screenshot(page,f'{label}-private-{element}')
                 page.get_by_role('button',name='Close documentation detail').click()
-        page.locator('.iag-manager-bar').get_by_role('button',name='Plant Database',exact=True).click()
+        open_page(page, 'database')
         section = page.get_by_role('region',name='Private asset package')
         with page.expect_download():
             section.locator('input[type=file]').first.set_input_files(upload)
@@ -329,7 +304,16 @@ def exercise_private_asset_package(page, label: str) -> None:
 
 
 try:
-    time.sleep(2)
+    deadline = time.monotonic() + 30
+    while True:
+        try:
+            with urllib.request.urlopen(BASE, timeout=1) as response:
+                assert response.status == 200
+            break
+        except OSError:
+            if server.poll() is not None or time.monotonic() > deadline:
+                raise RuntimeError('Preview server failed to become ready')
+            time.sleep(.2)
     with sync_playwright() as p:
         launch_args = {'headless': True}
         chrome_path = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
@@ -359,12 +343,14 @@ try:
                 wait_for_dashboard(page)
                 assert_manager_geometry(page)
                 screenshot(page, f'{label}-dashboard')
+                for route in ['home','more','account']:
+                    open_page(page, route)
+                    assert_manager_geometry(page)
+                    screenshot(page, f'{label}-page-{route}')
 
                 if label in REPRESENTATIVE_STATES:
                     page.goto(f'{BASE}?area=area-building-c&map=2d&tab=overview', wait_until='networkidle')
                     wait_for_dashboard(page)
-                    if label == 'phone-390x844':
-                        page.get_by_role('button', name='Close map inspector').click()
                     layer_button = page.locator('.map-layer-control > button')
                     layer_metrics = layer_button.evaluate("el => { const r = el.getBoundingClientRect(); return { display: getComputedStyle(el).display, width: r.width, height: r.height }; }")
                     minimum_target = 40 if label == 'phone-390x844' else 36
@@ -376,11 +362,14 @@ try:
                     page.locator('.map-search-results button').first.click()
                     page.wait_for_timeout(250)
                     assert 'area=area-warehouse-e' in page.url, 'Room search did not select the canonical Warehouse E state'
+                    page.get_by_role('button', name='Open details →').click()
+                    page.locator('[data-testid=inspector-rail]').wait_for(state='visible')
+                    assert_manager_geometry(page)
                     screenshot(page, f'{label}-room-inspector')
 
                     if label == 'phone-390x844':
-                        page.goto(f'{BASE}?area=area-warehouse-e&map=2d&tab=capture', wait_until='networkidle')
-                        wait_for_dashboard(page)
+                        page.goto(f'{BASE}?page=area&area=area-warehouse-e&tab=capture', wait_until='networkidle')
+                        page.locator('.page-navigation').wait_for(state='visible')
                         field_workspace = page.locator('[data-testid="inspector-rail"]')
                         field_workspace.wait_for(state='visible')
                         walkdown = page.locator('[data-testid="walkdown-form"]').first
@@ -391,6 +380,15 @@ try:
                         walkdown.get_by_text('Saved locally. Not in the graph yet.', exact=True).wait_for(state='visible')
                         screenshot(page, f'{label}-walkthrough')
 
+                    for route in ['home','more','field','observation','evidence','assetAdd','setup','settings','review','help']:
+                        open_page(page, route)
+                        assert_manager_geometry(page)
+                        screenshot(page, f'{label}-page-{route}')
+                        if route == 'field':
+                            for section in ['Connections','Evidence','Checklist']:
+                                page.get_by_role('navigation',name='Field sections').get_by_role('button',name=section,exact=True).click()
+                                assert_manager_geometry(page)
+                                screenshot(page,f'{label}-field-{section.lower()}')
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)

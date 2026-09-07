@@ -38,6 +38,8 @@ Do not remove phone, tablet, landscape, or desktop coverage to make a test pass.
 
 ## 3. Fixed chrome may never cover content
 
+The owner-requested September 2026 page redesign uses one shared app shell: header, primary navigation, and a separately scrolling page. Navigation occupies a structural grid row (bottom on phones); manager forms and the guide are dedicated pages. Do not restore stacked global toolbars. The audit checks actual header/navigation/content bounds, 44-pixel primary touch targets, and horizontal overflow while retaining all seven viewport sizes and the existing workspace workflows.
+
 The Plant Manager bar, Facility Guide, headers, navigation, and any future fixed/sticky chrome must reserve real layout space.
 
 Required behavior:

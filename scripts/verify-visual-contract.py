@@ -43,9 +43,9 @@ for viewport in (
     require(visual, viewport, 'scripts/dashboard-visual-check.py')
 
 for state in (
-    "name='Users'",
-    "name='Manage'",
-    "name='Map Edit'",
+    "open_page(page, 'account')",
+    "open_page(page, 'manage')",
+    "name='Edit map'",
     "?view=assets",
     "?view=documents",
     "?view=cabinet",
@@ -53,11 +53,11 @@ for state in (
     require(visual, state, 'scripts/dashboard-visual-check.py')
 
 for guard in (
-    'Reserved manager-bar space is too small',
-    'Map workspace is hidden behind manager toolbar',
-    'Facility Guide overlaps manager toolbar',
-    'Mobile toolbar should scroll horizontally',
-    'Mobile toolbar must not hide controls behind a mask',
+    'Navigation covers workspace content',
+    'Header covers workspace content',
+    'Navigation touch targets are too small',
+    'Page has horizontal overflow',
+    'Obsolete stacked navigation returned',
 ):
     require(visual, guard, 'scripts/dashboard-visual-check.py')
 

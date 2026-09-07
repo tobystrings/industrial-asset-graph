@@ -11,9 +11,10 @@ with socket.socket() as available_port:
     available_port.bind(('127.0.0.1', 0))
     preview_port = available_port.getsockname()[1]
 server = subprocess.Popen([npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', str(preview_port), '--strictPort'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-base = f'http://127.0.0.1:{preview_port}/industrial-asset-graph/?facilityId=test-facility'
+base = f'http://127.0.0.1:{preview_port}/industrial-asset-graph/?facilityId=test-facility&map=2d'
 
 def drag_percent(page, selector: str, start: tuple[float, float], end: tuple[float, float]):
+    page.locator(selector).scroll_into_view_if_needed()
     box = page.locator(selector).bounding_box()
     assert box, f'No bounds for {selector}'
     sx, sy = box['x'] + box['width'] * start[0], box['y'] + box['height'] * start[1]
@@ -21,7 +22,7 @@ def drag_percent(page, selector: str, start: tuple[float, float], end: tuple[flo
     page.mouse.move(sx, sy); page.mouse.down(); page.mouse.move(ex, ey, steps=8); page.mouse.up()
 
 def enter_editor(page):
-    page.locator('.iag-manager-bar').get_by_role('button', name='Map Edit', exact=True).click()
+    page.get_by_role('button', name='Edit map', exact=True).click()
     page.locator('.map-editor-shell').wait_for(state='visible', timeout=10000)
 
 def save(page):
@@ -96,6 +97,7 @@ try:
         drag_percent(page, '.map-editor-svg', (.58, .18), (.68, .28))
         page.get_by_role('button', name='Text / Label', exact=True).click()
         page.once('dialog', lambda dialog: dialog.accept('Synthetic markup only'))
+        page.locator('.map-editor-svg').scroll_into_view_if_needed()
         box = page.locator('.map-editor-svg').bounding_box(); assert box
         page.mouse.click(box['x'] + box['width'] * .65, box['y'] + box['height'] * .35)
         page.get_by_text('Synthetic markup only', exact=True).click()

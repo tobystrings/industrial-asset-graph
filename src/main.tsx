@@ -15,6 +15,7 @@ import { activeFacilitySelectionError } from './facility/activeFacility';
 import AppErrorBoundary from './ui/AppErrorBoundary';
 import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
+import './navigation/pages.css';
 import './ui/chrome-clearance.css';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { AuthGate } from './auth/LoginPage';

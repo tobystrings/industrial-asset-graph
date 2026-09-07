@@ -142,7 +142,10 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
   }, [svg]);
 
   useEffect(() => {
-    document.querySelector<HTMLElement>('.device-chips button.selected')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'instant' as ScrollBehavior });
+    const chip = document.querySelector<HTMLElement>('.device-chips button.selected');
+    const list = chip?.parentElement;
+    // Scroll only the device selector; never move the surrounding page on initial load.
+    if (chip && list) list.scrollLeft = Math.max(0, chip.offsetLeft - list.clientWidth / 2 + chip.offsetWidth / 2);
     if (svg && selectedId) requestAnimationFrame(() => panToSelected());
   }, [selectedId, svg]);
 

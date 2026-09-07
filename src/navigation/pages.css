@@ -1,0 +1,172 @@
+/* One frame; navigation occupies real grid rows, never floating over a page. */
+html body #root .app-shell.app-pages{height:var(--app-height,100dvh);min-height:0;width:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);background:#f3f6f5;color:#16333e;overflow:hidden;--manager-bar-height:0px;--genie-dock-height:0px;font-family:'Source Sans 3',system-ui,sans-serif}
+.page-header{grid-row:1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,4vw,48px);background:#fff;border-bottom:1px solid #dbe5e2}
+.page-brand{display:flex;align-items:center;gap:12px;color:#16333e;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.page-brand>span:first-child{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:white;background:#174f4a;font-size:12px;letter-spacing:.05em}
+.page-brand small{display:block;font-size:12px;font-weight:400;color:#607671;margin-top:2px}
+.page-account-link,.page-primary,.page-title>button{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:10px 16px;border-radius:10px;font-weight:600;text-decoration:none;white-space:nowrap}
+.page-account-link{color:#214e49;background:#edf4f1;border:1px solid #d4e3dd}
+.app-pages .page-primary,.app-pages .page-title>button{background:#1c5d50;color:white;border:1px solid #1c5d50}
+.page-navigation{grid-row:2;display:flex;justify-content:center;gap:8px;padding:8px 16px;background:#fff;border-bottom:1px solid #dbe5e2}
+.page-navigation a{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;min-width:100px;color:#536b65;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px}
+.page-navigation a[aria-current=page]{color:#164e44;background:#e9f2ec}
+.page-navigation a>span{font-size:20px;line-height:1}
+.page-scroll{grid-row:3;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding:20px;padding:28px clamp(16px,4vw,48px) 40px}
+.page-title{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1440px;margin:0 auto 24px}
+.page-title h1{font-size:clamp(25px,3vw,34px);line-height:1.15;letter-spacing:-.02em;margin:4px 0 8px;color:#16333e;outline:none}
+.page-title p{margin:0;color:#5c716c;font-size:16px;line-height:1.5}
+.page-back{display:inline-flex;align-items:center;min-height:36px;color:#456b61;text-decoration:none;font-size:14px}
+.page-workspace{max-width:1440px;margin:0 auto;min-width:0}
+.page-skip{position:absolute;left:16px;top:-100px;z-index:9999;background:white;color:#16333e;padding:14px}
+.page-skip:focus{top:8px}
+.app-pages a:focus-visible,.app-pages button:focus-visible,.app-pages input:focus-visible,.app-pages select:focus-visible,.app-pages textarea:focus-visible{outline:3px solid #459b87;outline-offset:3px}
+.app-pages button,.app-pages select,.app-pages input:not([type=checkbox]):not([type=radio]){min-height:44px}
+.app-pages button{cursor:pointer}
+.app-pages p{line-height:1.5}
+.simple-home{max-width:1080px;margin:auto;display:grid;gap:24px}
+.home-intro{padding:clamp(24px,5vw,48px);border-radius:20px;background:#e3eee7;color:#153e35}
+.page-eyebrow{font-size:12px;font-weight:700;letter-spacing:.13em;color:#436a5b}
+.home-intro h2{font-size:clamp(28px,4vw,42px);line-height:1.15;margin:12px 0}
+.home-intro p{max-width:460px;font-size:18px;margin:0 0 24px;color:#42665a}
+.home-destinations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.destination-card{display:block;padding:24px;background:white;border:1px solid #dbe4df;border-radius:16px;text-decoration:none;color:#16333e;min-width:0}
+.destination-card strong{display:flex;justify-content:space-between;font-size:22px;font-weight:600}
+.destination-card p{color:#5c716c;margin:12px 0 24px}
+.destination-card small{color:#2c715d;font-weight:600}
+.destination-card:hover{border-color:#7aab97}
+.home-followup{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px;background:white;border:1px solid #dbe4df;border-radius:16px}
+.home-followup h2,.more-page h2,.help-page h2{font-size:19px;margin:0 0 10px;color:#16333e}
+.home-followup p{margin:0 0 6px;color:#4d6860}.home-followup small{color:#63766f}.home-followup a{white-space:nowrap;color:#225e4d;min-height:44px;display:flex;align-items:center}
+.more-page{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.more-page section{min-width:0}
+.page-link-list{border:1px solid #dbe4df;border-radius:14px;overflow:hidden;background:white}
+.page-link-list a{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px;color:#16333e;text-decoration:none;border-bottom:1px solid #e4ece7;min-height:84px}
+.page-link-list a:last-child{border:0}.page-link-list a:hover{background:#f1f7f2}.page-link-list strong{display:block;font-size:17px;font-weight:600}.page-link-list small{display:block;color:#61736d;margin-top:6px;font-size:14px;line-height:1.4}
+.manager-page,.account-page{max-width:900px;margin:auto;background:#fff;border:1px solid #dbe4df;border-radius:16px;padding:clamp(16px,3vw,32px);color:#16333e}
+.app-pages .manager-page .iag-editor-form{padding:0;overflow:visible;max-height:none;display:grid;gap:20px}
+.app-pages .manager-page label,.app-pages .manager-page h2,.app-pages .manager-page h3,.app-pages .manager-page strong{color:#16333e}
+.app-pages .manager-page input,.app-pages .manager-page select,.app-pages .manager-page textarea{max-width:100%;box-sizing:border-box;font-size:16px}
+.app-pages .manager-page pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto}
+.app-pages .manager-page .iag-form-actions{position:static;padding:12px 0;background:transparent}
+.app-pages .manager-page .iag-db-note{color:#5b726b;overflow-wrap:anywhere}
+.app-pages .account-security{padding:0;margin:0;border:0;background:white}
+.app-pages .account-security,.app-pages .account-security form,.app-pages .account-security label{min-width:0;display:grid;gap:12px;color:#16333e}
+.app-pages .account-security button{min-width:0;width:100%;white-space:normal;padding:12px 16px;border-radius:9px;background:#edf4f0;border:1px solid #adc5ba;color:#174c3e;font:600 15px/1.4 inherit}
+.app-pages .account-security form button{background:#1c5d50;color:white;border-color:#1c5d50}
+.app-pages .account-security input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #adc5ba;border-radius:8px;background:white;color:#16333e;font-size:16px}
+.app-pages .account-security p{white-space:normal;overflow-wrap:anywhere}
+.help-page{max-width:900px;margin:auto;display:grid;gap:20px}
+.app-pages .help-page .facility-guide{position:relative!important;inset:auto!important;width:100%;max-width:100%;margin-top:16px;z-index:1}
+/* Existing technical workspaces live within the frame. Each retains local drawing controls. */
+html body #root .app-shell.app-pages .dashboard{position:relative!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;overflow:visible!important;background:none!important}
+html body #root .app-shell.app-pages .dashboard>.map-panel{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;min-height:0!important;margin:0!important;border-radius:14px;overflow:hidden!important}
+html body #root .app-shell.app-pages .dashboard>.map-panel>.panel-heading{display:none!important}
+html body #root .app-shell.app-pages .reference-layout{height:auto!important;min-height:0!important;padding-bottom:0!important}
+html body #root .app-shell.app-pages .reference-plan-wrap{min-height:clamp(280px,48dvh,650px)!important;max-height:65dvh;overflow:hidden!important}
+html body #root .app-shell.app-pages .reference-plan-image-stage,html body #root .app-shell.app-pages .facility-map-svg{width:var(--facility-drawing-width,1210px)!important}
+html body #root .app-shell.app-pages .reference-info-strip{max-height:140px!important;overflow:auto!important}
+html body #root .app-shell.app-pages .reference-layout-actions{display:flex!important;flex-wrap:wrap;gap:6px;overflow:visible!important}
+html body #root .app-shell.app-pages .reference-layout-actions button{display:inline-flex!important;min-height:44px!important;align-items:center;justify-content:center}
+html body #root .app-shell.app-pages .cabinet-detail-heading>span:not(.device-sticky),html body #root .app-shell.app-pages .cabinet-detail-heading>code{color:#c4d8e7!important}
+html body #root .app-shell.app-pages .dashboard>.rail{display:flex!important;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;min-width:0!important;margin-top:20px!important;border-radius:14px;overflow:hidden!important;background:#0c2436!important;color:#e9f2f8}
+html body #root .app-shell.app-pages .dashboard>.rail .rail-body{max-height:none!important;overflow:visible!important}
+html body #root .app-shell.app-pages .dashboard>.rail .rail-chrome{position:relative!important;inset:auto!important;background:#0c2436!important}
+html body #root .app-shell.app-pages .dashboard>.rail .inspector-tabs{display:flex!important;overflow:auto!important;flex-wrap:nowrap!important;position:static!important}
+html body #root .app-shell.app-pages .dashboard>.rail .inspector-tabs button{flex:0 0 auto;min-height:44px}
+html body #root .app-shell.app-pages .dashboard>.rail .rail-body>*{max-width:100%}
+html body #root .app-shell.app-pages .map-inspector-close{position:absolute;top:6px;right:6px;background:#173d50;color:white;border:0;border-radius:8px;z-index:3;min-width:44px}
+html body #root .app-shell.app-pages .page-asset .rail{margin-top:0!important}
+html body #root .app-shell.app-pages .asset-directory,html body #root .app-shell.app-pages .documents-workspace,html body #root .app-shell.app-pages .relationships-workspace,html body #root .app-shell.app-pages .field-documentation-workspace{position:relative!important;inset:auto!important;max-height:none!important;height:auto!important;min-height:0!important;width:100%!important;margin:0!important;overflow:visible!important}
+html body #root .app-shell.app-pages .asset-directory-head>div:first-child,html body #root .app-shell.app-pages .document-directory-head{display:none}
+html body #root .app-shell.app-pages .asset-directory-head{position:static;min-height:0;padding:0 0 16px}
+html body #root .app-shell.app-pages .asset-directory,html body #root .app-shell.app-pages .document-directory,html body #root .app-shell.app-pages .field-doc-workspace{background:white!important;border:1px solid #dbe4df;border-radius:14px;color:#16333e!important}
+html body #root .app-shell.app-pages .document-directory{display:block!important;width:100%!important;min-height:0!important;height:auto!important;margin:0!important}
+html body #root .app-shell.app-pages .document-browser,html body #root .app-shell.app-pages .document-preview{position:relative!important;inset:auto!important;max-height:none!important;height:auto!important;width:100%!important;overflow:visible!important;background:white!important}
+html body #root .app-shell.app-pages .document-directory.has-preview>.document-browser{display:none!important}
+html body #root .app-shell.app-pages .document-detail{padding:24px!important;color:#16333e!important}
+html body #root .app-shell.app-pages .document-detail .md-body{color:#16333e!important}
+html body #root .app-shell.app-pages .document-detail p,html body #root .app-shell.app-pages .document-detail li{color:#49675c!important}
+html body #root .app-shell.app-pages .document-close{position:relative!important;float:right;color:#214e49;background:#edf4f1;min-width:44px}
+html body #root .app-shell.app-pages .doc-group>header{background:#edf3ee!important;color:#16333e!important;border-bottom:1px solid #dbe4df}
+html body #root .app-shell.app-pages .doc-group>header h2,html body #root .app-shell.app-pages .doc-group>header small,html body #root .app-shell.app-pages .doc-group>header span{color:#365e50!important}
+html body #root .app-shell.app-pages .doc-group>header code{color:#4b7565!important}
+html body #root .app-shell.app-pages .doc-cards button{color:#16333e!important;background:white!important;border-color:#dbe4df!important}
+html body #root .app-shell.app-pages .doc-cards button em{color:#72521b!important}
+html body #root .app-shell.app-pages .document-state-filters{position:static!important;display:flex!important;flex-wrap:wrap!important;background:white!important}
+html body #root .app-shell.app-pages .document-state-filters button{min-height:44px;color:#355849!important;background:#f3f7f4!important;border-color:#c6d8cc!important}
+html body #root .app-shell.app-pages .document-state-filters button.selected{background:#dcecdf!important;color:#153e30!important}
+html body #root .app-shell.app-pages .field-doc-workspace{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important}
+html body #root .app-shell.app-pages .reference-layout-head{padding-top:16px!important;margin-top:0!important}
+html body #root .app-shell.app-pages .reference-layout-actions .edit-map-action{display:none!important}
+.app-pages .manager-page input,.app-pages .manager-page select,.app-pages .manager-page textarea{background:#fff!important;color:#16333e!important;border:1px solid #aec7b9!important;border-radius:8px!important;padding:12px!important}
+.app-pages .manager-page button{white-space:normal;overflow-wrap:anywhere;background:#edf4ef;color:#214f40;border:1px solid #bdd3c4;border-radius:8px;padding:10px 14px}
+.app-pages .manager-page button.primary{background:#1c5d50;color:white;border-color:#1c5d50}
+.app-pages .manager-page button.danger{background:#fff1ef;color:#943b2c;border-color:#e6b8af}
+.app-pages .manager-page .iag-user-card,.app-pages .manager-page .iag-pending-changes,.app-pages .manager-page .iag-admin-login,.app-pages .manager-page article,.app-pages .manager-page .iag-review-summary,.app-pages .manager-page .iag-db-stats{background:#f3f7f4;color:#16333e;border-color:#d5e3da}
+.app-pages .manager-page .iag-manage-list button{background:#f3f7f4!important;color:#16333e!important;border-color:#d5e3da!important}
+.app-pages .manager-page .iag-manage-list b,.app-pages .manager-page .iag-manage-list small{color:#416954!important}
+.app-pages .manager-page pre{background:#eaf1ec;color:#244d3d;border:1px solid #cfdfd3}
+html body #root .app-shell.app-pages .asset-directory input{background:white;color:#16333e;border-color:#aec7b9}
+html body #root .app-shell.app-pages .asset-directory .asset-directory-tools,html body #root .app-shell.app-pages .asset-directory .asset-directory-tools b{color:#436951}
+html body #root .app-shell.app-pages .asset-directory .area-group,html body #root .app-shell.app-pages .asset-directory .asset-card,html body #root .app-shell.app-pages .asset-directory .line-group{background:#f5f8f5!important;border-color:#dbe4df!important;color:#16333e!important}
+html body #root .app-shell.app-pages .asset-directory .area-group h2,html body #root .app-shell.app-pages .asset-directory .line-group h3,html body #root .app-shell.app-pages .asset-directory .asset-card h4,html body #root .app-shell.app-pages .asset-directory .area-group b{color:#16333e!important}
+html body #root .app-shell.app-pages .asset-directory .asset-card small,html body #root .app-shell.app-pages .asset-directory .asset-card p,html body #root .app-shell.app-pages .asset-directory .asset-card code{color:#496d5a!important}
+html body #root .app-shell.app-pages .asset-directory .system-chips button{background:white;color:#315d48;border:1px solid #bdd3c4}
+html body #root .app-shell.app-pages .asset-directory .system-chips button.selected{background:#dcecdf;color:#153e30}
+html body #root .app-shell.app-pages .field-doc-head{position:relative!important;display:block!important;min-height:0!important;background:transparent!important}
+html body #root .app-shell.app-pages .field-doc-head>button{position:static!important;margin-top:12px;background:#edf4ef;color:#214f40;border-color:#bdd3c4}
+html body #root .app-shell.app-pages .field-doc-workspace h1,html body #root .app-shell.app-pages .field-doc-workspace h2,html body #root .app-shell.app-pages .field-doc-workspace b,html body #root .app-shell.app-pages .field-doc-workspace strong,html body #root .app-shell.app-pages .field-doc-workspace label{color:#16333e!important}
+html body #root .app-shell.app-pages .field-doc-workspace p,html body #root .app-shell.app-pages .field-doc-workspace small,html body #root .app-shell.app-pages .field-doc-workspace code,html body #root .app-shell.app-pages .field-doc-workspace span{color:#496d5a!important}
+html body #root .app-shell.app-pages .field-doc-workspace input,html body #root .app-shell.app-pages .field-doc-workspace select,html body #root .app-shell.app-pages .field-doc-workspace textarea{background:white!important;color:#16333e!important;border-color:#bdd3c4!important;font-size:16px!important}
+html body #root .app-shell.app-pages .field-doc-progress,html body #root .app-shell.app-pages .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-relations,html body #root .app-shell.app-pages .field-doc-evidence{background:#f5f8f5!important;border-color:#dbe4df!important}
+html body #root .app-shell.app-pages .field-doc-layout{grid-template-columns:minmax(0,1fr)!important}
+html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-relations,html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-relations{display:none!important}
+.field-section-tabs{display:flex;gap:8px;margin:18px 0}.field-section-tabs button{flex:1;min-width:0;background:white;color:#315d48;border:1px solid #bdd3c4;border-radius:9px;padding:10px 6px}.field-section-tabs button[aria-pressed=true]{background:#dcecdf;color:#153e30}
+.map-selection-card{display:flex;align-items:center;gap:12px;padding:18px;margin-top:16px;background:white;border:1px solid #dbe4df;border-radius:12px;color:#16333e}
+.map-selection-card>div{flex:1;min-width:0}.map-selection-card h2{font-size:19px;line-height:1.3;margin:5px 0;color:#16333e}.map-selection-card small{color:#55715f}
+.map-selection-card button{background:#edf4ef;color:#214f40;border:1px solid #bdd3c4;border-radius:8px;padding:10px;min-width:44px}
+html body #root .app-shell.app-pages .cabinet-page .cabinet-summary span,html body #root .app-shell.app-pages .cabinet-page .cabinet-summary b,html body #root .app-shell.app-pages .cabinet-page .cabinet-detail p{color:#c8dce7}
+html body #root .app-shell.app-pages .asset-directory .system-chips,html body #root .app-shell.app-pages .asset-directory .area-group>header{background:#eaf2ec!important;border-color:#d2e0d6!important}
+html body #root .app-shell.app-pages .asset-directory .asset-card-status span,html body #root .app-shell.app-pages .asset-directory .area-group>header span,html body #root .app-shell.app-pages .asset-directory .line-group>header span,html body #root .app-shell.app-pages .asset-directory .line-group>header small{color:#4d705c!important}
+html body #root .app-shell.app-pages .asset-directory .device-disclosure,html body #root .app-shell.app-pages .asset-directory .device-disclosure summary{color:#355b47!important;background:#edf4ef!important}
+html body #root .app-shell.app-pages .field-doc-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;gap:16px;min-width:0}
+html body #root .app-shell.app-pages .field-doc-workspace label,html body #root .app-shell.app-pages .field-doc-workspace input,html body #root .app-shell.app-pages .field-doc-workspace select{min-width:0!important;max-width:100%!important;box-sizing:border-box}
+html body #root .app-shell.app-pages .field-doc-workspace select{width:100%!important}
+html body #root .app-shell.app-pages .field-initials{border:1px solid #d3e2d7;border-radius:9px;padding:12px;color:#3c624d;background:#f5f8f5}
+html body #root .app-shell.app-pages .field-initials summary{min-height:32px;line-height:1.5;cursor:pointer}
+html body #root .app-shell.app-pages .field-doc-workspace button{background:#eaf3ed!important;color:#234f3c!important;border-color:#b9d0c1!important;white-space:normal}
+html body #root .app-shell.app-pages .field-doc-checklist article{background:white!important;border-color:#d5e3d9!important}
+html body #root .app-shell.app-pages .field-doc-checklist button em{color:#4d705c!important}
+html body #root .app-shell.app-pages .cabinet-page h1,html body #root .app-shell.app-pages .cabinet-page h2,html body #root .app-shell.app-pages .cabinet-page h3,html body #root .app-shell.app-pages .cabinet-page dt,html body #root .app-shell.app-pages .cabinet-page dd,html body #root .app-shell.app-pages .cabinet-page p.panel-title{color:#e4eff5!important}
+html body #root .app-shell.app-pages .cabinet-header>div{min-width:0!important;flex:1!important}
+html body #root .app-shell.app-pages .cabinet-header h1{white-space:normal!important;text-overflow:clip!important;overflow:visible!important;max-width:none!important;line-height:1.3!important}
+html body #root .app-shell.app-pages .dashboard>.rail .panel{background:#102a3b!important}
+html body #root .app-shell.app-pages .dashboard>.rail h1,html body #root .app-shell.app-pages .dashboard>.rail h2,html body #root .app-shell.app-pages .dashboard>.rail h3,html body #root .app-shell.app-pages .dashboard>.rail h4,html body #root .app-shell.app-pages .dashboard>.rail p,html body #root .app-shell.app-pages .dashboard>.rail b,html body #root .app-shell.app-pages .dashboard>.rail strong,html body #root .app-shell.app-pages .dashboard>.rail label,html body #root .app-shell.app-pages .dashboard>.rail span,html body #root .app-shell.app-pages .dashboard>.rail small{color:#e0edf6!important}
+html body #root .app-shell.app-pages .cabinet-page{position:relative!important;inset:auto!important;min-height:0!important;height:auto!important;padding:0!important;background:#0b2135;border-radius:14px;overflow:hidden}
+html body #root .app-shell.app-pages .cabinet-header{position:relative!important;inset:auto!important;padding:20px!important;height:auto!important;min-height:0!important}
+html body #root .app-shell.app-pages .cabinet-header .cabinet-back,html body #root .app-shell.app-pages .cabinet-header .film-ghost{display:none}
+html body #root .app-shell.app-pages .cabinet-workspace{height:auto!important;min-height:580px;grid-template-rows:minmax(0,1fr);padding:12px!important;margin:0!important;grid-template-columns:minmax(150px,200px) minmax(0,1fr) minmax(240px,320px)!important}
+html body #root .app-shell.app-pages .cabinet-svg{height:480px!important;min-height:260px!important;max-height:65dvh}
+html body #root .app-shell.app-pages .cabinet-detail,html body #root .app-shell.app-pages .cabinet-device-list{max-height:none!important;overflow:visible!important}
+html body #root .app-shell.app-pages .cabinet-device-list .device-chips{max-height:420px;overflow:auto}
+html body #root .app-shell.app-pages .cabinet-drawing{min-width:0!important}
+@media(max-width:1050px){.more-page{grid-template-columns:1fr 1fr}.more-page section:last-child{grid-column:1/-1}html body #root .app-shell.app-pages .cabinet-workspace{grid-template-columns:minmax(0,1fr) minmax(240px,320px)!important}html body #root .app-shell.app-pages .cabinet-device-list{grid-column:1/-1;grid-row:1}html body #root .app-shell.app-pages .cabinet-device-list .device-chips{max-height:140px;display:flex;flex-wrap:wrap;gap:6px}}
+@media(max-width:700px){
+  html body #root .app-shell.app-pages{grid-template-rows:auto minmax(0,1fr) auto}
+  .page-header{padding:12px 16px}.page-brand{font-size:14px;gap:9px}.page-brand>span:first-child{width:34px;height:34px;border-radius:10px;font-size:10px}.page-brand small{font-size:11px}.page-account-link{font-size:13px;padding:8px 12px}
+  .page-navigation{grid-row:3;justify-content:space-around;gap:0;border-top:1px solid #dbe5e2;border-bottom:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+  .page-navigation a{flex:1;min-width:0;min-height:54px;flex-direction:column;gap:5px;font-size:11px}.page-navigation a>span{font-size:20px}
+  .page-scroll{grid-row:2;padding:18px 16px 24px}.page-title{margin-bottom:20px;align-items:flex-start}.page-title h1{font-size:27px}.page-title p{font-size:14px}.page-title .page-primary,.page-title>button{padding:8px 12px;font-size:13px}
+  .home-intro{padding:26px 22px;border-radius:16px}.home-intro p{font-size:16px}.simple-home{gap:16px}.home-destinations{gap:12px}.destination-card{padding:18px}.destination-card strong{font-size:18px}.destination-card p{font-size:14px;margin-bottom:18px}.destination-card small{font-size:12px}
+  .home-followup{padding:20px;align-items:flex-start;flex-direction:column;gap:12px}.more-page{grid-template-columns:1fr;gap:24px}.more-page section:last-child{grid-column:auto}.page-link-list a{padding:16px;min-height:80px}
+  .manager-page,.account-page{padding:18px 14px;border-radius:12px}.app-pages .manager-page .iag-review-diff{grid-template-columns:1fr}.app-pages .manager-page .iag-db-stats{flex-wrap:wrap}.app-pages .manager-page .iag-form-actions{flex-wrap:wrap}
+  html body #root .app-shell.app-pages .reference-layout-actions{flex-wrap:nowrap!important;overflow-x:auto!important;padding:4px 0!important;mask-image:none!important}html body #root .app-shell.app-pages .reference-layout-actions>*{flex:0 0 auto}
+  html body #root .app-shell.app-pages .reference-layout-heading{flex-wrap:wrap!important;height:auto!important;min-height:0!important}
+  html body #root .app-shell.app-pages .reference-plan-wrap{min-height:300px!important;max-height:55dvh}
+  html body #root .app-shell.app-pages .dashboard>.rail{margin-top:16px!important}
+  html body #root .app-shell.app-pages .cabinet-header{padding:16px!important}html body #root .app-shell.app-pages .cabinet-header h1{font-size:22px}
+  html body #root .app-shell.app-pages .cabinet-workspace{display:flex!important;flex-direction:column;gap:16px;min-height:0!important}
+  html body #root .app-shell.app-pages .cabinet-detail{order:0!important}html body #root .app-shell.app-pages .cabinet-device-list{order:1!important}html body #root .app-shell.app-pages .cabinet-drawing{order:2!important}
+  html body #root .app-shell.app-pages .cabinet-svg{height:360px!important;max-height:65dvh}
+}
+@media(max-width:400px){.home-destinations{grid-template-columns:1fr}.page-brand>span:first-child{display:none}.page-title{flex-wrap:wrap}}
+@media(max-height:500px) and (max-width:950px){.page-header{padding-top:6px;padding-bottom:6px}.page-navigation{padding-top:2px;padding-bottom:2px}.page-navigation a{min-height:44px}.page-scroll{padding-top:12px}}
