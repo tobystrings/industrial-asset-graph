@@ -3,3 +3,7 @@ dist/
 artifacts/
 .codex-dev-server.log
 *.tsbuildinfo
+.env
+.env.local
+.env.*.local
+!.env.example

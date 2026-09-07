@@ -18,6 +18,8 @@
     "verify:visual-contract": "python scripts/verify-visual-contract.py"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.115.0",
+    "jose": "^6.2.11",
     "pg": "^8.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

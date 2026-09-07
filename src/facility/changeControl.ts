@@ -64,7 +64,7 @@ export function saveCurrentUser(user: IagUser | null) {
 export function loadPendingChanges(facilityId: string): PendingChange[] { return readFacilityScoped<PendingChange[]>(facilityId, CHANGES_KEY, []); }
 export function savePendingChanges(facilityId: string, changes: PendingChange[]) { write(facilityStorageKey(facilityId, CHANGES_KEY), changes); }
 export function loadAuditEvents(facilityId: string): AuditEvent[] { return readFacilityScoped<AuditEvent[]>(facilityId, AUDIT_KEY, []); }
-export function saveAuditEvents(facilityId: string, events: AuditEvent[]) { write(facilityStorageKey(facilityId, AUDIT_KEY), events.slice(0, 100)); }
+export function saveAuditEvents(facilityId: string, events: AuditEvent[]) { write(facilityStorageKey(facilityId, AUDIT_KEY), events.slice(0, 1000)); }
 export function hasAdminCredential(): boolean { return typeof localStorage !== 'undefined' && Boolean(localStorage.getItem(ADMIN_HASH_KEY)); }
 
 export function clientIdentity(): string {

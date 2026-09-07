@@ -1,4 +1,23 @@
 /* Final fixed-chrome layout guard. Loaded after legacy UI styles. */
+@media (min-width: 901px) {
+  .app-shell.has-manager-bar .reference-topbar .workspace-tab-strip {
+    top: var(--iag-header, 64px); left: 18px; right: 52%;
+    height: 42px; min-height: 42px; padding: 0; background: #071625;
+    overflow-x: auto; flex-wrap: nowrap;
+  }
+  .app-shell.has-manager-bar .reference-topbar .recent-workspace-trail {
+    top: var(--iag-header, 64px); bottom: auto; left: 50%; right: 18px;
+    height: 42px; padding: 0; margin: 0; background: #071625;
+    overflow-x: auto; flex-wrap: nowrap; white-space: nowrap;
+  }
+  .app-shell.has-manager-bar .reference-topbar .recent-workspace-trail button {
+    min-height: 34px; padding: 5px 8px; font-size: 12px;
+  }
+  html .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard,
+  html .app-shell.has-manager-bar .dashboard:not(.workspace-map) {
+    padding-top: calc(var(--iag-header, 64px) + 50px) !important;
+  }
+}
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard {
   height: var(--app-height, 100dvh) !important;
   min-height: 0 !important;

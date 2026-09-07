@@ -30,7 +30,7 @@ const packageAssetUrl = (pkg: CabinetPackage | null, file: string) => {
 const pretty = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
-  const { featureConfig } = useFacility();
+  const { facility, featureConfig } = useFacility();
   const cabinetPackage = cabinetPackageFor(featureConfig.featuredCabinetAssetId, featureConfig);
   const assetUrl = (file: string) => packageAssetUrl(cabinetPackage, file);
   const [metadata, setMetadata] = useState<CabinetMetadata | null>(null);
@@ -184,7 +184,7 @@ export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
             <span className="cabinet-back-label">Facility dashboard</span>
           </button>
           <div>
-            <span>Control cabinet documentation</span>
+            <span className="cabinet-breadcrumb">{facility.name} / Assets / Control Cabinets</span>
             <h1>{metadata?.cabinet.name ?? 'Control Cabinet'}</h1>
           </div>
         </div>

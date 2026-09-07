@@ -12,6 +12,7 @@ const MUTATION_STORE = 'mutation-outbox';
 const ACTIVE_KEY = 'active';
 
 export interface AttachmentRecord {
+  previewAttachmentId?: string;
   id: string;
   assetId: string;
   name: string;
@@ -43,6 +44,7 @@ export interface PlantBackup {
   plant: FacilityPackage;
   attachments: ExportAttachment[];
   observations: ObservationRecord[];
+  auditLog?: Array<{ id: string; actor: string; action: string; detail: string; at: string }>;
 }
 
 export interface IagArchiveManifest {
@@ -266,7 +268,7 @@ export function portablePlantPackage(plant: FacilityPackage): FacilityPackage {
   };
   return {
     ...structuredClone(plant), evidence, components, documents, relationships,
-    assets: plant.assets.map((asset) => ({ ...asset, manufacturer: protectFact(asset.manufacturer), model: protectFact(asset.model), serialNumber: protectFact(asset.serialNumber), facts: asset.facts.map((item) => ({ ...item, value: protectFact(item.value) })) })),
+    assets: plant.assets.map((asset) => ({ ...asset, componentIds: asset.componentIds.filter(id => components.some(component => component.id === id)), manufacturer: protectFact(asset.manufacturer), model: protectFact(asset.model), serialNumber: protectFact(asset.serialNumber), facts: asset.facts.map((item) => ({ ...item, value: protectFact(item.value) })) })),
     revisions: plant.revisions.filter((item) => evidenceAllowed(item.evidenceIds)),
     assetSerialSources: plant.assetSerialSources.filter((item) => allowedEvidence.has(item.evidenceId)),
   };

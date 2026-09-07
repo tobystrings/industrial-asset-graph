@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-const { areas, components, evidence, facility, assets: machines, relationships, revisions } = activeFacilityPackage;
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+const { areas, components, documents, evidence, facility, assets: machines, relationships, revisions } = activeFacilityPackage;
 import { activeFacilityPackage } from './facility';
 import AssetDirectory from './AssetDirectory';
 import TopNav, { type WorkspaceTab } from './dashboard/TopNav';
@@ -7,8 +7,6 @@ import FacilitySidebar from './dashboard/FacilitySidebar';
 import KpiStrip from './dashboard/KpiStrip';
 import InspectorRail from './dashboard/InspectorRail';
 import RelationshipsWorkspace from './dashboard/RelationshipsWorkspace';
-import DocumentsWorkspace from './dashboard/DocumentsWorkspace';
-import FieldDocumentationWorkspace from './dashboard/FieldDocumentationWorkspace';
 import { cycleInspectorTab, parseInspectorTab, type InspectorTab } from './lib/boardChrome';
 import { parseDeviceQuery, writeDeviceQuery } from './lib/deviceQuery';
 import { assetDocumentationCompleteness, documentedAssetCount, documentationCoveragePercent, openFieldItemCount, recordCount, verificationCounts } from './lib/facilityMetrics';
@@ -27,6 +25,9 @@ import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
 import MapStage, { mapModeFromQuery, type MapMode } from './map/MapStage';
 import type { DocumentationState, FacilityArea, FacilityAsset, ReviewDecision, SystemKind, VerificationState } from './types/facility';
+
+const DocumentsWorkspace = lazy(() => import('./dashboard/DocumentsWorkspace'));
+const FieldDocumentationWorkspace = lazy(() => import('./dashboard/FieldDocumentationWorkspace'));
 
 const featureConfig = activeFacilityPackage.featureConfig;
 const featuredCabinetAssetId = featureConfig.featuredCabinetAssetId;
@@ -253,9 +254,10 @@ export default function Dashboard({
       setWorkspaceTab('map');
       onView('dashboard');
     }
-    if (pendingCommand === 'trace' && cabinet) {
-      setSelectedAsset(cabinet);
-      setSelectedArea(defaultArea);
+    if (pendingCommand === 'trace' && (selectedAsset ?? cabinet)) {
+      const target = selectedAsset ?? cabinet!;
+      setSelectedAsset(target);
+      setSelectedArea(areas.find(area => area.id === target.areaId) ?? null);
       setTraceOn(true);
       setWorkspaceTab('relationships');
       onView('dashboard');
@@ -284,8 +286,12 @@ export default function Dashboard({
     [selectedAsset, selectedArea, focusDevice],
   );
   const troubleshootReport = useMemo(
-    () => troubleshoot({ assets: machines, components, relationships }, selectedAsset?.id ?? '', traceMode),
-    [selectedAsset, traceMode],
+    () => {
+      const componentId = resolveTraceComponentId(focusDevice);
+      const target = componentId && selectedAsset && componentBelongsToAsset(componentId, selectedAsset.id) ? componentId : selectedAsset?.id ?? '';
+      return troubleshoot({ assets: machines, components, relationships }, target, traceMode);
+    },
+    [selectedAsset, focusDevice, traceMode],
   );
 
   const changeTraceMode = (mode: TroubleshootMode) => {
@@ -333,6 +339,24 @@ export default function Dashboard({
     history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ assetId?: string; areaId?: string; relationship?: boolean }>).detail;
+      if (detail.relationship) {
+        setWorkspaceTab('relationships');
+        onView('dashboard');
+        return;
+      }
+      if (detail.areaId) selectArea(areas.find((area) => area.id === detail.areaId) ?? areas[0]);
+      const asset = detail.assetId ? machines.find((item) => item.id === detail.assetId) : null;
+      if (asset) selectAsset(asset);
+      setDrawerOpen(false);
+      setPaletteOpen(false);
+    };
+    addEventListener('iag-focus-verification-target', handler);
+    return () => removeEventListener('iag-focus-verification-target', handler);
+  }, [areas, machines, onView]);
+
   const openWorkspace = (tab: WorkspaceTab) => {
     setWorkspaceTab(tab);
     setNavOpen(false);
@@ -377,7 +401,8 @@ export default function Dashboard({
     if (hit.kind === 'component' || hit.kind === 'asset') setTraceOn(true);
   };
 
-  const breadcrumb = [selectedArea?.name, selectedAsset?.id].filter(Boolean).join(' / ') || 'All documented areas';
+  const activeDocumentTitle = activeDocument ? documents.find((document) => document.id === activeDocument)?.title : null;
+  const breadcrumb = [selectedArea?.name, selectedAsset?.id, activeDocumentTitle].filter(Boolean).join(' / ') || 'All documented areas';
 
   return (
     <main className={`dashboard workspace-${workspaceTab} phone-${phoneTab} view-${view}${drawerOpen ? ' drawer-open' : ''}${focusCabinet ? ' focus-cabinet' : ''}${workspaceTab === 'map' && (selectedArea || selectedAsset) && !mapInspectorDismissed ? ' map-inspector-open' : ''}`}>
@@ -393,6 +418,8 @@ export default function Dashboard({
         onOpenCabinet={onOpenCabinet}
         onQuery={setQuery}
         onOpenSearch={() => setPaletteOpen(true)}
+        breadcrumb={breadcrumb}
+        attention={{ field: fieldItems, relationships: relationships.filter((item) => item.verificationStatus !== 'VERIFIED').length }}
       />
 
       <FacilitySidebar
@@ -464,27 +491,27 @@ export default function Dashboard({
               }}
             />
           )}
-          {workspaceTab === 'field' && <FieldDocumentationWorkspace selectedAsset={selectedAsset} onAsset={selectAsset} onChanged={() => setCaptureTick((value) => value + 1)} onExit={() => setWorkspaceTab('map')} />}
+          {workspaceTab === 'field' && <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading field documentation workspace…</section>}><FieldDocumentationWorkspace selectedAsset={selectedAsset} onAsset={selectAsset} onChanged={() => setCaptureTick((value) => value + 1)} onExit={() => setWorkspaceTab('map')} /></Suspense>}
         </>
       )}
 
       {view === 'assets' && (
-        <AssetDirectory systemKind={systemKind} onSystemKind={setSystemKind} query={query} onQuery={setQuery} onAsset={(asset) => { selectAsset(asset); onView('dashboard'); }} onDevice={(item, parent) => {
+        <AssetDirectory systemKind={systemKind} onSystemKind={setSystemKind} query={query} onQuery={setQuery} onAsset={(asset) => { selectAsset(asset); setWorkspaceTab('map'); setInspectorTab('record'); onView('dashboard'); }} onDevice={(item, parent) => {
           selectAsset(parent);
           setFocusDevice(item.id);
           const parsed = parseDeviceQuery(item.id);
           if (parent.id === featuredCabinetAssetId) { if (parsed) writeDeviceQuery(parsed.deviceId); onOpenCabinet(); }
-          else onView('dashboard');
+          else { setWorkspaceTab('map'); onView('dashboard'); }
         }} />
       )}
 
       {view === 'documents' && (
-        <DocumentsWorkspace
+        <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading document workspace…</section>}><DocumentsWorkspace
           activeDocument={activeDocument}
           docStateFilter={docStateFilter}
           onDocument={setActiveDocument}
           onDocStateFilter={setDocStateFilter}
-        />
+        /></Suspense>
       )}
 
       <InspectorRail

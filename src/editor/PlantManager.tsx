@@ -10,9 +10,11 @@ import { loadAppSettings, saveAppSettings, type AppSettings } from '../lib/appSe
 import './plantManager.css';
 import './plantManagerAffordance.css';
 import './changeControl.css';
+import PrivateAssetImport from './PrivateAssetImport';
 
-type Panel = 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | 'conflicts' | 'health' | 'import' | null;
+type Panel = 'overview' | 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | 'conflicts' | 'health' | 'import' | null;
 type MapPoint = { x: number; y: number } | null;
+const panelTitles: Record<Exclude<Panel, null>, string> = { overview: 'Command Center', asset: 'Add Asset', manage: 'Manage Assets', relationship: 'Connections', evidence: 'Media & Evidence', observation: 'Field Observation', setup: 'Plant Setup', database: 'Plant Database', users: 'Users & Change Approval', settings: 'Settings', conflicts: 'Resolve Sync Conflict', health: 'Data & Graph Health', import: 'Structured Import' };
 
 const relationshipLabels: { value: RelationshipType; label: string }[] = [
   { value: 'FEEDS', label: 'Feeds Power To' },
@@ -249,16 +251,18 @@ function DatabasePanel({ onDone }: { onDone: () => void }) {
   const [mode, setMode] = useState<'replace' | 'merge'>('replace');
   const [message, setMessage] = useState('');
   const stats = useMemo(() => ({ assets: facility.assets.length, relationships: facility.relationships.length, documents: facility.documents.length }), [facility]);
-  return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">Archive v2 contains the transport-eligible graph, map configuration, observations, and metadata. LOCAL_ONLY and RESTRICTED evidence files are excluded. Archive v1 and legacy JSON backups remain importable.</p></div>;
+return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{stats.assets}</b> Assets</span><span><b>{stats.relationships}</b> Connections</span><span><b>{stats.documents}</b> Documents</span></div><button className="primary" type="button" onClick={async () => downloadFile(await editor.exportArchive(), `${safePlantFileName(facility.facility.name)}.iag`)}>Export Plant Database (.iag)</button><div className="iag-import-mode"><label><input type="radio" checked={mode === 'replace'} onChange={() => setMode('replace')}/> Replace existing database</label><label><input type="radio" checked={mode === 'merge'} onChange={() => setMode('merge')}/> Merge with current database</label></div><input ref={input} hidden type="file" accept=".iag,.json,.iag.json,application/json,application/zip" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { if (file.name.toLowerCase().endsWith('.iag')) await editor.importArchive(file, mode); else await editor.importBackup(JSON.parse(await file.text()) as PlantBackup, mode); onDone(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Import failed'); } }}/><button type="button" onClick={() => input.current?.click()}>Import Plant Database</button>{message && <p className="iag-error">{message}</p>}<button className="danger" type="button" onClick={async () => { if (!confirm('Restore the bundled facility baseline and remove all local edits, attachments, and observations?')) return; await editor.resetToBaseline(); onDone(); }}>Restore Baseline</button><p className="iag-db-note">Archive v2 contains the transport-eligible graph, map configuration, observations, and metadata. LOCAL_ONLY and RESTRICTED evidence files are excluded. Archive v1 and legacy JSON backups remain importable.</p><PrivateAssetImport/></div>;
 }
 
 function UsersPanel() {
   const editor = useFacilityEditor();
   const facility = useFacility();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [passphrase, setPassphrase] = useState('');
   const [message, setMessage] = useState('');
   const isAdmin = editor.currentUser?.role === 'admin';
+  const exportAudit = () => downloadFile(new Blob([JSON.stringify(editor.auditLog, null, 2)], { type: 'application/json' }), `${safePlantFileName(facility.facility.name)}-audit-log.json`);
   const identify = () => {
     if (!name.trim()) { setMessage('Enter your name before proposing a change.'); return; }
     editor.identifyTechnician(name);
@@ -271,13 +275,22 @@ function UsersPanel() {
     else setMessage('Administrator passphrase was not accepted.');
     setPassphrase('');
   };
+  const supabaseLogin = async () => {
+    if (!email.includes('@')) { setMessage('Enter a valid work email address.'); return; }
+    const result = await editor.signInSupabase(email);
+    setMessage(result.error ?? 'Check your email for a secure sign-in link.');
+  };
   return <div className="iag-editor-form iag-users-panel">
     <section className="iag-user-card"><strong>{editor.currentUser ? editor.currentUser.name : 'No user identified'}</strong><span>{editor.currentUser ? editor.currentUser.role === 'admin' ? 'Administrator' : 'Technician — proposed changes require approval' : 'Identify yourself before editing plant or map records.'}</span>{editor.currentUser && <button type="button" onClick={() => editor.signOut()}>Sign out</button>}</section>
-    {!editor.currentUser && <><label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Technician name" autoComplete="name"/></label><button className="primary" type="button" onClick={identify}>Identify as technician</button></>}
+    <section className="iag-review-summary" aria-label="Review summary"><div><b>{editor.pendingChanges.length}</b><span>Pending review</span></div><div><b>{editor.sync.conflicts.length}</b><span>Conflicts</span></div><div><b>{editor.queuedMutationCount}</b><span>Queued sync</span></div></section>
+    {!editor.currentUser && editor.supabaseEnabled && <section className="iag-admin-login"><strong>Secure sign-in</strong><p>Use your work email. New accounts start as technicians until an administrator assigns a role in Supabase.</p><label>Work email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" autoComplete="email"/></label><button className="primary" type="button" onClick={() => void supabaseLogin()}>Email me a sign-in link</button></section>}
+    {!editor.currentUser && !editor.supabaseEnabled && <><label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Technician name" autoComplete="name"/></label><button className="primary" type="button" onClick={identify}>Identify as technician</button></>}
     {!isAdmin && <section className="iag-admin-login"><strong>Administrator sign-in</strong><p>Enter the 4-digit administrator PIN. This static deployment uses a browser-local demo credential; it is not production security.</p><label>Administrator PIN<input type="password" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={passphrase} onChange={(event) => setPassphrase(event.target.value.replace(/\D/g, '').slice(0, 4))} autoComplete="current-password"/></label><button type="button" onClick={() => void admin()}>Sign in as administrator</button></section>}
     {message && <p className="iag-db-note" role="status">{message}</p>}
+    <div className="iag-review-group-label">Decision queue</div>
     {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Submitted for review</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => { const current = reviewValue(facility, change, false); const proposed = reviewValue(facility, change, true); return <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div className="iag-review-diff"><label>Current canonical value<pre>{JSON.stringify(current, null, 2)}</pre></label><label>{change.operation === 'DELETE' ? 'Proposed deletion' : 'Proposed value'}<pre>{change.operation === 'DELETE' ? 'DELETE — tombstone after approval' : JSON.stringify(proposed, null, 2)}</pre></label></div><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & promote to canonical</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>; })}</section>}
-    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Local activity log</strong><span>{editor.auditLog.length}</span></div>{editor.auditLog.length === 0 ? <p>No local activity has been recorded yet.</p> : editor.auditLog.slice(0, 12).map((event) => <article key={event.id}><strong>{event.action}</strong><small>{event.actor} · {new Date(event.at).toLocaleString()} · {event.detail}</small></article>)}</section>
+    <div className="iag-review-group-label">Activity</div>
+    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Local activity log</strong><span>{editor.auditLog.length}</span></div><button type="button" onClick={exportAudit}>Export audit log (.json)</button>{editor.auditLog.length === 0 ? <p>No local activity has been recorded yet.</p> : editor.auditLog.slice(0, 12).map((event) => <article key={event.id}><strong>{event.action}</strong><small>{event.actor} · {new Date(event.at).toLocaleString()} · {event.detail}</small></article>)}</section>
     <p className="iag-db-note">The administrator credential is local development access, not production security. Approved mutations enter the persistent sync outbox; the shared backend retains its own canonical revision history.</p>
   </div>;
 }
@@ -305,10 +318,11 @@ function DataHealthPanel() {
   const lowCoverageAreas = facility.areas
     .map((area) => ({ area, assets: facility.assets.filter((asset) => asset.areaId === area.id) }))
     .filter(({ assets }) => assets.length === 0 || assets.some((asset) => asset.verificationStatus !== 'VERIFIED'));
+  const focusTarget = (detail: { assetId?: string; areaId?: string; relationship?: boolean }) => window.dispatchEvent(new CustomEvent('iag-focus-verification-target', { detail }));
   return <div className="iag-editor-form iag-health-panel">
     <section className="iag-user-card"><div className="iag-section-head"><strong>Data validation</strong><span>{validation.state}</span></div><p>{validation.detail}</p><small>Last run {new Date(validation.at).toLocaleString()}</small><button type="button" onClick={() => setValidation(validate())}>Run verification</button></section>
     <section className="iag-user-card"><strong>Documentation and graph coverage</strong><dl className="iag-health-counts"><div><dt>Documented assets</dt><dd>{facility.assets.length}</dd></div><div><dt>Verified relationships</dt><dd>{facility.relationships.filter((item) => item.verificationStatus === 'VERIFIED').length}</dd></div><div><dt>Relationships needing field verification</dt><dd>{verifyRelationships.length}</dd></div><div><dt>Disputed relationships</dt><dd>{disputedRelationships.length}</dd></div><div><dt>Disputed facts</dt><dd>{disputedFacts.length}</dd></div><div><dt>Open asset unknowns</dt><dd>{unknowns.length}</dd></div><div><dt>Conflicts awaiting review</dt><dd>{editor.sync.conflicts.length}</dd></div><div><dt>Pending local mutations</dt><dd>{editor.queuedMutationCount}</dd></div><div><dt>LOCAL_ONLY evidence records</dt><dd>{localEvidence.length}</dd></div></dl><small>Counts are shown directly; no composite health score is inferred.</small></section>
-    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Next verification targets</strong><span>{unknowns.length + verifyRelationships.length + disputedRelationships.length + lowCoverageAreas.length}</span></div>{lowCoverageAreas.map(({ area, assets }) => <article key={`area:${area.id}`}><strong>{area.name}</strong><small>{assets.length ? `${assets.length} documented asset(s); review FIELD_VERIFY records` : 'No documented assets; start field verification'}</small></article>)}{unknowns.map(({ asset, unknown }) => <article key={`${asset.id}:${unknown}`}><strong>{asset.id}</strong><small>{unknown}</small></article>)}{verifyRelationships.map((relationship) => <article key={relationship.id}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · FIELD_VERIFY · {relationship.evidenceIds.length} evidence reference(s)</small></article>)}{disputedRelationships.map((relationship) => <article key={relationship.id}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · DISPUTED · review evidence before promotion</small></article>)}</section>
+    <section className="iag-pending-changes"><div className="iag-section-head"><strong>Next verification targets</strong><span>{unknowns.length + verifyRelationships.length + disputedRelationships.length + lowCoverageAreas.length}</span></div>{lowCoverageAreas.map(({ area, assets }) => <button className="iag-target-row" type="button" key={`area:${area.id}`} onClick={() => focusTarget({ areaId: area.id })}><strong>{area.name}</strong><small>{assets.length ? `${assets.length} documented asset(s); review FIELD_VERIFY records` : 'No documented assets; start field verification'}</small><b>Open →</b></button>)}{unknowns.map(({ asset, unknown }) => <button className="iag-target-row" type="button" key={`${asset.id}:${unknown}`} onClick={() => focusTarget({ assetId: asset.id })}><strong>{asset.id}</strong><small>{unknown}</small><b>Open →</b></button>)}{verifyRelationships.map((relationship) => <button className="iag-target-row" type="button" key={relationship.id} onClick={() => focusTarget({ relationship: true })}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · FIELD_VERIFY · {relationship.evidenceIds.length} evidence reference(s)</small><b>Trace →</b></button>)}{disputedRelationships.map((relationship) => <button className="iag-target-row" type="button" key={relationship.id} onClick={() => focusTarget({ relationship: true })}><strong>{relationship.source} → {relationship.target}</strong><small>{relationship.type} · DISPUTED · review evidence before promotion</small><b>Trace →</b></button>)}</section>
   </div>;
 }
 
@@ -341,13 +355,41 @@ function BulkImportPanel() {
   </div>;
 }
 
+function CommandCenterPanel({ onOpen }: { onOpen: (panel: Exclude<Panel, null>, clearMapPoint?: boolean) => void }) {
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  const fieldItems = facility.assets.filter((asset) => asset.verificationStatus !== 'VERIFIED').length;
+  const unresolvedRelationships = facility.relationships.filter((item) => item.verificationStatus !== 'VERIFIED').length;
+  const nextAction = !editor.currentUser ? { label: 'Identify operator', panel: 'users' as const, detail: 'Set the person responsible for this editing session.' } : editor.sync.conflicts.length ? { label: 'Resolve conflicts', panel: 'conflicts' as const, detail: 'Compare canonical and proposed values before syncing.' } : editor.pendingChanges.length ? { label: 'Review pending changes', panel: 'users' as const, detail: 'Approve or reject the queued record changes.' } : fieldItems || unresolvedRelationships ? { label: 'Review verification targets', panel: 'health' as const, detail: 'Work from documented gaps without promoting guesses.' } : { label: 'Document equipment', panel: 'asset' as const, detail: 'Add the next known asset to the plant record.' };
+  const cards = [{ label: 'Review queue', value: editor.pendingChanges.length, detail: 'pending changes', panel: 'users' as const }, { label: 'Sync conflicts', value: editor.sync.conflicts.length, detail: 'need comparison', panel: 'conflicts' as const }, { label: 'Asset verification', value: fieldItems, detail: 'assets to verify', panel: 'health' as const }, { label: 'Graph verification', value: unresolvedRelationships, detail: 'relationships to verify', panel: 'health' as const }];
+  const openTask = (panel: Exclude<Panel, null>) => onOpen(panel, panel === 'asset');
+  return <div className="iag-editor-form iag-command-center">
+    <section className="iag-command-hero"><div><small>PLANT MANAGER · {facility.facility.name}</small><h3>What are we moving forward?</h3><p>{nextAction.detail}</p></div><button className="primary" type="button" onClick={() => openTask(nextAction.panel)}>{nextAction.label} →</button></section>
+    <section className="iag-command-cards" aria-label="Current work queues">{cards.map((card) => <button type="button" key={card.label} onClick={() => openTask(card.panel)}><small>{card.label}</small><strong>{card.value}</strong><span>{card.detail} · Open →</span></button>)}</section>
+    <section className="iag-command-section"><div className="iag-section-head"><strong>Start a documented task</strong><span>Genie is ready</span></div><div className="iag-command-actions"><button type="button" onClick={() => openTask('asset')}>+ Add equipment</button><button type="button" onClick={() => openTask('observation')}>Record a finding</button><button type="button" onClick={() => openTask('evidence')}>Attach evidence</button><button type="button" onClick={() => openTask('relationship')}>Trace a connection</button></div></section>
+    <section className="iag-command-note"><span className="iag-genie-orb" aria-hidden="true">✦</span><div><strong>{editor.currentUser ? `Working as ${editor.currentUser.name}` : 'Genie needs an operator'}</strong><p>{editor.currentUser ? 'Every change stays local, reviewable, and evidence-labeled.' : 'Identify yourself so notes and proposed changes have accountable ownership.'}</p></div><button type="button" onClick={() => openTask('users')}>Users →</button></section>
+  </div>;
+}
+
 export default function PlantManager() {
   const facility = useFacility();
   const editor = useFacilityEditor();
-  const [panel, setPanel] = useState<Panel>(null);
+  const [panel, setPanelState] = useState<Panel>(() => {
+    const value = new URLSearchParams(location.search).get('manager');
+    return ['overview', 'asset', 'manage', 'relationship', 'evidence', 'observation', 'setup', 'database', 'users', 'settings', 'conflicts', 'health', 'import'].includes(value ?? '') ? value as Exclude<Panel, null> : null;
+  });
   const [mapPoint, setMapPoint] = useState<MapPoint>(null);
   const [mapEdit, setMapEdit] = useState(false);
   const previousFocus = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const onPopState = () => {
+      const value = new URLSearchParams(location.search).get('manager');
+      setPanelState(['overview', 'asset', 'manage', 'relationship', 'evidence', 'observation', 'setup', 'database', 'users', 'settings', 'conflicts', 'health', 'import'].includes(value ?? '') ? value as Exclude<Panel, null> : null);
+    };
+    addEventListener('popstate', onPopState);
+    return () => removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -380,6 +422,17 @@ export default function PlantManager() {
   }, []);
 
   useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setPanel('overview');
+      }
+    };
+    addEventListener('keydown', handler);
+    return () => removeEventListener('keydown', handler);
+  }, []);
+
+  useEffect(() => {
     if (!panel) return;
     previousFocus.current = document.activeElement as HTMLElement | null;
     const timer = window.setTimeout(() => (document.querySelector('.iag-editor-panel > header button[aria-label="Close"]') as HTMLButtonElement | null)?.focus(), 0);
@@ -388,18 +441,53 @@ export default function PlantManager() {
     return () => { window.clearTimeout(timer); document.removeEventListener('keydown', onKeyDown); previousFocus.current?.focus(); };
   }, [panel]);
 
-  const title = panel === 'asset' ? 'Add Asset' : panel === 'manage' ? 'Manage Assets' : panel === 'relationship' ? 'Connections' : panel === 'evidence' ? 'Media & Evidence' : panel === 'observation' ? 'Field Observation' : panel === 'setup' ? 'Plant Setup' : panel === 'database' ? 'Plant Database' : panel === 'users' ? 'Users & Change Approval' : panel === 'settings' ? 'Settings' : panel === 'conflicts' ? 'Resolve Sync Conflict' : panel === 'health' ? 'Data & Graph Health' : panel === 'import' ? 'Structured Import' : '';
+  const title = panel ? panelTitles[panel] : '';
   const syncLabel = editor.sync.phase === 'LOCAL_ONLY' ? `Saved locally · ${editor.queuedMutationCount}` : editor.sync.phase === 'OFFLINE' ? `Offline · ${editor.queuedMutationCount} waiting` : editor.sync.phase === 'PENDING' ? `${editor.queuedMutationCount} waiting to sync` : editor.sync.phase === 'SYNCING' ? 'Syncing' : editor.sync.phase === 'CONFLICT' ? `${editor.sync.conflicts.length} conflict${editor.sync.conflicts.length === 1 ? '' : 's'}` : editor.sync.phase === 'ERROR' ? 'Sync failed · retry' : 'Synced';
   const close = () => { setPanel(null); setMapPoint(null); };
+  const setPanel = (next: Panel, clearMapPoint = false) => {
+    if (clearMapPoint) setMapPoint(null);
+    setPanelState(next);
+    const params = new URLSearchParams(location.search);
+    if (next) params.set('manager', next);
+    else params.delete('manager');
+    history.pushState(null, '', `${location.pathname}${params.size ? `?${params}` : ''}${location.hash}`);
+    window.dispatchEvent(new CustomEvent('iag-recent-location', { detail: next ? panelTitles[next] : undefined }));
+  };
+  const activeWorkspace = new URLSearchParams(location.search).get('view');
+  const workspacePrompt: Record<string, string> = { assets: 'Which asset are we verifying?', relationships: 'Which connection are we tracing?', documents: 'Which document are we checking?', field: 'What did we find in the field?', map: 'Where are we working on the map?' };
+  const workspaceHint: Record<string, string> = { assets: 'Keep new facts evidence-labeled as you review the asset directory.', relationships: 'Trace documented endpoints and leave uncertain links for verification.', documents: 'Use the source record and keep provenance visible.', field: 'Record observations as FIELD_VERIFY until the evidence supports promotion.', map: 'Select a documented area or asset to continue.' };
+  const genieQuestion = !editor.currentUser ? 'Who are we working as?' : editor.sync.phase === 'CONFLICT' ? 'What should we resolve?' : editor.sync.phase === 'ERROR' ? 'Should we retry sync?' : editor.pendingChanges.length ? 'What should we review next?' : workspacePrompt[activeWorkspace ?? ''] ?? 'What are we documenting?';
+  const genieHint = !editor.currentUser ? 'Identify yourself before changing the plant record.' : editor.sync.phase === 'CONFLICT' ? 'Compare the proposed and canonical values.' : editor.sync.phase === 'ERROR' ? `${editor.queuedMutationCount} queued change${editor.queuedMutationCount === 1 ? '' : 's'} retained. Retry when the connection is ready.` : editor.pendingChanges.length ? `${editor.pendingChanges.length} change${editor.pendingChanges.length === 1 ? '' : 's'} waiting for approval.` : workspaceHint[activeWorkspace ?? ''] ?? 'Choose a task and Genie will open the right workspace.';
+  const nextAction: { label: string; panel: Exclude<Panel, null> } = !editor.currentUser
+    ? { label: 'Identify operator', panel: 'users' }
+    : editor.sync.phase === 'CONFLICT'
+      ? { label: 'Resolve conflicts', panel: 'conflicts' }
+      : editor.pendingChanges.length
+        ? { label: `Review ${editor.pendingChanges.length} pending`, panel: 'users' }
+        : { label: 'Open command center', panel: 'overview' };
+
+  const genieTasks: { label: string; panel: Exclude<Panel, null> }[] = !editor.currentUser
+    ? [{ label: 'Identify yourself', panel: 'users' }, { label: 'Review what is missing', panel: 'health' }]
+    : editor.sync.phase === 'CONFLICT'
+      ? [{ label: 'Resolve conflicts', panel: 'conflicts' }, { label: 'Review what is missing', panel: 'health' }]
+      : [{ label: 'Open command center', panel: 'overview' }, { label: 'Add equipment', panel: 'asset' }, { label: 'Record a finding', panel: 'observation' }, { label: 'Review what is missing', panel: 'health' }];
 
   return <>
     <div className="iag-manager-bar" aria-label="Plant editing tools">
+      <div className="iag-genie-concierge" role="region" aria-live="polite" aria-label={`${genieQuestion} ${genieHint}`}>
+        <button className="iag-genie-orb" type="button" aria-label="Open Genie command center" aria-keyshortcuts="Control+K Meta+K" title="Open Genie command center (Ctrl/Cmd+K)" onClick={() => setPanel('overview')}>✦</button>
+        <div><strong>{genieQuestion}</strong><span>{genieHint}</span></div>
+        <div className="iag-genie-tasks" aria-label="Start a task">
+          {genieTasks.map((task) => <button key={task.panel} type="button" onClick={() => { if (task.panel === 'asset') setMapPoint(null); setPanel(task.panel); }}>{task.label}</button>)}
+        </div>
+        <button className="iag-genie-next" type="button" onClick={() => setPanel(nextAction.panel)}><span>Next</span>{nextAction.label} →</button>
+      </div>
       <span className={`iag-storage-status ${editor.ready ? 'ready' : ''}`}><i />{editor.ready ? editor.currentUser ? `${editor.currentUser.name.toUpperCase()} · ${editor.currentUser.role === 'admin' ? 'ADMIN' : `${editor.pendingChanges.length} PENDING`}` : 'IDENTIFY TO EDIT' : 'OPENING DATABASE…'}</span>
       <button type="button" aria-label={syncLabel.toUpperCase()} title={editor.sync.error ?? `${editor.queuedMutationCount} queued mutation(s)`} onClick={() => editor.sync.phase === 'CONFLICT' ? setPanel('conflicts') : void editor.syncNow()} disabled={editor.sync.phase === 'SYNCING'}>{syncLabel.toUpperCase()}</button><span className="sr-only" role="status" aria-live="polite">Synchronization status: {syncLabel}</span>
       <button type="button" onClick={() => setPanel('users')}>Users</button><button type="button" onClick={() => { setMapPoint(null); setPanel('asset'); }}>+ Asset</button><button type="button" onClick={() => setPanel('manage')}>Manage</button><button type="button" onClick={() => setPanel('relationship')}>Connect</button><button type="button" onClick={() => setPanel('observation')}>Add Note</button><button type="button" onClick={() => setPanel('evidence')}>Add Photo / PDF</button><button className={mapEdit ? 'active' : ''} type="button" aria-pressed={mapEdit} onClick={() => { if (mapEdit) setMapEdit(false); else if (editor.currentUser?.role === 'admin') window.dispatchEvent(new CustomEvent('iag-open-map-editor')); else setPanel('users'); }}>Map Edit</button><button type="button" onClick={() => setPanel('setup')}>Plant Setup</button><button type="button" onClick={() => setPanel('database')}>Plant Database</button><button type="button" onClick={() => setPanel('import')}>Bulk Import</button><button type="button" onClick={() => setPanel('health')}>Data Health</button>
     </div>
     {mapEdit && <div className="iag-map-edit-banner">MAP / AREA EDIT · Draft changes are not saved until approved <button type="button" onClick={() => setMapEdit(false)}>Exit</button></div>}
-    {panel && typeof document !== 'undefined' && createPortal(<div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" role="dialog" aria-modal="true" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><button type="button" aria-label="Close" onClick={close}>×</button></header>{panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>} {panel === 'conflicts' && <ConflictsPanel/>} {panel === 'health' && <DataHealthPanel/>} {panel === 'import' && <BulkImportPanel/>}</aside></div>, document.body)}
+    {panel && typeof document !== 'undefined' && createPortal(<div className="iag-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}><aside className="iag-editor-panel" role="dialog" aria-modal="true" aria-label={title}><header><div><small>{facility.facility.name}</small><h2>{title}</h2></div><div className="iag-panel-header-actions">{panel !== 'overview' && <button type="button" className="iag-panel-home" aria-label="Return to Command Center" onClick={() => setPanel('overview')}>Command Center</button>}<button type="button" aria-label="Close" onClick={close}>×</button></div></header>{panel === 'overview' && <CommandCenterPanel onOpen={setPanel}/>} {panel === 'asset' && <AssetForm point={mapPoint} onDone={close}/>} {panel === 'manage' && <ManageAssets onDone={close}/>} {panel === 'relationship' && <RelationshipPanel/>} {panel === 'evidence' && <EvidencePanel/>} {panel === 'observation' && <ObservationPanel/>} {panel === 'setup' && <PlantSetupPanel/>} {panel === 'database' && <DatabasePanel onDone={close}/>} {panel === 'users' && <UsersPanel/>} {panel === 'settings' && <SettingsPanel/>} {panel === 'conflicts' && <ConflictsPanel/>} {panel === 'health' && <DataHealthPanel/>} {panel === 'import' && <BulkImportPanel/>}</aside></div>, document.body)}
   </>;
 }
 

@@ -20,11 +20,16 @@ export interface SyncTransport {
 }
 
 export class HttpSyncTransport implements SyncTransport {
-  constructor(private readonly baseUrl: string, private readonly fetcher: typeof fetch = fetch, private readonly writeToken?: string) {}
+  constructor(private readonly baseUrl: string, private readonly fetcher: typeof fetch = fetch, private readonly writeToken?: string, private readonly tokenProvider?: () => Promise<string | null>) {}
+
+  private async authorization(): Promise<Record<string, string>> {
+    const token = this.tokenProvider ? await this.tokenProvider() : this.writeToken;
+    return token ? { authorization: `Bearer ${token}` } : {};
+  }
 
   async send(facilityId: string, mutation: SyncMutation): Promise<MutationResult> {
     const response = await this.fetcher(`${this.baseUrl.replace(/\/$/, '')}/api/facilities/${encodeURIComponent(facilityId)}/mutations`, {
-      method: 'POST', headers: { 'content-type': 'application/json', ...(this.writeToken ? { authorization: `Bearer ${this.writeToken}` } : {}) }, body: JSON.stringify(mutation),
+      method: 'POST', headers: { 'content-type': 'application/json', ...(await this.authorization()) }, body: JSON.stringify(mutation),
     });
     const result = await response.json() as MutationResult | { error?: string };
     if (response.status === 409 && 'status' in result && result.status === 'conflict') return result;
@@ -34,17 +39,20 @@ export class HttpSyncTransport implements SyncTransport {
 
   async pull(facilityId: string, since?: string): Promise<CanonicalEntityEnvelope[]> {
     const query = since ? `?since=${encodeURIComponent(since)}` : '';
-    const response = await this.fetcher(`${this.baseUrl.replace(/\/$/, '')}/api/facilities/${encodeURIComponent(facilityId)}/entities${query}`);
+    const response = await this.fetcher(`${this.baseUrl.replace(/\/$/, '')}/api/facilities/${encodeURIComponent(facilityId)}/entities${query}`, {
+      headers: await this.authorization(),
+    });
     const result = await response.json() as { entities?: CanonicalEntityEnvelope[]; error?: string };
     if (!response.ok || !Array.isArray(result.entities)) throw new Error(result.error ?? `Pull failed with HTTP ${response.status}.`);
     return result.entities;
   }
 }
 
-export function applyCanonicalEntities(pkg: FacilityPackage, entities: CanonicalEntityEnvelope[]): FacilityPackage {
+export function applyCanonicalEntities(pkg: FacilityPackage, entities: CanonicalEntityEnvelope[], preserveEntityIds: ReadonlySet<string> = new Set()): FacilityPackage {
   const next = structuredClone(pkg);
   const upsert = <T extends { id: string }>(rows: T[], value: T) => rows.some((item) => item.id === value.id) ? rows.map((item) => item.id === value.id ? value : item) : [...rows, value];
   for (const entity of entities) {
+    if (preserveEntityIds.has(entity.entityId)) continue;
     next.entityVersions[entity.entityId] = entity.version;
     const value = entity.value as ({ id: string } & Record<string, unknown>) | undefined;
     if (entity.entityType === 'facility' && value && !entity.deleted) next.facility = value as unknown as FacilityPackage['facility'];

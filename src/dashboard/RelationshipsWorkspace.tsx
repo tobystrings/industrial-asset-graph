@@ -30,7 +30,7 @@ export default function RelationshipsWorkspace({ report, mode, selectedAsset, on
   return (
     <section className="relationship-panel troubleshoot-panel panel enter" data-guide-target="relationships" data-testid="troubleshoot-mode">
       <header className="troubleshoot-head">
-        <div><small>Troubleshoot / Impact Mode</small><h1>{selectedAsset?.name ?? 'Select an asset'}</h1><code>{selectedAsset?.id ?? 'No asset selected'}</code></div>
+        <div><small>Troubleshoot / Impact Mode</small><h1>{report.selected?.label ?? selectedAsset?.name ?? 'Select an asset'}</h1><code>{report.selected?.id ?? selectedAsset?.id ?? 'No asset selected'}</code></div>
         <div className="troubleshoot-head-actions"><button type="button" onClick={onMap}>View on map</button><button className="troubleshoot-exit" type="button" onClick={onExit}>Clear / Exit</button></div>
       </header>
       {!selectedAsset ? <div className="relationship-empty" role="status"><b>Select an asset to troubleshoot.</b><span>Only documented plant relationships will be shown.</span></div> : <>

@@ -2,6 +2,10 @@ from pathlib import Path
 import os
 import subprocess
 import time
+import json
+import io
+import zipfile
+import hashlib
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
 
@@ -114,6 +118,11 @@ def exercise_manager_states(page, label: str) -> None:
     page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
     manager = page.locator('.iag-manager-bar')
 
+    manager.get_by_role('button', name='Open Genie command center').click()
+    page.get_by_role('heading', name='Command Center').wait_for(state='visible')
+    screenshot(page, f'{label}-command-center')
+    close_editor(page)
+
     manager.get_by_role('button', name='Users', exact=True).click()
     page.locator('.iag-editor-panel').wait_for(state='visible')
     screenshot(page, f'{label}-users')
@@ -125,6 +134,7 @@ def exercise_manager_states(page, label: str) -> None:
 
     manager.get_by_role('button', name='Manage', exact=True).click()
     page.locator('.iag-editor-panel').wait_for(state='visible')
+    page.get_by_role('button', name='Return to Command Center', exact=True).wait_for(state='visible')
     screenshot(page, f'{label}-manage-assets')
     close_editor(page)
 
@@ -151,6 +161,16 @@ def exercise_manager_states(page, label: str) -> None:
     page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
     manager = page.locator('.iag-manager-bar')
     manager.get_by_role('button', name='Map Edit', exact=True).click()
+    # Supabase may restore a real technician session while the harness reloads.
+    # Re-establish the synthetic admin through the existing local-only test path
+    # before exercising the protected map editor.
+    if page.get_by_role('heading', name='Users').is_visible():
+        users_panel = page.locator('.iag-users-panel')
+        users_panel.get_by_label('Administrator PIN').fill('1234')
+        users_panel.get_by_role('button', name='Sign in as administrator').click()
+        page.get_by_role('button', name='Close', exact=True).click()
+        manager = page.locator('.iag-manager-bar')
+        manager.get_by_role('button', name='Map Edit', exact=True).click()
     page.locator('.iag-map-edit-banner').wait_for(state='visible')
     page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
@@ -202,6 +222,12 @@ def exercise_workspace_states(page, label: str) -> None:
     page.locator('.iag-manager-bar').wait_for(state='visible')
     screenshot(page, f'{label}-documents')
     assert_manager_geometry(page)
+    recent_assets = page.locator('.recent-workspace-trail .recent-workspace-tab').filter(has_text='Assets').first
+    if recent_assets.is_visible():
+        recent_assets.locator('button').first.click()
+        page.wait_for_function("() => new URLSearchParams(location.search).get('view') === 'assets'")
+        page.locator('.iag-manager-bar').wait_for(state='visible')
+        assert 'view=assets' in page.url, f'Recent workspace did not restore assets state: {page.url}'
 
     page.goto(f'{BASE}?view=cabinet', wait_until='networkidle')
     page.get_by_role('heading', name='Line 2 Conveyor Control Cabinet').wait_for(state='visible', timeout=30000)
@@ -215,6 +241,93 @@ def diagnostic(page, label: str) -> None:
         screenshot(page, f'FAIL-{label}')
     except Exception:
         pass
+
+
+def exercise_private_asset_package(page, label: str) -> None:
+    """Always cover additive equipment/evidence UI; optionally validate a real private bundle."""
+    global output
+    private_path = os.environ.get('IAG_PRIVATE_VISUAL_BUNDLE')
+    if private_path:
+        archive = Path(private_path).read_bytes()
+    else:
+        plant = page.evaluate('''() => new Promise((resolve, reject) => {
+          const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
+          request.onsuccess = () => { const db = request.result; const read = db.transaction('plant').objectStore('plant').get('active'); read.onsuccess = () => { db.close(); resolve(read.result); }; read.onerror = () => reject(read.error); };
+          request.onerror = () => reject(request.error);
+        })''')
+        asset = dict(plant['assets'][0], id='visual-private-machine', name='Private evidence test machine', componentIds=['visual-private-component'])
+        svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#123f54"/><text x="60" y="300" fill="white" font-size="40">Synthetic evidence fixture</text></svg>'
+        patch = dict(facilityId=plant['facility']['id'], entityVersions={}, areas=[], assets=[asset], components=[dict(id='visual-private-component',label='Private test component',type='VFD',parentId=asset['id'],verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])], evidence=[dict(id='visual-private-evidence',type='PHOTO',title='Synthetic local evidence',access='LOCAL_ONLY',pathOrUrl='indexeddb://attachment/visual-private-file')], documents=[dict(id='visual-private-doc',assetId=asset['id'],category='Photos',title='Synthetic local evidence',path='indexeddb://attachment/visual-private-file',state='REVIEW',required=False,verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])],relationships=[],revisions=[],assetSerialSources=[])
+        manifest = dict(format='industrial-asset-graph-private',version=1,patch=patch,observations=[],attachments=[dict(id='visual-private-file',assetId=asset['id'],name='fixture.svg',mimeType='image/svg+xml',size=len(svg),category='PHOTO',verificationStatus='FIELD_VERIFY',access='LOCAL_ONLY',createdAt='2026-09-07T00:00:00Z',filePath='files/fixture.svg',sha256=hashlib.sha256(svg).hexdigest())])
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_STORED) as z:
+            z.writestr('private-manifest.json',json.dumps(manifest)); z.writestr('files/fixture.svg',svg)
+        archive = stream.getvalue()
+    with zipfile.ZipFile(io.BytesIO(archive)) as z:
+        manifest = json.loads(z.read('private-manifest.json'))
+    asset = manifest['patch']['assets'][0]
+    upload = private_path if private_path else dict(name='private-package.zip',mimeType='application/zip',buffer=archive)
+    old_output = output
+    if private_path:
+        output = Path(os.environ['IAG_PRIVATE_VISUAL_OUTPUT'])
+        output.mkdir(parents=True,exist_ok=True)
+    try:
+        page.locator('.iag-manager-bar').get_by_role('button',name='Plant Database',exact=True).click()
+        section = page.get_by_role('region',name='Private asset package')
+        with page.expect_download() as backup:
+            section.locator('input[type=file]').first.set_input_files(upload)
+        if private_path:
+            backup.value.save_as(str(output/f'{label}-before-import.zip'))
+        section.get_by_role('status').filter(has_text='conflicts retained for review').wait_for(timeout=120000)
+        assert '0 conflicts' in section.get_by_role('status').inner_text()
+        screenshot(page,f'{label}-private-import')
+        close_editor(page)
+        page.goto(f'{BASE}?view=assets&asset={asset["id"]}',wait_until='networkidle')
+        page.get_by_text(asset['name'],exact=True).first.wait_for(state='visible')
+        assert page.locator('.deep-link-warning').count()==0, 'Imported asset deep link failed after reload'
+        page.get_by_placeholder('Search this directory…').fill(asset['name'])
+        assert_manager_geometry(page); screenshot(page,f'{label}-private-machine')
+        page.get_by_role('button',name='Open asset record',exact=True).click()
+        page.locator('.asset-panel').get_by_text(asset['name'],exact=True).wait_for(state='visible')
+        record_width = page.get_by_test_id('inspector-rail').bounding_box()['width']
+        assert record_width >= min(300, page.viewport_size['width']-20), 'Asset record collapsed into an unreadable narrow column'
+        screenshot(page,f'{label}-private-asset-record')
+        operational = next((r for r in manifest['patch']['relationships'] if r['type'] in ['SUPPLIES','FEEDS','CONTROLS','MECHANICALLY_DRIVES']),None)
+        focus = '&device='+operational['source'] if operational else ''
+        page.goto(f'{BASE}?asset={asset["id"]}&trace=full{focus}',wait_until='networkidle')
+        page.get_by_test_id('troubleshoot-mode').wait_for(state='visible')
+        if private_path:
+            assert page.locator('.dependency-card').count()>0, 'Imported machine relationships did not resolve'
+        assert_manager_geometry(page); screenshot(page,f'{label}-private-relationships')
+        page.goto(f'{BASE}?view=documents',wait_until='networkidle')
+        doc = next((d for d in manifest['patch']['documents'] if d['title']=='Wulftec-machine-dossier.pdf'),manifest['patch']['documents'][0])
+        page.locator('.doc-cards button').filter(has_text=doc['title']).first.click()
+        local = page.locator('.local-document-preview')
+        local.get_by_role('link',name='Download original',exact=True).wait_for(state='visible')
+        assert local.locator('iframe,img,video,pre').count()>0, 'Local evidence has no preview'
+        if local.locator('img').count():
+            page.wait_for_function("() => [...document.querySelectorAll('.local-document-preview img')].every(img => img.complete && img.naturalWidth > 0)")
+        screenshot(page,f'{label}-private-document')
+        assert_manager_geometry(page)
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Private workspace overflows horizontally'
+        page.get_by_role('button',name='Close documentation detail').click()
+        if private_path:
+            for prefix, element in [('image/', 'img'), ('video/', 'video')]:
+                attachment = next(a for a in manifest['attachments'] if a['mimeType'].startswith(prefix))
+                media_doc = next(d for d in manifest['patch']['documents'] if d['path']=='indexeddb://attachment/'+attachment['id'])
+                page.locator('.doc-cards button').filter(has_text=media_doc['title']).first.click()
+                page.locator('.local-document-preview '+element).wait_for(state='visible')
+                page.wait_for_function("kind => { const e=document.querySelector('.local-document-preview '+kind); return kind==='img' ? e.complete && e.naturalWidth>0 : e.readyState>=1; }",arg=element,timeout=30000)
+                screenshot(page,f'{label}-private-{element}')
+                page.get_by_role('button',name='Close documentation detail').click()
+        page.locator('.iag-manager-bar').get_by_role('button',name='Plant Database',exact=True).click()
+        section = page.get_by_role('region',name='Private asset package')
+        with page.expect_download():
+            section.locator('input[type=file]').first.set_input_files(upload)
+        section.get_by_role('status').filter(has_text='Added 0 records and 0 attachments').wait_for(timeout=120000)
+        close_editor(page)
+    finally:
+        output=old_output
 
 
 try:
@@ -263,10 +376,19 @@ try:
                     if label == 'phone-390x844':
                         page.goto(f'{BASE}?area=area-warehouse-e&map=2d&tab=capture', wait_until='networkidle')
                         wait_for_dashboard(page)
+                        field_workspace = page.locator('[data-testid="inspector-rail"]')
+                        field_workspace.wait_for(state='visible')
+                        walkdown = page.locator('[data-testid="walkdown-form"]').first
+                        walkdown.wait_for(state='visible')
+                        walkdown.get_by_label('Typed value').fill('Observed during production-readiness walkthrough')
+                        walkdown.locator('input[placeholder="Initials"]').first.fill('VTT')
+                        walkdown.get_by_role('button', name='Save capture', exact=True).click()
+                        walkdown.get_by_text('Saved locally. Not in the graph yet.', exact=True).wait_for(state='visible')
                         screenshot(page, f'{label}-walkthrough')
 
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
+                    exercise_private_asset_package(page, label)
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:

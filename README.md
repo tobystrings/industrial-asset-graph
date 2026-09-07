@@ -66,7 +66,7 @@ Facility packages now carry explicit schema, package-revision, and entity-versio
 
 The shared-write contract lives in `src/facility/syncContract.ts`. It specifies stable mutation/actor/client IDs, base entity versions, review state, idempotent retry behavior, explicit conflicts, and tombstone deletion. `LOCAL_ONLY` evidence and local drafts are rejected at the transport boundary. The PostgreSQL/API adapter is implemented under `server/` and can be enabled for connected deployments; the current public build remains local/seeded. The local admin credential and optional development bearer token are not production authentication.
 
-For a protected local/shared deployment, set `IAG_WRITE_TOKEN` on the API and configure the client transport through `VITE_IAG_API_URL`; mutation requests must then include the matching bearer token through the deployment’s authenticated gateway. The built-in token guard is only a replaceable boundary for development and is not a substitute for an identity provider, token rotation, or role-based authorization.
+For a protected local/shared deployment, use Supabase Auth. Put `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in an untracked `.env.local` file; the browser login uses a one-time email link and the resulting session JWT is sent to the API for sync. New users default to `technician`. Promote a trusted user by setting `iag_role` to `admin` in server-controlled `raw_app_meta_data`; never use user-editable metadata for authorization. Set `SUPABASE_URL` in the API environment so it can verify session JWTs through Supabase’s public JWKS endpoint. `SUPABASE_JWT_SECRET` is an optional legacy HS256 fallback; the legacy `IAG_WRITE_TOKEN` path remains for local development only.
 
 ### Local shared-backend development
 
@@ -94,6 +94,10 @@ npm run dev -- --host 0.0.0.0 --port 4173
 ```
 
 `VITE_IAG_WRITE_TOKEN` is suitable only for a trusted local development session because Vite variables are visible to the browser; use an authenticated gateway or identity provider for shared/production deployments. The static Admin Portal PIN (`1234`) is intentionally stable across browser storage clears and devices, but is not a secret until server-side verification replaces it.
+
+### Supabase Auth setup
+
+Copy `.env.example` to `.env.local`, fill in the Supabase URL and publishable/anon key, and add `http://localhost:5173` under Supabase Authentication → URL Configuration. Enable the Email provider. The API additionally needs `SUPABASE_URL` in its server environment; it verifies sessions against the public JWT Keys JWKS endpoint. Do not copy the Supabase Secret API key into the browser or commit it.
 
 The API listens only on loopback by default. Its development identity is carried by mutation actor/client IDs and is not production authentication or authorization. Do not expose it outside a trusted development machine without adding authenticated transport, authorization, secrets management, TLS, and deployment-specific CORS controls.
 

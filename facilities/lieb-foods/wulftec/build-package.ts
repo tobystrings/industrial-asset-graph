@@ -1,0 +1,46 @@
+import 'fake-indexeddb/auto';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import buildLiebFoodsPackage from '../index';
+import { mergeAssetPackage, readPrivateAssetBundle, importPrivateAssetBundle, type PrivateAssetBundle } from '../../../src/facility/additivePackage';
+import { createStoredZip, readStoredZip } from '../../../src/facility/iagArchive';
+import { resetPlant, exportPlantArchive, importPlantArchive, portablePlantPackage } from '../../../src/facility/runtimeDb';
+import { validateFacilityPackage } from '../../../src/facility/schema';
+
+// Run with a private output directory outside public/ and outside OneDrive.
+const root = resolve(process.argv[2] ?? '');
+if (!process.argv[2] || /onedrive/i.test(root)) throw new Error('Provide a private output directory outside OneDrive.');
+const patch = JSON.parse(await readFile(join(root, 'native/patch.json'), 'utf8'));
+const rows = JSON.parse(await readFile(join(root, 'native/attachments.json'), 'utf8'));
+const seed = buildLiebFoodsPackage();
+const merged = mergeAssetPackage(seed, patch);
+validateFacilityPackage(merged.plant);
+const again = mergeAssetPackage(merged.plant, patch);
+if (again.added.length || again.conflicts.length) throw new Error('Package failed repeat-application validation.');
+const manifest: PrivateAssetBundle = { format: 'industrial-asset-graph-private', version: 1, patch, attachments: rows.map(({ privatePath: _path, ...row }: Record<string, unknown>) => row), observations: [] };
+const entries: Array<{ name: string; data: string | Uint8Array }> = [{ name: 'private-manifest.json', data: JSON.stringify(manifest) }];
+for (const row of rows) entries.push({ name: row.filePath, data: await readFile(join(root, row.privatePath)) });
+const privateZip = await createStoredZip(entries);
+await readPrivateAssetBundle(privateZip);
+await writeFile(join(root, 'native/Wulftec-private-import.zip'), new Uint8Array(await privateZip.arrayBuffer()));
+await resetPlant(seed); // fake-indexeddb process only: never accesses the user's browser.
+const inserted = await importPrivateAssetBundle(privateZip, seed.facility.id);
+if (inserted.attachmentsAdded !== rows.length || inserted.conflicts.length) throw new Error('Private local relink validation failed.');
+const repeated = await importPrivateAssetBundle(privateZip, seed.facility.id);
+if (repeated.added.length || repeated.attachmentsAdded || repeated.conflicts.length) throw new Error('Private local insertion is not idempotent.');
+const portable = portablePlantPackage(merged.plant);
+validateFacilityPackage(portable);
+const archive = await exportPlantArchive(seed.facility.id);
+await writeFile(join(root, 'native/Wulftec-portable.iag'), new Uint8Array(await archive.arrayBuffer()));
+await resetPlant(seed);
+const imported = await importPlantArchive(archive, 'merge', seed.facility.id);
+validateFacilityPackage(imported);
+const files = await readStoredZip(await exportPlantArchive(seed.facility.id));
+const roundtrip = JSON.parse(await files.get('data/plant.json')!.text());
+validateFacilityPackage(roundtrip);
+await writeFile(join(root, 'native/isolated-merged-plant.json'), JSON.stringify(merged.plant, null, 2));
+await mkdir(resolve('facilities/lieb-foods/private/wulftec'), { recursive: true });
+await writeFile(resolve('facilities/lieb-foods/private/wulftec/patch.json'), JSON.stringify(patch, null, 2));
+const result = { schema: 'PASS', idempotence: 'PASS', nativeArchive: 'created by exportPlantArchive', importExportRoundtrip: 'PASS', privateAttachmentIntegrity: 'PASS', assets: patch.assets.length, components: patch.components.length, relationships: patch.relationships.length, evidence: patch.evidence.length, privateAttachments: rows.length, portableAttachments: 0, portableMachineComponents: portable.assets.find(asset => asset.id === patch.assets[0].id)?.componentIds.length, isolation: 'Node fake-indexeddb; actual browser database untouched' };
+await writeFile(join(root, 'native/validation.json'), JSON.stringify(result, null, 2));
+console.log(JSON.stringify(result, null, 2));

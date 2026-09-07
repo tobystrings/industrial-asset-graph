@@ -2,14 +2,19 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { pool } from './db.js';
 import { PostgresMutationStore } from './postgresMutationStore.js';
 import type { SyncMutation } from '../src/facility/syncContract.js';
-import { isWriteAuthorized } from './auth.js';
+import { authenticateRequest } from './auth.js';
 
 const store = new PostgresMutationStore(pool);
 const port = Number(process.env.IAG_API_PORT ?? 8787);
+const host = process.env.IAG_API_HOST?.trim() || '127.0.0.1';
 const allowedOrigins = new Set((process.env.IAG_ALLOWED_ORIGINS ?? 'http://127.0.0.1:4173,http://localhost:4173').split(',').map((value) => value.trim()).filter(Boolean));
 // Development remains usable without a token; production deployments should set this
 // behind a real identity provider before exposing the API beyond loopback.
 const writeToken = process.env.IAG_WRITE_TOKEN?.trim() || null;
+const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET?.trim() || null;
+const supabaseUrl = process.env.SUPABASE_URL?.trim().replace(/\/$/, '') || null;
+if (process.env.NODE_ENV === 'production' && !writeToken && !supabaseJwtSecret && !supabaseUrl) throw new Error('SUPABASE_URL or IAG_WRITE_TOKEN is required when the shared API runs in production.');
+if (process.env.NODE_ENV === 'production' && !process.env.IAG_ALLOWED_ORIGINS?.trim()) throw new Error('IAG_ALLOWED_ORIGINS is required when the shared API runs in production.');
 
 function json(response: ServerResponse, status: number, body: unknown) {
   response.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
@@ -53,17 +58,19 @@ const server = createServer(async (request, response) => {
     }
     const entityMatch = /^\/api\/facilities\/([^/]+)\/entities\/([^/]+)$/.exec(url.pathname);
     if (request.method === 'GET' && entityMatch) {
+      if (!await authenticateRequest(request.headers, writeToken, supabaseJwtSecret, supabaseUrl)) return json(response, 401, { error: 'Authentication required for shared reads.' });
       const entity = await store.entity(decodeURIComponent(entityMatch[1]), decodeURIComponent(entityMatch[2]));
       return json(response, entity ? 200 : 404, entity ?? { error: 'Entity not found.' });
     }
     const entitiesMatch = /^\/api\/facilities\/([^/]+)\/entities$/.exec(url.pathname);
     if (request.method === 'GET' && entitiesMatch) {
+      if (!await authenticateRequest(request.headers, writeToken, supabaseJwtSecret, supabaseUrl)) return json(response, 401, { error: 'Authentication required for shared reads.' });
       const entities = await store.entities(decodeURIComponent(entitiesMatch[1]), url.searchParams.get('since') ?? undefined);
       return json(response, 200, { entities });
     }
     const mutationMatch = /^\/api\/facilities\/([^/]+)\/mutations$/.exec(url.pathname);
     if (request.method === 'POST' && mutationMatch) {
-      if (!isWriteAuthorized(request.headers, writeToken)) return json(response, 401, { error: 'Authentication required for shared writes.' });
+      if (!await authenticateRequest(request.headers, writeToken, supabaseJwtSecret, supabaseUrl)) return json(response, 401, { error: 'Authentication required for shared writes.' });
       const input = await body(request);
       if (!mutationShape(input)) return json(response, 400, { error: 'Invalid mutation.' });
       const result = await store.apply(decodeURIComponent(mutationMatch[1]), input);
@@ -76,7 +83,7 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, '127.0.0.1', () => process.stdout.write(`Industrial Asset Graph API listening on http://127.0.0.1:${port}\n`));
+server.listen(port, host, () => process.stdout.write(`Industrial Asset Graph API listening on http://${host}:${port}\n`));
 
 async function shutdown() {
   server.close();

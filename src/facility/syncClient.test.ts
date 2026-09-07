@@ -38,11 +38,38 @@ describe('sync client', () => {
     expect(next.entityVersions['DEMO-MCH-001']).toBe(2);
   });
 
+  it('does not overwrite an entity that still has local-only work queued', () => {
+    const local = { ...demoFacilityPackage.assets[0], name: 'Technician draft' };
+    const next = applyCanonicalEntities({ ...demoFacilityPackage, assets: [local] }, [{ entityId: local.id, entityType: 'asset', version: 4, value: { ...local, name: 'Remote update' } as unknown as Record<string, unknown>, deleted: false, updatedAt: '2026-08-28T00:00:00Z', updatedBy: 'reviewer' }], new Set([local.id]));
+    expect(next.assets.find((item) => item.id === local.id)?.name).toBe('Technician draft');
+    expect(next.entityVersions[local.id]).toBe(demoFacilityPackage.entityVersions[local.id]);
+  });
+
   it('sends the optional development bearer token without changing the mutation body', async () => {
     let request: RequestInit | undefined;
     const transport = new HttpSyncTransport('http://api', async (_url, init) => { request = init; return new Response(JSON.stringify({ status: 'accepted', mutationId: 'one', entityId: 'one', version: 1 }), { status: 200 }); }, 'dev-token');
     await transport.send('facility', item('one'));
     expect((request?.headers as Record<string, string>).authorization).toBe('Bearer dev-token');
     expect(JSON.parse(String(request?.body))).toMatchObject({ mutationId: 'one', entityId: 'one' });
+  });
+
+  it('uses an encoded incremental pull cursor when provided', async () => {
+    let requestedUrl = '';
+    const transport = new HttpSyncTransport('http://api', async (url) => {
+      requestedUrl = String(url);
+      return new Response(JSON.stringify({ entities: [] }), { status: 200 });
+    });
+    await transport.pull?.('facility/one', '2026-08-28T12:34:56.000Z');
+    expect(requestedUrl).toBe('http://api/api/facilities/facility%2Fone/entities?since=2026-08-28T12%3A34%3A56.000Z');
+  });
+
+  it('authenticates canonical pulls when a shared token is configured', async () => {
+    let request: RequestInit | undefined;
+    const transport = new HttpSyncTransport('http://api', async (_url, init) => {
+      request = init;
+      return new Response(JSON.stringify({ entities: [] }), { status: 200 });
+    }, 'shared-token');
+    await transport.pull?.('facility');
+    expect((request?.headers as Record<string, string>).authorization).toBe('Bearer shared-token');
   });
 });

@@ -479,6 +479,10 @@ progress::-webkit-progress-value { background: var(--teal-3); border-radius: 99p
 .document-detail .md-body { color: var(--body); font-size: 13.5px; line-height: 1.5; }
 .document-detail .md-body h1, .document-detail .md-body h2, .document-detail .md-body h3 { color: #fff; }
 .document-detail .md-body code { background: rgba(0,0,0,.35); padding: 1px 4px; border-radius: 4px; }
+.local-document-preview { min-width: 0; overflow-wrap: anywhere; }
+.local-document-preview img, .local-document-preview video { display: block; width: 100%; max-height: 65vh; object-fit: contain; }
+.local-document-preview iframe { display: block; width: 100%; height: 65vh; margin-top: 12px; border: 1px solid var(--hair); }
+.local-document-preview pre { max-width: 100%; max-height: 65vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
 .empty-state h2 { margin: 0 0 8px; font-size: 15px; }
 .empty-state p { margin: 0 0 8px; font-size: 13px; color: var(--muted); }
 .empty-chips { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
@@ -1521,3 +1525,4 @@ button:focus-visible, input:focus-visible { outline: 2px solid #5eead4; outline-
   .dashboard.workspace-field .field-doc-relations, .dashboard.workspace-field .field-doc-evidence { min-width:0; }
 }
 .room-asset-list{display:flex;flex-direction:column;gap:8px;margin-top:15px}.room-asset-list button{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;width:100%;padding:11px 12px;border:1px solid rgba(148,163,184,.28);border-radius:9px;background:rgba(30,41,59,.55);color:#e5edf7;text-align:left;cursor:pointer}.room-asset-list button:hover{border-color:#2dd4bf;background:rgba(13,148,136,.14)}.room-asset-list span{display:flex;min-width:0;flex-direction:column;gap:3px}.room-asset-list b{font:800 12px ui-monospace,monospace;color:#5eead4}.room-asset-list small{color:#d4deeb;font-size:12px}.room-asset-list em{flex:0 0 auto;color:#fcd34d;font-size:10px;font-style:normal;font-weight:800;text-transform:uppercase}
+.cabinet-breadcrumb{color:#7dd3fc!important;font-size:11px!important;font-weight:850;letter-spacing:.08em;text-transform:uppercase}

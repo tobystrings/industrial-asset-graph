@@ -38,9 +38,11 @@ import {
   type AuditEvent,
   type PendingChange,
 } from './changeControl';
-import type { MutationOperation, SyncEntityType } from './syncContract';
+import { isTransportEligible, type MutationOperation, type SyncEntityType } from './syncContract';
 import { applyCanonicalEntities, HttpSyncTransport, syncMutationQueue, type SyncSummary } from './syncClient';
 import { validateFacilityPackage } from './schema';
+import { iagUserFromSupabase, supabase, supabaseEnabled } from './supabaseAuth';
+import { importPrivateAssetBundle, type ImportConflict } from './additivePackage';
 
 const FacilityContext = createContext<FacilityPackage | null>(null);
 
@@ -52,6 +54,8 @@ export interface FacilityEditorApi {
   adminCredentialConfigured: boolean;
   sync: SyncSummary;
   queuedMutationCount: number;
+  supabaseEnabled: boolean;
+  signInSupabase(email: string): Promise<{ error?: string }>;
   syncNow(): Promise<void>;
   resolveConflict(mutationId: string, action: 'KEEP_CANONICAL' | 'APPLY_PROPOSED'): Promise<void>;
   identifyTechnician(name: string): void;
@@ -76,6 +80,7 @@ export interface FacilityEditorApi {
   addObservation(input: Omit<ObservationRecord, 'id' | 'createdAt'>): Promise<ObservationRecord>;
   observations(assetId?: string): Promise<ObservationRecord[]>;
   exportArchive(): Promise<Blob>;
+  importPrivateBundle(file: Blob): Promise<{ conflicts: ImportConflict[]; added: string[]; attachmentsAdded: number }>;
   importArchive(file: Blob, mode: 'replace' | 'merge'): Promise<void>;
   exportBackup(): Promise<PlantBackup>;
   importBackup(backup: PlantBackup, mode: 'replace' | 'merge'): Promise<void>;
@@ -163,8 +168,27 @@ export function FacilityProvider({
   const [queuedMutationCount, setQueuedMutationCount] = useState(0);
   const pkgRef = useRef(pkg);
   const pendingRef = useRef(pendingChanges);
+  const syncInFlight = useRef(false);
 
   const apiUrl = ((import.meta as ImportMeta & { env?: { VITE_IAG_API_URL?: string } }).env?.VITE_IAG_API_URL ?? '').trim();
+
+  useEffect(() => {
+    if (!supabase) return;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) { const user = iagUserFromSupabase(data.session.user); setCurrentUser(user); saveCurrentUser(user); }
+    });
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        const user = iagUserFromSupabase(session.user);
+        setCurrentUser(user);
+        saveCurrentUser(user);
+      } else if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        saveCurrentUser(null);
+      }
+    });
+    return () => subscription.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     void ensureInitialAdminPin().then(() => setAdminCredentialConfigured(true));
@@ -208,10 +232,13 @@ export function FacilityProvider({
   }, [pkg.facility.id]);
 
   const appendAudit = useCallback((actor: string, action: string, detail: string) => {
-    const next = [{ id: crypto.randomUUID(), actor, action, detail, at: new Date().toISOString() }, ...auditLog];
-    setAuditLog(next);
-    saveAuditEvents(pkg.facility.id, next);
-  }, [auditLog, pkg.facility.id]);
+    const event = { id: crypto.randomUUID(), actor, action, detail, at: new Date().toISOString() };
+    setAuditLog((current) => {
+      const next = [event, ...current];
+      saveAuditEvents(pkg.facility.id, next);
+      return next;
+    });
+  }, [pkg.facility.id]);
 
   const commitCanonical = useCallback(async (next: FacilityPackage, entityId: string, reason: string, actor: IagUser, descriptor: ChangeDescriptor) => {
     const latest = pkgRef.current;
@@ -229,29 +256,47 @@ export function FacilityProvider({
   }, [apiUrl, commit]);
 
   const syncNow = useCallback(async () => {
-    const queue = await listQueuedMutations(pkg.facility.id);
-    setQueuedMutationCount(queue.length);
-    if (!apiUrl) { setSync({ phase: 'LOCAL_ONLY', accepted: [], conflicts: [], retained: queue }); return; }
-    if (typeof navigator !== 'undefined' && !navigator.onLine) { setSync({ phase: 'OFFLINE', accepted: [], conflicts: [], retained: queue }); return; }
-    setSync({ phase: 'SYNCING', accepted: [], conflicts: [], retained: queue });
-    const transport = new HttpSyncTransport(apiUrl, fetch, import.meta.env.VITE_IAG_WRITE_TOKEN);
-    const result = await syncMutationQueue(pkg.facility.id, queue, transport);
-    await replaceQueuedMutations(result.retained, pkg.facility.id);
-    setQueuedMutationCount(result.retained.length);
-    setSync(result);
+    if (syncInFlight.current) return;
+    syncInFlight.current = true;
     try {
-      const remote = await transport.pull(pkg.facility.id);
-      if (remote.length) await commit(applyCanonicalEntities(pkgRef.current, remote));
-    } catch (error) {
-      setSync({ ...result, phase: 'ERROR', error: error instanceof Error ? error.message : 'Unable to receive canonical changes.' });
-      return;
+      const queue = await listQueuedMutations(pkg.facility.id);
+      setQueuedMutationCount(queue.length);
+      if (!apiUrl) { setSync({ phase: 'LOCAL_ONLY', accepted: [], conflicts: [], retained: queue }); return; }
+      if (typeof navigator !== 'undefined' && !navigator.onLine) { setSync({ phase: 'OFFLINE', accepted: [], conflicts: [], retained: queue }); return; }
+      setSync({ phase: 'SYNCING', accepted: [], conflicts: [], retained: queue });
+      const transport = new HttpSyncTransport(apiUrl, fetch, import.meta.env.VITE_IAG_WRITE_TOKEN, async () => {
+        if (supabase) return (await supabase.auth.getSession()).data.session?.access_token ?? null;
+        return import.meta.env.VITE_IAG_WRITE_TOKEN ?? null;
+      });
+      const since = sync.syncedAt;
+      let result: SyncSummary;
+      try {
+        result = await syncMutationQueue(pkg.facility.id, queue, transport);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unable to submit queued changes.';
+        setSync({ phase: 'ERROR', accepted: [], conflicts: [], retained: queue, error: message });
+        return;
+      }
+      await replaceQueuedMutations(result.retained, pkg.facility.id);
+      setQueuedMutationCount(result.retained.length);
+      setSync(result);
+      try {
+        const remote = await transport.pull(pkg.facility.id, since);
+        const localOnlyEntityIds = new Set(queue.filter((mutation) => !isTransportEligible(mutation)).map((mutation) => mutation.entityId));
+        if (remote.length) await commit(applyCanonicalEntities(pkgRef.current, remote, localOnlyEntityIds));
+      } catch (error) {
+        setSync({ ...result, phase: 'ERROR', syncedAt: since, error: error instanceof Error ? error.message : 'Unable to receive canonical changes.' });
+        return;
+      }
+      if (result.accepted.length && !result.conflicts.length) {
+        const entityVersions = { ...pkgRef.current.entityVersions };
+        for (const accepted of result.accepted) if ('version' in accepted) entityVersions[accepted.entityId] = accepted.version;
+        if (!Object.keys(entityVersions).every((id) => pkgRef.current.entityVersions[id] === entityVersions[id])) await commit({ ...pkgRef.current, entityVersions });
+      }
+    } finally {
+      syncInFlight.current = false;
     }
-    if (result.accepted.length && !result.conflicts.length) {
-      const entityVersions = { ...pkg.entityVersions };
-      for (const accepted of result.accepted) if ('version' in accepted) entityVersions[accepted.entityId] = accepted.version;
-      if (!Object.keys(entityVersions).every((id) => pkgRef.current.entityVersions[id] === entityVersions[id])) await commit({ ...pkgRef.current, entityVersions });
-    }
-  }, [apiUrl, commit, pkg]);
+  }, [apiUrl, commit, pkg, sync.syncedAt]);
 
   const resolveConflict = useCallback(async (mutationId: string, action: 'KEEP_CANONICAL' | 'APPLY_PROPOSED') => {
     const queue = await listQueuedMutations(pkg.facility.id);
@@ -265,6 +310,14 @@ export function FacilityProvider({
     setSync({ phase: apiUrl && retained.some((item) => item.reviewState !== 'LOCAL_DRAFT') ? 'PENDING' : 'LOCAL_ONLY', accepted: [], conflicts: [], retained });
     appendAudit(currentUser?.name ?? 'Reviewer', action === 'APPLY_PROPOSED' ? 'Conflict proposed for resolution' : 'Conflict resolved with canonical value', `${original.entityId} · server revision ${conflict.currentVersion}`);
   }, [apiUrl, appendAudit, currentUser?.name, sync.conflicts]);
+
+  useEffect(() => {
+    const onOnline = () => { if (apiUrl) void syncNow(); };
+    const onOffline = () => setSync((state) => state.phase === 'SYNCING' ? { ...state, phase: 'OFFLINE' } : state);
+    addEventListener('online', onOnline);
+    addEventListener('offline', onOffline);
+    return () => { removeEventListener('online', onOnline); removeEventListener('offline', onOffline); };
+  }, [apiUrl, syncNow]);
 
   const recordChange = useCallback(async (next: FacilityPackage, entityId: string, reason: string, descriptor: ChangeDescriptor) => {
     if (!currentUser?.name) throw new Error('Identify yourself before proposing a change.');
@@ -289,6 +342,12 @@ export function FacilityProvider({
     adminCredentialConfigured,
     sync,
     queuedMutationCount,
+    supabaseEnabled,
+    async signInSupabase(email) {
+      if (!supabase) return { error: 'Supabase is not configured in this deployment.' };
+      const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin } });
+      return error ? { error: error.message } : {};
+    },
     syncNow,
     resolveConflict,
     identifyTechnician(name) {
@@ -465,18 +524,35 @@ export function FacilityProvider({
     },
     observations: (assetId) => listObservations(assetId, pkg.facility.id),
     exportArchive: () => exportPlantArchive(pkg.facility.id),
+    async importPrivateBundle(file) {
+      const result = await importPrivateAssetBundle(file, pkg.facility.id);
+      syncActiveFacilityPackage(result.plant);
+      pkgRef.current = result.plant;
+      setPkg(result.plant);
+      appendAudit(currentUser?.name ?? 'Local package import', 'Private asset import', `${result.added.length} new records; ${result.conflicts.length} retained local conflicts`);
+      return result;
+    },
     async importArchive(file, mode) {
       const next = await importPlantArchive(file, mode, pkg.facility.id);
       syncActiveFacilityPackage(next);
       pkgRef.current = next;
       setPkg(next);
     },
-    exportBackup: () => exportPlantBackup(pkg.facility.id),
+    async exportBackup() {
+      return { ...(await exportPlantBackup(pkg.facility.id)), auditLog };
+    },
     async importBackup(backup, mode) {
       const next = await importPlantBackup(backup, mode, pkg.facility.id);
       syncActiveFacilityPackage(next);
       pkgRef.current = next;
       setPkg(next);
+      if (backup.auditLog) {
+        const imported = mode === 'merge'
+          ? [...new Map([...auditLog, ...backup.auditLog].map((event) => [event.id, event])).values()]
+          : backup.auditLog;
+        saveAuditEvents(pkg.facility.id, imported);
+        setAuditLog(imported);
+      }
     },
     async resetToBaseline() {
       await resetPlant(value);

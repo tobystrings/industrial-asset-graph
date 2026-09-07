@@ -4,6 +4,7 @@ import { documentSource } from '../lib/documentCatalog';
 import { renderMarkdown } from '../lib/markdown';
 import { markerClass } from '../lib/statusMark';
 import type { DocumentationState } from '../types/facility';
+import LocalDocumentPreview from './LocalDocumentPreview';
 
 const stateLabel: Record<string, string> = {
   COMPLETE: 'Complete', REVIEW: 'Review', IN_PROGRESS: 'In progress', DRAFT: 'Draft', NOT_STARTED: 'Not started',
@@ -96,7 +97,9 @@ function DocumentBody({ documentId, onClose }: { documentId: string; onClose: ()
       <p className="panel-title">{record.category}</p>
       <h3>{record.title}</h3>
       <p className="document-status-line">Status: <strong>{stateLabel[record.state]}</strong> · <span className={markerClass(record.verificationStatus)} /> {stateLabel[record.verificationStatus]}</p>
-      <div className="md-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(source) }} />
+      {record.path.startsWith('indexeddb://attachment/')
+        ? <LocalDocumentPreview key={record.path} attachmentId={record.path.slice('indexeddb://attachment/'.length)}/>
+        : <div className="md-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(source) }} />}
     </section>
   );
 }

@@ -170,7 +170,11 @@
 .document-workspace-summary button { margin-left: auto; border: 0; background: transparent; color: var(--iag-blue); font-weight: 800; cursor: pointer; }
 .doc-group { border-color: #dfe5ec !important; background: #fff !important; }
 .doc-group > header { border-bottom-color: #e8edf2 !important; }
-.doc-cards button { border-color: #dfe5ec !important; background: #fff !important; }
+.document-directory .doc-cards button { border-color: #dfe5ec !important; background: #fff !important; color: #1f2f43; }
+.document-directory .doc-cards button small { color: #53657a; }
+.asset-directory :is(h1,h2,h3,h4) { color: #f1f5f9; }
+.document-directory .document-detail { background: #fff; color: #1f2f43; }
+.document-directory .document-detail .panel-title { color: #53657a; }
 .doc-cards button:hover { border-color: #9fc1df !important; background: #f8fbfe !important; }
 .doc-cards button.selected { border-color: #6fa7d8 !important; background: #edf6ff !important; box-shadow: inset 3px 0 0 #2d78b8; }
 .document-empty { display: grid; place-items: start; gap: 6px; max-width: 520px; margin: 28px auto; padding: 22px; border: 1px dashed #bdc8d4; border-radius: 9px; background: #fff; color: #64748b; }

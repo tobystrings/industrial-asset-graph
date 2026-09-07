@@ -1,12 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import ControlCabinetView from './ControlCabinetView';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Dashboard, { type AppView } from './Dashboard';
-import { useFacility } from './facility';
+import { useFacility, useFacilityEditor } from './facility';
 import PlantManager from './editor/PlantManager';
 import './editor/plantManagerCrud.css';
 import type { FilmCommand } from './lib/filmBridge';
 import { subscribeViewport } from './lib/viewport';
 import { FacilityGuide, guideDialogue, useFacilityGuide, type GuideActionId, type GuidePage } from './features/facility-guide';
+
+const ControlCabinetView = lazy(() => import('./ControlCabinetView'));
 
 function initialView(): AppView {
   const value = new URLSearchParams(location.search).get('view');
@@ -18,6 +19,7 @@ export default function App() {
   const shellRef = useRef<HTMLDivElement>(null);
   const guide = useFacilityGuide();
   const { featureConfig } = useFacility();
+  const { ready } = useFacilityEditor();
   const params = new URLSearchParams(location.search);
   const [view, setView] = useState<AppView>(initialView);
   const [pendingCommand, setPendingCommand] = useState<FilmCommand | null>(
@@ -26,6 +28,11 @@ export default function App() {
       : null,
   );
   useLayoutEffect(() => subscribeViewport(() => undefined), []);
+  useEffect(() => {
+    const onPopState = () => setView(initialView());
+    addEventListener('popstate', onPopState);
+    return () => removeEventListener('popstate', onPopState);
+  }, []);
   useLayoutEffect(() => {
     const shell = shellRef.current;
     if (!shell) return;
@@ -58,7 +65,7 @@ export default function App() {
     const nextParams = new URLSearchParams(location.search);
     if (next === 'dashboard') nextParams.delete('view');
     else nextParams.set('view', next);
-    history.replaceState(null, '', `${location.pathname}${nextParams.size ? `?${nextParams}` : ''}`);
+    history.pushState(null, '', `${location.pathname}${nextParams.size ? `?${nextParams}` : ''}`);
   };
   useEffect(() => {
     const handler = (event: Event) => {
@@ -86,8 +93,8 @@ export default function App() {
   return (
     <div ref={shellRef} className="app-shell has-manager-bar">
       <div className="backdrop" aria-hidden="true" />
-      {view === 'cabinet'
-        ? <ControlCabinetView onBack={() => changeView('dashboard')} />
+      {!ready ? <main className="workspace-loading" role="status">Loading local facility records…</main> : view === 'cabinet'
+        ? <Suspense fallback={<main className="iag-cabinet-loading" aria-live="polite">Loading control cabinet workspace…</main>}><ControlCabinetView onBack={() => changeView('dashboard')} /></Suspense>
         : (
           <Dashboard
             view={view}
