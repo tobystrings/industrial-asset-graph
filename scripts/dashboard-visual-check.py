@@ -6,6 +6,7 @@ import json
 import io
 import zipfile
 import hashlib
+import socket
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
@@ -14,13 +15,16 @@ output = Path('artifacts')
 output.mkdir(exist_ok=True)
 
 npm = 'npm.cmd' if os.name == 'nt' else 'npm'
+with socket.socket() as available_port:
+    available_port.bind(('127.0.0.1', 0))
+    preview_port = available_port.getsockname()[1]
 server = subprocess.Popen(
-    [npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', '4174'],
+    [npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', str(preview_port), '--strictPort'],
     stdout=subprocess.DEVNULL,
     stderr=subprocess.STDOUT,
 )
 
-BASE = 'http://127.0.0.1:4174/industrial-asset-graph/'
+BASE = f'http://127.0.0.1:{preview_port}/industrial-asset-graph/'
 VIEWPORTS = (
     ('desktop-1920x1080', 1920, 1080),
     ('laptop-1366x768', 1366, 768),
@@ -126,6 +130,8 @@ def exercise_manager_states(page, label: str) -> None:
 
     manager.get_by_role('button', name='Users', exact=True).click()
     page.locator('.iag-editor-panel').wait_for(state='visible')
+    account_label_color = page.locator('.account-security label').evaluate('el => getComputedStyle(el).color')
+    assert account_label_color == 'rgb(22, 51, 62)', f'Account label loses contrast: {account_label_color}'
     screenshot(page, f'{label}-users')
     close_editor(page)
     page.evaluate("() => { localStorage.removeItem('iag-change-control-user'); localStorage.removeItem('iag-change-control-pending-changes'); }")

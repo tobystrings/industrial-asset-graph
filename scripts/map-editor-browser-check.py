@@ -2,11 +2,16 @@ from pathlib import Path
 import os
 import subprocess
 import time
+import socket
 from playwright.sync_api import sync_playwright
+from auth_test_fixture import install_auth_fixture, sign_in
 
 npm = 'npm.cmd' if os.name == 'nt' else 'npm'
-server = subprocess.Popen([npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', '4175'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-base = 'http://127.0.0.1:4175/industrial-asset-graph/?facilityId=test-facility'
+with socket.socket() as available_port:
+    available_port.bind(('127.0.0.1', 0))
+    preview_port = available_port.getsockname()[1]
+server = subprocess.Popen([npm, 'run', 'preview', '--', '--host', '127.0.0.1', '--port', str(preview_port), '--strictPort'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+base = f'http://127.0.0.1:{preview_port}/industrial-asset-graph/?facilityId=test-facility'
 
 def drag_percent(page, selector: str, start: tuple[float, float], end: tuple[float, float]):
     box = page.locator(selector).bounding_box()
@@ -27,13 +32,15 @@ try:
     time.sleep(1.5)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context(viewport={'width': 1366, 'height': 768})
+        context = browser.new_context(viewport={'width': 1366, 'height': 768}, service_workers='block')
         page = context.new_page()
+        install_auth_fixture(page)
         console_issues = []
-        page.on('console', lambda message: console_issues.append(f'{message.type}: {message.text}') if message.type in ('error', 'warning') else None)
+        # The harness blocks workers so Auth requests cannot escape its network fixture.
+        # Ignore only Playwright's notice about that explicit test setting.
+        page.on('console', lambda message: console_issues.append(f'{message.type}: {message.text}') if message.type in ('error', 'warning') and message.text != 'Service Worker registration blocked by Playwright' else None)
         page.goto(base, wait_until='networkidle')
-        page.evaluate("""() => localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'map-e2e-admin', name: 'Map E2E Admin', role: 'admin' }))""")
-        page.reload(wait_until='networkidle')
+        sign_in(page)
 
         # Scenario 1: rename and durable reload.
         enter_editor(page)
