@@ -2,14 +2,13 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { pool } from './db.js';
 import { PostgresMutationStore } from './postgresMutationStore.js';
 import type { SyncMutation } from '../src/facility/syncContract.js';
-import { authenticateRequest } from './auth.js';
+import { authenticateRequest, canWriteCanonical } from './auth.js';
 
 const store = new PostgresMutationStore(pool);
 const port = Number(process.env.IAG_API_PORT ?? 8787);
 const host = process.env.IAG_API_HOST?.trim() || '127.0.0.1';
 const allowedOrigins = new Set((process.env.IAG_ALLOWED_ORIGINS ?? 'http://127.0.0.1:4173,http://localhost:4173').split(',').map((value) => value.trim()).filter(Boolean));
-// Development remains usable without a token; production deployments should set this
-// behind a real identity provider before exposing the API beyond loopback.
+// Shared reads and writes require a verified identity, including in development.
 const writeToken = process.env.IAG_WRITE_TOKEN?.trim() || null;
 const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET?.trim() || null;
 const supabaseUrl = process.env.SUPABASE_URL?.trim().replace(/\/$/, '') || null;
@@ -70,10 +69,12 @@ const server = createServer(async (request, response) => {
     }
     const mutationMatch = /^\/api\/facilities\/([^/]+)\/mutations$/.exec(url.pathname);
     if (request.method === 'POST' && mutationMatch) {
-      if (!await authenticateRequest(request.headers, writeToken, supabaseJwtSecret, supabaseUrl)) return json(response, 401, { error: 'Authentication required for shared writes.' });
+      const principal = await authenticateRequest(request.headers, writeToken, supabaseJwtSecret, supabaseUrl);
+      if (!principal) return json(response, 401, { error: 'Authentication required for shared writes.' });
       const input = await body(request);
       if (!mutationShape(input)) return json(response, 400, { error: 'Invalid mutation.' });
-      const result = await store.apply(decodeURIComponent(mutationMatch[1]), input);
+      if (!canWriteCanonical(principal, input.reviewState)) return json(response, 403, { error: 'Administrator approval is required for canonical writes.' });
+      const result = await store.apply(decodeURIComponent(mutationMatch[1]), { ...input, actorId: principal.id });
       return json(response, result.status === 'conflict' ? 409 : 200, result);
     }
     return json(response, 404, { error: 'Not found.' });

@@ -8,6 +8,10 @@ export function isWriteAuthorized(headers: IncomingHttpHeaders, configuredToken:
 
 export type SupabasePrincipal = { id: string; email?: string; role: 'technician' | 'admin' };
 
+export function canWriteCanonical(principal: SupabasePrincipal, reviewState: unknown): boolean {
+  return principal.role === 'admin' && (reviewState === 'APPROVED' || reviewState === 'CONFLICT');
+}
+
 /** Verify a Supabase access token with the configured legacy secret or public JWKS. */
 export async function authenticateRequest(headers: IncomingHttpHeaders, configuredToken: string | null, jwtSecret: string | null, supabaseUrl: string | null): Promise<SupabasePrincipal | null> {
   const value = headers.authorization;

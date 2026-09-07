@@ -23,16 +23,10 @@ import {
   type PlantBackup,
 } from './runtimeDb';
 import {
-  hasAdminCredential,
-  loadCurrentUser,
   loadAuditEvents,
   loadPendingChanges,
   saveAuditEvents,
-  saveCurrentUser,
-  ensureInitialAdminPin,
   savePendingChanges,
-  setAdminPassphrase,
-  verifyAdminPassphrase,
   clientIdentity,
   type IagUser,
   type AuditEvent,
@@ -41,7 +35,8 @@ import {
 import { isTransportEligible, type MutationOperation, type SyncEntityType } from './syncContract';
 import { applyCanonicalEntities, HttpSyncTransport, syncMutationQueue, type SyncSummary } from './syncClient';
 import { validateFacilityPackage } from './schema';
-import { iagUserFromSupabase, supabase, supabaseEnabled } from './supabaseAuth';
+import { iagUserFromSupabase, supabase } from './supabaseAuth';
+import type { User } from '@supabase/supabase-js';
 import { importPrivateAssetBundle, type ImportConflict } from './additivePackage';
 
 const FacilityContext = createContext<FacilityPackage | null>(null);
@@ -51,17 +46,10 @@ export interface FacilityEditorApi {
   currentUser: IagUser | null;
   pendingChanges: PendingChange[];
   auditLog: AuditEvent[];
-  adminCredentialConfigured: boolean;
   sync: SyncSummary;
   queuedMutationCount: number;
-  supabaseEnabled: boolean;
-  signInSupabase(email: string): Promise<{ error?: string }>;
   syncNow(): Promise<void>;
   resolveConflict(mutationId: string, action: 'KEEP_CANONICAL' | 'APPLY_PROPOSED'): Promise<void>;
-  identifyTechnician(name: string): void;
-  configureAdmin(passphrase: string): Promise<void>;
-  signInAdmin(passphrase: string): Promise<boolean>;
-  signOut(): void;
   approveChange(id: string): Promise<void>;
   rejectChange(id: string): void;
   saveFacility(facility: FacilityIdentity): Promise<void>;
@@ -154,16 +142,17 @@ export function applyReviewedChange(current: FacilityPackage, proposed: Facility
 export function FacilityProvider({
   children,
   value = activeFacilityPackage,
+  authenticatedUser = null,
 }: {
   children: ReactNode;
   value?: FacilityPackage;
+  authenticatedUser?: User | null;
 }) {
   const [pkg, setPkg] = useState<FacilityPackage>(value);
   const [ready, setReady] = useState(false);
-  const [currentUser, setCurrentUser] = useState<IagUser | null>(() => loadCurrentUser());
+  const currentUser: IagUser | null = useMemo(() => authenticatedUser ? iagUserFromSupabase(authenticatedUser) : null, [authenticatedUser]);
   const [pendingChanges, setPendingChanges] = useState<PendingChange[]>(() => loadPendingChanges(value.facility.id));
   const [auditLog, setAuditLog] = useState<AuditEvent[]>(() => loadAuditEvents(value.facility.id));
-  const [adminCredentialConfigured, setAdminCredentialConfigured] = useState(() => hasAdminCredential());
   const [sync, setSync] = useState<SyncSummary>({ phase: 'LOCAL_ONLY', accepted: [], conflicts: [], retained: [] });
   const [queuedMutationCount, setQueuedMutationCount] = useState(0);
   const pkgRef = useRef(pkg);
@@ -171,28 +160,6 @@ export function FacilityProvider({
   const syncInFlight = useRef(false);
 
   const apiUrl = ((import.meta as ImportMeta & { env?: { VITE_IAG_API_URL?: string } }).env?.VITE_IAG_API_URL ?? '').trim();
-
-  useEffect(() => {
-    if (!supabase) return;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) { const user = iagUserFromSupabase(data.session.user); setCurrentUser(user); saveCurrentUser(user); }
-    });
-    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        const user = iagUserFromSupabase(session.user);
-        setCurrentUser(user);
-        saveCurrentUser(user);
-      } else if (event === 'SIGNED_OUT') {
-        setCurrentUser(null);
-        saveCurrentUser(null);
-      }
-    });
-    return () => subscription.subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    void ensureInitialAdminPin().then(() => setAdminCredentialConfigured(true));
-  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -339,40 +306,10 @@ export function FacilityProvider({
     currentUser,
     pendingChanges,
     auditLog,
-    adminCredentialConfigured,
     sync,
     queuedMutationCount,
-    supabaseEnabled,
-    async signInSupabase(email) {
-      if (!supabase) return { error: 'Supabase is not configured in this deployment.' };
-      const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin } });
-      return error ? { error: error.message } : {};
-    },
     syncNow,
     resolveConflict,
-    identifyTechnician(name) {
-      const user: IagUser = { id: crypto.randomUUID(), name: name.trim(), role: 'technician' };
-      setCurrentUser(user);
-      saveCurrentUser(user);
-      appendAudit(user.name, 'Identified as technician', 'Ready to submit changes for review');
-    },
-    async configureAdmin(passphrase) {
-      await setAdminPassphrase(passphrase);
-      const user: IagUser = { id: 'local-admin', name: 'Administrator', role: 'admin' };
-      setAdminCredentialConfigured(true);
-      setCurrentUser(user);
-      saveCurrentUser(user);
-      appendAudit(user.name, 'Created administrator credential', 'Local browser credential created');
-    },
-    async signInAdmin(passphrase) {
-      if (!await verifyAdminPassphrase(passphrase)) return false;
-      const user: IagUser = { id: 'local-admin', name: 'Administrator', role: 'admin' };
-      setCurrentUser(user);
-      saveCurrentUser(user);
-      appendAudit(user.name, 'Administrator signed in', 'Opened local review access');
-      return true;
-    },
-    signOut() { if (currentUser) appendAudit(currentUser.name, 'Signed out', 'Ended local session'); setCurrentUser(null); saveCurrentUser(null); },
     async approveChange(id) {
       if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required to approve changes.');
       const change = pendingRef.current.find((item) => item.id === id);
@@ -561,7 +498,7 @@ export function FacilityProvider({
       pkgRef.current = next;
       setPkg(next);
     },
-  }), [ready, pkg, value, commitCanonical, currentUser, pendingChanges, auditLog, adminCredentialConfigured, sync, queuedMutationCount, syncNow, resolveConflict, appendAudit, recordChange, savePending]);
+  }), [ready, pkg, value, commitCanonical, currentUser, pendingChanges, auditLog, sync, queuedMutationCount, syncNow, resolveConflict, appendAudit, recordChange, savePending]);
 
   return (
     <FacilityContext.Provider value={pkg}>

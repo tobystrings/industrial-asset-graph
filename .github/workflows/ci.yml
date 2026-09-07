@@ -44,6 +44,10 @@ jobs:
         run: npm run verify:visual-contract
 
       - name: Build
+        env:
+          # Synthetic endpoint; Playwright intercepts Auth requests, never real credentials.
+          VITE_SUPABASE_URL: https://iag-auth-test.supabase.co
+          VITE_SUPABASE_ANON_KEY: synthetic-visual-test-key
         run: npm run build
 
       - name: Run dashboard visual verification

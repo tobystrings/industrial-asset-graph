@@ -52,7 +52,7 @@ export default function FieldDocumentationWorkspace({ selectedAsset, onAsset, on
   const identify = () => {
     const name = technician.trim();
     if (!name) { setMessage('Enter technician initials or name before capturing field evidence.'); return false; }
-    if (!editor.currentUser || editor.currentUser.name !== name) editor.identifyTechnician(name);
+    // Field initials label this observation; they cannot replace the authenticated account.
     saveLastWho(name); setMessage(`Recording locally as ${name}.`); return true;
   };
 

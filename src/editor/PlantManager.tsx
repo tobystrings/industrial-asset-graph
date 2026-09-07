@@ -11,6 +11,7 @@ import './plantManager.css';
 import './plantManagerAffordance.css';
 import './changeControl.css';
 import PrivateAssetImport from './PrivateAssetImport';
+import AccountSecurity from '../auth/AccountSecurity';
 
 type Panel = 'overview' | 'asset' | 'manage' | 'relationship' | 'evidence' | 'observation' | 'setup' | 'database' | 'users' | 'settings' | 'conflicts' | 'health' | 'import' | null;
 type MapPoint = { x: number; y: number } | null;
@@ -257,41 +258,17 @@ return <div className="iag-editor-form"><div className="iag-db-stats"><span><b>{
 function UsersPanel() {
   const editor = useFacilityEditor();
   const facility = useFacility();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [passphrase, setPassphrase] = useState('');
-  const [message, setMessage] = useState('');
   const isAdmin = editor.currentUser?.role === 'admin';
   const exportAudit = () => downloadFile(new Blob([JSON.stringify(editor.auditLog, null, 2)], { type: 'application/json' }), `${safePlantFileName(facility.facility.name)}-audit-log.json`);
-  const identify = () => {
-    if (!name.trim()) { setMessage('Enter your name before proposing a change.'); return; }
-    editor.identifyTechnician(name);
-    setMessage('You are identified. Changes will be submitted for administrator approval.');
-  };
-  const admin = async () => {
-    if (!/^\d{4}$/.test(passphrase)) { setMessage('Enter the 4-digit administrator PIN.'); return; }
-    if (!editor.adminCredentialConfigured) { await editor.configureAdmin(passphrase); setMessage('Administrator credential created for this browser.'); }
-    else if (await editor.signInAdmin(passphrase)) setMessage('Administrator signed in.');
-    else setMessage('Administrator passphrase was not accepted.');
-    setPassphrase('');
-  };
-  const supabaseLogin = async () => {
-    if (!email.includes('@')) { setMessage('Enter a valid work email address.'); return; }
-    const result = await editor.signInSupabase(email);
-    setMessage(result.error ?? 'Check your email for a secure sign-in link.');
-  };
   return <div className="iag-editor-form iag-users-panel">
-    <section className="iag-user-card"><strong>{editor.currentUser ? editor.currentUser.name : 'No user identified'}</strong><span>{editor.currentUser ? editor.currentUser.role === 'admin' ? 'Administrator' : 'Technician — proposed changes require approval' : 'Identify yourself before editing plant or map records.'}</span>{editor.currentUser && <button type="button" onClick={() => editor.signOut()}>Sign out</button>}</section>
+    <section className="iag-user-card"><strong>{editor.currentUser ? editor.currentUser.name : 'No user identified'}</strong><span>{editor.currentUser ? editor.currentUser.role === 'admin' ? 'Administrator' : 'Technician — proposed changes require approval' : 'Identify yourself before editing plant or map records.'}</span></section>
     <section className="iag-review-summary" aria-label="Review summary"><div><b>{editor.pendingChanges.length}</b><span>Pending review</span></div><div><b>{editor.sync.conflicts.length}</b><span>Conflicts</span></div><div><b>{editor.queuedMutationCount}</b><span>Queued sync</span></div></section>
-    {!editor.currentUser && editor.supabaseEnabled && <section className="iag-admin-login"><strong>Secure sign-in</strong><p>Use your work email. New accounts start as technicians until an administrator assigns a role in Supabase.</p><label>Work email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" autoComplete="email"/></label><button className="primary" type="button" onClick={() => void supabaseLogin()}>Email me a sign-in link</button></section>}
-    {!editor.currentUser && !editor.supabaseEnabled && <><label>Your name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Technician name" autoComplete="name"/></label><button className="primary" type="button" onClick={identify}>Identify as technician</button></>}
-    {!isAdmin && <section className="iag-admin-login"><strong>Administrator sign-in</strong><p>Enter the 4-digit administrator PIN. This static deployment uses a browser-local demo credential; it is not production security.</p><label>Administrator PIN<input type="password" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={passphrase} onChange={(event) => setPassphrase(event.target.value.replace(/\D/g, '').slice(0, 4))} autoComplete="current-password"/></label><button type="button" onClick={() => void admin()}>Sign in as administrator</button></section>}
-    {message && <p className="iag-db-note" role="status">{message}</p>}
+    <AccountSecurity/>
     <div className="iag-review-group-label">Decision queue</div>
     {isAdmin && <section className="iag-pending-changes"><div className="iag-section-head"><strong>Submitted for review</strong><span>{editor.pendingChanges.length}</span></div>{editor.pendingChanges.length === 0 ? <p>No changes are awaiting approval.</p> : editor.pendingChanges.map((change) => { const current = reviewValue(facility, change, false); const proposed = reviewValue(facility, change, true); return <article key={change.id}><strong>{change.reason}</strong><small>{change.entityId} · proposed by {change.proposedBy} · {new Date(change.proposedAt).toLocaleString()}</small><div className="iag-review-diff"><label>Current canonical value<pre>{JSON.stringify(current, null, 2)}</pre></label><label>{change.operation === 'DELETE' ? 'Proposed deletion' : 'Proposed value'}<pre>{change.operation === 'DELETE' ? 'DELETE — tombstone after approval' : JSON.stringify(proposed, null, 2)}</pre></label></div><div><button className="primary" type="button" onClick={() => void editor.approveChange(change.id)}>Approve & promote to canonical</button><button className="danger" type="button" onClick={() => editor.rejectChange(change.id)}>Reject</button></div></article>; })}</section>}
     <div className="iag-review-group-label">Activity</div>
     <section className="iag-pending-changes"><div className="iag-section-head"><strong>Local activity log</strong><span>{editor.auditLog.length}</span></div><button type="button" onClick={exportAudit}>Export audit log (.json)</button>{editor.auditLog.length === 0 ? <p>No local activity has been recorded yet.</p> : editor.auditLog.slice(0, 12).map((event) => <article key={event.id}><strong>{event.action}</strong><small>{event.actor} · {new Date(event.at).toLocaleString()} · {event.detail}</small></article>)}</section>
-    <p className="iag-db-note">The administrator credential is local development access, not production security. Approved mutations enter the persistent sync outbox; the shared backend retains its own canonical revision history.</p>
+    <p className="iag-db-note">Account roles are assigned by your administrator. Approved mutations enter the persistent sync outbox; the shared backend retains its own canonical revision history.</p>
   </div>;
 }
 

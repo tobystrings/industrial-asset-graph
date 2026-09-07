@@ -16,13 +16,20 @@ import AppErrorBoundary from './ui/AppErrorBoundary';
 import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
 import './ui/chrome-clearance.css';
+import { AuthProvider, useAuth } from './auth/AuthProvider';
+import { AuthGate } from './auth/LoginPage';
 
 applyAppSettings();
+
+function SignedInWorkspace() {
+  const { user } = useAuth();
+  return <FacilityProvider key={user?.id} authenticatedUser={user}><GuideProvider><App /></GuideProvider></FacilityProvider>;
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   activeFacilitySelectionError
     ? <main role="alert" style={{ maxWidth: 720, margin: '10vh auto', padding: 24, color: '#f4f7fb', background: '#17202a', fontFamily: 'system-ui' }}><h1>Facility could not be loaded</h1><p>{activeFacilitySelectionError.message}</p><p>Choose a registered facility ID or remove the facility parameter to load the default facility.</p></main>
-    : <React.StrictMode><AppErrorBoundary><FacilityProvider><GuideProvider><App /></GuideProvider></FacilityProvider></AppErrorBoundary></React.StrictMode>,
+    : <React.StrictMode><AppErrorBoundary><AuthProvider><AuthGate><SignedInWorkspace /></AuthGate></AuthProvider></AppErrorBoundary></React.StrictMode>,
 );
 
 if ('serviceWorker' in navigator && window.isSecureContext) {

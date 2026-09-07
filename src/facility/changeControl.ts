@@ -1,15 +1,8 @@
 import type { FacilityPackage } from './types';
 import type { MutationOperation, SyncEntityType } from './syncContract';
 
-const IDENTITY_KEY = 'iag-change-control-user';
-const ADMIN_HASH_KEY = 'iag-change-control-admin-hash';
-const ADMIN_PIN_VERSION_KEY = 'iag-admin-pin-version';
 const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
-// Static GitHub Pages cannot keep a secret. This value is a functional demo
-// credential only; production deployments must replace verification server-side.
-export const INITIAL_ADMIN_PIN = '1234';
-
 export type IagUser = { id: string; name: string; role: 'technician' | 'admin' };
 export type PendingChange = {
   id: string;
@@ -35,12 +28,6 @@ function write(key: string, value: unknown) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function loadCurrentUser(): IagUser | null {
-  const user = read<Partial<IagUser> | null>(IDENTITY_KEY, null);
-  if (!user?.name || (user.role !== 'technician' && user.role !== 'admin')) return null;
-  return { id: user.id ?? `legacy-${user.role}-${user.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`, name: user.name, role: user.role };
-}
-
 export function facilityStorageKey(facilityId: string, key: string) {
   return `iag:${encodeURIComponent(facilityId)}:${key}`;
 }
@@ -57,16 +44,10 @@ function readFacilityScoped<T>(facilityId: string, key: string, fallback: T): T 
   }
   return fallback;
 }
-export function saveCurrentUser(user: IagUser | null) {
-  if (typeof localStorage === 'undefined') return;
-  if (user) write(IDENTITY_KEY, user); else localStorage.removeItem(IDENTITY_KEY);
-}
 export function loadPendingChanges(facilityId: string): PendingChange[] { return readFacilityScoped<PendingChange[]>(facilityId, CHANGES_KEY, []); }
 export function savePendingChanges(facilityId: string, changes: PendingChange[]) { write(facilityStorageKey(facilityId, CHANGES_KEY), changes); }
 export function loadAuditEvents(facilityId: string): AuditEvent[] { return readFacilityScoped<AuditEvent[]>(facilityId, AUDIT_KEY, []); }
 export function saveAuditEvents(facilityId: string, events: AuditEvent[]) { write(facilityStorageKey(facilityId, AUDIT_KEY), events.slice(0, 1000)); }
-export function hasAdminCredential(): boolean { return typeof localStorage !== 'undefined' && Boolean(localStorage.getItem(ADMIN_HASH_KEY)); }
-
 export function clientIdentity(): string {
   const key = 'iag-change-control-client-id';
   if (typeof localStorage === 'undefined') return 'server-render-client';
@@ -75,32 +56,4 @@ export function clientIdentity(): string {
   const id = crypto.randomUUID();
   localStorage.setItem(key, id);
   return id;
-}
-
-async function digest(value: string): Promise<string> {
-  const bytes = new TextEncoder().encode(value);
-  const hash = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(hash)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-export async function setAdminPassphrase(passphrase: string) {
-  if (typeof localStorage === 'undefined') return;
-  if (!/^\d{4}$/.test(passphrase)) throw new Error('Administrator PIN must be exactly 4 numeric digits.');
-  localStorage.setItem(ADMIN_HASH_KEY, await digest(passphrase));
-}
-
-export async function verifyAdminPassphrase(passphrase: string): Promise<boolean> {
-  if (!/^\d{4}$/.test(passphrase)) return false;
-  // Static deployments cannot retain a server secret; keep the configured demo
-  // PIN stable even when browser storage is cleared or a new device is used.
-  if (passphrase === INITIAL_ADMIN_PIN) return true;
-  if (typeof localStorage === 'undefined') return false;
-  const expected = localStorage.getItem(ADMIN_HASH_KEY);
-  return Boolean(expected) && expected === await digest(passphrase);
-}
-
-export async function ensureInitialAdminPin(): Promise<void> {
-  if (typeof localStorage === 'undefined' || localStorage.getItem(ADMIN_PIN_VERSION_KEY) === '1') return;
-  await setAdminPassphrase(INITIAL_ADMIN_PIN);
-  localStorage.setItem(ADMIN_PIN_VERSION_KEY, '1');
 }

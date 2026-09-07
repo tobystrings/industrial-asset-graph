@@ -8,6 +8,7 @@ import zipfile
 import hashlib
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
+from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
 
 output = Path('artifacts')
 output.mkdir(exist_ok=True)
@@ -161,16 +162,7 @@ def exercise_manager_states(page, label: str) -> None:
     page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
     manager = page.locator('.iag-manager-bar')
     manager.get_by_role('button', name='Map Edit', exact=True).click()
-    # Supabase may restore a real technician session while the harness reloads.
-    # Re-establish the synthetic admin through the existing local-only test path
-    # before exercising the protected map editor.
-    if page.get_by_role('heading', name='Users').is_visible():
-        users_panel = page.locator('.iag-users-panel')
-        users_panel.get_by_label('Administrator PIN').fill('1234')
-        users_panel.get_by_role('button', name='Sign in as administrator').click()
-        page.get_by_role('button', name='Close', exact=True).click()
-        manager = page.locator('.iag-manager-bar')
-        manager.get_by_role('button', name='Map Edit', exact=True).click()
+    # The authenticated network fixture supplies the admin role. Local PINs never grant access.
     page.locator('.iag-map-edit-banner').wait_for(state='visible')
     page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
@@ -197,7 +189,7 @@ def exercise_manager_states(page, label: str) -> None:
     })''')
     page.reload(wait_until='networkidle')
     page.locator('.iag-manager-bar').wait_for(state='visible', timeout=10000)
-    conflict_button = page.locator('.iag-manager-bar button').filter(has_text='CONFLICT').first
+    conflict_button = page.locator('.iag-manager-bar button:visible').filter(has_text='CONFLICT').first
     conflict_button.wait_for(state='visible', timeout=10000)
     conflict_button.click()
     page.get_by_role('heading', name='Resolve Sync Conflict').wait_for(state='visible')
@@ -339,9 +331,13 @@ try:
             launch_args['executable_path'] = chrome_path
         browser = p.chromium.launch(**launch_args)
         failures = []
+        exercise_rejected_auth(browser, BASE, screenshot)
 
         for label, width, height in VIEWPORTS:
-            page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1)
+            print(f'Checking {label}: login and workspace', flush=True)
+            # Route Auth at the network boundary; service workers can bypass Playwright routes.
+            page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1, service_workers='block')
+            auth_state = install_auth_fixture(page)
             console_errors = []
             page.on(
                 'console',
@@ -350,6 +346,9 @@ try:
                 else None,
             )
             try:
+                page.goto(f'{BASE}?area=area-warehouse-f&asset=L2-CC-001&map=2d&tab=intel', wait_until='networkidle')
+                print(f'{label}: initial page loaded', flush=True)
+                exercise_login(page, label, BASE, screenshot, auth_state)
                 page.goto(f'{BASE}?area=area-warehouse-f&asset=L2-CC-001&map=2d&tab=intel', wait_until='networkidle')
                 wait_for_dashboard(page)
                 assert_manager_geometry(page)
@@ -392,6 +391,7 @@ try:
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:
+                print(f'{label}: {exc}', flush=True)
                 diagnostic(page, label)
                 failures.append(f'{label}: {exc}')
             finally:

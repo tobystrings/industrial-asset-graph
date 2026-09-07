@@ -64,9 +64,9 @@ Field photographs, PLC programs, credentials, and proprietary manuals are not bu
 
 Facility packages now carry explicit schema, package-revision, and entity-version metadata. Untagged legacy packages are migrated to schema v2 and runtime-validated at IndexedDB and import boundaries; existing `.iag` archive version 1 remains readable.
 
-The shared-write contract lives in `src/facility/syncContract.ts`. It specifies stable mutation/actor/client IDs, base entity versions, review state, idempotent retry behavior, explicit conflicts, and tombstone deletion. `LOCAL_ONLY` evidence and local drafts are rejected at the transport boundary. The PostgreSQL/API adapter is implemented under `server/` and can be enabled for connected deployments; the current public build remains local/seeded. The local admin credential and optional development bearer token are not production authentication.
+The shared-write contract lives in `src/facility/syncContract.ts`. It specifies stable mutation/actor/client IDs, base entity versions, review state, idempotent retry behavior, explicit conflicts, and tombstone deletion. `LOCAL_ONLY` evidence and local drafts are rejected at the transport boundary. The PostgreSQL/API adapter is implemented under `server/` and can be enabled for connected deployments; the current public build remains local/seeded. The former local administrator PIN no longer grants access.
 
-For a protected local/shared deployment, use Supabase Auth. Put `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in an untracked `.env.local` file; the browser login uses a one-time email link and the resulting session JWT is sent to the API for sync. New users default to `technician`. Promote a trusted user by setting `iag_role` to `admin` in server-controlled `raw_app_meta_data`; never use user-editable metadata for authorization. Set `SUPABASE_URL` in the API environment so it can verify session JWTs through Supabase’s public JWKS endpoint. `SUPABASE_JWT_SECRET` is an optional legacy HS256 fallback; the legacy `IAG_WRITE_TOKEN` path remains for local development only.
+The first page requires Supabase sign-in with username/email and password or a passkey. Forgot password provides email recovery. Put `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in an untracked `.env.local` file. New users default to `technician`; assign `iag_role: admin` only in server-controlled app metadata. The API verifies session JWTs and requires an administrator for approved canonical writes. See [Account sign-in setup](docs/AUTH-SETUP.md) for usernames, passkey enrollment, callbacks and deployment configuration.
 
 ### Local shared-backend development
 
@@ -93,13 +93,13 @@ $env:VITE_IAG_WRITE_TOKEN='replace-with-a-local-secret'
 npm run dev -- --host 0.0.0.0 --port 4173
 ```
 
-`VITE_IAG_WRITE_TOKEN` is suitable only for a trusted local development session because Vite variables are visible to the browser; use an authenticated gateway or identity provider for shared/production deployments. The static Admin Portal PIN (`1234`) is intentionally stable across browser storage clears and devices, but is not a secret until server-side verification replaces it.
+`VITE_IAG_WRITE_TOKEN` is a legacy development transport setting and must not be used in a public build. The authenticated application sends its Supabase session token. Set `SUPABASE_URL` on the API to verify that session; the development bearer token is intended for direct local API tooling.
 
 ### Supabase Auth setup
 
-Copy `.env.example` to `.env.local`, fill in the Supabase URL and publishable/anon key, and add `http://localhost:5173` under Supabase Authentication → URL Configuration. Enable the Email provider. The API additionally needs `SUPABASE_URL` in its server environment; it verifies sessions against the public JWT Keys JWKS endpoint. Do not copy the Supabase Secret API key into the browser or commit it.
+Copy `.env.example` to `.env.local` and fill in the existing Supabase URL and publishable/anon key. Follow [the setup guide](docs/AUTH-SETUP.md) to allow the complete project path for recovery, deploy the username lookup, and configure the passkey relying party. Do not copy a Supabase secret/service-role key into the browser or commit it.
 
-The API listens only on loopback by default. Its development identity is carried by mutation actor/client IDs and is not production authentication or authorization. Do not expose it outside a trusted development machine without adding authenticated transport, authorization, secrets management, TLS, and deployment-specific CORS controls.
+The API listens only on loopback by default. It derives mutation actor identity from the verified principal. A shared deployment additionally needs TLS, protected server credentials and deployment-specific allowed origins. Login does not deploy the shared API or make bundled public files private.
 
 With PostgreSQL and the API running, `npm run test:backend:live` exercises an accepted mutation, an idempotent retry, a stale-base `409` conflict, and a canonical readback.
 
