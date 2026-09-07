@@ -1,7 +1,7 @@
 import { createClient, type User } from '@supabase/supabase-js';
 import type { IagUser } from './changeControl';
 
-const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ?? {};
+const env = import.meta.env as Record<string, string | undefined>;
 const url = env.VITE_SUPABASE_URL?.trim() ?? '';
 const key = env.VITE_SUPABASE_ANON_KEY?.trim() ?? '';
 

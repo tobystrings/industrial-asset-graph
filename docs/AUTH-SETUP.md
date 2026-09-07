@@ -42,6 +42,14 @@ GitHub Pages hosts only the frontend. The existing shared PostgreSQL API require
 
 ## Validation
 
+### Live configuration verified 2026-09-07
+
+The existing Supabase project now has the production Site URL and both production redirects above, a 12-character minimum password, and passkeys enabled for `tobystrings.github.io` with display name Industrial Asset Graph. Its public passkey options endpoint returns HTTP 200 with a challenge.
+
+The username migration has been applied and `username-login` deployed with its own password validation and legacy JWT precheck disabled. Live probes confirmed a generic HTTP 400 for an unknown username, HTTP 403 for an unapproved origin, and permission-denied responses for anonymous alias resolution and username changes. No real password was submitted and no account alias was changed by these probes.
+
+Custom SMTP remains unconfigured. The default reset template includes `{{ .ConfirmationURL }}`. Supabase's [default mail service](https://supabase.com/docs/guides/auth/auth-smtp) sends only to project team addresses and is limited to two messages per hour; configure custom SMTP before relying on resets for other users. Actual receipt, password reset, and hardware passkey enrollment still require the account holder to complete the live flow.
+
 `npm test` covers callback paths, role provenance, identifier handling and rejected/incomplete username sessions. The responsive audit uses an isolated Auth network fixture rather than an application bypass. It exercises first-visit login, forged local identity rejection, username/password sign-in, persisted sessions, reset request and callback, mismatched passwords and real SDK sign-out on desktop/phone, alongside the unchanged workspace checks. These fixtures send no real email and do not prove live mail delivery or hardware passkey enrollment.
 
 Before release, verify one real account can sign in, receive/reset a password, enroll/use a passkey and sign out on the target hostname. Confirm admin/technician behavior with actual server-controlled roles. Usernames additionally require the deployed migration and Edge Function.

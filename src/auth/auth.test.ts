@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { User } from '@supabase/supabase-js';
 const mocks = vi.hoisted(() => ({ password: vi.fn(), invoke: vi.fn(), setSession: vi.fn() }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ auth: { signInWithPassword: mocks.password, setSession: mocks.setSession }, functions: { invoke: mocks.invoke } }) }));
@@ -7,6 +7,7 @@ vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'synthetic-public-key');
 const { authReturnUrl, iagUserFromSupabase, signInWithIdentifier } = await import('../facility/supabaseAuth');
 
 describe('account authentication boundaries', () => {
+  afterAll(() => vi.unstubAllEnvs());
   beforeEach(() => vi.clearAllMocks());
   it('keeps reset callbacks on the project path without copying access tokens', () => {
     expect(authReturnUrl('https://tobystrings.github.io', '/industrial-asset-graph/', true)).toBe('https://tobystrings.github.io/industrial-asset-graph/?auth=reset');
@@ -36,5 +37,14 @@ describe('account authentication boundaries', () => {
   it('rejects malformed usernames before contacting the server', async () => {
     await expect(signInWithIdentifier('../admin', 'password')).rejects.toThrow('Enter your email');
     expect(mocks.invoke).not.toHaveBeenCalled();
+  });
+  it('fails closed when deployment authentication configuration is missing', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_SUPABASE_URL', '');
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', '');
+    const unconfigured = await import('../facility/supabaseAuth');
+    expect(unconfigured.supabaseEnabled).toBe(false);
+    await expect(unconfigured.signInWithIdentifier('user@example.test', 'password')).rejects.toThrow('Sign-in is not configured');
+    expect(mocks.password).not.toHaveBeenCalled();
   });
 });
