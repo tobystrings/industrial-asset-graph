@@ -1,4 +1,5 @@
 import DeviceIntel from '../DeviceIntel';
+import { PageLink } from '../navigation/AppShell';
 import WulftecRecordLink from '../machines/WulftecRecordLink';
 import LocalDocumentPreview from './LocalDocumentPreview';
 import MachineRegisterView from './MachineRegisterView';
@@ -141,6 +142,7 @@ export default function SelectedAssetPanel({
   return (
     <aside className="asset-panel panel">
       <div className="asset-banner"><div><p>Selected asset</p><h2>{asset.id}</h2><span>{asset.name}</span></div><span className="verification-badge"><StatusI status={asset.verificationStatus} /> {stateLabel[asset.verificationStatus]}</span></div>
+      <PageLink page="maintenance" details={{asset:asset.id}} className="page-primary">Line membership, dependencies & service history →</PageLink>
       <div className="asset-actions">
         <WulftecRecordLink asset={asset}/>
         {isFeaturedCabinet && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}

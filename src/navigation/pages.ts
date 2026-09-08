@@ -1,4 +1,8 @@
 export const pages = {
+  lines: ['Production lines', 'Document equipment, flow and shared systems.'],
+  documentation: ['Documentation queue', 'Prioritize field knowledge and survey missing facts.'],
+  maintenance: ['Equipment field sheet', 'Line membership, dependencies and service history.'],
+  dependencies: ['Dependency records', 'Capture typed connections and their evidence.'],
   home: ['Home', 'Choose what you want to work on.'],
   map: ['Map', 'Find an area or a piece of equipment.'],
   assets: ['Assets', 'Find equipment and open its record.'],

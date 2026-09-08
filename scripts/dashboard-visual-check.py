@@ -86,6 +86,74 @@ def close_editor(page) -> None:
     open_page(page, 'map')
 
 
+def exercise_production_records(page, label):
+    open_page(page, 'maintenance&asset=L2-CC-001')
+    form = page.locator('.production-form').last
+    line4 = form.locator('fieldset').filter(has=page.locator('legend', has_text='Line 4'))
+    line4.get_by_label('Supports this line').check()
+    line4.get_by_label('Source / original line designation').fill('Synthetic browser survey; unverified shared membership')
+    form.get_by_label('Actual process stage / purpose').fill('Synthetic documented stage')
+    form.get_by_role('button', name='Add service / maintenance record').click()
+    form.get_by_label('Fault / symptom').fill('Synthetic observation for persistence check')
+    form.get_by_role('button', name='Save changes', exact=True).click()
+    form.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    form = page.locator('.production-form').last
+    assert form.get_by_label('Actual process stage / purpose').input_value() == 'Synthetic documented stage'
+    assert form.get_by_label('Fault / symptom').input_value() == 'Synthetic observation for persistence check'
+    assert form.locator('fieldset').filter(has=page.locator('legend', has_text='Line 4')).get_by_label('Supports this line').is_checked()
+    assert_manager_geometry(page)
+    form.get_by_label('Actual process stage / purpose').scroll_into_view_if_needed()
+    screenshot(page, f'{label}-production-field-capture')
+    page.get_by_role('link', name='Attach evidence', exact=True).click()
+    assert page.locator('.iag-editor-form select').first.input_value() == 'L2-CC-001'
+    page.locator('input[type=file]').first.set_input_files({'name':'production-survey.txt','mimeType':'text/plain','buffer':b'Synthetic field evidence'})
+    page.get_by_text('production-survey.txt', exact=True).first.wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('production-survey.txt', exact=True).first.wait_for()
+    open_page(page, 'documentation')
+    page.get_by_label('Next field action').fill('Synthetic survey backlog test')
+    page.get_by_role('button', name='Add survey task', exact=True).click()
+    page.get_by_role('button', name='Save changes', exact=True).click()
+    page.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    assert page.get_by_label('Action', exact=True).last.input_value() == 'Synthetic survey backlog test'
+    open_page(page, 'lines&line=shared')
+    assert page.get_by_role('link',name='Line 2 Conveyor Control Cabinet',exact=True).count() == 1
+    assert_manager_geometry(page)
+    screenshot(page, f'{label}-production-shared')
+    open_page(page, 'dependencies')
+    page.get_by_label('Source / upstream / supporting entity').select_option('FG-L4-MTN-001')
+    page.get_by_label('Target / downstream / supported entity').select_option('L2-CC-001')
+    page.get_by_label('Route / alternative').select_option('BYPASS')
+    page.get_by_label('Original markers, bypass conditions, conflicts and unresolved questions').fill('Synthetic conditional bypass; field verification required')
+    page.get_by_role('button', name='Save connection', exact=True).click()
+    page.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('Synthetic conditional bypass; field verification required', exact=True).wait_for()
+    assert_manager_geometry(page)
+    open_page(page, 'maintenance&asset=L2-CC-001')
+    page.get_by_text('Record components and assemblies', exact=True).click()
+    component_form = page.locator('.production-form').first
+    component_form.get_by_label('Original label / wire marker').fill('Synthetic component persistence test')
+    component_form.get_by_role('button', name='Save component', exact=True).click()
+    component_form.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('Record components and assemblies', exact=True).click()
+    assert page.get_by_label('Existing component').locator('option').filter(has_text='Synthetic component persistence test').count() == 1
+    assert_manager_geometry(page)
+    page.get_by_label('Existing component').scroll_into_view_if_needed()
+    screenshot(page, f'{label}-production-component')
+    page.evaluate("dispatchEvent(new Event('beforeprint'))")
+    page.emulate_media(media='print')
+    assert page.locator('.page-navigation').evaluate("e => getComputedStyle(e).display") == 'none'
+    assert page.locator('.app-shell').evaluate('e => e.getBoundingClientRect().height > innerHeight'), 'Print frame clips the field sheet'
+    assert page.locator('.production-workspace details:not([open])').count() == 0
+    screenshot(page, f'{label}-production-print')
+    page.emulate_media(media='screen')
+    page.evaluate("dispatchEvent(new Event('afterprint'))")
+
+
 def exercise_manager_states(page, label: str) -> None:
     page.evaluate('''() => {
       localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'visual-reviewer', name: 'Visual Test Reviewer', role: 'admin' }));
@@ -415,7 +483,7 @@ try:
                 wait_for_dashboard(page)
                 assert_manager_geometry(page)
                 screenshot(page, f'{label}-dashboard')
-                for route in ['home','more','account','wulftec']:
+                for route in ['home','more','account','wulftec','lines','documentation','maintenance&asset=L2-CC-001','dependencies']:
                     open_page(page, route)
                     if route == 'wulftec':
                         page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
@@ -490,6 +558,7 @@ try:
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)
+                    exercise_production_records(page, label)
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:

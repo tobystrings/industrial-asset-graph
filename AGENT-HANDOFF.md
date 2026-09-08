@@ -1,5 +1,7 @@
 # Industrial Asset Graph — agent handoff
 
+**September 8 production extension:** Home and More now expose Production lines, Documentation queue, Equipment field sheet, and Dependency records. See `docs/PRODUCTION-MAINTENANCE.md` for data, evidence, persistence, and field follow-up details. Seeded unused dependency types remain zero; technicians can explicitly author evidenced typed dependencies through review. The new potential-impact explorer traverses only verified dependency edges and verified line memberships; it never establishes shutdown or isolation consequences. Survey categories remain separate from inventory. Preserve these production extensions when editing existing assets or facility identity.
+
 **Date:** 2026-09-07
 **Product title:** Industrial Asset Graph (never “Plant Dependency Map”)
 **Repository root:** the directory containing this file
