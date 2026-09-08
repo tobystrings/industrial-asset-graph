@@ -97,6 +97,8 @@ export async function restorePrivateRecovery(file: Blob, facilityId: string): Pr
   const db = await openPlantDb(facilityId);
   try {
     const names = [...db.objectStoreNames];
+    // Recovery files created before the historical ledger restore an empty ledger.
+    if (!stores['historical-evidence']) stores['historical-evidence'] = { keys: [], values: [] };
     if (names.length !== Object.keys(stores).length || names.some(name => !stores[name] || stores[name].keys.length !== stores[name].values.length)) throw new Error('Recovery store layout mismatch.');
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction(names, 'readwrite');
@@ -130,6 +132,18 @@ export async function verifyPrivateRecovery(file: Blob, facilityId: string) {
     (row as AttachmentRecord).blob = new Blob([await blob.arrayBuffer()], { type: attachment.mimeType });
   }
   if (Object.values(stores).some(store => !Array.isArray(store.keys) || !Array.isArray(store.values) || store.keys.length !== store.values.length)) throw new Error('Recovery store layout mismatch.');
+  if (stores['historical-evidence']?.values.length) {
+    const { validateHistory, historyFileId } = await import('./historicalEvidence');
+    for (const value of stores['historical-evidence'].values) {
+      const record = value as import('./historicalEvidence').HistoryRecord;
+      validateHistory(record.manifest, facilityId);
+      if (record.facilityId !== facilityId || record.id !== record.manifest.id || !Array.isArray(record.reviews)) throw new Error('Historical recovery identity mismatch.');
+      for (const file of record.manifest.files) {
+        const attachment = stores.attachments.values.find(v => (v as AttachmentRecord).id === historyFileId(record.id, file)) as AttachmentRecord | undefined;
+        if (!attachment || attachment.assetId !== `history:${record.id}` || attachment.access !== 'LOCAL_ONLY' || attachment.size !== file.size || await sha256(attachment.blob) !== file.sha256) throw new Error('Historical recovery source mismatch.');
+      }
+    }
+  }
   return stores;
 }
 

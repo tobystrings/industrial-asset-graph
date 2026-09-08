@@ -35,7 +35,7 @@ export function HomePage() {
 }
 const groups: { title: string; ids: PageId[] }[] = [
   { title: 'On the floor', ids: ['lines','documentation','maintenance','dependencies','field','observation','evidence','cabinet','wulftec','relationships'] },
-  { title: 'Records & review', ids: ['manage','assetAdd','connection','review','health','conflicts'] },
+  { title: 'Records & review', ids: ['history','manage','assetAdd','connection','review','health','conflicts'] },
   { title: 'Workspace', ids: ['database','import','setup','settings','account','help'] },
 ];
 export function MorePage() { return <main className="more-page">{groups.map(group => <section key={group.title}><h2>{group.title}</h2><div className="page-link-list">{group.ids.map(id => <PageLink key={id} page={id}><span><strong>{pages[id][0]}</strong><small>{pages[id][1]}</small></span><span aria-hidden="true">›</span></PageLink>)}</div></section>)}</main>; }
