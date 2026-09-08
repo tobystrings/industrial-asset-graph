@@ -233,6 +233,12 @@ def exercise_private_asset_package(page, label: str) -> None:
         patch = dict(facilityId=plant['facility']['id'], entityVersions={}, areas=[], assets=[asset], components=[dict(id='visual-private-component',label='Private test component',type='VFD',parentId=asset['id'],verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])], evidence=[dict(id='visual-private-evidence',type='PHOTO',title='Synthetic local evidence',access='LOCAL_ONLY',pathOrUrl='indexeddb://attachment/visual-private-file')], documents=[dict(id='visual-private-doc',assetId=asset['id'],category='Photos',title='Synthetic local evidence',path='indexeddb://attachment/visual-private-file',state='REVIEW',required=False,verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])],relationships=[],revisions=[],assetSerialSources=[])
         register = dict(patch['documents'][0], id='visual-private-register', title='Wiring register', register=dict(kind='wiring-all', entries=[dict(id='visual-wire-6',label='Wire 6 · terminal 04',entityIds=[asset['id']],evidenceIds=['visual-private-evidence'],verificationStatus='FIELD_VERIFY',values=dict(wireId='6',sourceTerminal='04',destinationEquipment=None,state='PROPOSED'),provenance=dict(filename='synthetic.json',section='5',review='INHERITED',sourceId=None,locator=None))]))
         patch['documents'].append(register)
+        asset['manufacturer'] = dict(value='Wulftec', verificationStatus='FIELD_VERIFY', evidenceIds=['visual-private-evidence'])
+        asset['model'] = dict(value='WCRT-200', verificationStatus='FIELD_VERIFY', evidenceIds=['visual-private-evidence'])
+        for suffix, title in [('CABINET', 'Synthetic wrapper cabinet'), ('PRESTRETCH', 'Synthetic prestretch carriage')]:
+            component_id = asset['id']+'-'+suffix
+            asset['componentIds'].append(component_id)
+            patch['components'].append(dict(id=component_id,label=title,type='MECHANICAL_ASSEMBLY',parentId=asset['id'],verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence']))
         manifest = dict(format='industrial-asset-graph-private',version=1,patch=patch,observations=[],attachments=[dict(id='visual-private-file',assetId=asset['id'],name='fixture.svg',mimeType='image/svg+xml',size=len(svg),category='PHOTO',verificationStatus='FIELD_VERIFY',access='LOCAL_ONLY',createdAt='2026-09-07T00:00:00Z',filePath='files/fixture.svg',sha256=hashlib.sha256(svg).hexdigest())])
         stream = io.BytesIO()
         with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_STORED) as z:
@@ -267,6 +273,33 @@ def exercise_private_asset_package(page, label: str) -> None:
         record_width = page.get_by_test_id('inspector-rail').bounding_box()['width']
         assert record_width >= min(300, page.viewport_size['width']-20), 'Asset record collapsed into an unreadable narrow column'
         screenshot(page,f'{label}-private-asset-record')
+        page.get_by_role('link', name='Open 3D model', exact=True).click()
+        panel = page.get_by_role('region', name='Asset graph connection')
+        panel.get_by_text(asset['id'], exact=True).wait_for(state='visible')
+        page.get_by_label('Inspect assembly', exact=True).select_option('cabinet')
+        page.get_by_role('button', name='Explode', exact=True).click()
+        assert 'assembly=cabinet' in page.url and 'explode=100' in page.url
+        page.reload(wait_until='networkidle')
+        assert page.get_by_label('Inspect assembly', exact=True).input_value() == 'cabinet'
+        assert page.locator('#explosion').input_value() == '100'
+        assert_manager_geometry(page)
+        screenshot(page, f'{label}-connected-model')
+        panel.get_by_role('link', name='Open component record', exact=True).click()
+        page.locator('.component-record').wait_for(state='visible')
+        page.get_by_role('region', name='Component evidence').locator('summary').first.click()
+        page.locator('.local-document-preview').get_by_role('link', name='Download original', exact=True).wait_for(state='visible')
+        assert_manager_geometry(page)
+        screenshot(page, f'{label}-model-component-evidence')
+        page.locator('.component-record section').filter(has=page.get_by_role('heading',name='Linked documents',exact=True)).get_by_role('link').first.click()
+        page.get_by_role('link', name='Return to 3D model', exact=True).click()
+        page.locator('.wulftec-canvas[data-ready=true]').wait_for()
+        assert page.get_by_label('Inspect assembly', exact=True).input_value() == 'cabinet'
+        assert page.locator('#explosion').input_value() == '100'
+        page.get_by_label('View',exact=True).select_option('carriage')
+        page.get_by_label('Inspect assembly',exact=True).select_option('rollers')
+        panel.get_by_text('Carriage record context',exact=True).wait_for(state='visible')
+        panel.get_by_role('link',name='Open component record',exact=True).wait_for(state='visible')
+        screenshot(page,f'{label}-model-carriage-context')
         operational = next((r for r in manifest['patch']['relationships'] if r['type'] in ['SUPPLIES','FEEDS','CONTROLS','MECHANICALLY_DRIVES']),None)
         focus = '&device='+operational['source'] if operational else ''
         page.goto(f'{BASE}?asset={asset["id"]}&trace=full{focus}',wait_until='networkidle')

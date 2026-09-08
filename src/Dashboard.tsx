@@ -134,7 +134,11 @@ export default function Dashboard({
       trace: traceOn ? traceMode : null,
       ...genieQueryFromSearch(location.search),
     });
-    history.replaceState(null, '', `${location.pathname}${search}`);
+    const destination = new URLSearchParams(search);
+    if (pageMode === 'documents' && params.has('assembly')) {
+      for (const key of ['assembly', 'scope', 'explode']) if (params.has(key)) destination.set(key, params.get(key)!);
+    }
+    history.replaceState(null, '', `${location.pathname}?${destination}`);
     if (workspaceTab === 'field') {
       const fieldParams = new URLSearchParams(location.search);
       fieldParams.set('field', '1');

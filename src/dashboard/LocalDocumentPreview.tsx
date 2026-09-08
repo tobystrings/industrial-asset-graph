@@ -3,7 +3,7 @@ import { useFacility } from '../facility';
 import { getAttachment, type AttachmentRecord } from '../facility/runtimeDb';
 
 /** Controlled evidence stays in this facility's IndexedDB; no public URL is created. */
-export default function LocalDocumentPreview({ attachmentId }: { attachmentId: string }) {
+export default function LocalDocumentPreview({ attachmentId, expectedAssetId }: { attachmentId: string; expectedAssetId?: string }) {
   const facility = useFacility();
   const [value, setValue] = useState<{ record: AttachmentRecord; url: string; text?: string; previewUrl?: string } | null>(null);
   const [error, setError] = useState('');
@@ -14,6 +14,7 @@ export default function LocalDocumentPreview({ attachmentId }: { attachmentId: s
     setValue(null); setError('');
     void getAttachment(attachmentId, facility.facility.id).then(async record => {
       if (!record) throw new Error('This local attachment is missing. Reapply its private package to relink the original.');
+      if (expectedAssetId && record.assetId !== expectedAssetId) throw new Error('This attachment belongs to different equipment.');
       const text = /^(text\/plain|text\/markdown|text\/csv|application\/json)/.test(record.mimeType) ? await record.blob.text() : undefined;
       const preview = record.previewAttachmentId ? await getAttachment(record.previewAttachmentId, facility.facility.id) : null;
       if (disposed) return;
@@ -32,7 +33,7 @@ export default function LocalDocumentPreview({ attachmentId }: { attachmentId: s
       if (url) URL.revokeObjectURL(url);
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [attachmentId, facility.facility.id]);
+  }, [attachmentId, expectedAssetId, facility.facility.id]);
   if (error) return <p role="alert">{error}</p>;
   if (!value) return <p role="status">Loading local evidence…</p>;
   const { record, url, text } = value;
