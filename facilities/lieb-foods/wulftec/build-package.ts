@@ -6,6 +6,7 @@ import { mergeAssetPackage, readPrivateAssetBundle, importPrivateAssetBundle, ty
 import { createStoredZip, readStoredZip } from '../../../src/facility/iagArchive';
 import { resetPlant, exportPlantArchive, importPlantArchive, portablePlantPackage } from '../../../src/facility/runtimeDb';
 import { validateFacilityPackage } from '../../../src/facility/schema';
+import { mapMachineRegister } from '../../../src/facility/machineRegisters';
 
 // Run with a private output directory outside public/ and outside OneDrive.
 const root = resolve(process.argv[2] ?? '');
@@ -13,6 +14,33 @@ if (!process.argv[2] || /onedrive/i.test(root)) throw new Error('Provide a priva
 const patch = JSON.parse(await readFile(join(root, 'native/patch.json'), 'utf8'));
 const rows = JSON.parse(await readFile(join(root, 'native/attachments.json'), 'utf8'));
 const seed = buildLiebFoodsPackage();
+const assetId = 'LIEB-WULFTEC-A6882';
+const dossierText = await readFile(join(root, 'dossier/Wulftec-machine-dossier.md'), 'utf8');
+const maintenanceSection = dossierText.split('## 9.')[1]?.split('## 10.')[0];
+if (!maintenanceSection) throw new Error('Dossier maintenance section missing.');
+const maintenanceRows = maintenanceSection.split(/\r?\n/).filter(line => line.startsWith('| ') && !line.startsWith('| Finding') && !line.startsWith('| ---')).map(line => {
+  const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+  return { title: cells[0], finding: cells[1], state: 'SOURCE_FINDING', verificationStatus: 'FIELD_VERIFY', writableConfiguration: false };
+});
+const dossierDocument = patch.documents.find((d: { title: string }) => d.title === 'Wulftec-machine-dossier.md');
+if (!dossierDocument) throw new Error('Dossier source document missing.');
+const maintenanceDocument = mapMachineRegister(patch, assetId, 'maintenance-findings', maintenanceRows, dossierDocument, '9');
+patch.documents = patch.documents.filter((d: { id: string }) => d.id !== maintenanceDocument.id);
+patch.documents.push(maintenanceDocument);
+const registerSections: Record<string, string> = { 'parts-nameplates': '3', 'wiring-all': '5', 'wiring-verified-current': '5', 'parameters-all': '6', 'io-signals': '7', 'plc-software-history': '7', 'service-timeline': '8', 'drawing-index': '10', 'video-index': '10', conflicts: '11', 'field-verification': '12', 'missing-sources': '12', 'source-register': '14', 'source-occurrences': '14' };
+for (const [kind, section] of Object.entries(registerSections)) {
+  const sourceDocument = patch.documents.find((d: { title: string }) => d.title === `${kind}.json`);
+  if (!sourceDocument) throw new Error(`Missing register source document: ${kind}`);
+  const values = JSON.parse(await readFile(join(root, `registers/${kind}.json`), 'utf8'));
+  if (kind === 'service-timeline' || kind === 'plc-software-history') values.sort((a: { sourceUtc: string }, b: { sourceUtc: string }) => Date.parse(a.sourceUtc) - Date.parse(b.sourceUtc));
+  const document = mapMachineRegister(patch, assetId, kind, values, sourceDocument, section);
+  patch.documents = patch.documents.filter((d: { id: string }) => d.id !== document.id);
+  patch.documents.push(document);
+  const relationshipId = `${document.id}-link`;
+  patch.relationships = patch.relationships.filter((r: { id: string }) => r.id !== relationshipId);
+  patch.relationships.push({ id: relationshipId, source: assetId, target: document.id, type: 'HAS_DOCUMENT', verificationStatus: 'FIELD_VERIFY', evidenceIds: document.evidenceIds });
+}
+await writeFile(join(root, 'native/integrated-patch.json'), JSON.stringify(patch, null, 2));
 const merged = mergeAssetPackage(seed, patch);
 validateFacilityPackage(merged.plant);
 const again = mergeAssetPackage(merged.plant, patch);

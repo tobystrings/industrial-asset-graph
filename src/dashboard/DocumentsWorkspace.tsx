@@ -5,6 +5,7 @@ import { renderMarkdown } from '../lib/markdown';
 import { markerClass } from '../lib/statusMark';
 import type { DocumentationState } from '../types/facility';
 import LocalDocumentPreview from './LocalDocumentPreview';
+import MachineRegisterView from './MachineRegisterView';
 
 const stateLabel: Record<string, string> = {
   COMPLETE: 'Complete', REVIEW: 'Review', IN_PROGRESS: 'In progress', DRAFT: 'Draft', NOT_STARTED: 'Not started',
@@ -82,12 +83,12 @@ export default function DocumentsWorkspace({
           )}
         </div>
       </div>
-      {activeDocument && <aside className="document-preview scroll-pane" aria-label="Document preview"><DocumentBody documentId={activeDocument} onClose={() => onDocument(null)} /></aside>}
+      {activeDocument && <aside className="document-preview scroll-pane" aria-label="Document preview"><DocumentBody documentId={activeDocument} onClose={() => onDocument(null)} onDocument={onDocument} /></aside>}
     </section>
   );
 }
 
-function DocumentBody({ documentId, onClose }: { documentId: string; onClose: () => void }) {
+function DocumentBody({ documentId, onClose, onDocument }: { documentId: string; onClose: () => void; onDocument: (id: string) => void }) {
   const record = documents.find((item) => item.id === documentId);
   if (!record) return null;
   const source = documentSource(record.path) ?? `# ${record.title}\n\nDocument file is not in this build.`;
@@ -97,7 +98,7 @@ function DocumentBody({ documentId, onClose }: { documentId: string; onClose: ()
       <p className="panel-title">{record.category}</p>
       <h3>{record.title}</h3>
       <p className="document-status-line">Status: <strong>{stateLabel[record.state]}</strong> · <span className={markerClass(record.verificationStatus)} /> {stateLabel[record.verificationStatus]}</p>
-      {record.path.startsWith('indexeddb://attachment/')
+      {record.register ? <MachineRegisterView key={record.id} document={record} onDocument={onDocument}/> : record.path.startsWith('indexeddb://attachment/')
         ? <LocalDocumentPreview key={record.path} attachmentId={record.path.slice('indexeddb://attachment/'.length)}/>
         : <div className="md-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(source) }} />}
     </section>

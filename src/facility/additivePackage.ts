@@ -93,6 +93,26 @@ export async function exportPrivateRecovery(facilityId: string): Promise<Blob> {
 
 /** Explicit rollback only. Validate the entire backup before replacing any local store. */
 export async function restorePrivateRecovery(file: Blob, facilityId: string): Promise<void> {
+  const stores = await verifyPrivateRecovery(file, facilityId);
+  const db = await openPlantDb(facilityId);
+  try {
+    const names = [...db.objectStoreNames];
+    if (names.length !== Object.keys(stores).length || names.some(name => !stores[name] || stores[name].keys.length !== stores[name].values.length)) throw new Error('Recovery store layout mismatch.');
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(names, 'readwrite');
+      tx.oncomplete = () => resolve(); tx.onabort = () => reject(tx.error ?? new Error('Recovery aborted.')); tx.onerror = () => reject(tx.error);
+      try {
+        for (const name of names) {
+          const store = tx.objectStore(name); store.clear();
+          stores[name].values.forEach((value, i) => store.keyPath === null ? store.put(value, stores[name].keys[i]) : store.put(value));
+        }
+      } catch (error) { tx.abort(); reject(error); }
+    });
+  } finally { db.close(); }
+}
+
+/** Read back and verify recovery bytes without mutating any facility. */
+export async function verifyPrivateRecovery(file: Blob, facilityId: string) {
   const files = await readStoredZip(file);
   const entry = files.get('recovery.json');
   if (!entry) throw new Error('Private recovery manifest missing.');
@@ -109,21 +129,8 @@ export async function restorePrivateRecovery(file: Blob, facilityId: string): Pr
     if (!blob || blob.size !== attachment.size || await sha256(blob) !== attachment.blob.sha256) throw new Error(`Recovery attachment integrity failed: ${attachment.id}`);
     (row as AttachmentRecord).blob = new Blob([await blob.arrayBuffer()], { type: attachment.mimeType });
   }
-  const db = await openPlantDb(facilityId);
-  try {
-    const names = [...db.objectStoreNames];
-    if (names.length !== Object.keys(stores).length || names.some(name => !stores[name] || stores[name].keys.length !== stores[name].values.length)) throw new Error('Recovery store layout mismatch.');
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(names, 'readwrite');
-      tx.oncomplete = () => resolve(); tx.onabort = () => reject(tx.error ?? new Error('Recovery aborted.')); tx.onerror = () => reject(tx.error);
-      try {
-        for (const name of names) {
-          const store = tx.objectStore(name); store.clear();
-          stores[name].values.forEach((value, i) => store.keyPath === null ? store.put(value, stores[name].keys[i]) : store.put(value));
-        }
-      } catch (error) { tx.abort(); reject(error); }
-    });
-  } finally { db.close(); }
+  if (Object.values(stores).some(store => !Array.isArray(store.keys) || !Array.isArray(store.values) || store.keys.length !== store.values.length)) throw new Error('Recovery store layout mismatch.');
+  return stores;
 }
 
 /** Add only missing IDs. Existing values and pending mutations remain unchanged. */
@@ -155,7 +162,11 @@ export async function importPrivateAssetBundle(file: Blob, facilityId: string) {
     const preview = [...oldAttachments, ...attachmentAdds].find(item => item.id === row.previewAttachmentId);
     if (!preview || preview.assetId !== row.assetId || preview.access !== row.access || !preview.mimeType.startsWith('image/')) throw new Error(`Invalid controlled preview: ${row.id}`);
   }
-  for (const doc of manifest.patch.documents) if (doc.path.startsWith('indexeddb://attachment/') && !attachmentIds.has(doc.path.slice('indexeddb://attachment/'.length))) throw new Error(`Missing local document attachment: ${doc.id}`);
+  for (const doc of manifest.patch.documents) if (doc.path.startsWith('indexeddb://attachment/')) {
+    const id = doc.path.slice('indexeddb://attachment/'.length);
+    if (!attachmentIds.has(id)) throw new Error(`Missing local document attachment: ${doc.id}`);
+    if (![...oldAttachments, ...attachmentAdds].some(row => row.id === id && row.assetId === doc.assetId)) throw new Error(`Document attachment belongs to another asset: ${doc.id}`);
+  }
   const db = await openPlantDb(facilityId);
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(['plant', 'attachments', 'observations'], 'readwrite');

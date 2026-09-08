@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFacility } from '../facility';
 import { getAttachment, type AttachmentRecord } from '../facility/runtimeDb';
 
@@ -7,6 +7,8 @@ export default function LocalDocumentPreview({ attachmentId }: { attachmentId: s
   const facility = useFacility();
   const [value, setValue] = useState<{ record: AttachmentRecord; url: string; text?: string; previewUrl?: string } | null>(null);
   const [error, setError] = useState('');
+  const mediaNodes = useRef(new Set<HTMLImageElement | HTMLVideoElement>());
+  const rememberMedia = (node: HTMLImageElement | HTMLVideoElement | null) => { if (node) mediaNodes.current.add(node); };
   useEffect(() => {
     let disposed = false; let url = ''; let previewUrl = '';
     setValue(null); setError('');
@@ -18,7 +20,18 @@ export default function LocalDocumentPreview({ attachmentId }: { attachmentId: s
       if (preview?.mimeType.startsWith('image/') && preview.assetId === record.assetId) previewUrl = URL.createObjectURL(preview.blob);
       url = URL.createObjectURL(record.blob); setValue({ record, url, text, previewUrl });
     }).catch(reason => { if (!disposed) setError(reason instanceof Error ? reason.message : 'Unable to read local evidence.'); });
-    return () => { disposed = true; if (url) URL.revokeObjectURL(url); if (previewUrl) URL.revokeObjectURL(previewUrl); };
+    return () => {
+      disposed = true;
+      // Stop pending media/range requests before releasing their local blob URLs.
+      for (const node of mediaNodes.current) {
+        if (node instanceof HTMLVideoElement) node.pause();
+        node.removeAttribute('src');
+        if (node instanceof HTMLVideoElement) node.load();
+      }
+      mediaNodes.current.clear();
+      if (url) URL.revokeObjectURL(url);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
   }, [attachmentId, facility.facility.id]);
   if (error) return <p role="alert">{error}</p>;
   if (!value) return <p role="status">Loading local evidence…</p>;
@@ -26,9 +39,9 @@ export default function LocalDocumentPreview({ attachmentId }: { attachmentId: s
   return <div className="local-document-preview">
     <p>{record.access === 'RESTRICTED' ? 'Restricted evidence' : 'Local evidence'} · {(record.size / 1024).toFixed(0)} KB</p>
     <p><a href={url} download={record.name}>Download original</a></p>
-    {record.mimeType.startsWith('image/') && <a href={url} target="_blank" rel="noreferrer"><img src={url} alt={record.name}/></a>}
-    {record.mimeType.startsWith('video/') && <video src={url} controls preload="metadata"/>}
-    {record.mimeType === 'application/pdf' && <><a href={url} target="_blank" rel="noreferrer">Open PDF at full size</a>{value.previewUrl ? <><p>Cover preview · open the PDF for all pages.</p><a href={url} target="_blank" rel="noreferrer"><img src={value.previewUrl} alt={`${record.name} cover preview`}/></a></> : <iframe src={url} title={record.name}/>}</>}
+    {record.mimeType.startsWith('image/') && <a href={url} target="_blank" rel="noreferrer"><img ref={rememberMedia} src={url} alt={record.name}/></a>}
+    {record.mimeType.startsWith('video/') && <video ref={rememberMedia} src={url} controls preload="metadata"/>}
+    {record.mimeType === 'application/pdf' && <><a href={url} target="_blank" rel="noreferrer">Open PDF at full size</a>{value.previewUrl ? <><p>Cover preview · open the PDF for all pages.</p><a href={url} target="_blank" rel="noreferrer"><img ref={rememberMedia} src={value.previewUrl} alt={`${record.name} cover preview`}/></a></> : <iframe src={url} title={record.name}/>}</>}
     {text !== undefined && <pre>{text}</pre>}
   </div>;
 }

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import activeFacilityPackage, { syncActiveFacilityPackage } from './activeFacility';
 import type { FacilityIdentity, FacilityMapMarker, FacilityPackage } from './types';
-import type { FacilityArea, FacilityAsset, RelationshipRecord } from '../types/facility';
+import type { ComponentRecord, FacilityArea, FacilityAsset, RelationshipRecord } from '../types/facility';
 import {
   deleteAttachment as removeAttachmentRecord,
   ensurePlantSeed,
@@ -56,6 +56,7 @@ export interface FacilityEditorApi {
   saveArea(area: FacilityArea): Promise<void>;
   deleteArea(areaId: string): Promise<void>;
   saveAsset(asset: FacilityAsset, marker?: { x: number; y: number }): Promise<void>;
+  saveComponent(component: ComponentRecord): Promise<void>;
   deleteAsset(assetId: string): Promise<void>;
   saveRelationship(relationship: RelationshipRecord): Promise<void>;
   deleteRelationship(relationshipId: string): Promise<void>;
@@ -128,7 +129,10 @@ export function applyReviewedChange(current: FacilityPackage, proposed: Facility
     return { ...current, mapConfig: { ...(current.mapConfig ?? {}), markers: next } };
   }
   if (descriptor.entityType === 'map_config') return { ...current, areas: proposed.areas, assets: proposed.assets, mapConfig: proposed.mapConfig };
-  if (descriptor.entityType === 'component') return { ...current, components: descriptor.operation === 'DELETE' ? current.components.filter((item) => item.id !== entityId) : upsert(current.components, proposed.components.find((item) => item.id === entityId)!) };
+  if (descriptor.entityType === 'component') {
+    const component = proposed.components.find(item => item.id === entityId);
+    return { ...current, components: descriptor.operation === 'DELETE' ? current.components.filter(item => item.id !== entityId) : upsert(current.components, component!), assets: current.assets.map(asset => ({...asset, componentIds: [...asset.componentIds.filter(id => id !== entityId), ...(descriptor.operation !== 'DELETE' && component?.parentId === asset.id ? [entityId] : [])]})) };
+  }
   if (descriptor.entityType === 'document') return { ...current, documents: descriptor.operation === 'DELETE' ? current.documents.filter((item) => item.id !== entityId) : upsert(current.documents, proposed.documents.find((item) => item.id === entityId)!) };
   if (descriptor.entityType === 'evidence') {
     if (descriptor.operation === 'DELETE') return { ...current, evidence: current.evidence.filter((item) => item.id !== entityId), documents: current.documents.filter((item) => !item.evidenceIds.includes(entityId)) };
@@ -212,7 +216,15 @@ export function FacilityProvider({
     const baseVersion = latest.entityVersions[entityId] ?? 0;
     const versioned = stampRevision({ ...next, packageRevision: latest.packageRevision + 1, entityVersions: { ...latest.entityVersions, [entityId]: baseVersion + 1 } }, entityId, reason, actor.name, 'APPROVED');
     await commit(versioned);
-    const evidenceIds = Array.isArray(descriptor.value?.evidenceIds) ? descriptor.value.evidenceIds.filter((id): id is string => typeof id === 'string') : [];
+    const evidenceIds: string[] = [];
+    const collectEvidence = (value: unknown): void => {
+      if (!value || typeof value !== 'object') return;
+      for (const [key, child] of Object.entries(value)) {
+        if (key === 'evidenceIds' && Array.isArray(child)) evidenceIds.push(...child.filter((id): id is string => typeof id === 'string'));
+        else collectEvidence(child);
+      }
+    };
+    collectEvidence(descriptor.value);
     const evidenceAccess = descriptor.entityType === 'evidence' && typeof descriptor.value?.access === 'string'
       ? [descriptor.value.access as 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED']
       : evidenceIds.map((id) => latest.evidence.find((item) => item.id === id)?.access ?? 'RESTRICTED');
@@ -327,6 +339,7 @@ export function FacilityProvider({
       if (change) appendAudit(currentUser.name, 'Rejected change', `${change.reason} · ${change.entityId} · proposed by ${change.proposedBy}`);
     },
     async saveFacility(facility) {
+      validateFacilityPackage({ ...pkg, facility });
       await recordChange({ ...pkg, facility }, facility.id, 'Facility identity saved in application', { entityType: 'facility', operation: 'UPSERT', value: facility as unknown as Record<string, unknown> });
     },
     async saveArea(area) {
@@ -371,6 +384,7 @@ export function FacilityProvider({
         if (index >= 0) markers[index] = { ...markers[index], ...marker };
         else markers.push(marker);
       }
+      validateFacilityPackage({ ...pkg, assets, areas, mapConfig: { ...(pkg.mapConfig ?? {}), markers } });
       await recordChange({ ...pkg, assets, areas, mapConfig: { ...(pkg.mapConfig ?? {}), markers } }, asset.id, 'Asset saved in application', { entityType: 'asset', operation: 'UPSERT', value: asset as unknown as Record<string, unknown> });
     },
     async deleteAsset(assetId) {
@@ -388,11 +402,20 @@ export function FacilityProvider({
       for (const attachment of attached) await removeAttachmentRecord(attachment.id, pkg.facility.id);
       await recordChange(next, assetId, 'Asset deleted in application', { entityType: 'asset', operation: 'DELETE' });
     },
+    async saveComponent(component) {
+      const latest = pkgRef.current;
+      if (component.verificationStatus === 'VERIFIED' && !component.evidenceIds.length) throw new Error('Verified components require supporting evidence.');
+      const components = latest.components.some(c => c.id === component.id) ? latest.components.map(c => c.id === component.id ? component : c) : [...latest.components,component];
+      const assets = latest.assets.map(a => ({...a,componentIds:[...a.componentIds.filter(id => id !== component.id),...(a.id === component.parentId ? [component.id] : [])]}));
+      const next = {...latest,components,assets};
+      validateFacilityPackage(next);
+      await recordChange(next, component.id, 'Component or assembly saved in application', {entityType:'component',operation:'UPSERT',value:component as unknown as Record<string,unknown>});
+    },
     async saveRelationship(relationship) {
       const latest = pkgRef.current;
       const proposedAssetIds = new Set(pendingRef.current.filter((item) => item.entityType === 'asset' && item.operation === 'UPSERT').map((item) => item.entityId));
-      const knownAsset = (id: string) => latest.assets.some((item) => item.id === id) || proposedAssetIds.has(id);
-      if (!knownAsset(relationship.source) || !knownAsset(relationship.target)) throw new Error('Relationship endpoints must reference documented or concurrently proposed assets.');
+      const knownEntity = (id: string) => [...latest.assets, ...latest.components, ...latest.areas, ...latest.documents, ...latest.evidence].some((item) => item.id === id) || proposedAssetIds.has(id);
+      if (!knownEntity(relationship.source) || !knownEntity(relationship.target)) throw new Error('Relationship endpoints must reference documented or concurrently proposed entities in this facility.');
       if (relationship.source === relationship.target) throw new Error('Relationship endpoints must be different.');
       if (relationship.verificationStatus === 'VERIFIED' && relationship.evidenceIds.length === 0) throw new Error('VERIFIED relationships require evidence.');
       if (relationship.evidenceIds.some((id) => !latest.evidence.some((item) => item.id === id))) throw new Error('Relationship evidence reference is not present in this facility package.');

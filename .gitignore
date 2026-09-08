@@ -1,5 +1,6 @@
 node_modules/
 dist/
+/facilities/*/private/
 artifacts/
 .codex-dev-server.log
 *.tsbuildinfo

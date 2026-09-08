@@ -6,15 +6,27 @@ export interface VerifiedFact<T> { value: T | null; verificationStatus: Verifica
 export interface AreaOverlay { x: number; y: number; width: number; height: number; polygon?: Array<{ x: number; y: number }>; }
 export interface FacilityArea { id: string; name: string; shortName: string; status: DocumentationState; overlay: AreaOverlay; assetIds: string[]; notes?: string; visible?: boolean; }
 export interface EvidenceRecord { id: string; type: 'PHOTO' | 'NAMEPLATE' | 'DRAWING' | 'MANUAL' | 'FIELD_TEST' | 'CMMS_RECORD' | 'OTHER'; title: string; pathOrUrl: string; access: 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED'; }
-export interface DocumentRecord { id: string; assetId: string; category: string; title: string; path: string; state: DocumentationState; required: boolean; verificationStatus: VerificationState; evidenceIds: string[]; }
+export interface RegisterEntry {
+  id: string;
+  label: string;
+  entityIds: string[];
+  evidenceIds: string[];
+  verificationStatus: VerificationState;
+  /** Original source values, including explicit nulls; never a writable configuration. */
+  values: Record<string, unknown>;
+  provenance: { filename: string; section: string; review: 'INHERITED'; sourceId: string | null; locator: string | null };
+}
+export interface MachineRegister { kind: string; entries: RegisterEntry[]; }
+export interface DocumentRecord { id: string; assetId: string; category: string; title: string; path: string; state: DocumentationState; required: boolean; verificationStatus: VerificationState; evidenceIds: string[]; register?: MachineRegister; }
 export interface FacilityAsset {
+  production?: import('../facility/production').AssetProduction;
   id: string; name: string; description: string; type: string; facilityId: string; areaId: string; line: string;
   verificationStatus: VerificationState; manufacturer: VerifiedFact<string>; model: VerifiedFact<string>; serialNumber: VerifiedFact<string>;
   facts: { label: string; value: VerifiedFact<string | number> }[];
   componentIds: string[]; unknowns: string[];
 }
 export interface ComponentRecord { id: string; label: string; type: string; parentId: string; verificationStatus: VerificationState; manufacturer?: string; model?: string; evidenceIds: string[]; productFamilyId?: string; }
-export interface RelationshipRecord { id: string; source: string; target: string; type: RelationshipType; verificationStatus: VerificationState; evidenceIds: string[]; }
+export interface RelationshipRecord { id: string; source: string; target: string; type: RelationshipType; verificationStatus: VerificationState; evidenceIds: string[]; sourceReference?: string; verifiedAt?: string; note?: string; route?: 'NORMAL' | 'BRANCH' | 'BYPASS' | 'REDUNDANT'; }
 export type SignalKind = 'ANALOG' | 'DIGITAL' | 'NETWORK' | 'DISCRETE';
 export interface ProductParam {
   code: string;

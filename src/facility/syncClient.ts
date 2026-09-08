@@ -58,7 +58,11 @@ export function applyCanonicalEntities(pkg: FacilityPackage, entities: Canonical
     if (entity.entityType === 'facility' && value && !entity.deleted) next.facility = value as unknown as FacilityPackage['facility'];
     else if (entity.entityType === 'area') next.areas = entity.deleted ? next.areas.filter((item) => item.id !== entity.entityId) : upsert(next.areas, value as unknown as FacilityPackage['areas'][number]);
     else if (entity.entityType === 'asset') next.assets = entity.deleted ? next.assets.filter((item) => item.id !== entity.entityId) : upsert(next.assets, value as unknown as FacilityPackage['assets'][number]);
-    else if (entity.entityType === 'component') next.components = entity.deleted ? next.components.filter((item) => item.id !== entity.entityId) : upsert(next.components, value as unknown as FacilityPackage['components'][number]);
+    else if (entity.entityType === 'component') {
+      const component = value as unknown as FacilityPackage['components'][number];
+      next.components = entity.deleted ? next.components.filter(item => item.id !== entity.entityId) : upsert(next.components, component);
+      next.assets = next.assets.map(asset => ({...asset,componentIds:[...asset.componentIds.filter(id => id !== entity.entityId),...(!entity.deleted && component.parentId === asset.id ? [entity.entityId] : [])]}));
+    }
     else if (entity.entityType === 'relationship') next.relationships = entity.deleted ? next.relationships.filter((item) => item.id !== entity.entityId) : upsert(next.relationships, value as unknown as FacilityPackage['relationships'][number]);
     else if (entity.entityType === 'document') next.documents = entity.deleted ? next.documents.filter((item) => item.id !== entity.entityId) : upsert(next.documents, value as unknown as FacilityPackage['documents'][number]);
     else if (entity.entityType === 'evidence') next.evidence = entity.deleted ? next.evidence.filter((item) => item.id !== entity.entityId) : upsert(next.evidence, value as unknown as FacilityPackage['evidence'][number]);

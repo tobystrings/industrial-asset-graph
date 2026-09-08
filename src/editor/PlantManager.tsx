@@ -78,6 +78,7 @@ function AssetForm({ point, asset, onDone }: { point: MapPoint; asset?: Facility
     event.preventDefault();
     const assetId = id.trim() || `AST-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const next: FacilityAsset = {
+      ...asset,
       id: assetId,
       name: name.trim() || assetId,
       description,
@@ -140,7 +141,7 @@ function RelationshipPanel() {
   const editor = useFacilityEditor();
   const [editingId, setEditingId] = useState<string | null>(null);
   const editing = facility.relationships.find((item) => item.id === editingId);
-  const [source, setSource] = useState(facility.assets[0]?.id ?? '');
+  const [source, setSource] = useState(() => facility.assets.find(a => a.id === new URLSearchParams(window.location.search).get('asset'))?.id ?? facility.assets[0]?.id ?? '');
   const [target, setTarget] = useState(facility.assets[1]?.id ?? facility.assets[0]?.id ?? '');
   const [type, setType] = useState<RelationshipType>('FEEDS');
   const [verificationStatus, setVerificationStatus] = useState<VerificationState>('FIELD_VERIFY');
@@ -161,7 +162,7 @@ function RelationshipPanel() {
     event.preventDefault();
     if (!source || !target || source === target) { setMessage('Choose two different documented endpoints.'); return; }
     if (verificationStatus === 'VERIFIED' && !evidenceId) { setMessage('VERIFIED relationships require an evidence reference.'); return; }
-    await editor.saveRelationship({ id: editing?.id ?? crypto.randomUUID(), source, target, type, verificationStatus, evidenceIds: evidenceId ? [evidenceId] : [] });
+    await editor.saveRelationship({ ...editing, id: editing?.id ?? crypto.randomUUID(), source, target, type, verificationStatus, evidenceIds: evidenceId ? [evidenceId] : [] });
     reset();
   };
   const name = (id: string) => facility.assets.find((asset) => asset.id === id)?.name ?? id;
@@ -172,7 +173,7 @@ function RelationshipPanel() {
 function EvidencePanel() {
   const facility = useFacility();
   const editor = useFacilityEditor();
-  const [assetId, setAssetId] = useState(facility.assets[0]?.id ?? '');
+  const [assetId, setAssetId] = useState(() => facility.assets.find(a => a.id === new URLSearchParams(window.location.search).get('asset'))?.id ?? facility.assets[0]?.id ?? '');
   const [rows, setRows] = useState<AttachmentRecord[]>([]);
   const [verifiedUpload, setVerifiedUpload] = useState(false);
   const [viewer, setViewer] = useState<{ url: string; name: string; mimeType: string } | null>(null);
@@ -193,7 +194,7 @@ function EvidencePanel() {
 function ObservationPanel() {
   const facility = useFacility();
   const editor = useFacilityEditor();
-  const [assetId, setAssetId] = useState(facility.assets[0]?.id ?? '');
+  const [assetId, setAssetId] = useState(() => facility.assets.find(a => a.id === new URLSearchParams(window.location.search).get('asset'))?.id ?? facility.assets[0]?.id ?? '');
   const [text, setText] = useState('');
   const [status, setStatus] = useState<'VERIFIED' | 'FIELD_VERIFY' | 'INFERRED' | 'DISPUTED'>('FIELD_VERIFY');
   const [rows, setRows] = useState<Awaited<ReturnType<typeof editor.observations>>>([]);

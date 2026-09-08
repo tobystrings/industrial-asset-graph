@@ -1,4 +1,4 @@
-const CACHE = 'iag-static-v3';
+const CACHE = 'iag-static-v4';
 const APP_SCOPE = '/industrial-asset-graph/';
 const STATIC_ASSETS = [
   `${APP_SCOPE}manifest.webmanifest`,
@@ -26,12 +26,16 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // Never cache mutable Vite modules, API responses, or private package paths.
+  const url = new URL(event.request.url);
 
   // HTML must never be cache-first: Vite filenames change on every deployment.
   if (event.request.mode === 'navigate') {
     event.respondWith(fetch(event.request).catch(() => caches.match(`${APP_SCOPE}index.html`)));
     return;
   }
+  const cacheable = STATIC_ASSETS.includes(url.pathname) || url.pathname.startsWith(`${APP_SCOPE}assets/`);
+  if (url.origin !== self.location.origin || !cacheable) return;
 
   event.respondWith((async () => {
     const cached = await caches.match(event.request);

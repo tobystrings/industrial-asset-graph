@@ -86,6 +86,74 @@ def close_editor(page) -> None:
     open_page(page, 'map')
 
 
+def exercise_production_records(page, label):
+    open_page(page, 'maintenance&asset=L2-CC-001')
+    form = page.locator('.production-form').last
+    line4 = form.locator('fieldset').filter(has=page.locator('legend', has_text='Line 4'))
+    line4.get_by_label('Supports this line').check()
+    line4.get_by_label('Source / original line designation').fill('Synthetic browser survey; unverified shared membership')
+    form.get_by_label('Actual process stage / purpose').fill('Synthetic documented stage')
+    form.get_by_role('button', name='Add service / maintenance record').click()
+    form.get_by_label('Fault / symptom').fill('Synthetic observation for persistence check')
+    form.get_by_role('button', name='Save changes', exact=True).click()
+    form.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    form = page.locator('.production-form').last
+    assert form.get_by_label('Actual process stage / purpose').input_value() == 'Synthetic documented stage'
+    assert form.get_by_label('Fault / symptom').input_value() == 'Synthetic observation for persistence check'
+    assert form.locator('fieldset').filter(has=page.locator('legend', has_text='Line 4')).get_by_label('Supports this line').is_checked()
+    assert_manager_geometry(page)
+    form.get_by_label('Actual process stage / purpose').scroll_into_view_if_needed()
+    screenshot(page, f'{label}-production-field-capture')
+    page.get_by_role('link', name='Attach evidence', exact=True).click()
+    assert page.locator('.iag-editor-form select').first.input_value() == 'L2-CC-001'
+    page.locator('input[type=file]').first.set_input_files({'name':'production-survey.txt','mimeType':'text/plain','buffer':b'Synthetic field evidence'})
+    page.get_by_text('production-survey.txt', exact=True).first.wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('production-survey.txt', exact=True).first.wait_for()
+    open_page(page, 'documentation')
+    page.get_by_label('Next field action').fill('Synthetic survey backlog test')
+    page.get_by_role('button', name='Add survey task', exact=True).click()
+    page.get_by_role('button', name='Save changes', exact=True).click()
+    page.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    assert page.get_by_label('Action', exact=True).last.input_value() == 'Synthetic survey backlog test'
+    open_page(page, 'lines&line=shared')
+    assert page.get_by_role('link',name='Line 2 Conveyor Control Cabinet',exact=True).count() == 1
+    assert_manager_geometry(page)
+    screenshot(page, f'{label}-production-shared')
+    open_page(page, 'dependencies')
+    page.get_by_label('Source / upstream / supporting entity').select_option('FG-L4-MTN-001')
+    page.get_by_label('Target / downstream / supported entity').select_option('L2-CC-001')
+    page.get_by_label('Route / alternative').select_option('BYPASS')
+    page.get_by_label('Original markers, bypass conditions, conflicts and unresolved questions').fill('Synthetic conditional bypass; field verification required')
+    page.get_by_role('button', name='Save connection', exact=True).click()
+    page.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('Synthetic conditional bypass; field verification required', exact=True).wait_for()
+    assert_manager_geometry(page)
+    open_page(page, 'maintenance&asset=L2-CC-001')
+    page.get_by_text('Record components and assemblies', exact=True).click()
+    component_form = page.locator('.production-form').first
+    component_form.get_by_label('Original label / wire marker').fill('Synthetic component persistence test')
+    component_form.get_by_role('button', name='Save component', exact=True).click()
+    component_form.get_by_role('status').filter(has_text='Saved on this device').wait_for()
+    page.reload(wait_until='networkidle')
+    page.get_by_text('Record components and assemblies', exact=True).click()
+    assert page.get_by_label('Existing component').locator('option').filter(has_text='Synthetic component persistence test').count() == 1
+    assert_manager_geometry(page)
+    page.get_by_label('Existing component').scroll_into_view_if_needed()
+    screenshot(page, f'{label}-production-component')
+    page.evaluate("dispatchEvent(new Event('beforeprint'))")
+    page.emulate_media(media='print')
+    assert page.locator('.page-navigation').evaluate("e => getComputedStyle(e).display") == 'none'
+    assert page.locator('.app-shell').evaluate('e => e.getBoundingClientRect().height > innerHeight'), 'Print frame clips the field sheet'
+    assert page.locator('.production-workspace details:not([open])').count() == 0
+    screenshot(page, f'{label}-production-print')
+    page.emulate_media(media='screen')
+    page.evaluate("dispatchEvent(new Event('afterprint'))")
+
+
 def exercise_manager_states(page, label: str) -> None:
     page.evaluate('''() => {
       localStorage.setItem('iag-change-control-user', JSON.stringify({ id: 'visual-reviewer', name: 'Visual Test Reviewer', role: 'admin' }));
@@ -231,6 +299,8 @@ def exercise_private_asset_package(page, label: str) -> None:
         asset = dict(plant['assets'][0], id='visual-private-machine', name='Private evidence test machine', componentIds=['visual-private-component'])
         svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#123f54"/><text x="60" y="300" fill="white" font-size="40">Synthetic evidence fixture</text></svg>'
         patch = dict(facilityId=plant['facility']['id'], entityVersions={}, areas=[], assets=[asset], components=[dict(id='visual-private-component',label='Private test component',type='VFD',parentId=asset['id'],verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])], evidence=[dict(id='visual-private-evidence',type='PHOTO',title='Synthetic local evidence',access='LOCAL_ONLY',pathOrUrl='indexeddb://attachment/visual-private-file')], documents=[dict(id='visual-private-doc',assetId=asset['id'],category='Photos',title='Synthetic local evidence',path='indexeddb://attachment/visual-private-file',state='REVIEW',required=False,verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])],relationships=[],revisions=[],assetSerialSources=[])
+        register = dict(patch['documents'][0], id='visual-private-register', title='Wiring register', register=dict(kind='wiring-all', entries=[dict(id='visual-wire-6',label='Wire 6 · terminal 04',entityIds=[asset['id']],evidenceIds=['visual-private-evidence'],verificationStatus='FIELD_VERIFY',values=dict(wireId='6',sourceTerminal='04',destinationEquipment=None,state='PROPOSED'),provenance=dict(filename='synthetic.json',section='5',review='INHERITED',sourceId=None,locator=None))]))
+        patch['documents'].append(register)
         manifest = dict(format='industrial-asset-graph-private',version=1,patch=patch,observations=[],attachments=[dict(id='visual-private-file',assetId=asset['id'],name='fixture.svg',mimeType='image/svg+xml',size=len(svg),category='PHOTO',verificationStatus='FIELD_VERIFY',access='LOCAL_ONLY',createdAt='2026-09-07T00:00:00Z',filePath='files/fixture.svg',sha256=hashlib.sha256(svg).hexdigest())])
         stream = io.BytesIO()
         with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_STORED) as z:
@@ -281,6 +351,42 @@ def exercise_private_asset_package(page, label: str) -> None:
         if local.locator('img').count():
             page.wait_for_function("() => [...document.querySelectorAll('.local-document-preview img')].every(img => img.complete && img.naturalWidth > 0)")
         screenshot(page,f'{label}-private-document')
+        register_doc = next((d for d in manifest['patch']['documents'] if d.get('register')), None)
+        if register_doc:
+            page.goto(f'{BASE}?page=documents&doc={register_doc["id"]}', wait_until='networkidle')
+            register_view = page.locator('.machine-register')
+            register_view.get_by_role('button', name='Add review note', exact=True).first.click()
+            register_view.get_by_label('Review note', exact=True).fill('Disposable audit note: retain source uncertainty.')
+            register_view.get_by_role('button', name='Save review note', exact=True).click()
+            register_view.get_by_text('Review note saved locally. Source values retained.', exact=True).wait_for(state='visible')
+            page.reload(wait_until='networkidle')
+            page.locator('.machine-register').get_by_text('Review note: Disposable audit note:', exact=False).wait_for(state='visible')
+            page.locator('.machine-register').wait_for(state='visible')
+            page.locator('.machine-register summary').first.click()
+            assert_manager_geometry(page)
+            screenshot(page, f'{label}-private-register')
+            for native_doc in (d for d in manifest['patch']['documents'] if d.get('register')):
+                page.goto(f'{BASE}?page=documents&doc={native_doc["id"]}', wait_until='networkidle')
+                register_view = page.locator('.machine-register')
+                register_view.wait_for(state='visible')
+                count = len(native_doc['register']['entries'])
+                assert f'{count} of {count} entries' in register_view.inner_text(), 'Native register count is not visible'
+                if count:
+                    contrast = register_view.locator('article p').first.evaluate('''element => {
+                      const luminance = color => { const rgb = color.match(/[\\d.]+/g).slice(0,3).map(Number).map(c => { c /= 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; }); return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]; };
+                      const foreground = luminance(getComputedStyle(element).color);
+                      const background = luminance(getComputedStyle(element.closest('article')).backgroundColor);
+                      return (Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
+                    }''')
+                    assert contrast >= 4.5, f'Register text contrast is too low: {contrast}'
+                assert_manager_geometry(page)
+                if native_doc['register']['kind'] in ['parameters-all', 'wiring-all', 'missing-sources']:
+                    screenshot(page, f'{label}-private-{native_doc["register"]["kind"]}')
+                if count:
+                    query = native_doc['register']['entries'][0]['label']
+                    register_view.get_by_label('Search register', exact=True).fill(query)
+                    assert register_view.locator('article').count() >= 1, 'Register search lost a known row'
+            page.goto(f'{BASE}?page=documents&doc={register_doc["id"]}', wait_until='networkidle')
         assert_manager_geometry(page)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Private workspace overflows horizontally'
         page.get_by_role('button',name='Close documentation detail').click()
@@ -329,6 +435,7 @@ try:
             page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1, service_workers='block')
             auth_state = install_auth_fixture(page)
             console_errors = []
+            page.on('requestfailed', lambda request: print(f'Request failed: {request.url} ({request.failure})', flush=True))
             page.on(
                 'console',
                 lambda message, errors=console_errors: errors.append(message.text)
@@ -343,7 +450,7 @@ try:
                 wait_for_dashboard(page)
                 assert_manager_geometry(page)
                 screenshot(page, f'{label}-dashboard')
-                for route in ['home','more','account','wulftec']:
+                for route in ['home','more','account','wulftec','lines','documentation','maintenance&asset=L2-CC-001','dependencies']:
                     open_page(page, route)
                     if route == 'wulftec':
                         page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
@@ -418,6 +525,7 @@ try:
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)
+                    exercise_production_records(page, label)
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:

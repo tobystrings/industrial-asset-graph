@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useFacility, useFacilityEditor } from '../facility';
-import { exportPrivateRecovery, restorePrivateRecovery, type ImportConflict } from '../facility/additivePackage';
+import { exportPrivateRecovery, restorePrivateRecovery, verifyPrivateRecovery, type ImportConflict } from '../facility/additivePackage';
 
 function download(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob); const anchor = document.createElement('a');
@@ -21,7 +21,9 @@ export default function PrivateAssetImport() {
       const file = event.target.files?.[0]; if (!file) return;
       setBusy(true); setMessage('Checking and importing private package…');
       try {
-        download(await exportPrivateRecovery(facility.facility.id), `${facility.facility.id}-before-private-import-${Date.now()}.zip`);
+        const backup = await exportPrivateRecovery(facility.facility.id);
+        await verifyPrivateRecovery(backup, facility.facility.id);
+        download(backup, `${facility.facility.id}-before-private-import-${Date.now()}.zip`);
         const result = await editor.importPrivateBundle(file);
         setConflicts(result.conflicts);
         localStorage.setItem(conflictKey, JSON.stringify(result.conflicts));

@@ -1,5 +1,7 @@
 import DeviceIntel from '../DeviceIntel';
+import { PageLink } from '../navigation/AppShell';
 import LocalDocumentPreview from './LocalDocumentPreview';
+import MachineRegisterView from './MachineRegisterView';
 import PlcRackView from '../PlcRackView';
 import WalkdownForm from '../WalkdownForm';
 import { activeFacilityPackage } from '../facility';
@@ -38,7 +40,7 @@ function StatusI({ status }: { status: string }) {
   return <i className={markerClass(status as VerificationState)} aria-hidden="true" />;
 }
 
-function DocumentBody({ documentId, onClose }: { documentId: string; onClose: () => void }) {
+function DocumentBody({ documentId, onClose, onDocument }: { documentId: string; onClose: () => void; onDocument: (id: string) => void }) {
   const record = documents.find((item) => item.id === documentId);
   if (!record) return null;
   const source = documentSource(record.path) ?? `# ${record.title}\n\nDocument file is not in this build.`;
@@ -48,7 +50,7 @@ function DocumentBody({ documentId, onClose }: { documentId: string; onClose: ()
       <p className="panel-title">{record.category}</p>
       <h3>{record.title}</h3>
       <p>Status: <strong>{stateLabel[record.state]}</strong> · <span className={markerClass(record.verificationStatus)} /> {stateLabel[record.verificationStatus]}</p>
-      {record.path.startsWith('indexeddb://attachment/')
+      {record.register ? <MachineRegisterView key={record.id} document={record} onDocument={onDocument}/> : record.path.startsWith('indexeddb://attachment/')
         ? <LocalDocumentPreview key={record.path} attachmentId={record.path.slice('indexeddb://attachment/'.length)}/>
         : <div className="md-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(source) }} />}
     </section>
@@ -139,6 +141,7 @@ export default function SelectedAssetPanel({
   return (
     <aside className="asset-panel panel">
       <div className="asset-banner"><div><p>Selected asset</p><h2>{asset.id}</h2><span>{asset.name}</span></div><span className="verification-badge"><StatusI status={asset.verificationStatus} /> {stateLabel[asset.verificationStatus]}</span></div>
+      <PageLink page="maintenance" details={{asset:asset.id}} className="page-primary">Line membership, dependencies & service history →</PageLink>
       <div className="asset-actions">
         {isFeaturedCabinet && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
         {isFeaturedCabinet && <button className="packet-btn" type="button" onClick={onFocusCabinet}>{focusCabinet ? 'Board' : 'At panel'}</button>}
@@ -161,7 +164,8 @@ export default function SelectedAssetPanel({
       )}
       {tab === 'intel' && <><button className="ghost-trace" type="button" onClick={onTrace}>Trace path</button>{isFeaturedCabinet && <PlcRackView />}{asset.componentIds.some((id) => id.includes('VFD') || id.includes('SD')) && <DeviceIntel deviceOrComponentId={focusDevice ?? asset.componentIds.find((id) => id.includes('VFD')) ?? asset.id} onSelectDrive={(_, cabinetDeviceId) => { writeDeviceQuery(cabinetDeviceId); onOpenCabinet(); }} />}</>}
       {tab === 'record' && <>{serialSourcesDisagree(asset.id) && <section className="serial-dispute" data-testid="serial-dispute"><p className="panel-title">Conflicting identifiers</p>{serialSourcesFor(asset.id).map((source) => <p key={source.id}><b>{source.label}</b> · {source.value} · {source.verificationStatus}</p>)}<small>Both sources are DISPUTED. The graph does not pick a winner.</small></section>}<dl className="identity-grid"><FactRow label="Location" value={`${areas.find((item) => item.id === asset.areaId)?.name} / ${asset.line}`} status={isFeaturedCabinet ? 'INFERRED' : asset.verificationStatus} note={isFeaturedCabinet ? 'Area association is provisional.' : undefined} /><FactRow label="Asset type" value={asset.type} status="VERIFIED" /><FactRow label="Manufacturer" value={asset.manufacturer.value} status={asset.manufacturer.verificationStatus} note={asset.manufacturer.note} /><FactRow label="Model" value={asset.model.value} status={asset.model.verificationStatus} note={asset.model.note} /><FactRow label="Serial" value={asset.serialNumber.value} status={asset.serialNumber.verificationStatus} note={asset.serialNumber.note} />{asset.facts.map((item) => <FactRow key={item.label} label={item.label} value={item.value.value} status={item.value.verificationStatus} note={item.value.note} unit={item.value.unit} />)}</dl><div className="progress-header"><span>Documentation progress</span><b>{documentationPercent(asset.id)}%</b></div><progress value={documentationPercent(asset.id)} max="100" />{parts.length > 0 && <section className="visible-parts" data-testid="visible-parts"><p className="panel-title">Visible on drawing</p><ul>{parts.map((part) => <li key={part.id}>{part.label} · {part.id}</li>)}</ul></section>}</>}
-      {tab === 'docs' && (active ? <DocumentBody documentId={active.id} onClose={() => onDocument(null)} /> : <div className="document-grid">{assetDocs.map((item) => <button key={item.id} onClick={() => onDocument(item.id)}><b>{item.category}</b><small>{stateLabel[item.state]}</small></button>)}</div>)}
+      {(tab === 'record' || tab === 'intel') && assetDocs.some(d => d.register) && <section><h3>Machine knowledge</h3><p>Equipment, historical settings, wiring, service and unresolved evidence.</p><div className="document-grid">{assetDocs.filter(d => d.register).map(d => <button key={d.id} onClick={() => onDocument(d.id)}>{d.title} · {d.register!.entries.length}</button>)}</div>{active?.register && <MachineRegisterView key={active.id} document={active} onDocument={onDocument}/>}</section>}
+      {tab === 'docs' && (active ? <DocumentBody documentId={active.id} onClose={() => onDocument(null)} onDocument={onDocument} /> : <div className="document-grid">{assetDocs.map((item) => <button key={item.id} onClick={() => onDocument(item.id)}><b>{item.title}</b><small>{item.category} · {stateLabel[item.state]}</small></button>)}</div>)}
     </aside>
   );
 }
