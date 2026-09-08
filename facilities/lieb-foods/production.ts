@@ -15,8 +15,8 @@ export function liebProduction(): ProductionConfig {
       'PLC', 'HMI', 'I/O', 'Network', 'Control cabinet', 'VFD', 'Motor', 'Sensor', 'Valve', 'Safety device',
     ],
     survey: [
-      { id: 'survey-wulftec', category: 'Stretch wrapper', action: 'Reconcile existing Wulftec private package and confirm line membership', lineId: '', state: 'OPEN', notes: 'Canonical private-package asset LIEB-WULFTEC-A6882, WCRT-200. Source reports Line 4 but explicitly leaves assignment unconfirmed. Reuse this ID; do not create a duplicate.' },
-      { id: 'survey-kosme', category: 'Labeler', action: 'Locate Kosme labeler documentation and reconcile its existing asset ID', lineId: '', state: 'OPEN', notes: 'Owner reports existing documentation; not located in this checkout. Request the existing package or document location and reconcile its ID before adding an asset. Line assignment not established.' },
+      { id: 'survey-wulftec', category: 'Stretch wrapper', action: 'Confirm Wulftec floor location and production-line membership', lineId: '', state: 'RECORDED', notes: 'Canonical asset LIEB-WULFTEC-A6882 and its master evidence packet are deployed. Source reports Line 4, but assignment remains unconfirmed.' },
+      { id: 'survey-kosme', category: 'Labeler', action: 'Confirm Kosme floor location and production-line membership', lineId: '', state: 'RECORDED', notes: 'Canonical asset LIEB-KOSME-TOPIIAD-L05358, OEM evidence, CR30 procedures, CR22 dossier, and photo archive are deployed. Line assignment remains unconfirmed.' },
     ],
   };
 }

@@ -41,7 +41,7 @@ describe('floor-pass helpers', () => {
   it('names apply as a local overlay and keeps coverage honest', () => {
     expect(applyConfirmText({ field: 'dest', targetId: 'L2-CC-VFD-001' }).toLowerCase()).toContain('dest-unknown');
     expect(applyConfirmText({ field: 'dest', targetId: 'L2-CC-VFD-001' }).toLowerCase()).toContain('not written to the graph');
-    expect(coverageSubtitle()).toBe(`${documentedAreaCount()} of ${areas.length} areas has assets`);
+    expect(coverageSubtitle()).toBe(`${documentedAreaCount()} of ${areas.length} areas have assets`);
     expect(queueCountLabel(null)).toBe(`${graphFieldItemCount(null)} in the graph · ${openFieldItemCount(null)} open on this phone`);
     expect(destUnknownOpenCount()).toBe(line2DriveInstances().filter((item) => !item.destId).length);
     expect(intelFocusTitle('vfd-01')).toContain('dest-unknown');
@@ -57,6 +57,6 @@ describe('floor-pass helpers', () => {
     );
     expect(fromRects.scale).toBe(2);
     expect(fromRects.x).toBe(400 / 2 - 210 * 2);
-    expect(machines.length).toBe(2);
+    expect(machines.length).toBe(4);
   });
 });

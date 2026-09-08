@@ -19,7 +19,7 @@ describe('production documentation', () => {
     const pkg = structuredClone(buildLiebFoodsPackage());
     expect(pkg.facility.production!.lines.map(l => l.name)).toEqual(['Line 1','Line 2','Line 4']);
     expect(pkg.facility.production!.lines.map(l => l.importance)).toEqual([1,2,2]);
-    expect(pkg.assets.map(a => a.id)).toEqual(['FG-L4-MTN-001','L2-CC-001']);
+    expect(pkg.assets.map(a => a.id)).toEqual(['FG-L4-MTN-001','L2-CC-001','LIEB-WULFTEC-A6882','LIEB-KOSME-TOPIIAD-L05358']);
     expect(memberships(pkg,pkg.assets[1])[0].verificationStatus).toBe('FIELD_VERIFY');
     expect(pkg.facility.production!.survey).toHaveLength(2);
     expect(demoFacilityPackage.facility.production).toBeUndefined();

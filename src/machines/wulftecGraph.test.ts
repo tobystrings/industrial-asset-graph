@@ -13,7 +13,8 @@ function fixture() {
 describe('Wulftec graph associations', () => {
   it('uses existing records, retains uncertainty, and does not mutate the graph', () => {
     const { plant, asset, component } = fixture(); const before = JSON.stringify(plant);
-    expect(modelAsset(plant, null)?.id).toBe(asset.id);
+    expect(modelAsset(plant, null)).toBeUndefined();
+    expect(modelAsset(plant, asset.id)?.id).toBe(asset.id);
     expect(linkedComponents(plant, asset, 'carriage')).toEqual([component]);
     expect(linkedComponents(plant, asset, 'rollers')).toEqual([component]);
     expect(componentAssembly(asset, component)).toBe('carriage');

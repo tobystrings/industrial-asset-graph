@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && npm run typecheck:server && vite build && node scripts/export-wulftec-viewer.mjs dist/wulftec/index.html",
+    "build": "node scripts/generate-evidence-index.mjs && tsc -b && npm run typecheck:server && vite build && node scripts/export-wulftec-viewer.mjs dist/wulftec/index.html",
     "typecheck:server": "tsc -p tsconfig.server.json",
     "backend:dev": "tsx watch server/api.ts",
     "backend:start": "tsx server/api.ts",
