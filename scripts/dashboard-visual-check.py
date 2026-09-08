@@ -343,12 +343,38 @@ try:
                 wait_for_dashboard(page)
                 assert_manager_geometry(page)
                 screenshot(page, f'{label}-dashboard')
-                for route in ['home','more','account']:
+                for route in ['home','more','account','wulftec']:
                     open_page(page, route)
+                    if route == 'wulftec':
+                        page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
                     assert_manager_geometry(page)
                     screenshot(page, f'{label}-page-{route}')
 
                 if label in REPRESENTATIVE_STATES:
+                    open_page(page, 'wulftec')
+                    canvas = page.locator('.wulftec-canvas canvas')
+                    page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
+                    before = canvas.screenshot()
+                    canvas.focus()
+                    page.keyboard.press('ArrowRight')
+                    page.wait_for_timeout(250)
+                    assert before != canvas.screenshot(), 'Orbit control did not change rendered model'
+                    page.get_by_role('button', name='Auto-rotate', exact=True).click()
+                    page.get_by_role('button', name='Pause rotation', exact=True).click()
+                    page.get_by_role('button', name='Explode', exact=True).click()
+                    assert page.locator('#explosion').input_value() == '100'
+                    screenshot(page, f'{label}-wulftec-exploded')
+                    page.get_by_label('View', exact=True).select_option('carriage')
+                    page.get_by_label('Inspect assembly').select_option('rollers')
+                    page.wait_for_timeout(300)
+                    assert_manager_geometry(page)
+                    screenshot(page, f'{label}-wulftec-carriage')
+                    with page.expect_download() as download_info:
+                        page.get_by_role('button', name='Download current view (.glb)').click()
+                    exported = download_info.value.path()
+                    assert Path(exported).read_bytes()[:4] == b'glTF', 'Export is not a binary glTF model'
+                    page.get_by_role('button', name='Assemble', exact=True).click()
+                    assert page.locator('#explosion').input_value() == '0'
                     page.goto(f'{BASE}?area=area-building-c&map=2d&tab=overview', wait_until='networkidle')
                     wait_for_dashboard(page)
                     layer_button = page.locator('.map-layer-control > button')
