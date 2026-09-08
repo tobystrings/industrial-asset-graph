@@ -73,6 +73,18 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
   for (const document of pkg.documents!) {
     if (!assetIds.has(document.assetId)) throw new Error(`Document ${document.id} references missing asset ${document.assetId}.`);
     for (const evidenceId of document.evidenceIds) if (!evidenceIds.has(evidenceId)) throw new Error(`Document ${document.id} references missing evidence ${evidenceId}.`);
+    if (document.register) {
+      if (!document.register.kind || !Array.isArray(document.register.entries)) throw new Error('Invalid machine register.');
+      if (!document.evidenceIds.length || document.evidenceIds.some(id => pkg.evidence!.find(e => e.id === id)?.access === 'PUBLIC_APP')) throw new Error('Machine registers require controlled source evidence.');
+      const entryIds = new Set<string>();
+      for (const entry of document.register.entries) {
+        if (!entry.id || entryIds.has(entry.id) || !entry.label || !verificationStates.has(entry.verificationStatus)) throw new Error('Invalid or duplicate register entry.');
+        entryIds.add(entry.id);
+        if (!entry.values || Array.isArray(entry.values) || typeof entry.values !== 'object' || entry.provenance?.review !== 'INHERITED') throw new Error('Register source values and provenance are required.');
+        if (!Array.isArray(entry.entityIds) || !entry.entityIds.length || entry.entityIds.some(id => id !== document.assetId && !pkg.components!.some(c => c.id === id && c.parentId === document.assetId))) throw new Error('Register entry has an unrelated equipment reference.');
+        if (!Array.isArray(entry.evidenceIds) || entry.evidenceIds.some(id => !evidenceIds.has(id))) throw new Error('Register entry references missing evidence.');
+      }
+    }
   }
   for (const relationship of pkg.relationships!) for (const evidenceId of relationship.evidenceIds) if (!evidenceIds.has(evidenceId)) throw new Error(`Relationship ${relationship.id} references missing evidence ${evidenceId}.`);
   for (const marker of (pkg.mapConfig?.markers ?? []) as Array<{ id?: string; assetId?: string; areaId?: string }>) {

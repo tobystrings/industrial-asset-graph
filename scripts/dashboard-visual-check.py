@@ -231,6 +231,8 @@ def exercise_private_asset_package(page, label: str) -> None:
         asset = dict(plant['assets'][0], id='visual-private-machine', name='Private evidence test machine', componentIds=['visual-private-component'])
         svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#123f54"/><text x="60" y="300" fill="white" font-size="40">Synthetic evidence fixture</text></svg>'
         patch = dict(facilityId=plant['facility']['id'], entityVersions={}, areas=[], assets=[asset], components=[dict(id='visual-private-component',label='Private test component',type='VFD',parentId=asset['id'],verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])], evidence=[dict(id='visual-private-evidence',type='PHOTO',title='Synthetic local evidence',access='LOCAL_ONLY',pathOrUrl='indexeddb://attachment/visual-private-file')], documents=[dict(id='visual-private-doc',assetId=asset['id'],category='Photos',title='Synthetic local evidence',path='indexeddb://attachment/visual-private-file',state='REVIEW',required=False,verificationStatus='FIELD_VERIFY',evidenceIds=['visual-private-evidence'])],relationships=[],revisions=[],assetSerialSources=[])
+        register = dict(patch['documents'][0], id='visual-private-register', title='Wiring register', register=dict(kind='wiring-all', entries=[dict(id='visual-wire-6',label='Wire 6 · terminal 04',entityIds=[asset['id']],evidenceIds=['visual-private-evidence'],verificationStatus='FIELD_VERIFY',values=dict(wireId='6',sourceTerminal='04',destinationEquipment=None,state='PROPOSED'),provenance=dict(filename='synthetic.json',section='5',review='INHERITED',sourceId=None,locator=None))]))
+        patch['documents'].append(register)
         manifest = dict(format='industrial-asset-graph-private',version=1,patch=patch,observations=[],attachments=[dict(id='visual-private-file',assetId=asset['id'],name='fixture.svg',mimeType='image/svg+xml',size=len(svg),category='PHOTO',verificationStatus='FIELD_VERIFY',access='LOCAL_ONLY',createdAt='2026-09-07T00:00:00Z',filePath='files/fixture.svg',sha256=hashlib.sha256(svg).hexdigest())])
         stream = io.BytesIO()
         with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_STORED) as z:
@@ -281,6 +283,42 @@ def exercise_private_asset_package(page, label: str) -> None:
         if local.locator('img').count():
             page.wait_for_function("() => [...document.querySelectorAll('.local-document-preview img')].every(img => img.complete && img.naturalWidth > 0)")
         screenshot(page,f'{label}-private-document')
+        register_doc = next((d for d in manifest['patch']['documents'] if d.get('register')), None)
+        if register_doc:
+            page.goto(f'{BASE}?page=documents&doc={register_doc["id"]}', wait_until='networkidle')
+            register_view = page.locator('.machine-register')
+            register_view.get_by_role('button', name='Add review note', exact=True).first.click()
+            register_view.get_by_label('Review note', exact=True).fill('Disposable audit note: retain source uncertainty.')
+            register_view.get_by_role('button', name='Save review note', exact=True).click()
+            register_view.get_by_text('Review note saved locally. Source values retained.', exact=True).wait_for(state='visible')
+            page.reload(wait_until='networkidle')
+            page.locator('.machine-register').get_by_text('Review note: Disposable audit note:', exact=False).wait_for(state='visible')
+            page.locator('.machine-register').wait_for(state='visible')
+            page.locator('.machine-register summary').first.click()
+            assert_manager_geometry(page)
+            screenshot(page, f'{label}-private-register')
+            for native_doc in (d for d in manifest['patch']['documents'] if d.get('register')):
+                page.goto(f'{BASE}?page=documents&doc={native_doc["id"]}', wait_until='networkidle')
+                register_view = page.locator('.machine-register')
+                register_view.wait_for(state='visible')
+                count = len(native_doc['register']['entries'])
+                assert f'{count} of {count} entries' in register_view.inner_text(), 'Native register count is not visible'
+                if count:
+                    contrast = register_view.locator('article p').first.evaluate('''element => {
+                      const luminance = color => { const rgb = color.match(/[\\d.]+/g).slice(0,3).map(Number).map(c => { c /= 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; }); return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]; };
+                      const foreground = luminance(getComputedStyle(element).color);
+                      const background = luminance(getComputedStyle(element.closest('article')).backgroundColor);
+                      return (Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
+                    }''')
+                    assert contrast >= 4.5, f'Register text contrast is too low: {contrast}'
+                assert_manager_geometry(page)
+                if native_doc['register']['kind'] in ['parameters-all', 'wiring-all', 'missing-sources']:
+                    screenshot(page, f'{label}-private-{native_doc["register"]["kind"]}')
+                if count:
+                    query = native_doc['register']['entries'][0]['label']
+                    register_view.get_by_label('Search register', exact=True).fill(query)
+                    assert register_view.locator('article').count() >= 1, 'Register search lost a known row'
+            page.goto(f'{BASE}?page=documents&doc={register_doc["id"]}', wait_until='networkidle')
         assert_manager_geometry(page)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Private workspace overflows horizontally'
         page.get_by_role('button',name='Close documentation detail').click()
@@ -329,6 +367,7 @@ try:
             page = browser.new_page(viewport={'width': width, 'height': height}, device_scale_factor=1, service_workers='block')
             auth_state = install_auth_fixture(page)
             console_errors = []
+            page.on('requestfailed', lambda request: print(f'Request failed: {request.url} ({request.failure})', flush=True))
             page.on(
                 'console',
                 lambda message, errors=console_errors: errors.append(message.text)

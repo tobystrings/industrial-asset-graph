@@ -52,6 +52,17 @@ describe('private additive asset packages', () => {
     expect(await loadPlant(plant.facility.id)).toEqual(plant);
     expect(await listAttachments(undefined, plant.facility.id)).toEqual([]);
   });
+  it('rejects absent files, malformed manifests and foreign attachment ownership without partial writes', async () => {
+    const { plant, patch } = fixture(); await resetPlant(plant);
+    const files = await readStoredZip(await bundle(patch));
+    const manifest = await files.get('private-manifest.json')!.text();
+    await expect(importPrivateAssetBundle(await createStoredZip([{ name: 'private-manifest.json', data: manifest }]), plant.facility.id)).rejects.toThrow(/integrity/);
+    await expect(importPrivateAssetBundle(await createStoredZip([{ name: 'private-manifest.json', data: '{bad' }]), plant.facility.id)).rejects.toThrow();
+    const bad = JSON.parse(manifest); bad.attachments[0].assetId = plant.assets[0].id;
+    await expect(importPrivateAssetBundle(await createStoredZip([{ name: 'private-manifest.json', data: JSON.stringify(bad) }, { name: 'files/photo.txt', data: files.get('files/photo.txt')! }]), plant.facility.id)).rejects.toThrow(/another asset/);
+    expect(await loadPlant(plant.facility.id)).toEqual(plant);
+    expect(await listAttachments(undefined, plant.facility.id)).toEqual([]);
+  });
   it('restores exact pre-insertion state and rejects a foreign recovery without writes', async () => {
     const { plant, patch } = fixture(); await resetPlant(plant);
     const pending: SyncMutation = { mutationId: 'preserved-draft', entityId: plant.assets[0].id, entityType: 'asset', actorId: 'technician', clientId: 'local', baseVersion: 1, operation: 'UPSERT', createdAt: '2026-09-07T00:00:00Z', reviewState: 'LOCAL_DRAFT', value: { name: 'Unsubmitted correction' } };
