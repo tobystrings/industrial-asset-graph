@@ -1,4 +1,5 @@
 export const pages = {
+  history: ['Historical evidence', 'Review recovered sources, uncertainties and field tasks.'],
   lines: ['Production lines', 'Document equipment, flow and shared systems.'],
   documentation: ['Documentation queue', 'Prioritize field knowledge and survey missing facts.'],
   maintenance: ['Equipment field sheet', 'Line membership, dependencies and service history.'],

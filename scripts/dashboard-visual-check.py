@@ -86,6 +86,62 @@ def close_editor(page) -> None:
     open_page(page, 'map')
 
 
+def exercise_historical_evidence(page, label):
+    open_page(page, 'history')
+    private_path = os.environ.get('IAG_HISTORY_BUNDLE')
+    if private_path:
+        payload = Path(private_path).read_bytes()
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            manifest = json.loads(archive.read('history.json'))
+    else:
+        source = b'Synthetic historical source, not plant evidence.'
+        manifest = {'format':'industrial-asset-graph-history','version':1,'id':'synthetic-history','facilityId':'facility-j-lieb','title':'Synthetic historical evidence','access':'LOCAL_ONLY',
+            'subjects':[{'id':'subject','name':'Synthetic candidate','candidateAssetId':'L2-CC-001','priority':1,'lineContext':'Unknown; field verification required'}],
+            'files':[{'path':'source.txt','size':len(source),'sha256':hashlib.sha256(source).hexdigest(),'mimeType':'text/plain','incomplete':False}],
+            'sources':[{'id':'source','name':'Synthetic source','paths':['source.txt'],'coverage':'Synthetic fixture only'}],
+            'assertions':[{'id':'SYNTHETIC-01','subject':'subject','kind':'HISTORICAL_SNAPSHOT','text':'Historical display with unknown observation time','values':{'raw_value':'00001'},'verification':'FIELD_VERIFY','citations':[{'sourceId':'source','locator':'row 1'}]}],
+            'tasks':[{'id':'VERIFY-01','subject':'subject','priority':1,'action':'Verify synthetic observation','assertionIds':['SYNTHETIC-01']}]}
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_STORED) as archive:
+            archive.writestr('history.json', json.dumps(manifest))
+            archive.writestr('source.txt', source)
+        payload = buffer.getvalue()
+    page.get_by_label('Prepared evidence bundle').set_input_files({'name':'history.iag','mimeType':'application/zip','buffer':payload})
+    page.get_by_test_id('history-preview').wait_for()
+    assert_manager_geometry(page)
+    assert page.locator('.history-card').first.evaluate('e => getComputedStyle(e).color') == 'rgb(23, 44, 59)', 'Historical source text lost contrast'
+    screenshot(page, f'{label}-history-preview')
+    with page.expect_download():
+        page.get_by_role('button', name='Stage local evidence', exact=True).click()
+    page.get_by_role('status').filter(has_text='Staged on this device').wait_for(timeout=60000)
+    page.reload(wait_until='networkidle')
+    page.get_by_role('heading',name=manifest['title'],exact=True).wait_for()
+    assertion_id = manifest['assertions'][0]['id']
+    page.get_by_label('Search assertions').fill(assertion_id)
+    detail = page.locator('.history-assertions details').filter(has=page.locator('summary',has_text=assertion_id)).first
+    detail.locator('summary').click()
+    detail.get_by_label('Review state').select_option('REVIEWED')
+    detail.get_by_label('Review rationale').fill('Synthetic browser review only; no field verification or equipment change.')
+    detail.get_by_role('button',name='Save historical review').click()
+    page.get_by_role('status').filter(has_text='Review saved').wait_for()
+    assert_manager_geometry(page)
+    detail.scroll_into_view_if_needed()
+    screenshot(page, f'{label}-history-review')
+    page.get_by_label('Prepared evidence bundle').set_input_files({'name':'history.iag','mimeType':'application/zip','buffer':payload})
+    page.get_by_text('Already staged. Re-import will preserve all reviews.',exact=True).wait_for()
+    with page.expect_download():
+        page.get_by_role('button',name='Stage local evidence',exact=True).click()
+    page.get_by_role('status').filter(has_text='Already staged;').wait_for(timeout=60000)
+    page.reload(wait_until='networkidle')
+    page.get_by_text('1 review events',exact=False).wait_for()
+    page.get_by_text(f'Source coverage ({len(manifest["sources"])})',exact=True).click()
+    source_name = manifest['sources'][0]['paths'][0].split('/')[-1]
+    with page.expect_download() as source_download:
+        page.get_by_role('button',name=source_name,exact=True).first.click()
+    metadata = next(f for f in manifest['files'] if f['path'] == manifest['sources'][0]['paths'][0])
+    assert hashlib.sha256(Path(source_download.value.path()).read_bytes()).hexdigest() == metadata['sha256']
+
+
 def exercise_production_records(page, label):
     open_page(page, 'maintenance&asset=L2-CC-001')
     form = page.locator('.production-form').last
@@ -223,7 +279,7 @@ def exercise_manager_states(page, label: str) -> None:
     page.evaluate("() => localStorage.removeItem('iag-change-control-user')")
 
     page.evaluate('''() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
+      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb');
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         const db = request.result;
@@ -246,7 +302,7 @@ def exercise_manager_states(page, label: str) -> None:
     screenshot(page, f'{label}-sync-conflict')
     close_editor(page)
     page.evaluate('''() => new Promise((resolve, reject) => {
-      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
+      const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb');
       request.onerror = () => reject(request.error);
       request.onsuccess = () => { const db = request.result; const tx = db.transaction('mutation-outbox', 'readwrite'); tx.objectStore('mutation-outbox').delete('visual-test-conflict'); tx.oncomplete = () => { db.close(); resolve(); }; tx.onerror = () => reject(tx.error); };
     })''')
@@ -292,7 +348,7 @@ def exercise_private_asset_package(page, label: str) -> None:
         archive = Path(private_path).read_bytes()
     else:
         plant = page.evaluate('''() => new Promise((resolve, reject) => {
-          const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb', 2);
+          const request = indexedDB.open('industrial-asset-graph-runtime--facility-j-lieb');
           request.onsuccess = () => { const db = request.result; const read = db.transaction('plant').objectStore('plant').get('active'); read.onsuccess = () => { db.close(); resolve(read.result); }; read.onerror = () => reject(read.error); };
           request.onerror = () => reject(request.error);
         })''')
@@ -559,6 +615,7 @@ try:
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)
                     exercise_production_records(page, label)
+                    exercise_historical_evidence(page, label)
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:

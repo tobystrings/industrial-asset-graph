@@ -4,7 +4,7 @@ import { loadFacilityPackage } from './schema';
 import type { SyncMutation } from './syncContract';
 
 const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const PLANT_STORE = 'plant';
 const ATTACHMENT_STORE = 'attachments';
 const OBSERVATION_STORE = 'observations';
@@ -88,6 +88,7 @@ export function openPlantDb(facilityId?: string): Promise<IDBDatabase> {
     const request = indexedDB.open(facilityDatabaseName(facilityId), DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
+      if (!db.objectStoreNames.contains('historical-evidence')) db.createObjectStore('historical-evidence', { keyPath: 'id' });
       if (!db.objectStoreNames.contains(PLANT_STORE)) db.createObjectStore(PLANT_STORE);
       if (!db.objectStoreNames.contains(ATTACHMENT_STORE)) {
         const store = db.createObjectStore(ATTACHMENT_STORE, { keyPath: 'id' });
@@ -142,7 +143,8 @@ export async function savePlant(pkg: FacilityPackage, facilityId = pkg.facility.
 
 export async function resetPlant(seed: FacilityPackage): Promise<void> {
   const db = await openPlantDb(seed.facility.id);
-  const tx = db.transaction([PLANT_STORE, ATTACHMENT_STORE, OBSERVATION_STORE, MUTATION_STORE], 'readwrite');
+  const tx = db.transaction([PLANT_STORE, ATTACHMENT_STORE, OBSERVATION_STORE, MUTATION_STORE, 'historical-evidence'], 'readwrite');
+  tx.objectStore('historical-evidence').clear();
   tx.objectStore(PLANT_STORE).put(structuredClone(seed), ACTIVE_KEY);
   tx.objectStore(ATTACHMENT_STORE).clear();
   tx.objectStore(OBSERVATION_STORE).clear();
@@ -152,6 +154,7 @@ export async function resetPlant(seed: FacilityPackage): Promise<void> {
 }
 
 export async function putAttachment(record: AttachmentRecord, facilityId?: string): Promise<void> {
+  if (record.id.startsWith('history-') || record.assetId.startsWith('history:')) throw new Error('Historical source attachments are immutable. Import a new historical batch for revisions.');
   const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
   tx.objectStore(ATTACHMENT_STORE).put(record);
@@ -160,6 +163,7 @@ export async function putAttachment(record: AttachmentRecord, facilityId?: strin
 }
 
 export async function deleteAttachment(id: string, facilityId?: string): Promise<void> {
+  if (id.startsWith('history-')) throw new Error('Historical source attachments are immutable.');
   const db = await openPlantDb(facilityId);
   const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
   tx.objectStore(ATTACHMENT_STORE).delete(id);
@@ -308,16 +312,20 @@ async function applyImportedPlant(
   facilityId: string,
 ): Promise<FacilityPackage> {
   if (incoming.facility.id !== facilityId) throw new Error(`Facility archive mismatch: expected ${facilityId}, received ${incoming.facility.id}`);
+  if (attachments.some(a => a.id.startsWith('history-') || a.assetId.startsWith('history:'))) throw new Error('Historical sources require the dedicated local evidence importer.');
   const current = await loadPlant(facilityId);
   const next = mergePlant(current, incoming, mode);
   await savePlant(next, facilityId);
   const db = await openPlantDb(facilityId);
   const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
   if (mode === 'replace') {
-    tx.objectStore(ATTACHMENT_STORE).clear();
+    // Portable archives exclude historical evidence; replacing canonical data must
+    // not discard the local ledger's immutable source files.
+    const cursor = tx.objectStore(ATTACHMENT_STORE).openCursor();
+    cursor.onsuccess = () => { const row = cursor.result; if (row) { if (!String(row.key).startsWith('history-')) row.delete(); row.continue(); } else { for (const attachment of attachments) tx.objectStore(ATTACHMENT_STORE).put(attachment); } };
     tx.objectStore(OBSERVATION_STORE).clear();
   }
-  for (const attachment of attachments) tx.objectStore(ATTACHMENT_STORE).put(attachment);
+  if (mode !== 'replace') for (const attachment of attachments) tx.objectStore(ATTACHMENT_STORE).put(attachment);
   for (const observation of observations) tx.objectStore(OBSERVATION_STORE).put(observation);
   await transactionDone(tx);
   db.close();
