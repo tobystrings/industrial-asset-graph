@@ -21,3 +21,7 @@ Use **Plant Manager → Plant Database → Add Private Asset Package** to insert
 The private handoff includes the populated dossier, source register, recovered originals, parameter snapshots, wire registers, conflicts and field-verification list. Its integration README explains recovery and remaining evidence limits. No private media is included by this builder in the frontend bundle.
 
 The responsive audit always covers a synthetic private equipment import. To test a real private bundle, set `IAG_PRIVATE_VISUAL_BUNDLE` to its ZIP path and `IAG_PRIVATE_VISUAL_OUTPUT` to a private screenshot directory, then run `npm run test:visual`.
+
+## Deployed Pages and private records
+
+Deploy the application code before using structured registers on Pages. A localhost import does not populate the deployed site: IndexedDB is scoped to the exact browser profile and origin. Sign in at the deployed Pages URL, then use More → Plant database → Add Private Asset Package to import the private ZIP there. Verify reload and repeat-import results at that URL. Signing in alone does not synchronize private records between devices. Never place the private ZIP, evidence files, or populated controlled registers in the public Pages artifact.

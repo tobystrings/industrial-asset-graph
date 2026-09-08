@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as T from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { assemblyInfo, createWulftec } from './wulftecModel';
 import './wulftec-viewer.css';
+import { publicGraphHref, readModelState } from './wulftecGraph';
 
-type Settings = { explosion: number; rotate: boolean; scope: string; selected: string; guards: boolean };
+export type Settings = { explosion: number; rotate: boolean; scope: string; selected: string; guards: boolean };
 type Actions = { fit: (direction?: string) => void; download: () => Promise<void> };
-export default function WulftecViewer() {
+export default function WulftecViewer({ initialState = readModelState(location.search), onStateChange, graphPanel }: { initialState?: Partial<Settings>; onStateChange?: (settings: Settings) => void; graphPanel?: ReactNode }) {
   const host = useRef<HTMLDivElement>(null);
   const actions = useRef<Actions | null>(null);
-  const [settings, setSettings] = useState<Settings>({ explosion: 0, rotate: false, scope: 'machine', selected: '', guards: true });
+  const [settings, setSettings] = useState<Settings>({ explosion: 0, rotate: false, scope: 'machine', selected: '', guards: true, ...initialState });
+  useEffect(() => { onStateChange?.(settings); }, [settings, onStateChange]);
   const live = useRef(settings); live.current = settings;
   const [error, setError] = useState('');
   const [exporting, setExporting] = useState(false);
@@ -128,6 +130,7 @@ export default function WulftecViewer() {
       <label className="wulftec-check"><input type="checkbox" checked={settings.guards} onChange={e => setSettings(s => ({ ...s, guards: e.target.checked }))}/> Show guarding</label>
       <label className="wulftec-parts">Inspect assembly<select aria-label="Inspect assembly" value={settings.selected} onChange={e => setSettings(s => ({ ...s, selected: e.target.value }))}><option value="">Select a part</option>{assemblyInfo.filter((_, i) => settings.scope === 'machine' || i >= 5).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label>
       <div className="wulftec-selection" aria-live="polite"><strong>{selected?.[1] ?? 'Explore the assemblies'}</strong><p>{selected?.[2] ?? 'Select from the list or click the model. Use the carriage view for a closer look at the rollers, drive, gate, and cover.'}</p></div>
+      {graphPanel ?? <section className="wulftec-graph-cta"><h3>Industrial Asset Graph</h3><p>Open the connected equipment record, component evidence, documents, and service history in your facility.</p><a href={publicGraphHref(location.search, settings)}>Open in Asset Graph →</a><p>Sign in to access your facility’s private records.</p></section>}
       <button disabled={exporting || !!error} onClick={async () => { setExporting(true); try { await actions.current?.download(); } catch { setError('Model export failed. Please try again.'); } finally { setExporting(false); } }}>{exporting ? 'Preparing model…' : 'Download current view (.glb)'}</button>
       <p className="wulftec-note">Illustrative geometry: unseen details and undimensioned parts are approximate. Exploded spacing is for viewing, not a disassembly sequence. GLB coordinates use inches.</p>
       <details><summary>Keyboard controls</summary><p>Focus the model, then use arrow keys to orbit, + / − to zoom, and 0 to fit.</p></details>

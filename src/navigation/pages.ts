@@ -11,6 +11,7 @@ export const pages = {
   documents: ['Documents', 'Manuals, drawings, and evidence in one library.'],
   cabinet: ['Control cabinet', 'Explore the drawing and select a device.'],
   wulftec: ['Wulftec 3D model', 'Rotate the WCRT-200 and explore its assemblies.'],
+  component: ['Component record', 'Documented identity, evidence, and connections.'],
   field: ['Field documentation', 'Capture what you see and keep its source.'],
   relationships: ['Troubleshooting', 'Follow documented connections.'],
   more: ['More', 'Capture, review, and manage your workspace.'],

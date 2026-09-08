@@ -6,6 +6,7 @@ import { markerClass } from '../lib/statusMark';
 import type { DocumentationState } from '../types/facility';
 import LocalDocumentPreview from './LocalDocumentPreview';
 import MachineRegisterView from './MachineRegisterView';
+import WulftecRecordLink from '../machines/WulftecRecordLink';
 
 const stateLabel: Record<string, string> = {
   COMPLETE: 'Complete', REVIEW: 'Review', IN_PROGRESS: 'In progress', DRAFT: 'Draft', NOT_STARTED: 'Not started',
@@ -97,6 +98,7 @@ function DocumentBody({ documentId, onClose, onDocument }: { documentId: string;
       <button className="document-close" type="button" onClick={onClose} aria-label="Close documentation detail">×</button>
       <p className="panel-title">{record.category}</p>
       <h3>{record.title}</h3>
+      <WulftecRecordLink asset={machines.find(asset => asset.id === record.assetId)}>Return to 3D model</WulftecRecordLink>
       <p className="document-status-line">Status: <strong>{stateLabel[record.state]}</strong> · <span className={markerClass(record.verificationStatus)} /> {stateLabel[record.verificationStatus]}</p>
       {record.register ? <MachineRegisterView key={record.id} document={record} onDocument={onDocument}/> : record.path.startsWith('indexeddb://attachment/')
         ? <LocalDocumentPreview key={record.path} attachmentId={record.path.slice('indexeddb://attachment/'.length)}/>
