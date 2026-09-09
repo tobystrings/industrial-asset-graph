@@ -33,3 +33,9 @@ Working drafts are saved separately from canonical geometry and restored when th
 ## Validation
 
 Required release checks: unit tests, facility verification, publication verification, the permanent visual contract, production build, all seven responsive viewports, Map Studio browser scenarios, and the two-browser publication test. The live database was also tested transactionally for authorization, idempotence, optimistic conflicts, and facility isolation; test writes were rolled back.
+
+## Integrated Map Studio update
+
+The September 9 release also incorporates the existing symbol, source-cleanup, layer, equipment-placement, and text-preview editor. Tool groups and Text edits / Objects / Layers toggle closed, leaving the map full width. Cursor / Pan is the initial tool; selection is explicit before changing individual objects. Full screen and pop-out remain available. Text commands preview before Apply; connected AI is not claimed as configured.
+
+Validation after integration includes 213 passing unit tests (one existing skip), data and source hashes, cross-device area and attachment publication, revision deduplication, draft restoration, explicit conflict resolution, and map geometry/markup persistence. The seven-viewport visual audit remains mandatory before release.

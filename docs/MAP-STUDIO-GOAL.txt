@@ -1,0 +1,13 @@
+Build and deploy Map Studio in tobystrings/industrial-asset-graph.
+
+Goal: make the facility drawing editable through both direct manipulation and a plain-English text panel, while preserving existing equipment identities, documents, relationships, authentication, and saved field work.
+
+Create a dedicated, spacious studio within the existing app. Support full-screen editing, responsive tool panels, pan/zoom, snapping, layers with visibility and locking, object selection, properties, and undo/redo.
+
+Make areas, walls, labels, equipment placements, doors, stairs, and other facility symbols editable. Support adding, moving, resizing, rotating, duplicating, flipping, and deleting applicable objects. Include door variants, stair direction and step count, and reusable custom symbols. Provide a trace-and-replace workflow for symbols baked into the reference image; preserve an independently editable source mask so moved or deleted replacements do not leave ghost symbols. Do not pretend raster pixels are already vector objects.
+
+Add a text window that understands selected objects and named areas, previews proposed changes on the map, allows conversational refinement, and applies only after explicit user action. Ambiguous or unsupported requests must ask for clarification without changing the draft. Manual and text edits must share the same validated history. Clearly distinguish offline supported commands from connected AI; keep AI credentials on the server.
+
+Preserve canonical asset IDs and area assignments through edits, merge/split, undo/redo, save/reload, and archive transfer. Keep local versus shared saving truthful. Prevent stale previews or saves from overwriting newer work.
+
+Validate meaningful editing workflows, symbol replacement, text previews, persistence, and desktop/tablet/phone layouts. Pass the repository's required release checks without weakening them. Publish the verified changes to the existing GitHub Pages application and report any external-service blockers precisely.

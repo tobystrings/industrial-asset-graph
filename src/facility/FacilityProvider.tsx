@@ -68,7 +68,7 @@ export interface FacilityEditorApi {
   deleteRelationship(relationshipId: string): Promise<void>;
   saveMarker(marker: FacilityMapMarker): Promise<void>;
   deleteMarker(markerId: string): Promise<void>;
-  saveMapDraft(next: Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'>, summary: string[]): Promise<void>;
+  saveMapDraft(next: Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'> & { relationships?: FacilityPackage['relationships'] }, summary: string[]): Promise<void>;
   addAttachment(assetId: string, file: File, verificationStatus?: 'VERIFIED' | 'FIELD_VERIFY'): Promise<AttachmentRecord>;
   deleteAttachment(id: string): Promise<void>;
   attachments(assetId?: string): Promise<AttachmentRecord[]>;
@@ -134,7 +134,7 @@ export function applyReviewedChange(current: FacilityPackage, proposed: Facility
     const next = descriptor.operation === 'DELETE' ? markers.filter((item) => item.id !== entityId) : upsert(markers, ((proposed.mapConfig?.markers ?? []) as FacilityMapMarker[]).find((item) => item.id === entityId)!);
     return { ...current, mapConfig: { ...(current.mapConfig ?? {}), markers: next } };
   }
-  if (descriptor.entityType === 'map_config') return { ...current, areas: proposed.areas, assets: proposed.assets, mapConfig: proposed.mapConfig };
+  if (descriptor.entityType === 'map_config') return { ...current, areas: proposed.areas, assets: proposed.assets, relationships: proposed.relationships, mapConfig: proposed.mapConfig };
   if (descriptor.entityType === 'component') {
     const component = proposed.components.find(item => item.id === entityId);
     return { ...current, components: descriptor.operation === 'DELETE' ? current.components.filter(item => item.id !== entityId) : upsert(current.components, component!), assets: current.assets.map(asset => ({...asset, componentIds: [...asset.componentIds.filter(id => id !== entityId), ...(descriptor.operation !== 'DELETE' && component?.parentId === asset.id ? [entityId] : [])]})) };
@@ -200,10 +200,10 @@ export function FacilityProvider({
   }, [apiUrl, value]);
 
   const commit = useCallback(async (next: FacilityPackage) => {
+    await savePlant(next, next.facility.id, pkgRef.current.packageRevision);
     syncActiveFacilityPackage(next);
     pkgRef.current = next;
     setPkg(next);
-    await savePlant(next, next.facility.id);
   }, []);
 
   const savePending = useCallback((next: PendingChange[]) => {
@@ -373,10 +373,10 @@ export function FacilityProvider({
     },
     async saveMapDraft(next, summary) {
       if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required for structural map editing.');
-      const proposed = { ...pkgRef.current, areas: structuredClone(next.areas), assets: structuredClone(next.assets), mapConfig: structuredClone(next.mapConfig ?? {}) };
+      const proposed = { ...pkgRef.current, areas: structuredClone(next.areas), assets: structuredClone(next.assets), relationships: structuredClone(next.relationships ?? pkgRef.current.relationships), mapConfig: structuredClone(next.mapConfig ?? {}) };
       validateFacilityPackage(proposed);
       const entityId = `map-config:${pkgRef.current.facility.id}`;
-      await recordChange(proposed, entityId, summary.length ? `Map editor: ${summary.join('; ')}` : 'Map editor changes saved', { entityType: 'map_config', operation: 'UPSERT', value: { areas: proposed.areas, assets: proposed.assets, mapConfig: proposed.mapConfig } as unknown as Record<string, unknown> });
+      await recordChange(proposed, entityId, summary.length ? `Map editor: ${summary.join('; ')}` : 'Map editor changes saved', { entityType: 'map_config', operation: 'UPSERT', value: { areas: proposed.areas, assets: proposed.assets, relationships: proposed.relationships, mapConfig: proposed.mapConfig } as unknown as Record<string, unknown> });
       appendAudit(currentUser.name, 'Saved structural map changes', summary.join('; ') || 'Map draft committed');
     },
     async saveAsset(asset, markerPosition) {

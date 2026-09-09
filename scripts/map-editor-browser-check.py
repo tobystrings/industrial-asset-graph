@@ -74,6 +74,7 @@ try:
         tool(page, 'Wall / Line')
         drag_percent(page, '.map-editor-svg', (.251, .05), (.251, .25))
         wall = page.locator('.map-editor-walls polyline').last
+        tool(page, 'Select')
         wall.click(force=True)
         tool(page, 'Delete')
         assert page.locator('.map-editor-walls polyline').count() == 0
@@ -96,6 +97,7 @@ try:
         page.locator('.map-editor-selection-actions').get_by_role('button', name='→').click()
         page.get_by_role('button', name='Undo', exact=True).click()
         page.get_by_role('button', name='Redo', exact=True).click()
+        page.once('dialog', lambda dialog: dialog.accept())
         page.get_by_role('button', name='Cancel / Exit', exact=True).click()
         assert page.locator('.map-editor-shell').count() == 0
         page.reload(wait_until='networkidle')
@@ -110,6 +112,7 @@ try:
         page.locator('.map-editor-svg').scroll_into_view_if_needed()
         box = page.locator('.map-editor-svg').bounding_box(); assert box
         page.mouse.click(box['x'] + box['width'] * .65, box['y'] + box['height'] * .35)
+        tool(page, 'Select')
         page.get_by_text('Synthetic markup only', exact=True).click()
         tool(page, 'Freehand Eraser')
         assert page.get_by_text('Synthetic markup only', exact=True).count() == 0

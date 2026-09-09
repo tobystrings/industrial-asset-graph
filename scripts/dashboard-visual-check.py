@@ -10,6 +10,7 @@ import socket
 import urllib.request
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
+from map_studio_visual import exercise_map_studio, studio_pane
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
 
 output = Path('artifacts')
@@ -115,6 +116,7 @@ def exercise_area_rename(page, label):
     page.locator('.map-floating-controls').get_by_role('button', name='Fit', exact=True).click()
     page.get_by_role('button', name='Select', exact=True).click()
     page.locator('[aria-label="Edit area Warehouse E"]').click(force=True)
+    studio_pane(page, 'Drawing tools')
     props = page.get_by_role('complementary', name='Area Properties')
     props.get_by_label('Area name', exact=True).fill('Renamed receiving room')
     assert props.get_by_label('Display label', exact=True).input_value() == 'Renamed receiving room'
@@ -316,6 +318,7 @@ def exercise_manager_states(page, label: str) -> None:
 
     page.get_by_role('button', name='Edit map', exact=True).click()
     # The authenticated network fixture supplies the admin role. Local PINs never grant access.
+    studio_pane(page, 'Drawing tools')
     page.locator('.map-editor-shell').wait_for(state='visible')
     page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
@@ -590,6 +593,8 @@ try:
                         page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
                     assert_manager_geometry(page)
                     screenshot(page, f'{label}-page-{route}')
+
+                exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 
                 if label in REPRESENTATIVE_STATES:
                     open_page(page, 'wulftec')
