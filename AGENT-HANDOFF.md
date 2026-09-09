@@ -1,5 +1,7 @@
 # Industrial Asset Graph — agent handoff
 
+**September 9 Map Studio:** The dedicated map editor is deployed. Read [the full Map Studio project context](docs/MAP-STUDIO-PROJECT-CONTEXT.md) before continuing map work; it includes the user requests, accepted goal, implemented behavior, source-file map, release evidence, and remaining AI/shared-service configuration. The operational guide is [MAP-STUDIO.md](docs/MAP-STUDIO.md). Preserve editable symbols, anchored source cleanup, validated text previews, graph-aware undo/redo, and stale-save protection.
+
 **September 8 production extension:** Home and More now expose Production lines, Documentation queue, Equipment field sheet, and Dependency records. See `docs/PRODUCTION-MAINTENANCE.md` for data, evidence, persistence, and field follow-up details. Seeded unused dependency types remain zero; technicians can explicitly author evidenced typed dependencies through review. The new potential-impact explorer traverses only verified dependency edges and verified line memberships; it never establishes shutdown or isolation consequences. Survey categories remain separate from inventory. Preserve these production extensions when editing existing assets or facility identity.
 
 **Date:** 2026-09-07
