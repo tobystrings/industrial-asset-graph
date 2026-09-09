@@ -55,3 +55,7 @@ html body #root .app-shell.app-pages .map-studio .reference-plan-wrap{min-height
 html body #root .app-shell.app-pages .map-studio .map-honesty-note{color:#b7c8dc!important}
 html body #root .app-shell.app-pages .map-studio .map-zoom-readout{color:#d6e7fb}
 @media(max-width:900px){html body #root .app-shell.app-pages .reference-layout.map-studio{height:auto!important;min-height:0!important}.map-studio .reference-layout-actions{max-width:100%;min-width:0}}
+html body #root .app-shell.app-pages .detailed-map-stage:has(.map-studio),html body #root .app-shell.app-pages .detailed-map-viewport:has(>.map-studio){display:block!important;height:auto!important;min-height:0!important;align-items:stretch!important}
+html body #root .app-shell.app-pages .reference-layout.map-studio{background:#0c1725!important;color:#e2e8f0!important}
+html body #root .app-shell.app-pages .map-studio>.reference-layout-head h2{color:#f1f5f9!important}
+html body #root .map-studio:fullscreen{height:100dvh!important;max-width:none!important;min-height:0!important}

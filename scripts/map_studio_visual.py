@@ -9,6 +9,8 @@ def exercise_map_studio(page,label,open_page,screenshot,assert_geometry):
     open_page(page,'map')
     page.get_by_role('button',name='Edit map',exact=True).click()
     page.locator('.map-studio').wait_for()
+    page.wait_for_timeout(250)
+    print(label+' studio geometry: '+str(page.locator('.map-studio').evaluate('e => {const r=e.getBoundingClientRect();return {top:r.top,left:r.left,width:r.width,height:r.height,viewport:innerHeight}}')),flush=True)
     assert_geometry(page)
     screenshot(page,label+'-map-studio-canvas')
     studio_pane(page,'Text / objects / layers')
@@ -30,6 +32,7 @@ def exercise_map_studio(page,label,open_page,screenshot,assert_geometry):
     assert page.locator('[data-mask-id]').count()==1,'Replacement did not create its source cleanup'
     panel.get_by_label('Symbol name',exact=True).fill('Audit stairs')
     panel.get_by_label('Step count',exact=True).fill('9')
+    screenshot(page,label+'-map-studio-before-direction')
     panel.get_by_label('Stair direction',exact=True).select_option('down')
     panel.get_by_label('Rotation (degrees)',exact=True).fill('90')
     assert_geometry(page)

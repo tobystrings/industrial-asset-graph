@@ -54,6 +54,12 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [studioPane,setStudioPane]=useState('canvas');
 
   useEffect(() => {
+    if(!editMode) return;
+    const frame=requestAnimationFrame(()=>planWrapRef.current?.closest('section.reference-layout')?.scrollIntoView({block:'start',behavior:'instant'}));
+    return()=>cancelAnimationFrame(frame);
+  },[editMode]);
+
+  useEffect(() => {
     const handler = (event: Event) => setEditMode(Boolean((event as CustomEvent<boolean>).detail));
     addEventListener('iag-map-edit-mode', handler);
     return () => removeEventListener('iag-map-edit-mode', handler);
