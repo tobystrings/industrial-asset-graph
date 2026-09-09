@@ -246,11 +246,11 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
         </div>
         <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button><button type="button" onClick={fitPlan}>Fit</button></div>
       </div>
-      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span>{gridPoint && <span>Selected coordinate <b>{gridPoint.label}</b> · {gridPoint.x.toFixed(1)}%, {gridPoint.y.toFixed(1)}%</span>}</div>
+      {!editMode && <><div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span>{gridPoint && <span>Selected coordinate <b>{gridPoint.label}</b> · {gridPoint.x.toFixed(1)}%, {gridPoint.y.toFixed(1)}%</span>}</div>
       <div className="reference-info-strip"><section><h3>Legend</h3>{legendContent}</section><section><h3>Control Cabinets</h3>{cabinetDirectory}</section><section><h3>Major Machines / Equipment</h3>{machineDirectory}</section><section><h3>Areas</h3>{areaDirectory}</section><section><h3>Notes</h3>{notes}</section></div>
       <div className="mobile-map-meta-tabs" role="tablist" aria-label="Map details">{(['legend','cabinets','areas','notes'] as MetaTab[]).map((tab) => <button key={tab} type="button" role="tab" aria-pressed={metaTab === tab} onClick={() => setMetaTab(tab)}>{tab}</button>)}</div>
       <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && cabinetDirectory}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>
-      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{mapConfig?.drawingTitle ?? ''}</span></div></footer>
+      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{mapConfig?.drawingTitle ?? ''}</span></div></footer></>}
     </div>
     {editMode&&<MapStudioPanel session={mapEditor}/>}
   </section>;
