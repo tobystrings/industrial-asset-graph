@@ -19,7 +19,18 @@ describe('facility map editor model', () => {
     const pkg = buildTestFacilityPackage();
     const next = updateArea(draftFromPackage(pkg), 'synthetic-area-001', { name: 'Renamed Test Area' });
     expect(next.areas[0]).toMatchObject({ id: 'synthetic-area-001', name: 'Renamed Test Area' });
+    expect(next.areas[0].shortName).toBe('Renamed Test Area');
     expect(pkg.assets[0].areaId).toBe('synthetic-area-001');
+  });
+
+  it('updates a stale short label on rename, while allowing an explicit shorter label', () => {
+    const pkg = buildTestFacilityPackage();
+    pkg.areas[0].shortName = 'Old abbreviation';
+    const renamed = updateArea(draftFromPackage(pkg), pkg.areas[0].id, { name: 'New room name' });
+    expect(renamed.areas[0].shortName).toBe('New room name');
+    const labeled = updateArea(renamed, pkg.areas[0].id, { shortName: 'New room' });
+    expect(labeled.areas[0].name).toBe('New room name');
+    expect(mapChangeSummary(renamed, labeled)).toEqual(['Changed map label for New room name']);
   });
 
   it('adds an empty rectangle or polygon area and rejects duplicate IDs', () => {

@@ -90,7 +90,7 @@ export function addArea(draft: MapEditorDraft, area: FacilityArea): MapEditorDra
 export function updateArea(draft: MapEditorDraft, areaId: string, update: Partial<Omit<FacilityArea, 'id' | 'assetIds'>>): MapEditorDraft {
   const current = draft.areas.find((area) => area.id === areaId);
   if (!current) throw new Error(`Unknown area: ${areaId}`);
-  const next = { ...current, ...clone(update), id: current.id, assetIds: current.assetIds };
+  const next = { ...current, ...clone(update), ...(update.name !== undefined && update.shortName === undefined ? { shortName: update.name } : {}), id: current.id, assetIds: current.assetIds };
   if (!validOverlay(next.overlay)) throw new Error('Area geometry is invalid.');
   return { ...draft, areas: draft.areas.map((area) => area.id === areaId ? next : area) };
 }
@@ -151,6 +151,9 @@ export function mapChangeSummary(before: MapEditorDraft, after: MapEditorDraft):
     const old = prior.get(area.id);
     if (!old) summary.push(`Added area ${area.name}`);
     else if (old.name !== area.name) summary.push(`Renamed ${old.name} → ${area.name}`);
+    else if (old.shortName !== area.shortName) summary.push(`Changed map label for ${area.name}`);
+    else if (old.visible !== area.visible) summary.push(`Changed visibility for ${area.name}`);
+    else if (old.notes !== area.notes) summary.push(`Changed notes for ${area.name}`);
     else if (JSON.stringify(old.overlay) !== JSON.stringify(area.overlay)) summary.push(`Changed geometry for ${area.name}`);
   }
   for (const area of before.areas) if (!next.has(area.id)) summary.push(`Removed or merged area ${area.name}`);

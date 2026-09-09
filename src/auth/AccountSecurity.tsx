@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { authReturnUrl, supabase, usernamePattern } from '../facility/supabaseAuth';
+import { authReturnUrl, iagUserFromSupabase, supabase, usernamePattern } from '../facility/supabaseAuth';
 import { useAuth } from './AuthProvider';
 
 type Passkey = { id: string; friendly_name?: string; created_at: string };
@@ -37,6 +37,9 @@ export default function AccountSecurity() {
   };
   return <section className="account-security" aria-label="Account security">
     <strong>Account security</strong><p>{auth.user?.email}</p>
+    <p><strong>Application role: {auth.user && iagUserFromSupabase(auth.user).role === 'admin' ? 'Administrator' : 'Technician'}</strong></p>
+    <p>{auth.user && iagUserFromSupabase(auth.user).role === 'admin' ? 'Your edits save directly. You can edit the map and approve proposed changes.' : 'Your edits are submitted for administrator review before they change the map.'}</p>
+    <button type="button" disabled={busy} onClick={() => void run(async () => { const result = await supabase!.auth.refreshSession(); if (result.error) throw result.error; setMessage('Permissions refreshed from your account.'); })}>Refresh permissions</button>
     <form onSubmit={saveUsername}><label>Sign-in username<input required minLength={3} maxLength={32} autoComplete="username" autoCapitalize="none" spellCheck={false} value={username} onChange={event => setUsername(event.target.value)}/></label><button type="submit" disabled={busy}>Save username</button></form>
     <p>Add a passkey to sign in using your device PIN, fingerprint or face recognition. Your device keeps the PIN.</p>
     <button type="button" disabled={busy || typeof PublicKeyCredential === 'undefined'} onClick={() => void run(async () => {

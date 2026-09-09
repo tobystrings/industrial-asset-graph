@@ -86,6 +86,30 @@ def close_editor(page) -> None:
     open_page(page, 'map')
 
 
+def exercise_area_rename(page, label):
+    open_page(page, 'account')
+    page.get_by_text('Application role: Administrator', exact=True).wait_for()
+    page.get_by_role('button', name='Refresh permissions', exact=True).click()
+    page.get_by_text('Permissions refreshed from your account.', exact=True).wait_for()
+    open_page(page, 'map')
+    page.get_by_role('button', name='Edit map', exact=True).click()
+    page.locator('[aria-label="Edit area Warehouse E"]').click(force=True)
+    props = page.get_by_role('complementary', name='Area Properties')
+    props.get_by_label('Area name', exact=True).fill('Renamed receiving room')
+    assert props.get_by_label('Display label', exact=True).input_value() == 'Renamed receiving room'
+    assert_manager_geometry(page)
+    screenshot(page, f'{label}-map-rename-edit')
+    page.get_by_role('button', name='Done', exact=True).click()
+    page.locator('.map-editor-shell').wait_for(state='detached')
+    page.reload(wait_until='networkidle')
+    zone = page.locator('.svg-zone[aria-label="Select Renamed receiving room"]')
+    zone.wait_for()
+    assert zone.locator('text').text_content() == 'Renamed receiving room'
+    assert zone.locator('text').evaluate('e => getComputedStyle(e).fill') != 'rgba(0, 0, 0, 0)'
+    assert_manager_geometry(page)
+    screenshot(page, f'{label}-map-rename-saved')
+
+
 def exercise_historical_evidence(page, label):
     open_page(page, 'history')
     private_path = os.environ.get('IAG_HISTORY_BUNDLE')
@@ -616,6 +640,7 @@ try:
                     exercise_private_asset_package(page, label)
                     exercise_production_records(page, label)
                     exercise_historical_evidence(page, label)
+                    exercise_area_rename(page, label)
 
                 assert not console_errors, f'Browser console errors: {console_errors}'
             except Exception as exc:
