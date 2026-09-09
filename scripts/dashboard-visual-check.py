@@ -644,7 +644,7 @@ try:
                         walkdown.get_by_label('Typed value').fill('Observed during production-readiness walkthrough')
                         walkdown.locator('input[placeholder="Initials"]').first.fill('VTT')
                         walkdown.get_by_role('button', name='Save capture', exact=True).click()
-                        walkdown.get_by_text('Saved locally. Not in the graph yet.', exact=True).wait_for(state='visible')
+                        walkdown.get_by_text('Capture and photo saved for public publication. Not in the graph yet.', exact=True).wait_for(state='visible')
                         screenshot(page, f'{label}-walkthrough')
 
                     for route in ['home','more','field','observation','evidence','assetAdd','setup','settings','review','help']:

@@ -4,6 +4,7 @@ import { loadAuditEvents, loadPendingChanges, saveAuditEvents, savePendingChange
 import { type HistoryRecord } from './historicalEvidence';
 import { sha256 } from './additivePackage';
 import { supabase } from './supabaseAuth';
+import { loadWalkdownCaptures, replaceWalkdownCaptures } from '../lib/walkdown';
 
 export { canonicalJson, emptyPublication, initialPublicationBase, mergePublication, validatePublication } from './publicationModel';
 export type { Publication, PublicationConflict, PublicationRow, PublishedAttachment } from './publicationModel';
@@ -33,7 +34,7 @@ export async function capturePublication(plant: FacilityPackage, uploaded = new 
       const record={...metadata,url:supabase.storage.from('iag-public').getPublicUrl(path).data.publicUrl,sha256:digest};
       uploaded.set(key,record); published.push(record);
     }
-    return {format:'iag-publication',version:1,facilityId,plant:structuredClone(plant),attachments:published,observations,history,pending:loadPendingChanges(facilityId),audit:loadAuditEvents(facilityId),drafts};
+    return {format:'iag-publication',version:1,facilityId,plant:structuredClone(plant),attachments:published,observations,history,pending:loadPendingChanges(facilityId),audit:loadAuditEvents(facilityId),drafts,walkdown:facilityId==='facility-j-lieb'?loadWalkdownCaptures():[]};
   } finally { db.close(); }
 }
 
@@ -76,6 +77,7 @@ export async function receiveSharedProposals(local:Publication) {
     }
     for(const attachment of row.payload.attachments as PublishedAttachment[]) if(!next.attachments.some(a=>a.id===attachment.id))next.attachments.push(attachment);
     for(const observation of row.payload.observations as ObservationRecord[]) if(!next.observations.some(a=>a.id===observation.id))next.observations.push(observation);
+    next.walkdown=[...new Map([...(row.payload.walkdown??[]),...(next.walkdown??[])].map(c=>[c.id,c])).values()];
     next.audit.push({id:auditId,actor:row.submitted_by,at:new Date().toISOString(),action:'Received shared proposal for review',detail:`Submission revision ${row.revision}; canonical plant unchanged.`});
   }
   await applyPublication(next);return {payload:next,count};
@@ -109,5 +111,6 @@ export async function applyPublication(payload: Publication) {
       }
     });
     savePendingChanges(payload.facilityId,payload.pending);saveAuditEvents(payload.facilityId,payload.audit);
+    if(payload.facilityId==='facility-j-lieb' && payload.walkdown)replaceWalkdownCaptures(payload.walkdown);
   } finally { db.close(); }
 }

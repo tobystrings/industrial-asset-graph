@@ -15,14 +15,24 @@ async function json(endpoint) {
   if (!response.ok) throw new Error(`Public plant fetch failed (${response.status}).`);
   return response.json();
 }
-const revisions = await json(`iag_publication_revisions?facility_id=eq.${facilityId}&order=revision.asc`);
+async function allRows(endpoint) {
+  const result=[];
+  for(let offset=0;;offset+=200) {
+    const page=await json(`${endpoint}&limit=200&offset=${offset}`);
+    if(!Array.isArray(page))throw new Error('Invalid publication page.');
+    result.push(...page);if(page.length<200)return result;
+  }
+}
+const revisions = await allRows(`iag_publication_revisions?facility_id=eq.${facilityId}&order=revision.asc`);
 if (!Array.isArray(revisions)) throw new Error('Invalid public revision response.');
-const submissions = await json(`iag_submission_revisions?facility_id=eq.${facilityId}&order=updated_at.asc`);
+const submissions = await allRows(`iag_submission_revisions?facility_id=eq.${facilityId}&order=updated_at.asc,submitted_by.asc,revision.asc`);
 if (!Array.isArray(submissions)) throw new Error('Invalid public proposal response.');
+const verifiedFiles=new Set();
 for (const row of [...revisions,...submissions]) {
   if (row.facility_id !== facilityId || row.payload?.facilityId !== facilityId || row.payload?.plant?.facility?.id !== facilityId || !Number.isSafeInteger(row.revision)) throw new Error('Publication facility or revision mismatch.');
   for (const file of row.payload.attachments) {
     if (!/^[a-f0-9]{64}$/.test(file.sha256)) throw new Error('Invalid file digest.');
+    if(verifiedFiles.has(file.sha256))continue;
     const target = path.join(root, 'files', file.sha256);
     let bytes;
     try { bytes = await readFile(target); } catch { /* not mirrored yet */ }
@@ -36,6 +46,7 @@ for (const row of [...revisions,...submissions]) {
       await mkdir(path.dirname(target), { recursive: true });
       await writeFile(target, bytes);
     }
+    verifiedFiles.add(file.sha256);
   }
   if(row.submitted_by && !/^[a-f0-9-]{36}$/.test(row.submitted_by)) throw new Error('Invalid proposal author ID.');
   const directory = row.submitted_by ? path.join(root,'proposals',row.submitted_by) : path.join(root,'revisions');

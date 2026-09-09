@@ -16,6 +16,8 @@ GitHub Pages hosts the application and published files. The existing Supabase pr
 
 The browser retains an offline copy. Shared snapshots contain canonical records, attachments, observations, historical assertions and reviews, pending proposals, audit events, and saved map drafts. File content is uploaded immutably, addressed by hash, and verified before another device imports it. A transaction commits a revision only if its base revision is current. Duplicate request IDs cannot create a second revision. A three-way merge combines independent edits and exposes conflicting values for explicit review.
 
+Existing browser records join shared publication when that device opens the updated application. Field captures now save selected photo bytes as well as their fingerprints. Older captures that retained only a filename/hash cannot supply missing original photo bytes. Field-capture storage is now facility-scoped.
+
 The publication workflow checks for new saved revisions every five minutes and supports manual dispatch. GitHub may delay scheduled runs. It verifies snapshots and file hashes, commits them under `public/facility-state/`, and triggers normal CI and Pages deployment. “Saved across devices” means Supabase confirmed the save; it does not claim that the corresponding GitHub deployment has completed. The UI links to the publication workflow for that status.
 
 Historical versions remain in the shared revision tables and Git history. The publication token is an encrypted repository secret and must remain valid for automated pushes. Other facilities keep their existing independent storage and publication policy.

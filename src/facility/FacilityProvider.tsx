@@ -461,7 +461,7 @@ export function FacilityProvider({
       const category: AttachmentRecord['category'] = file.type.startsWith('image/') ? 'PHOTO' : file.type === 'application/pdf' || lower.endsWith('.pdf') ? 'PDF' : lower.match(/\.(dwg|dxf|svg)$/) ? 'DRAWING' : 'OTHER';
       const record: AttachmentRecord = {
         id: crypto.randomUUID(), assetId, name: file.name, mimeType: file.type || 'application/octet-stream', size: file.size,
-        blob: file, category, verificationStatus, access: 'LOCAL_ONLY', createdAt: new Date().toISOString(),
+        blob: file, category, verificationStatus, access: publication.state.phase === 'DISABLED' ? 'LOCAL_ONLY' : 'PUBLIC_APP', createdAt: new Date().toISOString(),
       };
       await putAttachment(record, pkg.facility.id);
       const evidenceId = `EV-${record.id}`;
@@ -470,7 +470,7 @@ export function FacilityProvider({
         type: category === 'PHOTO' ? 'PHOTO' as const : category === 'DRAWING' ? 'DRAWING' as const : category === 'PDF' ? 'MANUAL' as const : 'OTHER' as const,
         title: `${assetId} · ${file.name}`,
         pathOrUrl: `indexeddb://attachment/${record.id}`,
-        access: 'LOCAL_ONLY' as const,
+        access: record.access,
       }];
       const documents = category === 'PDF' || category === 'DRAWING' ? [...pkg.documents, {
         id: `DOC-${record.id}`,
@@ -493,7 +493,7 @@ export function FacilityProvider({
         ...pkg,
         evidence: pkg.evidence.filter((item) => item.pathOrUrl !== uri),
         documents: pkg.documents.filter((item) => item.path !== uri),
-      }, id, 'Local evidence removed in application', { entityType: 'evidence', operation: 'DELETE', value: { access: 'LOCAL_ONLY' } });
+      }, `EV-${id}`, 'Evidence removed in application', { entityType: 'evidence', operation: 'DELETE', value: { access: publication.state.phase === 'DISABLED' ? 'LOCAL_ONLY' : 'PUBLIC_APP' } });
     },
     attachments: (assetId) => listAttachments(assetId, pkg.facility.id),
     async addObservation(input) {

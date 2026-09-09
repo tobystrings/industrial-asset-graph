@@ -1,8 +1,9 @@
 import type { FacilityPackage } from './types';
+import type { WalkdownCapture } from '../types/facility';
 import type { AttachmentRecord, ObservationRecord } from './runtimeDb';
 import type { AuditEvent, PendingChange } from './changeControl';
 import { validateFacilityPackage } from './schema';
-import { validateHistory, type HistoryRecord } from './historicalEvidence';
+import { historyFileId, validateHistory, type HistoryRecord } from './historicalEvidence';
 
 export type PublishedAttachment = Omit<AttachmentRecord, 'blob'> & { url: string; sha256: string };
 export interface Publication {
@@ -10,6 +11,7 @@ export interface Publication {
   plant: FacilityPackage; attachments: PublishedAttachment[]; observations: ObservationRecord[];
   history: HistoryRecord[]; pending: PendingChange[]; audit: AuditEvent[];
   drafts?: Array<{id:string;facilityId:string;[key:string]:unknown}>;
+  walkdown?: WalkdownCapture[];
 }
 export interface PublicationRow { facility_id: string; revision: number; payload: Publication; updated_at: string }
 export interface PublicationConflict { path: string; base: unknown; local: unknown; shared: unknown }
@@ -69,7 +71,14 @@ export function validatePublication(p: Publication, facilityId: string) {
   for (const rows of [p.attachments,p.observations,p.history,p.pending,p.audit]) {
     if (!Array.isArray(rows) || rows.some(x => !x?.id) || new Set(rows.map(x=>x.id)).size !== rows.length) throw new Error('Invalid publication records.');
   }
-  for (const h of p.history) { validateHistory(h.manifest,facilityId); if (h.facilityId !== facilityId) throw new Error('Historical facility mismatch.'); }
+  for (const h of p.history) {
+    validateHistory(h.manifest,facilityId); if (h.facilityId !== facilityId) throw new Error('Historical facility mismatch.');
+    for(const file of h.manifest.files) {
+      const attachment=p.attachments.find(a=>a.id===historyFileId(h.id,file));
+      if(!attachment && h.publicSourceBase==='facility-content/lieb-foods/recovered-2026-09-08/J_Lieb_Plant_Codex_Handoff/' && facilityId==='facility-j-lieb')continue;
+      if(!attachment||attachment.sha256!==file.sha256||attachment.size!==file.size||attachment.assetId!==`history:${h.id}`)throw new Error('Historical publication source mismatch.');
+    }
+  }
   for (const a of p.attachments) if (!/^[a-f0-9]{64}$/.test(a.sha256) || !Number.isSafeInteger(a.size) || a.size < 0 || !a.url.startsWith('https://')) throw new Error('Invalid published attachment.');
   for (const pending of p.pending) if (pending.next.facility.id !== facilityId) throw new Error('Proposal facility mismatch.');
   if(p.drafts?.some(d=>d.id!=='map-draft'||d.facilityId!==facilityId))throw new Error('Map draft facility mismatch.');

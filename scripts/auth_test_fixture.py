@@ -2,6 +2,8 @@
 import base64
 import json
 import time
+from email.parser import BytesParser
+from email.policy import default as email_policy
 from urllib.parse import urlparse, parse_qs
 
 EMAIL = 'visual-reviewer@example.test'
@@ -25,7 +27,12 @@ def install_auth_fixture(page, cloud=None):
         if '/storage/v1/object/' in url.path:
             path = url.path.split('/iag-public/', 1)[-1]
             if request.method == 'POST':
-                cloud['files'][path] = request.post_data_buffer
+                content=request.post_data_buffer
+                content_type=request.headers.get('content-type','')
+                if content_type.startswith('multipart/form-data'):
+                    message=BytesParser(policy=email_policy).parsebytes(('Content-Type: '+content_type+'\r\nMIME-Version: 1.0\r\n\r\n').encode()+content)
+                    content=next(part.get_payload(decode=True) for part in message.iter_parts() if part.get_filename())
+                cloud['files'][path] = content
                 return reply({'Key':path})
             if path in cloud['files']:
                 return route.fulfill(status=200,headers=headers,body=cloud['files'][path])

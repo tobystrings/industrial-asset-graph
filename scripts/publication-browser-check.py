@@ -1,5 +1,6 @@
 """Two isolated browsers share only a mocked authenticated publication service."""
 import os,subprocess,time,socket,json
+import hashlib
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from auth_test_fixture import install_auth_fixture,sign_in
@@ -10,7 +11,10 @@ server=subprocess.Popen(['npm.cmd' if os.name=='nt' else 'npm','run','preview','
 base=f'http://127.0.0.1:{port}/industrial-asset-graph/'
 cloud={'publication':None,'publication_requests':{},'files':{},'submissions':{}}
 def saved(page):
-    page.locator('.publication-status.phase-saved').wait_for(timeout=30000)
+    try: page.locator('.publication-status.phase-saved').wait_for(timeout=30000)
+    except Exception:
+        print(page.locator('.publication-status').inner_text(),flush=True)
+        raise
 def edit(page,old,new):
     page.get_by_role('button',name='Edit map',exact=True).click()
     page.get_by_role('button',name='Select',exact=True).click()
@@ -53,9 +57,20 @@ try:
         first.get_by_role('button',name='Keep this device’s conflicting values',exact=True).click();saved(first)
         second.reload(wait_until='networkidle');saved(second)
         second.locator('.svg-zone[aria-label="Select Local concurrent name"]').wait_for()
+        first.goto(base+'?page=evidence',wait_until='networkidle');saved(first)
+        content=b'<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="green"/></svg>'
+        first.locator('.iag-file-drop input[type=file]').set_input_files({'name':'shared-test-drawing.svg','mimeType':'image/svg+xml','buffer':content})
+        first.get_by_text('shared-test-drawing.svg',exact=True).wait_for()
+        first.get_by_role('button',name='Save & publish now',exact=True).click();saved(first)
+        file=next(a for a in cloud['publication']['payload']['attachments'] if a['name']=='shared-test-drawing.svg')
+        assert file['sha256']==hashlib.sha256(content).hexdigest()
+        second.goto(base+'?page=evidence',wait_until='networkidle');saved(second)
+        second.get_by_text('shared-test-drawing.svg',exact=True).click()
+        second.locator('.iag-file-viewer img').wait_for()
+        assert second.locator('.iag-file-viewer img').evaluate('e=>e.complete && e.naturalWidth>0'), 'Received attachment did not render'
         Path('artifacts').mkdir(exist_ok=True)
         second.screenshot(path='artifacts/publication-second-device.png')
-        print('PASS: cross-device rename, duplicate prevention, draft recovery, concurrent conflict, explicit resolution, and reload.')
+        print('PASS: cross-device rename and attachment bytes, duplicate prevention, draft recovery, concurrent conflict, explicit resolution, and reload.')
         browser.close()
 finally:
     server.terminate()

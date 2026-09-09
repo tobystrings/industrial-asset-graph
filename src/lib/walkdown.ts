@@ -1,10 +1,14 @@
 import type { ReviewDecision, WalkdownCapture, WalkdownField } from '../types/facility';
+import activeFacilityPackage from '../facility/activeFacility';
+import { facilityStorageKey } from '../facility/changeControl';
 
 export const WALKDOWN_STORAGE_KEY = 'industrial-asset-walkdown-captures';
 
 const INVENTABLE: WalkdownField[] = ['dest', 'motor', 'recovery'];
 
-let memory: WalkdownCapture[] = [];
+const memories = new Map<string,WalkdownCapture[]>();
+const currentFacility = () => activeFacilityPackage.facility.id;
+const storageKey = () => facilityStorageKey(currentFacility(),WALKDOWN_STORAGE_KEY);
 
 function canUseStorage(): boolean {
   try {
@@ -20,23 +24,26 @@ function canUseStorage(): boolean {
 export function loadWalkdownCaptures(): WalkdownCapture[] {
   if (canUseStorage()) {
     try {
-      const raw = localStorage.getItem(WALKDOWN_STORAGE_KEY);
+      const scoped=localStorage.getItem(storageKey());
+      const raw = scoped ?? (currentFacility()==='facility-j-lieb'?localStorage.getItem(WALKDOWN_STORAGE_KEY):null);
+      if(scoped===null && raw)localStorage.setItem(storageKey(),raw);
       if (raw) return JSON.parse(raw) as WalkdownCapture[];
     } catch {
-      return memory.slice();
+      return (memories.get(currentFacility())??[]).slice();
     }
   }
-  return memory.slice();
+  return (memories.get(currentFacility())??[]).slice();
 }
 
 function persist(items: WalkdownCapture[]): void {
-  memory = items.slice();
-  if (canUseStorage()) localStorage.setItem(WALKDOWN_STORAGE_KEY, JSON.stringify(items));
+  memories.set(currentFacility(),items.slice());
+  if (canUseStorage()) localStorage.setItem(storageKey(), JSON.stringify(items));
 }
+export function replaceWalkdownCaptures(items:WalkdownCapture[]){persist(items);}
 
 export function resetWalkdownStore(): void {
-  memory = [];
-  if (canUseStorage()) localStorage.removeItem(WALKDOWN_STORAGE_KEY);
+  memories.set(currentFacility(),[]);
+  if (canUseStorage()) {localStorage.setItem(storageKey(),'[]');if(currentFacility()==='facility-j-lieb')localStorage.removeItem(WALKDOWN_STORAGE_KEY);}
 }
 
 export function unknownKey(assetId: string, unknown: string): string {
