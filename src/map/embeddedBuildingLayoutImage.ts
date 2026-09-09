@@ -4,3 +4,4 @@
 const buildingLayoutImage = '/industrial-asset-graph/assets/lieb-foods-structural-plan.png';
 
 export default buildingLayoutImage;
+export { referenceLabelMasks } from '../../facilities/lieb-foods/referenceDrawing';

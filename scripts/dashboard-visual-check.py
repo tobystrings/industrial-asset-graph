@@ -92,7 +92,7 @@ def exercise_area_rename(page, label):
     page.get_by_role('button', name='Refresh permissions', exact=True).click()
     page.get_by_text('Permissions refreshed from your account.', exact=True).wait_for()
     open_page(page, 'map')
-    page.get_by_role('button', name='Edit Map', exact=True).click()
+    page.get_by_role('button', name='Edit map', exact=True).click()
     page.locator('[aria-label="Edit area Warehouse E"]').click(force=True)
     props = page.get_by_role('complementary', name='Area Properties')
     props.get_by_label('Area name', exact=True).fill('Renamed receiving room')
