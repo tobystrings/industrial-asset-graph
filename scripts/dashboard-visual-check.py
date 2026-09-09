@@ -297,6 +297,7 @@ def exercise_manager_states(page, label: str) -> None:
 
     page.get_by_role('button', name='Edit map', exact=True).click()
     # The authenticated network fixture supplies the admin role. Local PINs never grant access.
+    studio_pane(page, 'Drawing tools')
     page.locator('.map-editor-shell').wait_for(state='visible')
     page.locator('.map-editor-shell').wait_for(state='visible')
     screenshot(page, f'{label}-map-edit')
