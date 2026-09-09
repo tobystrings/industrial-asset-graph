@@ -104,7 +104,7 @@ def exercise_area_rename(page, label):
     page.reload(wait_until='networkidle')
     zone = page.locator('.svg-zone[aria-label="Select Renamed receiving room"]')
     zone.wait_for()
-    assert zone.locator('text').inner_text() == 'Renamed receiving room'
+    assert zone.locator('text').text_content() == 'Renamed receiving room'
     assert zone.locator('text').evaluate('e => getComputedStyle(e).fill') != 'rgba(0, 0, 0, 0)'
     assert_manager_geometry(page)
     screenshot(page, f'{label}-map-rename-saved')
