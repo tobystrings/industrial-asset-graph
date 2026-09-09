@@ -67,7 +67,7 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
     {tab==='Text edits'&&<section className="studio-tab-body" aria-label="Text edits">
       <h3>Describe your edit</h3><p>Click or multi-select objects, then refer to “this” or “these”.</p>
       <div className="studio-selection-context">{s.selection.length?s.selection.map(r=>objectLabel(d,r)).join(' · '):'Nothing selected — exact room names also work.'}</div>
-      <label>Edit instructions<textarea rows={5} value={input} onChange={e=>{setInput(e.target.value);requestId.current++;setBusy(false);setPreview(null);s.setPreviewDraft(null);}} placeholder="Rename this to Main Cooler"/></label>
+      <label>Edit instructions<textarea aria-label="Edit instructions" rows={5} value={input} onChange={e=>{setInput(e.target.value);requestId.current++;setBusy(false);setPreview(null);s.setPreviewDraft(null);}} placeholder="Rename this to Main Cooler"/></label>
       <div className="studio-examples">{['Move this left 1','Flip this','Rotate this 90','Delete this'].map(t=><button key={t} onClick={()=>{setInput(t);setPreview(null);s.setPreviewDraft(null);}}>{t}</button>)}</div>
       <label className="studio-check"><input type="checkbox" checked={useAI} disabled={!apiUrl} onChange={e=>setUseAI(e.target.checked)}/>Use connected AI</label>
       <small>{apiUrl?'AI requires server configuration.':'Supported text commands are available offline. Connected AI is not configured for this deployment.'} Movement and sizes use percentages of the drawing, not surveyed feet.</small>
