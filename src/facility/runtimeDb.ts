@@ -133,10 +133,18 @@ export async function loadPlant(facilityId?: string): Promise<FacilityPackage | 
   return result ? loadFacilityPackage(result) : null;
 }
 
-export async function savePlant(pkg: FacilityPackage, facilityId = pkg.facility.id): Promise<void> {
+export async function savePlant(pkg: FacilityPackage, facilityId = pkg.facility.id, expectedRevision?: number): Promise<void> {
   const db = await openPlantDb(facilityId);
   const tx = db.transaction(PLANT_STORE, 'readwrite');
-  tx.objectStore(PLANT_STORE).put(structuredClone(pkg), ACTIVE_KEY);
+  const store = tx.objectStore(PLANT_STORE);
+  if (expectedRevision !== undefined) {
+    const current = await requestAsPromise(store.get(ACTIVE_KEY)) as FacilityPackage | undefined;
+    if (current && current.packageRevision !== expectedRevision) {
+      db.close();
+      throw new Error('Another window saved newer plant data. Export your draft, reload, and reconcile before saving.');
+    }
+  }
+  store.put(structuredClone(pkg), ACTIVE_KEY);
   await transactionDone(tx);
   db.close();
 }

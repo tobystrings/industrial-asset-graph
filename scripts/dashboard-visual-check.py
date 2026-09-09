@@ -10,6 +10,7 @@ import socket
 import urllib.request
 from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
+from map_studio_visual import exercise_map_studio, studio_pane
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
 
 output = Path('artifacts')
@@ -94,6 +95,7 @@ def exercise_area_rename(page, label):
     open_page(page, 'map')
     page.get_by_role('button', name='Edit map', exact=True).click()
     page.locator('[aria-label="Edit area Warehouse E"]').click(force=True)
+    studio_pane(page, 'Drawing tools')
     props = page.get_by_role('complementary', name='Area Properties')
     props.get_by_label('Area name', exact=True).fill('Renamed receiving room')
     assert props.get_by_label('Display label', exact=True).input_value() == 'Renamed receiving room'
@@ -569,6 +571,8 @@ try:
                         page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
                     assert_manager_geometry(page)
                     screenshot(page, f'{label}-page-{route}')
+
+                exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 
                 if label in REPRESENTATIVE_STATES:
                     open_page(page, 'wulftec')

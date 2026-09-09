@@ -1,11 +1,13 @@
 import type { FacilityMapAnnotation, FacilityMapConfig, FacilityMapWall, FacilityPackage } from '../facility/types';
 import type { FacilityArea } from '../types/facility';
 
-export type MapEditorTool = 'select' | 'multi-select' | 'pan' | 'add-area' | 'add-rectangle' | 'add-polygon' | 'edit-shape' | 'move' | 'resize' | 'wall' | 'erase' | 'merge' | 'split' | 'text' | 'note' | 'pen' | 'line' | 'arrow' | 'highlight' | 'annotation-eraser';
-export type MapObjectRef = { kind: 'area' | 'wall' | 'annotation'; id: string };
+export type MapEditorTool = 'select' | 'multi-select' | 'pan' | 'add-area' | 'add-rectangle' | 'add-polygon' | 'edit-shape' | 'move' | 'resize' | 'wall' | 'erase' | 'merge' | 'split' | 'text' | 'note' | 'pen' | 'line' | 'arrow' | 'highlight' | 'annotation-eraser' | 'symbol' | 'replace-symbol' | 'mask' | 'place-equipment';
+export type MapObjectRef = { kind: 'area' | 'wall' | 'annotation' | 'symbol' | 'mask' | 'marker'; id: string };
 export type MapPoint = { x: number; y: number };
 
 export interface MapEditorDraft {
+  assets?: FacilityPackage['assets'];
+  relationships?: FacilityPackage['relationships'];
   areas: FacilityArea[];
   mapConfig: FacilityMapConfig;
 }
@@ -20,7 +22,7 @@ const clone = <T,>(value: T): T => structuredClone(value);
 const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value * 10) / 10));
 
 export function draftFromPackage(pkg: FacilityPackage): MapEditorDraft {
-  return { areas: clone(pkg.areas), mapConfig: clone(pkg.mapConfig ?? {}) };
+  return { relationships: clone(pkg.relationships), assets: clone(pkg.assets), areas: clone(pkg.areas), mapConfig: clone(pkg.mapConfig ?? {}) };
 }
 
 export function createHistory(draft: MapEditorDraft): MapEditorHistory {
@@ -77,7 +79,7 @@ export function validateMapDraft(pkg: FacilityPackage, draft: MapEditorDraft): s
     if (!item.id || objectIds.has(item.id)) errors.push(`Duplicate or missing map object ID: ${item.id || '(empty)'}.`);
     objectIds.add(item.id);
   }
-  for (const wall of draft.mapConfig.walls ?? []) if (wall.points.length < 2 || wall.points.some((point) => point.x < 0 || point.x > 100 || point.y < 0 || point.y > 100)) errors.push(`Wall ${wall.id} has invalid geometry.`);
+  for (const wall of draft.mapConfig.walls ?? []) if (wall.points.length < 2 || wall.points.some((point) => !Number.isFinite(point.x) || !Number.isFinite(point.y) || point.x < 0 || point.x > 100 || point.y < 0 || point.y > 100)) errors.push(`Wall ${wall.id} has invalid geometry.`);
   return [...new Set(errors)];
 }
 
@@ -99,8 +101,9 @@ export function deleteArea(draft: MapEditorDraft, pkg: FacilityPackage, areaId: 
   const assets = pkg.assets.filter((asset) => asset.areaId === areaId);
   if (assets.length) throw new Error(`Area contains ${assets.length} asset${assets.length === 1 ? '' : 's'} (${assets.map((asset) => asset.id).join(', ')}). Reassign or merge them before deleting.`);
   if (pkg.featureConfig.defaultAreaId === areaId) throw new Error('The facility default area cannot be deleted.');
+  if ((draft.relationships ?? pkg.relationships).some(r=>r.source===areaId||r.target===areaId)) throw new Error('Area still has graph relationships. Reassign them before deleting.');
   const markers = (draft.mapConfig.markers ?? []).filter((marker) => (marker as typeof marker & { areaId?: string }).areaId !== areaId);
-  return { areas: draft.areas.filter((area) => area.id !== areaId), mapConfig: { ...draft.mapConfig, markers } };
+  return { ...draft, areas: draft.areas.filter((area) => area.id !== areaId), mapConfig: { ...draft.mapConfig, markers } };
 }
 
 export function mergeAreas(draft: MapEditorDraft, pkg: FacilityPackage, areaIds: string[], survivorId: string, name: string): { draft: MapEditorDraft; assets: FacilityPackage['assets'] } {
@@ -118,7 +121,7 @@ export function mergeAreas(draft: MapEditorDraft, pkg: FacilityPackage, areaIds:
   const survivor = { ...chosen.find((area) => area.id === survivorId)!, name: name.trim(), shortName: name.trim(), overlay: { x, y, width: right - x, height: bottom - y }, assetIds };
   const areas = draft.areas.filter((area) => !areaIds.includes(area.id) || area.id === survivorId).map((area) => area.id === survivorId ? survivor : area);
   const assets = pkg.assets.map((asset) => areaIds.includes(asset.areaId) ? { ...asset, areaId: survivorId } : asset);
-  return { draft: { ...draft, areas }, assets };
+  return { draft: { ...draft, areas, assets, relationships: (draft.relationships ?? pkg.relationships).map(r=>({...r,source:areaIds.includes(r.source)?survivorId:r.source,target:areaIds.includes(r.target)?survivorId:r.target})) }, assets };
 }
 
 export function splitArea(draft: MapEditorDraft, pkg: FacilityPackage, areaId: string, newId: string, newName: string, direction: 'vertical' | 'horizontal', assignments: Record<string, string>): { draft: MapEditorDraft; assets: FacilityPackage['assets'] } {
@@ -137,7 +140,7 @@ export function splitArea(draft: MapEditorDraft, pkg: FacilityPackage, areaId: s
   const second: FacilityArea = { ...area, id: newId, name: newName.trim(), shortName: newName.trim(), overlay: secondOverlay, assetIds: secondIds };
   const areas = draft.areas.map((item) => item.id === areaId ? first : item).concat(second);
   const assets = pkg.assets.map((asset) => assignments[asset.id] ? { ...asset, areaId: assignments[asset.id] } : asset);
-  return { draft: { ...draft, areas }, assets };
+  return { draft: { ...draft, areas, assets, relationships: (draft.relationships ?? pkg.relationships).map(r=>r.type==='LOCATED_IN'&&assignments[r.source]&&r.target===areaId?{...r,target:assignments[r.source]}:r) }, assets };
 }
 
 export function setWalls(draft: MapEditorDraft, walls: FacilityMapWall[]): MapEditorDraft { return { ...draft, mapConfig: { ...draft.mapConfig, walls: clone(walls) } }; }
@@ -161,5 +164,6 @@ export function mapChangeSummary(before: MapEditorDraft, after: MapEditorDraft):
   const annotationDelta = (after.mapConfig.annotations?.length ?? 0) - (before.mapConfig.annotations?.length ?? 0);
   if (wallDelta) summary.push(`${wallDelta > 0 ? 'Added' : 'Removed'} ${Math.abs(wallDelta)} wall${Math.abs(wallDelta) === 1 ? '' : 's'}`);
   if (annotationDelta) summary.push(`${annotationDelta > 0 ? 'Added' : 'Removed'} ${Math.abs(annotationDelta)} annotation${Math.abs(annotationDelta) === 1 ? '' : 's'}`);
+  for (const key of ['walls', 'annotations', 'markers', 'studio'] as const) if (!(key==='walls'&&wallDelta) && !(key==='annotations'&&annotationDelta) && JSON.stringify(before.mapConfig[key]) !== JSON.stringify(after.mapConfig[key])) summary.push(`Updated map ${key}`);
   return summary;
 }

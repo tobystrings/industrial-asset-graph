@@ -72,7 +72,29 @@ export type FacilityMapAnnotation =
   | { id: string; kind: 'RECTANGLE' | 'CIRCLE'; x: number; y: number; width: number; height: number; color: string; label?: string }
   | { id: string; kind: 'TEXT' | 'NOTE'; x: number; y: number; text: string; color: string; label?: string };
 
+export type MapSymbolKind = 'door' | 'double-door' | 'sliding-door' | 'rollup-door' | 'stairs' | 'column' | 'window' | 'dock' | 'drain' | 'barrier' | 'custom';
+export interface FacilityMapSymbol {
+  id: string; kind: MapSymbolKind; label: string;
+  x: number; y: number; width: number; height: number;
+  rotation: number; flipped?: boolean; steps?: number; direction?: 'up' | 'down';
+  paths?: Array<Array<{ x: number; y: number }>>;
+}
+export interface FacilityReferenceMask {
+  id: string; x: number; y: number; width: number; height: number;
+  label: string;
+}
+export type StudioLayer = 'reference' | 'areas' | 'walls' | 'symbols' | 'equipment' | 'markup' | 'masks';
+export interface FacilityMapStudio {
+  layers?: Partial<Record<StudioLayer, { visible: boolean; locked: boolean }>>;
+  referenceOpacity?: number;
+  snap?: number;
+  symbols?: FacilityMapSymbol[];
+  masks?: FacilityReferenceMask[];
+  templates?: FacilityMapSymbol[];
+}
+
 export interface EditableFacilityMapConfig {
+  studio?: FacilityMapStudio;
   markers?: FacilityMapMarker[];
   walls?: FacilityMapWall[];
   annotations?: FacilityMapAnnotation[];
