@@ -4,6 +4,9 @@ import type { FacilityMapAnnotation, FacilityMapMarker, FacilityMapWall } from '
 import type { FacilityArea, FacilityAsset, VerificationState } from '../types/facility';
 import buildingLayoutImage, { referenceLabelMasks } from './embeddedBuildingLayoutImage';
 import './detailedBuildingLayout.css';
+import { MapStudioPanel } from './MapStudioPanel';
+import { ReferenceCleanup, SavedStudioSymbols } from './StudioSymbols';
+import { layerState } from './studioModel';
 import './buildingLayoutImage.css';
 import '../ui/map-polish.css';
 import { loadAppSettings, type AppSettings } from '../lib/appSettings';
@@ -40,13 +43,21 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(() => new URLSearchParams(location.search).get('edit') === '1');
   const [gridOpen, setGridOpen] = useState(false);
-  const [gridPoint, setGridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
+  const [gridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
   const [mapSearch, setMapSearch] = useState('');
   const [layers, setLayers] = useState({ cabinets: true, machines: true, reference: false });
   const [layerOpen, setLayerOpen] = useState(false);
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
   const leaveMapEditor = useCallback(() => { setEditMode(false); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: false })); }, []);
   const mapEditor = useMapEditorSession(editMode, leaveMapEditor);
+  const displayConfig = editMode ? (mapEditor.previewDraft ?? mapEditor.history.present).mapConfig : mapConfig ?? {};
+  const [studioPane,setStudioPane]=useState('canvas');
+
+  useEffect(() => {
+    if(!editMode) return;
+    const frame=requestAnimationFrame(()=>planWrapRef.current?.closest('section.reference-layout')?.scrollIntoView({block:'start',behavior:'instant'}));
+    return()=>cancelAnimationFrame(frame);
+  },[editMode]);
 
   useEffect(() => {
     const handler = (event: Event) => setEditMode(Boolean((event as CustomEvent<boolean>).detail));
@@ -139,7 +150,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const pointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (editMode || (event.target as Element).closest('.map-hotspot')) return;
+    if ((editMode && mapEditor.tool !== 'pan') || (event.target as Element).closest('.map-hotspot')) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     didPan.current = false;
@@ -150,7 +161,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const pointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (editMode || !pointers.current.has(event.pointerId)) return;
+    if ((editMode && mapEditor.tool !== 'pan') || !pointers.current.has(event.pointerId)) return;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     const points = [...pointers.current.values()];
     if (points.length === 1) {
@@ -173,19 +184,8 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const wheelZoom = (event: React.WheelEvent<HTMLDivElement>) => {
-    if (editMode) return;
     event.preventDefault();
     setView((current) => ({ ...current, scale: clampScale(current.scale + (event.deltaY < 0 ? .12 : -.12)) }));
-  };
-
-  const addAtClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (!editMode || (event.target as Element).closest('.map-hotspot')) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width * 100;
-    const y = (event.clientY - rect.top) / rect.height * 100;
-    const point = { x, y, label: mapCoordinateLabel(x, y) };
-    setGridPoint(point);
-    window.dispatchEvent(new CustomEvent('iag-map-add-asset', { detail: point }));
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -211,42 +211,47 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const areaDirectory = <div className="area-grid">{areas.map((area) => <button type="button" key={area.id} onClick={() => onArea(area)}><b>{area.name}</b><span>{area.shortName}</span></button>)}</div>;
   const notes = <ul><li>Map boundaries and labels remain drawing context.</li><li>Graph-linked pins are loaded from the editable plant database.</li><li>Use Map Edit to place new assets without editing source code.</li></ul>;
 
-  return <section className="reference-layout" aria-label="Building Layout">
-    <header className="reference-layout-head"><div><h2>{mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p className="map-honesty-note">Live area labels reflect saved edits. The background is a reference drawing; equipment locations require field verification.</p></div><div className="map-toolbar-search"><label><span className="sr-only">Search map</span><input value={mapSearch} onChange={(event) => setMapSearch(event.target.value)} placeholder="Search rooms, areas, or assets…" /></label>{searchResults.length > 0 && <div className="map-search-results">{searchResults.map((result) => <button type="button" key={`${result.kind}-${result.id}`} onClick={() => openSearchResult(result)}><b>{result.title}</b><small>{result.kind === 'asset' ? result.asset.type : 'Room / area'}</small></button>)}</div>}</div><div className="reference-layout-actions" aria-label="Map controls"><div className="map-layer-control"><button type="button" aria-expanded={layerOpen} onClick={() => setLayerOpen((open) => !open)}>Layers</button>{layerOpen && <div className="map-layer-menu"><label><input type="checkbox" checked={layers.cabinets} onChange={(event) => setLayers((value) => ({ ...value, cabinets: event.target.checked }))}/>Control cabinets</label><label><input type="checkbox" checked={layers.machines} onChange={(event) => setLayers((value) => ({ ...value, machines: event.target.checked }))}/>Machines</label><label><input type="checkbox" checked={layers.reference} onChange={(event) => setLayers((value) => ({ ...value, reference: event.target.checked }))}/>Reference symbols</label></div>}</div><button type="button" aria-pressed={gridOpen} onClick={() => setGridOpen((open) => !open)}>Grid</button><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit</button><button type="button" onClick={resetPlan}>Reset</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { if (editMode) { void mapEditor.finish(); return; } if (mapEditor.editor.currentUser?.role !== 'admin') { window.dispatchEvent(new CustomEvent('iag-open-users')); return; } setEditMode(true); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
+  return <section className={`reference-layout ${editMode ? 'map-studio' : ''} studio-pane-${studioPane}`} aria-label="Building Layout">
+    <header className="reference-layout-head"><div><h2>{editMode ? 'Map Studio' : mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p className="map-honesty-note">Live area labels reflect saved edits. The background is a reference drawing; equipment locations require field verification.</p></div><div className="map-toolbar-search"><label><span className="sr-only">Search map</span><input value={mapSearch} onChange={(event) => setMapSearch(event.target.value)} placeholder="Search rooms, areas, or assets…" /></label>{searchResults.length > 0 && <div className="map-search-results">{searchResults.map((result) => <button type="button" key={`${result.kind}-${result.id}`} onClick={() => openSearchResult(result)}><b>{result.title}</b><small>{result.kind === 'asset' ? result.asset.type : 'Room / area'}</small></button>)}</div>}</div><div className="reference-layout-actions" aria-label="Map controls"><div className="map-layer-control"><button type="button" aria-expanded={layerOpen} onClick={() => setLayerOpen((open) => !open)}>Layers</button>{layerOpen && <div className="map-layer-menu"><label><input type="checkbox" checked={layers.cabinets} onChange={(event) => setLayers((value) => ({ ...value, cabinets: event.target.checked }))}/>Control cabinets</label><label><input type="checkbox" checked={layers.machines} onChange={(event) => setLayers((value) => ({ ...value, machines: event.target.checked }))}/>Machines</label><label><input type="checkbox" checked={layers.reference} onChange={(event) => setLayers((value) => ({ ...value, reference: event.target.checked }))}/>Reference symbols</label></div>}</div><button type="button" aria-pressed={gridOpen} onClick={() => setGridOpen((open) => !open)}>Grid</button><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit</button><button type="button" onClick={resetPlan}>Reset</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { if (editMode) { void mapEditor.finish(); return; } if (mapEditor.editor.currentUser?.role !== 'admin') { window.dispatchEvent(new CustomEvent('iag-open-users')); return; } setEditMode(true); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
+    {editMode&&<nav className="studio-mobile-nav" aria-label="Map Studio sections">{['canvas','tools','assistant'].map(p=><button key={p} aria-pressed={studioPane===p} onClick={()=>setStudioPane(p)}>{p==='canvas'?'Map':p==='tools'?'Drawing tools':'Text / objects / layers'}</button>)}</nav>}
+    {editMode&&<div className="studio-window-actions"><button onClick={()=>{const section=planWrapRef.current?.closest('section.reference-layout');if(document.fullscreenElement) void document.exitFullscreen();else if(section?.requestFullscreen) void section.requestFullscreen().catch(()=>mapEditor.setMessage('Full screen is unavailable in this browser.'));}}>Full screen</button><button onClick={()=>{if(mapEditor.dirty){mapEditor.setMessage('Save Changes before opening another editor window.');return;}window.open(`${location.pathname}?page=map&edit=1`,'iag-map-studio','popup,width=1600,height=1000');}}>Pop out</button><span>{mapEditor.previewDraft?'Preview — apply or discard in Text edits':mapEditor.tool==='pan'?'Drag to pan · scroll to zoom':'Drag to draw or move · scroll to zoom'}</span></div>}
     <MapEditorToolbar session={mapEditor}/>
     <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
       <div ref={planWrapRef} className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" style={{ '--facility-drawing-width': `${drawingWidth}px`, '--facility-drawing-ratio': `${drawingWidth} / ${drawingHeight}` } as React.CSSProperties}>
-            <svg className="facility-map-svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} role="img" aria-label={`${facility.name} interactive facility layout`} onClick={addAtClick}>
-            <image href={buildingLayoutImage} width={drawingWidth} height={drawingHeight} preserveAspectRatio="xMinYMin meet" onLoad={(event) => { const image = event.currentTarget as SVGImageElement; const box = image.getBBox(); if (box.width && box.height) setNaturalSize({ width: box.width, height: box.height }); }}/>
+            <svg className="facility-map-svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} role="img" aria-label={`${facility.name} interactive facility layout`}>
+            <image opacity={layerState(displayConfig,'reference').visible ? displayConfig.studio?.referenceOpacity ?? 1 : 0} href={buildingLayoutImage} width={drawingWidth} height={drawingHeight} preserveAspectRatio="xMinYMin meet" onLoad={(event) => { const image = event.currentTarget as SVGImageElement; const box = image.getBBox(); if (box.width && box.height) setNaturalSize({ width: box.width, height: box.height }); }}/>
             <g aria-hidden="true" pointerEvents="none">{referenceLabelMasks.map(([x,y,width,height], i) => <rect key={i} x={x / 1536 * drawingWidth} y={y / 1024 * drawingHeight} width={width / 1536 * drawingWidth} height={height / 1024 * drawingHeight} fill="#fff" rx="3"/>)}</g>
+            <ReferenceCleanup config={displayConfig} width={drawingWidth} height={drawingHeight}/>
             {gridOpen && <g className="svg-coordinate-grid" aria-label="Technician placement coordinate grid">{Array.from({ length: 27 }, (_, index) => <line key={`v-${index}`} x1={index * drawingWidth / 26} x2={index * drawingWidth / 26} y1={0} y2={drawingHeight}/>) }{Array.from({ length: 21 }, (_, index) => <line key={`h-${index}`} x1={0} x2={drawingWidth} y1={index * drawingHeight / 20} y2={index * drawingHeight / 20}/>) }{Array.from({ length: 26 }, (_, index) => <text key={`c-${index}`} x={(index + .5) * drawingWidth / 26} y={14}>{String.fromCharCode(65 + index)}</text>)}{Array.from({ length: 20 }, (_, index) => <text key={`r-${index}`} x={8} y={(index + .5) * drawingHeight / 20 + 4}>{index + 1}</text>)}</g>}
-            <g className="svg-zone-layer">{areas.filter(area => area.visible !== false).map((area) => area.overlay ? <g key={area.id} role="button" tabIndex={0} className={`svg-zone ${selectedArea?.id === area.id ? 'selected' : ''}`} aria-label={`Select ${area.name}`} onClick={(event) => { event.stopPropagation(); if (!didPan.current) onArea(area); }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onArea(area); } }}>{area.overlay.polygon ? <polygon points={zoneShape(area)}/> : <rect x={area.overlay.x / 100 * drawingWidth} y={area.overlay.y / 100 * drawingHeight} width={area.overlay.width / 100 * drawingWidth} height={area.overlay.height / 100 * drawingHeight}/>}<text x={(area.overlay.x + area.overlay.width / 2) / 100 * drawingWidth} y={(area.overlay.y + area.overlay.height / 2) / 100 * drawingHeight}>{area.shortName}</text></g> : null)}</g>
-            {!editMode && <g className="map-editor-walls saved-map-layer" aria-label="Saved structural walls">{walls.map((wall) => <polyline key={wall.id} points={mapPoints(wall.points)}/>)}</g>}
-            {!editMode && <g className="map-editor-annotations saved-map-layer" aria-label="Saved manual annotations">{annotations.map((annotation) => annotation.kind === 'TEXT' || annotation.kind === 'NOTE' ? <text key={annotation.id} x={annotation.x / 100 * drawingWidth} y={annotation.y / 100 * drawingHeight} fill={annotation.color}>{annotation.text}</text> : annotation.kind === 'RECTANGLE' || annotation.kind === 'CIRCLE' ? <rect key={annotation.id} x={annotation.x / 100 * drawingWidth} y={annotation.y / 100 * drawingHeight} width={annotation.width / 100 * drawingWidth} height={annotation.height / 100 * drawingHeight} stroke={annotation.color}/> : <polyline key={annotation.id} points={mapPoints('points' in annotation ? annotation.points : [])} stroke={annotation.color} className={annotation.kind.toLowerCase()}/>)}</g>}
+            <g className="svg-zone-layer" style={{display:editMode||!layerState(displayConfig,'areas').visible?'none':undefined}}>{areas.filter(area => area.visible !== false).map((area) => area.overlay ? <g key={area.id} role="button" tabIndex={0} className={`svg-zone ${selectedArea?.id === area.id ? 'selected' : ''}`} aria-label={`Select ${area.name}`} onClick={(event) => { event.stopPropagation(); if (!didPan.current) onArea(area); }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onArea(area); } }}>{area.overlay.polygon ? <polygon points={zoneShape(area)}/> : <rect x={area.overlay.x / 100 * drawingWidth} y={area.overlay.y / 100 * drawingHeight} width={area.overlay.width / 100 * drawingWidth} height={area.overlay.height / 100 * drawingHeight}/>}<text x={(area.overlay.x + area.overlay.width / 2) / 100 * drawingWidth} y={(area.overlay.y + area.overlay.height / 2) / 100 * drawingHeight}>{area.shortName}</text></g> : null)}</g>
+            {!editMode && layerState(displayConfig,'walls').visible && <g className="map-editor-walls saved-map-layer" aria-label="Saved structural walls">{walls.map((wall) => <polyline key={wall.id} points={mapPoints(wall.points)}/>)}</g>}
+            {!editMode && layerState(displayConfig,'markup').visible && <g className="map-editor-annotations saved-map-layer" aria-label="Saved manual annotations">{annotations.map((annotation) => annotation.kind === 'TEXT' || annotation.kind === 'NOTE' ? <text key={annotation.id} x={annotation.x / 100 * drawingWidth} y={annotation.y / 100 * drawingHeight} fill={annotation.color}>{annotation.text}</text> : annotation.kind === 'RECTANGLE' || annotation.kind === 'CIRCLE' ? <rect key={annotation.id} x={annotation.x / 100 * drawingWidth} y={annotation.y / 100 * drawingHeight} width={annotation.width / 100 * drawingWidth} height={annotation.height / 100 * drawingHeight} stroke={annotation.color}/> : <polyline key={annotation.id} points={mapPoints('points' in annotation ? annotation.points : [])} stroke={annotation.color} className={annotation.kind.toLowerCase()}/>)}</g>}
             {markers.map((marker) => {
               const asset = liveAsset(marker.assetId);
               const selected = Boolean(asset && selectedAsset?.id === asset.id);
               const traced = Boolean(asset && traceAssetIds?.has(asset.id));
               const unrelated = Boolean(traceAssetIds?.size && asset && !traced);
               const categoryVisible = marker.tone === 'cabinet' ? layers.cabinets : marker.tone === 'machine' ? layers.machines : true;
-              const visible = categoryVisible && (marker.state !== 'REFERENCE' || layers.reference) && (marker.state === 'REFERENCE' || !asset || filters.has(asset.verificationStatus));
+              const visible = layerState(displayConfig,'equipment').visible && categoryVisible && (marker.state !== 'REFERENCE' || layers.reference) && (marker.state === 'REFERENCE' || !asset || filters.has(asset.verificationStatus));
               if (!visible) return null;
               const point = markerPoint(marker);
               return <g key={marker.id} role={marker.state === 'REFERENCE' ? undefined : 'button'} tabIndex={marker.state === 'REFERENCE' ? undefined : 0} className={`svg-asset-marker ${marker.tone} ${selected ? 'selected' : ''} ${traced ? 'trace-related' : ''} ${unrelated ? 'trace-unrelated' : ''} ${marker.state === 'REFERENCE' ? 'reference-only' : ''}`} transform={`translate(${point.x} ${point.y})`} onClick={(event) => { event.stopPropagation(); if (!didPan.current) activateMarker(marker); }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') activateMarker(marker); }} aria-label={marker.label}><rect x={-34} y={-12} width={68} height={24} rx={4}/><text textAnchor="middle" dominantBaseline="central">{marker.id}</text></g>;
             })}
             </svg>
+            {!editMode&&<svg className="studio-saved-overlay" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`}><SavedStudioSymbols config={displayConfig} width={drawingWidth} height={drawingHeight}/></svg>}
             <MapEditorSvgLayer session={mapEditor} width={drawingWidth} height={drawingHeight}/>
           </div>
         </div>
         <div className="map-floating-controls" aria-label="Touch map controls"><button type="button" onClick={() => zoomBy(.2)} aria-label="Zoom in">+</button><button type="button" onClick={() => zoomBy(-.2)} aria-label="Zoom out">−</button><button type="button" onClick={fitPlan}>Fit</button></div>
       </div>
-      <div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span>{gridPoint && <span>Selected coordinate <b>{gridPoint.label}</b> · {gridPoint.x.toFixed(1)}%, {gridPoint.y.toFixed(1)}%</span>}</div>
+      {!editMode && <><div className="reference-map-status" aria-live="polite"><span><b>{actionableMarkers.length}</b> graph-linked map tags</span><span><b>{markers.length - actionableMarkers.length}</b> reference tags</span>{gridPoint && <span>Selected coordinate <b>{gridPoint.label}</b> · {gridPoint.x.toFixed(1)}%, {gridPoint.y.toFixed(1)}%</span>}</div>
       <div className="reference-info-strip"><section><h3>Legend</h3>{legendContent}</section><section><h3>Control Cabinets</h3>{cabinetDirectory}</section><section><h3>Major Machines / Equipment</h3>{machineDirectory}</section><section><h3>Areas</h3>{areaDirectory}</section><section><h3>Notes</h3>{notes}</section></div>
       <div className="mobile-map-meta-tabs" role="tablist" aria-label="Map details">{(['legend','cabinets','areas','notes'] as MetaTab[]).map((tab) => <button key={tab} type="button" role="tab" aria-pressed={metaTab === tab} onClick={() => setMetaTab(tab)}>{tab}</button>)}</div>
       <section className="mobile-map-meta-panel" role="tabpanel"><h3>{metaTab === 'cabinets' ? 'Asset directories' : metaTab}</h3>{metaTab === 'legend' && legendContent}{metaTab === 'cabinets' && cabinetDirectory}{metaTab === 'areas' && areaDirectory}{metaTab === 'notes' && notes}</section>
-      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{mapConfig?.drawingTitle ?? ''}</span></div></footer>
+      <footer className="reference-title-block"><div className="north-arrow" aria-label="North arrow"><b>N</b><span>▲</span></div><div><b>FACILITY:</b><span>{facility.name}</span><b>LOCATION:</b><span>{mapConfig?.drawingTitle ?? ''}</span></div></footer></>}
     </div>
+    {editMode&&<MapStudioPanel session={mapEditor}/>}
   </section>;
 }

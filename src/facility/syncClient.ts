@@ -71,9 +71,10 @@ export function applyCanonicalEntities(pkg: FacilityPackage, entities: Canonical
       next.mapConfig = { ...(next.mapConfig ?? {}), markers: entity.deleted ? markers.filter((item) => item.id !== entity.entityId) : upsert(markers, value as unknown as FacilityMapMarker) };
     }
     else if (entity.entityType === 'map_config' && !entity.deleted) {
-      const payload = value as unknown as Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'>;
+      const payload = value as unknown as Pick<FacilityPackage, 'areas' | 'assets' | 'mapConfig'> & {relationships?: FacilityPackage['relationships']};
       next.areas = structuredClone(payload.areas);
       next.assets = structuredClone(payload.assets);
+      if(payload.relationships) next.relationships=structuredClone(payload.relationships);
       next.mapConfig = structuredClone(payload.mapConfig ?? {});
     }
   }
