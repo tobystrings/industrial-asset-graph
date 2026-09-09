@@ -38,3 +38,6 @@
 .reference-drawing-sheet.is-editing .reference-map-status,.reference-drawing-sheet.is-editing .reference-info-strip,.reference-drawing-sheet.is-editing .mobile-map-meta-tabs,.reference-drawing-sheet.is-editing .mobile-map-meta-panel,.reference-drawing-sheet.is-editing .reference-title-block{display:none!important}
 .reference-drawing-sheet.is-editing .map-floating-controls{display:flex!important}
 html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .reference-plan-wrap{height:calc(100dvh - 290px)!important;min-height:280px!important;max-height:none!important}
+
+.reference-drawing-sheet.is-editing .svg-zone-layer{opacity:0}
+html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .reference-map-status,html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .reference-info-strip,html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .mobile-map-meta-tabs,html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .mobile-map-meta-panel,html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .reference-title-block{display:none!important}

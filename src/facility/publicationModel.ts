@@ -78,4 +78,3 @@ export function validatePublication(p: Publication, facilityId: string) {
 export function emptyPublication(plant: FacilityPackage): Publication {
   return {format:'iag-publication',version:1,facilityId:plant.facility.id,plant:structuredClone(plant),attachments:[],observations:[],history:[],pending:[],audit:[]};
 }
-
