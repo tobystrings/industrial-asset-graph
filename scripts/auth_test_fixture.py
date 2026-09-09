@@ -7,8 +7,9 @@ from urllib.parse import urlparse, parse_qs
 EMAIL = 'visual-reviewer@example.test'
 PASSWORD = 'Synthetic-password-only-42!'
 
-def install_auth_fixture(page):
-    state = {'authenticated': False, 'role': 'admin', 'recoveries': [], 'password_updates': [], 'username': 'visual-reviewer', 'logouts': 0}
+def install_auth_fixture(page, cloud=None):
+    cloud = cloud if cloud is not None else {'publication':None, 'publication_requests':{}, 'files':{}, 'submissions':{}}
+    state = {'authenticated': False, 'role': 'admin', 'recoveries': [], 'password_updates': [], 'username': 'visual-reviewer', 'logouts': 0, 'publication': None, 'publication_requests': {}, 'files': {}}
     def user():
         return {'id': '00000000-0000-4000-8000-000000000042', 'aud': 'authenticated', 'role': 'authenticated', 'email': EMAIL, 'email_confirmed_at': '2026-09-07T00:00:00Z', 'created_at': '2026-09-07T00:00:00Z', 'app_metadata': {'provider': 'email', 'providers': ['email'], 'iag_role': state['role']}, 'user_metadata': {'full_name': 'Visual Test Reviewer'}}
     def session():
@@ -21,7 +22,34 @@ def install_auth_fixture(page):
         headers = {'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS'}
         def reply(data, status=200): route.fulfill(status=status, content_type='application/json', headers=headers, body=json.dumps(data))
         if request.method == 'OPTIONS': return reply({})
+        if '/storage/v1/object/' in url.path:
+            path = url.path.split('/iag-public/', 1)[-1]
+            if request.method == 'POST':
+                cloud['files'][path] = request.post_data_buffer
+                return reply({'Key':path})
+            if path in cloud['files']:
+                return route.fulfill(status=200,headers=headers,body=cloud['files'][path])
+            return reply({'error':'missing synthetic file'},404)
         body = request.post_data_json if request.post_data else {}
+        if url.path.endswith('/iag_publications'): return reply(cloud['publication'])
+        if url.path.endswith('/iag_submissions'):
+            if 'submitted_by' in parse_qs(url.query): return reply(cloud['submissions'].get(user()['id']))
+            return reply(list(cloud['submissions'].values()))
+        if url.path.endswith('/iag_submit'):
+            old=cloud['submissions'].get(user()['id']); revision=(old or {}).get('revision',0)
+            if body['p_base_revision']!=revision:return reply(dict(status='conflict',revision=revision))
+            cloud['submissions'][user()['id']]=dict(facility_id=body['p_facility_id'],submitted_by=user()['id'],revision=revision+1,payload=body['p_payload'])
+            return reply(dict(status='saved',revision=revision+1))
+        if url.path.endswith('/iag_publish'):
+            if state['role'] != 'admin': return reply({'message':'Administrator required'},403)
+            rid = body['p_request_id']
+            if rid in cloud['publication_requests']: return reply(dict(status='duplicate',revision=cloud['publication_requests'][rid]))
+            revision = (cloud['publication'] or {}).get('revision',0)
+            if body['p_base_revision'] != revision: return reply(dict(status='conflict',revision=revision,payload=cloud['publication']['payload']))
+            revision += 1
+            cloud['publication'] = dict(facility_id=body['p_facility_id'],revision=revision,payload=body['p_payload'],updated_at='2026-09-09T00:00:00Z')
+            cloud['publication_requests'][rid] = revision
+            return reply(dict(status='saved',revision=revision))
         if '/api/facilities/' in url.path:
             if request.method == 'GET': return reply({'entities': []})
             if body.get('conflict'):
@@ -50,7 +78,8 @@ def install_auth_fixture(page):
             return reply({'error': 'Invalid credentials'}, 400)
         return reply({'error': 'Unhandled synthetic Auth request'}, 400)
     page.route('**/auth/v1/**', handler)
-    page.route('**/rest/v1/rpc/*', handler)
+    page.route('**/rest/v1/**', handler)
+    page.route('**/storage/v1/object/**', handler)
     page.route('**/functions/v1/username-login', handler)
     page.route('**/api/facilities/**', handler)
     return state

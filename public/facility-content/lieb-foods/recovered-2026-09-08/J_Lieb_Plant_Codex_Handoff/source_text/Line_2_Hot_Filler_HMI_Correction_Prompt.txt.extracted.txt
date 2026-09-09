@@ -1,0 +1,373 @@
+You are correcting three technical process-flow diagrams for the LINE 2 HOT FILLER.
+
+PRIMARY RULE:
+Use the attached HMI screenshot as the authoritative source for process topology, device placement, flow direction, tag relationships, branch relationships, and instrument association. The HMI overrides any incorrect relationship shown in the existing diagrams.
+
+Do NOT redesign the system from assumption.
+Do NOT simplify away HMI devices.
+Do NOT move devices into another process path just because they appear visually nearby.
+Do NOT treat changing live values as permanent design values.
+Preserve the existing clean black-and-white technical drawing style with green forward/raw-product flow and orange hot-product/return flow.
+
+The goal is to correct the three existing diagrams so that their device sequence and relationships faithfully match the HMI.
+
+==================================================
+SHEET 1
+LINE 2 HOT FILLER — RAW PRODUCT FLOW TO HOLD TUBE
+==================================================
+
+Represent the GREEN forward/raw-product path.
+
+Correct intended main relationship:
+
+RAW PRODUCT SUPPLY
+→ PMP105
+→ LT301 150 GAL BALANCE TANK
+→ AV102
+→ PMP101
+→ PT101
+→ PMP102
+→ raw-product filtration/manifold section
+→ FM101
+→ HEATING HEAT EXCHANGER
+→ PT102
+→ HOLD TUBE
+→ TT101 at the hot-product/hold-tube outlet transition
+
+IMPORTANT CORRECTIONS:
+
+1. ADD PT102.
+   HMI shows PT102 = 2 PSI in the screenshot.
+   PT102 belongs immediately downstream of the heating heat exchanger / immediately before the hold tube.
+
+2. TT101 is a TEMPERATURE TRANSMITTER, not a pressure transmitter.
+   Use a TT instrument symbol/bubble.
+   HMI screenshot value is approximately 184.8°F.
+   Associate TT101 with the hold-tube outlet / hot-product transition.
+
+3. Include SRV101 in the raw-product filtration/manifold network.
+
+4. Preserve AV103, SRV101, FP302, and the visible filter/manifold relationships as GREEN raw-product-side equipment.
+   Do not place these devices into the orange return circuit.
+
+5. Do not represent the filtration section as a falsely simple straight series if the HMI shows manifold/bypass branches.
+   Reproduce the HMI relationship as closely as practical.
+
+6. FM101 belongs to the GREEN raw-product/forward path in this HMI view.
+   HMI screenshot shows approximately 20.0 G/M.
+
+7. Label the exchanger explicitly:
+   HEATING HEAT EXCHANGER
+
+8. Preserve AG301 associated with LT301.
+
+9. Preserve RTD310 associated with LT301.
+
+10. Use the HMI topology as authoritative even if the old drawing disagrees.
+
+Observed HMI snapshot values may be shown as reference values, but mark them as:
+“Observed HMI value — screenshot snapshot”
+because they are live process values and can change.
+
+Visible screenshot examples:
+PMP105 = 0 Hz
+LT301 = approximately 98 GAL
+RTD310 = approximately 123.5°F
+PMP101 = 0 Hz
+PT101 = 0 PSI
+PMP102 = approximately 31 Hz
+FM101 = approximately 20.0 G/M
+PT102 = 2 PSI
+TT101 = approximately 184.8°F
+
+==================================================
+SHEET 2
+LINE 2 HOT FILLER — HOLD TUBE TO LT302 COLLECTION TANK
+==================================================
+
+Represent the ORANGE hot-product path.
+
+Correct main relationship:
+
+HOLD TUBE
+→ TT101
+→ COOLING HEAT EXCHANGER
+→ PT103A
+→ TT102
+→ TV108
+→ RTD103
+→ AV104
+→ FILLER
+→ AV105
+→ LT302 COLLECTION TANK
+
+IMPORTANT CORRECTIONS:
+
+1. Label the exchanger explicitly:
+   COOLING HEAT EXCHANGER
+
+2. TT101 must remain a TT device.
+
+3. Preserve PT103A after the cooling exchanger.
+   HMI screenshot shows approximately 0 PSI.
+
+4. Preserve TT102.
+   HMI screenshot shows approximately 184.4°F.
+
+5. Preserve TV108 as the PID-controlled valve.
+   HMI screenshot shows approximately 100%.
+
+6. Preserve RTD103 downstream of TV108.
+   HMI screenshot shows approximately 182.9°F.
+
+7. Preserve AV104 before the filler.
+
+8. Preserve AV105 between the filler discharge and collection tank path.
+
+9. LT302 is the COLLECTION TANK.
+   HMI screenshot shows approximately 12 GAL.
+
+10. REMOVE the incorrect bottom loop from this sheet.
+    Do NOT show:
+    LT302 → Return Cooler → PMP103 → AV106 → back to the post-hold/cooling exchanger.
+
+    That loop is not supported by the HMI topology.
+
+11. This sheet should END at LT302 unless a very short continuation stub is needed to indicate that collection return continues on Sheet 3.
+
+12. Do not place AV106 inline on this path.
+
+Observed HMI snapshot examples:
+TT101 = approximately 184.8°F
+PT103A = 0 PSI
+TT102 = approximately 184.4°F
+TV108 = 100%
+RTD103 = approximately 182.9°F
+LT302 = approximately 12 GAL
+
+==================================================
+SHEET 3
+LINE 2 HOT FILLER — COLLECTION TANK TO BALANCE TANK
+==================================================
+
+Represent the ORANGE collection-return path.
+
+Correct main relationship from the HMI:
+
+LT302 COLLECTION TANK
+→ PMP103
+→ RETURN COOLER
+→ PT106
+→ PT107
+→ TV104
+→ downstream return instrumentation
+→ AV107
+→ AV108
+→ LT301 150 GAL BALANCE TANK
+
+Associate RTD105 and CP301 with the downstream return line exactly as shown on the HMI.
+
+IMPORTANT CORRECTIONS:
+
+1. PUMP/COOLER ORDER:
+   The HMI shows:
+   LT302 → PMP103 → RETURN COOLER
+   NOT:
+   LT302 → RETURN COOLER → PMP103
+
+2. REMOVE AV106 from the inline collection-return path.
+
+3. AV106 is a VERTICAL BRANCH associated with END PROCESS.
+   Draw it as a branch from the collection/PMP103 region according to the HMI.
+   Label the branch:
+   END PROCESS
+
+4. ADD PT107.
+   HMI screenshot shows PT107 = approximately 0 PSI.
+
+5. PT106 remains associated with the return-cooler discharge region.
+   HMI screenshot shows approximately 1 PSI.
+
+6. TV104 remains on the ORANGE return path.
+   HMI screenshot shows approximately 10%.
+
+7. REMOVE AV103 from this orange return sheet.
+   AV103 belongs to the GREEN raw-product filtration network.
+
+8. REMOVE SRV101 from this orange return sheet.
+   SRV101 belongs to the GREEN raw-product filtration network.
+
+9. REMOVE FP302 from this orange return sheet.
+   FP302 belongs to the GREEN raw-product filtration/manifold network.
+
+10. REMOVE FM101 from this orange collection-return path unless the HMI relationship can be positively shown to place it on orange.
+    In the provided HMI, FM101 is visually associated with the GREEN raw-product path.
+
+11. Preserve RTD105 associated with the return line.
+    HMI screenshot shows approximately 158.6°F.
+
+12. Preserve CP301 associated with the return line.
+    HMI screenshot shows approximately 0.0%.
+
+13. Preserve AV107 and AV108 immediately before entry to LT301 according to the HMI.
+
+14. Preserve RTD310 associated with LT301.
+
+15. Preserve AG301 agitator associated with LT301.
+
+Observed HMI snapshot examples:
+LT302 = approximately 12 GAL
+PMP103 = approximately 14 Hz
+PT106 = 1 PSI
+PT107 = 0 PSI
+TV104 = 10%
+RTD105 = approximately 158.6°F
+CP301 = 0.0%
+LT301 = approximately 98 GAL
+RTD310 = approximately 123.5°F
+
+==================================================
+COLOR / FLOW RULES
+==================================================
+
+GREEN:
+Raw-product supply / forward product path.
+
+ORANGE:
+Hot product / filler path / collection return path.
+
+CYAN:
+Cooling-water utility lines only where intentionally shown.
+
+BLUE:
+Water-supply utility lines only where intentionally shown.
+
+Do not merge utility circuits into product piping.
+
+Do not infer process flow from line proximity alone.
+Trace actual HMI line continuity, arrows, device insertion, and branch geometry.
+
+==================================================
+TAG / DEVICE RULES
+==================================================
+
+Keep all visible HMI tags exactly as written where legible.
+
+Important known tags include:
+
+AG301
+LT301
+RTD310
+PMP105
+AV102
+PMP101
+PT101
+PMP102
+AV103
+SRV101
+FP302
+FM101
+PT102
+TT101
+PT103
+PT103A
+TT102
+TV108
+RTD103
+AV104
+AV105
+LT302
+PMP103
+PT106
+PT107
+TV104
+RTD105
+CP301
+AV107
+AV108
+AV106
+
+Do not silently rename tags.
+
+If a tag meaning is uncertain, retain the tag and mark:
+“FUNCTION / DESCRIPTION TO FIELD VERIFY”
+
+Do not invent PLC addresses, I/O addresses, valve fail states, pipe sizes, control logic, or instrumentation ranges.
+
+==================================================
+LIVE VALUE RULE
+==================================================
+
+The HMI values are a process snapshot, not permanent specifications.
+
+Therefore:
+
+- Device relationships and topology = VERIFY AGAINST HMI AND TREAT AS AUTHORITATIVE.
+- Temperatures, pressures, tank gallons, percentages, flow, and Hz = label as observed screenshot values only.
+- Do not reject an otherwise correct topology merely because an older diagram has a different live value.
+- Where practical, use:
+  “OBSERVED HMI SNAPSHOT”
+  beside dynamic values.
+
+==================================================
+FINAL QUALITY-CONTROL CHECK
+==================================================
+
+Before producing the corrected diagrams, perform a minimum four-pass verification against the HMI:
+
+PASS 1 — FLOW CONTINUITY
+Trace every green and orange product line from beginning to end.
+
+PASS 2 — DEVICE ORDER
+Verify every pump, valve, transmitter, RTD, flowmeter, exchanger, tank, filter, filler, and branch occurs in the same relative order as the HMI.
+
+PASS 3 — BRANCH RELATIONSHIPS
+Specifically verify:
+- AV106 is an END PROCESS branch, not inline.
+- AV103/SRV101/FP302 stay with the green raw-product network.
+- PMP103 is before the RETURN COOLER.
+- PT107 exists on the collection-return section.
+- PT102 exists before the hold tube.
+- Sheet 2 does not contain a false loop back to the cooling exchanger.
+
+PASS 4 — TAG AND INSTRUMENT TYPE
+Verify each tag and instrument type.
+Specifically confirm:
+- TT101 = TT, not PT.
+- PT devices use PT symbols.
+- RTD devices use RTD symbols.
+- FM101 is represented as flow measurement.
+- TV104 and TV108 are represented as controlled valves/PID-related devices where appropriate.
+
+==================================================
+DELIVERABLE
+==================================================
+
+Produce three corrected, print-ready technical diagrams:
+
+1. LINE 2 HOT FILLER — RAW PRODUCT FLOW TO HOLD TUBE
+2. LINE 2 HOT FILLER — HOLD TUBE TO LT302 COLLECTION TANK
+3. LINE 2 HOT FILLER — COLLECTION TANK TO BALANCE TANK
+
+Maintain the same clean industrial schematic style as the existing diagrams:
+- white background
+- black equipment outlines
+- clear tag labels
+- numbered callouts
+- green raw/forward product path
+- orange hot/return product path
+- uncluttered technical layout
+- legend
+- notes box
+- revision block
+
+Add this note to each drawing:
+
+“PROCESS TOPOLOGY AND DEVICE RELATIONSHIPS CORRECTED TO MATCH LINE 2 HOT FILLER HMI. DYNAMIC VALUES SHOWN, WHERE PRESENT, ARE OBSERVED HMI SNAPSHOT VALUES AND ARE NOT FIXED DESIGN SETPOINTS. FIELD VERIFY UNRESOLVED DEVICE FUNCTIONS.”
+
+Do not finalize until all three corrected sheets agree with each other at their transition points:
+Sheet 1 ends at HOLD TUBE / TT101 transition.
+Sheet 2 begins at HOLD TUBE / TT101 and ends at LT302.
+Sheet 3 begins at LT302 and returns to LT301.
+
+The three sheets together must form one continuous, non-contradictory LINE 2 HOT FILLER product-flow relationship matching the attached HMI.

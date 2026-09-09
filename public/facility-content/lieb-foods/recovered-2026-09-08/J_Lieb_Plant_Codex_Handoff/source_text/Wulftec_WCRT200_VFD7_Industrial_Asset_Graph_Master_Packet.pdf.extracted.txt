@@ -1,0 +1,739 @@
+<PARSED TEXT FOR PAGE: 1 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 1
+WULFTEC WCRT-200
+VFD 7 - SECOND OUTFEED CONVEYOR
+Industrial Asset Graph Master Evidence & Replacement Packet
+Machine Wulftec International WCRT-200 Machine no. A6882 / Golden State Vintners #6882
+Asset VFD 7 - Second Outfeed Conveyor Location WCRT-200 electrical/control cabinet
+Electrical source Panel H2 - D4 - 1P Feeder circuits 14 / 16 / 18
+Removed drive Siemens MICROMASTER Vector Replacement Allen-Bradley PowerFlex 4, 22A-B8P0N104, Series A
+Primary failure Recurring F231 - output-current measurement
+imbalance
+Record date September 5, 2026
+PURPOSE AND EVIDENCE STANDARD
+This packet consolidates available field photographs, schematics, rendered reference pages, catalog numbers, parameter readings, terminal
+mappings, fault history, isolation guidance, and replacement-drive data for ingestion into the Industrial Asset Graph. User-observed field facts
+are recorded as such. Manufacturer-defined functions are separated from proposed commissioning assignments. Items that still require a
+meter, nameplate, PLC trace, or functional test are explicitly marked open.
+Critical safety boundary
+Qualified personnel only. Apply facility lockout/tagout, verify absence of voltage, wait the drive's required discharge interval, and measure DC-bus
+voltage before contact. Never megger a motor or cable while it remains connected to a VFD. Do not bypass safety interlocks. Keep personnel and
+product clear during controlled direction and fault-relay tests.
+PACKET CONTENTS
+Section Contents Evidence status
+A Asset identity, feeder, topology, parts and relationships Front summary
+B Observed symptoms, F231 isolation logic and service chronology Field observations + manufacturer
+definition
+C Siemens parameter highlights and full recorded set Direct keypad transcription
+D Siemens-to-PowerFlex wiring and commissioning cross-reference Assigned; meter/function checks flagged
+E Original VFD 7 master record Preserved unchanged as source
+appendix
+F Photographic and drawing evidence Original image files rendered with
+filenames
+<PARSED TEXT FOR PAGE: 2 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 2
+A. ASSET GRAPH RECORD
+Graph field Value Confidence / provenance
+facility J. Lieb Foods - Forest Grove, Oregon Project context
+machine Wulftec International WCRT-200 Manual cover / prior machine record
+machine_identifier A6882; Golden State Vintners #6882 Manual cover and prior record
+asset_id VFD 7 User-confirmed service designation
+service Second Outfeed Conveyor Control schematic / field report
+upstream_source Panel H2 - D4 - 1P User-reported September 5, 2026
+source_circuits 14, 16, 18 User-reported three-phase circuit positions
+legacy_drive Siemens MICROMASTER Vector Parameter record and field record
+replacement_drive Allen-Bradley PowerFlex 4; Cat. 22A-B8P0N104; Series A Nameplate photograph
+failure_mode F231 output-current measurement imbalance Fault history P140-P143/P930 and field report
+RELATIONSHIPS
+From Relationship To Details
+Panel H2 FEEDS D4-1P / circuits 14-16-18 Three-phase source record
+D4-1P SUPPLIES VFD 7 Incoming wires 591/593/595
+VFD 7 CONTROLS Second Outfeed Conveyor motor Outgoing wires 592/594/596
+SLC 5/03 control system COMMANDS / MONITORS VFD 7 Via field wiring/interposing logic; exact
+rack/slot/point remains open
+VFD 7 fault relay REPORTS STATUS Machine control Wires 188/187; PLC destination remains open
+POWER / CONTROL TOPOLOGY
+PANEL H2 D4-1P VFD 7 CONVEYOR MOTOR
+Circuits 14 / 16 / 18 591 / 593 / 595 PowerFlex 4
+22A-B8P0N104
+592 / 594 / 596
+Upstream distribution R/L1 - S/L2 - T/L3 U/T1 - V/T2 - W/T3 Second outfeed conveyor
+<PARSED TEXT FOR PAGE: 3 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 3
+B. EQUIPMENT AND PART IDENTIFICATION
+Component Manufacturer / catalog Recorded rating / function Status
+Machine Wulftec International WCRT-200 Stretch-wrapper system; manual dated May 2001 Confirmed by manual
+cover
+Legacy VFD Siemens MICROMASTER Vector VFD 7, second outfeed conveyor; software P922=2.04 Family confirmed; exact
+VFD 7 order/serial not
+visible
+Reference Siemens
+drive
+6SE3213-6CA40 750 W; 208/240 V input; 3-phase 3.90 A output Photo marked Drive 6 -
+comparison only
+Replacement VFD Allen-Bradley PowerFlex 4
+22A-B8P0N104, Series A
+1.5 kW / 2 HP; input 3-phase 200-240 VAC, 48-63 Hz, 9.5 A;
+output 3-phase 0-230 VAC, 0-240 Hz, 8.0 A continuous, 12.0
+A/60 s
+Confirmed by
+replacement nameplate
+PLC platform Allen-Bradley SLC 5/03 Machine sequence/control; second output module point 4
+observed driving a clicking relay
+Platform/observation
+recorded; exact I/O
+address open
+Motor Sterling Electric SH0014PCA - second
+outfeed conveyor motor
+1 HP; 1750 RPM; 3-phase; 60 Hz; 208-230/460 V; 3.2-2.9/1.45
+A; 85.5% efficiency; code K; service factor 1.15.
+Confirmed by user's
+direct plate reading and
+nameplate photograph;
+glare-obscured fields
+remain open
+AVAILABLE DRAWING / DOCUMENT IDENTIFIERS
+Evidence Identification Relevant content
+General arrangement Wulftec drawing, revision dated 2000/11/22 Machine footprint and conveyor layout; conveyor speed revision 30 FPM to 36
+FPM
+Control schematic Field photograph IMG_2736(1).jpeg VFD-4 through VFD-8, including second outfeed conveyor VFD-7 and
+terminal/wire annotations
+PLC input drawing Field photograph IMG_2733.jpeg Reverse, stop, safety and oversize-related input circuits
+Machine manual WCRT-200 Instruction Guide and Operating
+Manual
+Golden State Vintners #6882; May 2001; Wulftec contact data printed on cover
+Siemens instructions G85139-H1751-U529-D1 MICROMASTER Vector / MIDIMASTER Vector operating instructions
+PowerFlex instructions Rockwell 22A-UM001 PowerFlex 4 terminal definitions, control examples, programming and fault data
+<PARSED TEXT FOR PAGE: 4 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 4
+C. FAILURE HISTORY AND DIAGNOSTIC RECORD
+Observation Recorded detail Interpretation boundary
+Recurring fault Siemens F231; history P140=231, P141=231, P142=231, P143=231
+and P930=231
+Repeated stored fault, not a one-time display artifact
+Reset behavior P/reset clears temporarily; fault returns Reset does not establish root cause
+Cycle timing VFD 7 observed faulting near the end of the second-half/outfeed
+sequence
+Sequence timing can trigger the condition but does not
+prove photoeye causation
+Isolation result VFD 7 reportedly faulted with motor leads disconnected Strongly favors internal drive output/current-sensing
+hardware if U/V/W were removed at the drive and test
+conditions were equivalent
+Related system behavior Reset-button operation/chatter and other drives' faults were observed
+during troubleshooting
+May indicate shared control/power effects; do not merge
+distinct fault events without timestamps
+Photoeye correlation PE10 blockage/requested motion correlated with faults during earlier
+testing
+A command device may expose the fault by
+commanding run; F231 itself remains an output-current
+measurement fault
+F231 ISOLATION DECISION
+Test state Result Evidence weight / next action
+U/V/W disconnected at VFD; PE retained F231 remains Strong evidence for inverter output stage/current sensing or internal hardware. Stop
+repeated run attempts; replace/bench-evaluate drive.
+U/V/W disconnected at VFD; PE retained F231 clears Investigate cable, motor windings, terminations, moisture/ground leakage, mechanical
+load and motor data.
+Test configuration uncertain Any outcome Repeat only under controlled, documented conditions before declaring root cause.
+DE-ENERGIZED CHECKS TO RETAIN
+Phase-to-phase resistance U-V, V-W, W-U; each phase to PE; insulation resistance only with VFD and sensitive electronics isolated;
+mechanical freedom; bearing/chain condition; terminal torque/discoloration; moisture or contamination; incoming phase balance; commanded
+control voltage and simultaneous-command check.
+Working conclusion
+The reported persistence of F231 with the outgoing motor leads disconnected materially supports replacing the Siemens drive. Preserve the
+removed drive for inspection until the PowerFlex completes direction, current, stop, fault-relay, and repeated-cycle verification.
+<PARSED TEXT FOR PAGE: 5 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 5
+D. COMPLETE WIRING MIGRATION SUMMARY
+Wire Legacy Siemens landing PowerFlex 4 landing Function Verification
+591 A / L1 R / L1 Incoming phase 1 Panel H2-D4-1P; circuit set 14/16/18
+593 B / L2 S / L2 Incoming phase 2 Confirm phase-to-phase voltage
+595 C / L3 T / L3 Incoming phase 3 Confirm phase sequence
+592 U U / T1 Motor phase U Direction test
+594 V V / T2 Motor phase V Direction test
+596 W W / T3 Motor phase W Direction test
+6 T2 - 0 V/common 04 - Digital Common Control reference PowerFlex selector SRC after meter
+check
+129 T6 - DIN2; P052=18 02 - Start/Run FWD Forward; Siemens FF4=56 Hz Confirm +24 V to wire 6 when active
+128 T5 - DIN1; P051=18 03 - Direction/Run REV Reverse; Siemens FF5=55 Hz Confirm +24 V to wire 6 when active
+188 T19 - RL1 N.O. R1 - Relay N.O. Fault-status switched leg Program and prove fail-safe state
+187 T20 - RL1 common R2 - Relay Common Fault-status common R3 remains unused unless redesigned
+Not rec
+orded
+PE PE / ground Protective earth Identify and verify continuity
+SNK / SRC AND DIP-SWITCH RECORD
+Item Recorded setting Meaning
+Siemens 5-switch bank 1 UP; 2 DOWN; 3 DOWN; 4 UP; 5
+DOWN
+Analog-input configuration. Not equivalent to the PowerFlex SNK/SRC selector.
+PowerFlex SNK/SRC SRC - meter verify Cover states SRC inputs activate when pulled to +24 V. Functional match if
+128/129 are +24 V relative to wire 6 when active.
+PowerFlex factory jumper 01 STOP to 11 +24 V Shown installed in photographs. Retain/remove only as required by the selected
+start scheme and safety design.
+<PARSED TEXT FOR PAGE: 6 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 6
+E. PARAMETER RECORD - CRITICAL VALUES
+Parameter Value Meaning / migration relevance
+P002 / P003 1.5 s / 1.0 s Acceleration / deceleration
+P006 / P007 2 / 0 Fixed-frequency source; terminal control
+P013 60 Hz Maximum frequency
+P044 / P046 56 Hz / 55 Hz Fixed frequency 4 forward / fixed frequency 5 reversed by P050
+P051 / P052 18 / 18 DIN1 and DIN2 each provide run plus fixed-frequency selection
+P061 / P062 6 / 8 RL1 fault indication / RL2 warning active
+P080-P085 0.80; 60 Hz; 1725 RPM; 3.2 A; 230 V; 1
+HP
+Recorded Siemens motor data. Verify against the actual VFD 7 motor nameplate
+before entering PowerFlex values.
+P086 / P186 150% / 200% Motor current limit / instantaneous current limit
+P089 4.6 ohm Recorded stator resistance
+P111 / P112 / P113 1.01 HP / 6 / 14 Inverter rating/type/model code: MICROMASTER Vector MMV75/2
+P128 120 s Fan switch-off delay
+P134 303 VDC Recorded DC-link snapshot
+P140-P143 / P930 231 / 231 / 231 / 231 / 231 Repeated F231 fault history
+P922 2.04 Software version
+P944 / P971 0 / 1 Factory reset inactive / EEPROM storage enabled
+POWERFLEX COMMISSIONING PARAMETERS
+Legacy motor-data comparison: Siemens P085=1 HP matches the Sterling motor's 1 HP rating. P083=3.2 A matches the motor's 208 V full-load
+current; the plate lists 2.9 A at 230 V and 1.45 A at 460 V. P082=1725 RPM differs slightly from the plate's 1750 RPM and should be corrected to
+1750 RPM in the replacement drive. Set voltage/current as a matched pair after verifying the actual applied motor voltage.
+Parameter Required action Reason
+P031-P035 Enter 60 Hz and the matched nameplate pair: 208 V / 3.2 A or 230 V / 2.9 A,
+based on measured system voltage; use 0 Hz minimum and 60 Hz maximum
+unless machine design requires otherwise
+Do not mix voltage and current columns or use the
+drive's 8.0 A rating as motor FLA
+P036 Select actual maintained two-wire forward/reverse start source Terminals 02 and 03 will command direction
+P037 Match stop mode to machine design Terminal 01 behavior depends on start-source
+selection
+P038 Establish replacement speed reference PowerFlex direction inputs do not inherently
+reproduce separate 56/55 Hz speeds
+P039 / P040 Set 1.5 s accel / 1.0 s decel after machine review Matches recorded Siemens ramps
+A051 / A052 Assign only if separate preset-speed/interlock functions are deliberately required Avoid unintended override behavior
+A055 Set relay output for Fault and prove actual logic Preserve machine fault-status behavior on R1/R2
+<PARSED TEXT FOR PAGE: 7 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 7
+F. COMMISSIONING / ACCEPTANCE RECORD
+Check Required result / record Status
+Identity PowerFlex catalog photographed; motor identified as Sterling Electric SH0014PCA. Capture a glare-free
+straight-on image for remaining obscured plate fields.
+PARTIAL
+Feeder Verify Panel H2 - D4 - 1P and circuits 14/16/18 against panel directory and disconnect OPEN
+Power Record L1-L2, L2-L3, L3-L1; verify grounding and phase rotation OPEN
+Control mode Wire 6 = 0 V/common; active 128/129 approximately +24 V to wire 6; selector at SRC OPEN
+Command exclusivity 128 and 129 never energized simultaneously OPEN
+Forward 129/terminal 02 produces correct forward motion PASS / FAIL
+Reverse 128/terminal 03 produces correct reverse motion PASS / FAIL
+Stop / safety Terminal 01, normal stop, E-stop and all guards/interlocks operate as designed PASS / FAIL
+Fault relay R1/R2 provides correct healthy/fault state to machine control PASS / FAIL
+Motor current Record steady current per phase; compare with 3.2 A at 208 V or 2.9 A at 230 V _____ A
+Cycle test Run repeated full cycles including end-of-cycle outfeed transition _____ cycles
+PLC trace Record rack, slot, point/address and relay ID for wires 128, 129, 187 and 188 OPEN
+Technician Date/time
+Reviewer Production witness
+Final disposition Accepted / correction required / removed from service Work order
+OPEN INFORMATION REQUIRED FOR COMPLETE GRAPH CLOSURE
+Installed PowerFlex serial number; glare-free image of remaining obscured motor nameplate values; enclosure/cabinet tag;
+disconnect/fuse/breaker catalog and ratings; verified PE wire ID; exact SLC rack/slot/point and logical address; interposing relay IDs; drawing
+rung/page; final programmed PowerFlex parameter export; measured voltages/currents; final root cause; removed-drive disposition;
+post-replacement cycle count and sign-off.
+<PARSED TEXT FOR PAGE: 8 / 35>
+Wulftec WCRT-200 | VFD 7 | Industrial Asset Graph source packet Summary page 8
+G. SOURCE REGISTER AND INGESTION NOTES
+Source Included as Use in Industrial Asset Graph
+Siemens VFD 7 Second Outfeed Conveyor Master
+Record
+Appendix 1 - original 10-page PDF Failure analysis, safety, legacy identification, manual
+extracts and field worksheets
+Siemens-to-Allen-Bradley Completed
+Cross-Reference
+Appendix 2 - original 6-page PDF Full parameter record plus replacement terminal mapping
+and setup record
+Machine drawings and manual cover Appendix 3 - original photographs Machine/document nodes with image evidence and
+drawing relationships
+PowerFlex field photographs Appendix 3 - original photographs Part identity, terminal map, fault list, control cover and
+physical condition
+RECOMMENDED GRAPH NODES
+Machine: WCRT-200 A6882. Area/location: WCRT-200 cabinet and second outfeed conveyor. Distribution: Panel H2, feeder D4-1P, circuits
+14/16/18. Drive asset: VFD 7. Legacy part instance: Siemens MICROMASTER Vector. Replacement part instance: PowerFlex 4
+22A-B8P0N104. Motor asset: second outfeed conveyor motor. Controller: Allen-Bradley SLC 5/03. Signals: forward, reverse, digital common
+and drive fault. Documents: Siemens manual, Rockwell manual, Wulftec operating manual, general arrangement, PLC input sheet,
+conveyor-control sheet, parameter record and this packet. Event: recurring F231 and drive replacement.
+RECOMMENDED RELATIONSHIP TYPES
+FEEDS, PROTECTS, LOCATED_IN, CONTROLS, DRIVES, COMMANDS, MONITORS, REPORTS_FAULT_TO, DOCUMENTED_BY,
+REPLACED_BY, HAS_PARAMETER_SET, EXPERIENCED_FAULT, TESTED_BY, VERIFIED_BY and REQUIRES_FOLLOWUP.
+EVIDENCE LABELS
+Use CONFIRMED for direct nameplate, terminal-label, user field confirmation or direct parameter capture. Use REFERENCE_ONLY for
+photographs explicitly marked as adjacent Drive 6. Use PROPOSED for the PowerFlex terminal/programming migration until meter and
+functional tests pass. Use OPEN for missing PLC addresses, glare-obscured motor fields, protective-device data and final commissioning
+measurements.
+Appendix ordering
+Appendix 1 preserves the earlier Siemens VFD 7 master record. Appendix 2 preserves the completed replacement cross-reference and the
+full recorded parameter list. Appendix 3 renders every currently available relevant original photograph with its source filename. Duplicate views
+are retained when they are separate source files.
+<PARSED TEXT FOR PAGE: 9 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 1
+SIEMENS VFD 7
+SECOND OUTFEED CONVEYOR
+Asset field Current record
+Asset ID VFD 7
+Service Second outfeed conveyor
+Manufacturer / family Siemens MICROMASTER Vector
+Recurring reported fault F231 - output-current measurement imbalance
+Document status Working master record; field verification items remain open
+Prepared September 5, 2026
+SAFETY
+Lock out and tag out all applicable energy sources before moving power or motor conductors. Verify absence of
+voltage with an adequately rated tester. The drive label requires at least five minutes after power removal for internal
+discharge; verify the DC bus is discharged before contact. Do not bypass guards or safety interlocks.
+Evidence boundary
+Confirmed for VFD 7: asset number, second-outfeed-conveyor service, and recurring F231 report. Not yet confirmed
+from a VFD 7 nameplate or terminal photograph: exact catalog number, serial number, horsepower, and wire numbers.
+The supplied nameplate is visibly marked 6; its specifications and wiring are retained in this packet only as an
+adjacent/reference-drive comparison.
+<PARSED TEXT FOR PAGE: 10 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 2
+1. VFD 7 Field Identification
+Item Enter/verify at machine
+Manufacturer Siemens
+Product family MICROMASTER Vector
+Catalog/order number ____________________________
+Serial number ____________________________
+Motor rating ________ HP / ________ kW
+Input rating ________ V, ______ phase, ______ A
+Output rating ________ V, 3 phase, ______ A
+Location/cabinet ____________________________
+Driven motor tag ____________________________
+Reported operating symptom
+F231 occurs on VFD 7, serving the second outfeed conveyor. F231 is defined by Siemens as output-current
+measurement imbalance. A reset can clear the indication temporarily, but a recurring fault requires isolation of the
+motor/cable side from the inverter itself.
+Do not assign a photoeye as the cause solely because a photoeye initiates conveyor motion. A command device can
+expose the fault by requesting a run, but F231 specifically concerns the drive output-current measurement path.
+Reference documentation
+Siemens MICROMASTER Vector / MIDIMASTER Vector Operating Instructions, document family G85139-H1751-U529.
+The Siemens fault table directs F231 troubleshooting to the F002 checks: motor and cable shorts/earth faults, motor-data
+settings, stator resistance, acceleration, boost, and mechanical obstruction/overload.
+<PARSED TEXT FOR PAGE: 11 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 3
+2. Isolation Test for Recurring F231
+Step Action Meaning
+1 Record exactly when the fault occurs: power-up, run command, acceleration, steady run, or stop. Separates static/internal faults from load-dependent faults.
+2 LOTO. Wait at least five minutes and verify the DC bus is discharged. Photograph and label U, V, W before removal. Prevents shock and preserves phase order.
+3 Disconnect only the motor conductors from VFD 7 U/V/W; individually insulate and secure them. Keep PE connected. Isolates the motor and outgoing cable from the drive.
+4 Re-energize under controlled conditions and issue the same run command. Keep personnel clear; the inverter output is energized even without a motor. Recreates the trigger with the load side removed.
+5A If F231 remains with U/V/W disconnected at the drive, stop testing. Strongly points to the inverter output/current-sensing hardware or internal connection.
+5B If F231 disappears, LOTO again and test the outgoing cable and motor. Points toward cable, terminations, motor windings, or ground leakage.
+De-energized motor/cable checks
+Check Record
+U-V / V-W / W-U resistance ________ / ________ / ________ ohms; should be closely balanced
+Each phase to PE with ordinary ohmmeter ____________________________________________
+Insulation-resistance test Test only after isolating the cable/motor from the VFD and other electronics. Record test voltage and results.
+Mechanical condition Conveyor free/bound: __________ Motor/bearings: __________
+Terminations Loose, discolored, damaged, wet, contaminated: __________________________
+Never megger through a connected VFD. Disconnect sensitive electronics before insulation-resistance testing.
+<PARSED TEXT FOR PAGE: 12 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 4
+3. VFD 7 Wiring Record
+Complete this directly from VFD 7. Do not copy the Drive 6 reference numbers unless each terminal is physically verified.
+Circuit Terminal VFD 7 wire number Destination / notes
+Control common 2 ____________ 0 V/common
+Digital input 1 5 ____________ Function verified by P051: __________
+Digital input 2 6 ____________ Function verified by P052: __________
+Relay 1 18 ____________ P061 function: __________
+Relay 1 19 ____________ Contact role: __________
+Relay 1 20 ____________ Contact role: __________
+Incoming phase A / L1 A/L1 ____________ Voltage to B/C: __________
+Incoming phase B / L2 B/L2 ____________ Voltage to A/C: __________
+Incoming phase C / L3 C/L3 ____________ Voltage to A/B: __________
+Motor phase U ____________
+Motor phase V ____________
+Motor phase W ____________
+Protective earth PE ____________ Continuity verified: ______
+Adjacent/reference Drive 6 - verbally confirmed
+Terminal/function Wire
+2 / 0 V common 6
+5 / digital input 1 128
+6 / digital input 2 129
+19 / fault-relay contact 188
+20 / fault-relay contact 187
+Incoming A-B-C 591 - 593 - 595
+Outgoing U-V-W 592 - 594 - 596
+<PARSED TEXT FOR PAGE: 13 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 5
+4. Parameters to Capture Before Any Change
+Parameter Function VFD 7 Good comparison drive
+P001 Display selection ______ ______
+P002 Ramp-up time ______ s ______ s
+P003 Ramp-down time ______ s ______ s
+P005 Digital frequency setpoint ______ Hz ______ Hz
+P006 Frequency-command source ______ ______
+P007 Keypad control ______ ______
+P009 Parameter protection ______ ______
+P012 / P013 Min / max frequency ____ / ____ Hz ____ / ____ Hz
+P051 / P052 Digital-input functions ____ / ____ ____ / ____
+P061 / P062 Relay-output functions ____ / ____ ____ / ____
+P080 Motor power factor ______ ______
+P081 Motor nameplate frequency ______ Hz ______ Hz
+P082 Motor nameplate speed ______ rpm ______ rpm
+P083 Motor nameplate current ______ A ______ A
+P084 Motor nameplate voltage ______ V ______ V
+P085 Motor nameplate power ______ kW ______ kW
+P086 Motor current limit ______ % ______ %
+P088 Automatic calibration ______ ______
+P140-P143 Fault history ________________ ________________
+Parameter navigation
+Press P to enter parameters, use the arrow buttons to select a parameter, and press P to display its value. Pressing P after
+editing stores the new value. For documentation, record values without changing them.
+<PARSED TEXT FOR PAGE: 14 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 6
+5. Photographic Evidence - Drive 6 Reference
+These photographs document the adjacent/reference drive currently marked 6. They illustrate terminal locations and provide
+comparison information; they do not independently establish VFD 7 wiring.
+Drive marked 6. Nameplate: 6SE3213-6CA40; 750 W; 208/240 V
+input; 3-phase 3.90 A output.
+Reference U/V/W motor-output conductors, verbally confirmed as
+592/594/596.
+<PARSED TEXT FOR PAGE: 15 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 7
+Reference incoming phase conductors, verbally confirmed as
+591/593/595.
+Reference control terminal block showing wires 6, 128, 129, 188 and
+187.
+<PARSED TEXT FOR PAGE: 16 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 8
+6. Manual Evidence and Close-ups
+Manual terminal map: 2 = 0 V, 5 = DIN1, 6 = DIN2.
+Manual defaults: terminals 18/19/20 are relay 1; P061 default 6 = fault
+indication.
+<PARSED TEXT FOR PAGE: 17 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 9
+Manual parameter-navigation example. Manual commissioning parameter overview.
+<PARSED TEXT FOR PAGE: 18 / 35>
+Siemens VFD 7 - Second Outfeed Conveyor | Master Equipment Record Page 10
+7. Service Log and Final Disposition
+Date/time Operating event Fault Test/result Technician
+____________ ________________ _______ ________________________ __________
+____________ ________________ _______ ________________________ __________
+____________ ________________ _______ ________________________ __________
+____________ ________________ _______ ________________________ __________
+Disposition checklist
+Item Status / result
+VFD 7 nameplate photographed _______________________________________________
+VFD 7 wiring physically verified _______________________________________________
+Fault reproduced with exact event recorded _______________________________________________
+U/V/W disconnected-at-drive isolation test Fault remained / cleared / not performed
+Motor/cable resistance and insulation results _______________________________________________
+Parameters compared to matched drive _______________________________________________
+Root cause _______________________________________________
+Corrective action _______________________________________________
+Production verification: cycles / duration _______________________________________________
+Working conclusion
+If VFD 7 repeats F231 with its motor leads physically removed at U/V/W, the evidence strongly favors an internal
+inverter/current-measurement failure. If the fault clears, continue on the outgoing motor cable, motor windings, terminations,
+leakage to ground, and mechanical load. Replace or condemn equipment only after recording the isolation result and
+verifying the exact VFD 7 identity.
+Technician: ______________________________ Date: ______________ Reviewer: ______________________________
+<PARSED TEXT FOR PAGE: 19 / 35>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 1
+SIEMENS MICROMASTER VECTOR
+Complete Recorded Parameter Set - VFD 7 / Second Outfeed Conveyor
+Field values transcribed from the operator's direct keypad readings. Values are recorded settings or live read-only snapshots, not assumed factory
+defaults.
+P Number Value Siemens function / interpretation
+P001 0 Display mode - output frequency
+P002 1.5 Ramp-up time (s)
+P003 1 Ramp-down time (s)
+P004 0 Smoothing time (s)
+P005 5 Digital frequency setpoint (Hz)
+P006 2 Frequency source - fixed frequencies
+P007 0 Keypad control disabled / terminal control
+P009 3 All parameters readable and adjustable
+P010 1 Display scaling
+P011 0 Frequency setpoint memory disabled
+P012 0 Minimum motor frequency (Hz)
+P013 60 Maximum motor frequency (Hz)
+P014 0 Skip frequency 1 (Hz)
+P015 0 Automatic restart after mains failure disabled
+P016 0 Start on the fly disabled
+P017 1 Continuous smoothing
+P018 0 Automatic restart after fault disabled
+P019 2 Skip-frequency bandwidth (Hz)
+P021 0 Minimum analogue frequency (Hz)
+P022 60 Maximum analogue frequency (Hz)
+P023 0 Analogue input 1 type - 0-10 V / 0-20 mA
+P024 0 No analogue setpoint addition
+P025 0 Analogue output 1 - output frequency
+P027 0 Skip frequency 2 (Hz)
+P028 0 Skip frequency 3 (Hz)
+P029 0 Skip frequency 4 (Hz)
+P031 60 Jog frequency right (Hz)
+P032 5 Jog frequency left (Hz)
+P033 1 Jog ramp-up time (s)
+P034 1 Jog ramp-down time (s)
+P040 0 Positioning function disabled
+P041 0 Fixed frequency 1 (Hz)
+P042 0 Fixed frequency 2 (Hz)
+P043 0 Fixed frequency 3 (Hz)
+P044 56 Fixed frequency 4 (Hz)
+P045 0 Fixed-frequency 1-4 inversion selection
+P046 55 Fixed frequency 5 (Hz)
+<PARSED TEXT FOR PAGE: 20 / 35>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 2
+P Number Value Siemens function / interpretation
+P047 0 Fixed frequency 6 (Hz)
+P048 0 Fixed frequency 7 (Hz)
+P049 0 Fixed frequency 8 (Hz)
+P050 1 Fixed-frequency 5 inverted; 6-8 normal
+P051 18 DIN1 terminal 5 - fixed frequency 5 plus RUN
+P052 18 DIN2 terminal 6 - fixed frequency 4 plus RUN
+P053 0 DIN3 terminal 7 disabled
+P054 0 DIN4 terminal 8 disabled
+P055 0 DIN5 terminal 16 disabled
+P056 0 Digital-input debounce - 12.5 ms
+P057 1 Digital-input watchdog interval (s)
+P061 6 Relay RL1 - fault indication
+P062 8 Relay RL2 - warning active
+P063 1 External-brake release delay (s)
+P064 1 External-brake stopping time (s)
+P065 1 Current threshold for relay (A)
+P066 100 Compound braking (%)
+P069 1 Ramp extension enabled
+P070 4 Braking-resistor duty cycle - 100% (MMV only)
+P071 0 Slip compensation (%)
+P072 250 Slip limit (%)
+P073 0 DC injection braking (%)
+P074 1 I2t motor protection curve
+P075 0 External braking resistor not connected
+P076 0 Pulse frequency - 16 kHz, normal modulation
+P077 1 FCC control mode
+P078 100 Continuous boost (%)
+P079 50 Starting boost (%)
+P080 0.80 Motor power factor
+P081 60 Motor nameplate frequency (Hz)
+P082 1725 Motor nameplate speed (RPM)
+P083 3.2 Motor nameplate current (A)
+P084 230 Motor nameplate voltage (V)
+P085 1 Motor nameplate power (hp with P101=1)
+P086 150 Motor current limit (%)
+P087 0 Motor PTC disabled
+P088 0 Automatic stator calibration inactive
+P089 4.6 Stator resistance (ohm)
+P091 0 USS serial slave address
+P092 6 USS baud rate - 9600
+P093 0 Serial timeout disabled
+P094 60 USS nominal system setpoint (Hz)
+<PARSED TEXT FOR PAGE: 21 / 35>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 3
+P Number Value Siemens function / interpretation
+P095 0 USS compatibility - 0.1 Hz resolution
+P099 0 No option module
+P101 1 North American operation - 60 Hz / hp
+P111 1.01 Inverter power rating (hp), read-only
+P112 6 Inverter type - MICROMASTER Vector
+P113 14 Drive model - MMV75/2
+P121 1 RUN button enabled when P007=1
+P122 1 Forward/reverse button enabled when P007=1
+P123 1 JOG button enabled when P007=1
+P124 1 Up/down buttons enabled when P007=1
+P125 1 Forward and reverse operation allowed
+P128 120 Fan switch-off delay (s)
+P131 0 Frequency setpoint (Hz), read-only snapshot
+P132 0 Motor current (A), read-only snapshot
+P133 0 Motor torque (%), read-only snapshot
+P134 303 DC-link voltage (V), read-only snapshot
+P135 0 Motor speed (RPM), read-only snapshot
+P137 0 Output voltage (V), read-only snapshot
+P138 0 Rotor/shaft frequency (Hz), read-only snapshot
+P139 0 Peak output-current record
+P140 231 Most recent fault - F231
+P141 231 Previous fault - F231
+P142 231 Second previous fault - F231
+P143 231 Third previous fault - F231
+P186 200 Instantaneous motor-current limit (%)
+P201 0 PID closed-loop mode disabled
+P202 1 PID proportional gain
+P203 0 PID integral gain
+P204 0 PID derivative gain
+P205 1 PID sample interval - 25 ms
+P206 0 PID transducer filtering off
+P207 100 PID integral capture range (%)
+P208 0 Transducer type - direct acting
+P210 1.4 Transducer reading (%), read-only snapshot
+P211 0 PID 0% setpoint
+P212 100 PID 100% setpoint
+P220 0 Frequency cutoff disabled
+P321 0 Analogue-input-2 minimum frequency (Hz)
+P322 60 Analogue-input-2 maximum frequency (Hz)
+P323 0 Analogue input 2 - 0-10 V / 0-20 mA
+P356 6 DIN6 terminal 17 - fixed frequency 6
+P386 1 Vector speed-loop proportional gain
+<PARSED TEXT FOR PAGE: 22 / 35>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 4
+P Number Value Siemens function / interpretation
+P387 1 Vector speed-loop integral gain
+P720 0 Direct I/O functions - normal operation
+P721 0 Analogue-input-1 voltage (V), read-only
+P722 0 Analogue-output-1 current (mA)
+P723 0 Digital-input state (hex) - all inputs off
+P724 0 Direct relay control - both off
+P725 0 Analogue-input-2 voltage (V), read-only
+P910 0 Local control mode
+P922 2.04 Software version, read-only
+P923 0 Equipment system/reference number
+P930 231 Most recent fault - F231 (copy of P140)
+P931 0 Most recent warning - none
+P944 0 Factory reset inactive
+P971 1 EEPROM storage enabled
+Critical retained readings: P082 = 1725 RPM; P128 = 120 s; P922 = software 2.04; P140-P143 and P930 = F231. P944 must remain 0 unless an
+intentional factory reset is required.
+Literature: Siemens MICROMASTER Vector / MIDIMASTER Vector Operating Instructions, G85139-H1751-U529-D1; compact guide
+G85139-H1751-U568-D1, May 1999.
+<PARSED TEXT FOR PAGE: 23 / 35>
+VFD 7 - Second Outfeed Conveyor Completed cross-reference | Page 1
+VFD 7 - SIEMENS TO ALLEN-BRADLEY
+Completed replacement-drive wiring cross-reference | Second Outfeed Conveyor
+Replacement
+drive Allen-Bradley PowerFlex 4 Catalog 22A-B8P0N104, Series A
+Motor rating 1.5 kW / 2.0 HP Input 3-phase, 200-240 V AC, 48-63 Hz, 9.5 A
+Output 3-phase, 0-230 V AC, 0-240 Hz Output current 8.0 A continuous; 12.0 A / 60 s
+CONTROL-CONDUCTOR CROSS-REFERENCE
+Wire Siemens MICROMASTER
+Vector
+PowerFlex 4 landing Function / commissioning note Status
+6 T2 - control 0 V 04 - Digital Common Digital-input common. Confirm the SNK/SRC selector and
+control-voltage scheme before energizing.
+LANDING ASSIGNED
+VERIFY POLARITY
+129 T6 - DIN2
+P052=18; 56 Hz forward
+02 - Start / Run FWD Two-wire forward run command. PowerFlex P036 must be configured
+for the actual two-wire scheme.
+LANDING ASSIGNED
+PROGRAM + TEST
+128 T5 - DIN1
+P051=18; 55 Hz reverse
+03 - Direction / Run REV Two-wire reverse run command. Do not permit terminals 02 and 03 to
+be active together.
+LANDING ASSIGNED
+PROGRAM + TEST
+188 T19 - RL1 N.O.
+P061=6 fault
+R1 - Relay N.O. Fault-status switched leg. Set PowerFlex relay output selection to
+Fault and prove the desired energized/de-energized behavior.
+LANDING ASSIGNED
+PROVE LOGIC
+187 T20 - RL1 common R2 - Relay Common Fault-status relay common. R3 is the unused normally-closed contact
+unless the control circuit is intentionally redesigned.
+LANDING ASSIGNED
+PROVE LOGIC
+POWER AND MOTOR CONDUCTORS
+Wire Siemens PowerFlex 4 Circuit Status
+591 A / L1 R / L1 Incoming line phase 1 DIRECT CROSS-REFERENCE
+593 B / L2 S / L2 Incoming line phase 2 DIRECT CROSS-REFERENCE
+595 C / L3 T / L3 Incoming line phase 3 DIRECT CROSS-REFERENCE
+592 U U / T1 Motor output phase U DIRECT CROSS-REFERENCE
+594 V V / T2 Motor output phase V DIRECT CROSS-REFERENCE
+596 W W / T3 Motor output phase W DIRECT CROSS-REFERENCE
+Not recorded PE PE / ground Equipment grounding conductor IDENTIFY IN FIELD
+Important: This is a terminal/function cross-reference, not authorization to energize. Confirm every wire marker and terminal de-energized under LOTO. Verify
+phase sequence, motor direction, insulation to ground with the VFD disconnected, control polarity, and relay fail-safe behavior before commissioning.
+<PARSED TEXT FOR PAGE: 24 / 35>
+VFD 7 - Second Outfeed Conveyor Completed cross-reference | Page 2
+POWERFLEX 4 TERMINAL & SETUP RECORD
+Use during installation and commissioning | Source: drive nameplate/photo and Rockwell 22A-UM001
+Observed Siemens DIP bank 1 UP | 2 DOWN | 3 DOWN | 4 UP | 5 DOWN
+PowerFlex 4 SNK/SRC selector SET SRC - METER VERIFY BEFORE LANDING
+Relationship
+The Siemens five-switch bank configures analog-input modes and is not a position-for-position replacement. PowerFlex
+cover: SNK inputs activate when pulled to DIG COM; SRC inputs activate when pulled to +24 V. Wire 6 is the recorded
+0 V/common, so SRC is the functional match if wires 128/129 measure approximately +24 V to wire 6 when
+commanded.
+TERMINAL IDENTIFICATION
+Terminal PowerFlex 4 function Assigned VFD 7 conductor / note
+01 Stop / enable input Factory jumper to terminal 11 is installed in the supplied-drive photo. Retain or remove only as
+required by the selected start scheme and safety design.
+02 Start / Run Forward Wire 129 - proposed two-wire forward command
+03 Direction / Run Reverse Wire 128 - proposed two-wire reverse command
+04 Digital Common Wire 6 - control 0 V/common; set SRC after meter verification
+05 Digital Input 1 Unassigned
+06 Digital Input 2 Unassigned
+R1 Relay Normally Open Wire 188 - fault contact switched leg
+R2 Relay Common Wire 187 - fault contact common
+R3 Relay Normally Closed Unassigned
+11 +24 V DC Factory jumper to terminal 01 shown in photo
+12 +10 V DC Unassigned
+13 0-10 V input Unassigned
+14 Analog Common Unassigned
+15 4-20 mA input Unassigned
+16 RS-485 shield Unassigned
+COMMISSIONING ITEMS - MUST BE VERIFIED
+■ P036 Start Source: configure for the actual maintained two-wire forward/reverse control scheme.
+■ P037 Stop Mode: match machine stopping requirements; terminal 01 behavior changes with start-source selection.
+■ P038 Speed Reference and commanded frequency: Siemens used 55 Hz reverse and 56 Hz forward; PowerFlex 4 terminals 02/03 select direction, not two independent
+speeds. Establish the intended replacement speed strategy before running.
+■ A051/A052 Digital Input selections: leave unused unless a separate preset-speed or interlock function is deliberately added.
+■ A055 Relay Out Select: configure for Fault, then prove whether the PLC/control circuit requires closed-on-healthy or closed-on-fault logic.
+■ Motor nameplate values: enter the actual motor volts, hertz and full-load amps; do not copy the replacement drive's 8.0 A rating as motor FLA.
+Field verification
+Verified by Date
+Control voltage SNK / SRC
+Forward direction PASS / FAIL Reverse direction PASS / FAIL
+Fault relay logic PASS / FAIL E-stop / stop test PASS / FAIL
+Do not megger the motor cable while connected to either VFD. Wait the manufacturer's required discharge time, measure DC-bus voltage, and follow the facility
+electrical-safety procedure before touching terminals.
+<PARSED TEXT FOR PAGE: 25 / 35>
+Appendix 3 - Original photographic evidence Photo 1 of 11
+IMG_2733.jpeg
+PLC input-card schematic: reverse/stop/safety/oversize circuits.
+Source file: IMG_2733.jpeg | SHA-256: d86e2b737e56d8ac16fc405809d2bf1d749535e49a095232580b981fc2ec6865
+<PARSED TEXT FOR PAGE: 26 / 35>
+Appendix 3 - Original photographic evidence Photo 2 of 11
+IMG_2736(1).jpeg
+Conveyor-control schematic: VFD-4 through VFD-8, including VFD-7 second outfeed conveyor.
+Source file: IMG_2736(1).jpeg | SHA-256: 56ee6eda9d1acb0dcf10af2ca8de77d8807f628526329cf49db80d4286b33b62
+<PARSED TEXT FOR PAGE: 27 / 35>
+Appendix 3 - Original photographic evidence Photo 3 of 11
+IMG_2740.jpeg
+WCRT-200 general arrangement; revision 2000/11/22; conveyor speed changed 30 to 36 FPM.
+Source file: IMG_2740.jpeg | SHA-256: 83c9721f64464cb44d39c90fcefd1c8f8e5d5fa141ac2ad48851e37139bcd8c9
+<PARSED TEXT FOR PAGE: 28 / 35>
+Appendix 3 - Original photographic evidence Photo 4 of 11
+IMG_2747.jpeg
+Wulftec WCRT-200 operating manual cover; Golden State Vintners #6882; May 2001.
+Source file: IMG_2747.jpeg | SHA-256: 0c80ffe1ede7b8434cf85d5414e552117841e43c256c2e8bcb921aafb2ce0a7c
+<PARSED TEXT FOR PAGE: 29 / 35>
+Appendix 3 - Original photographic evidence Photo 5 of 11
+IMG_A84788D5-2D9E-4AB2-847A-F6091267B2E2.jpeg
+Allen-Bradley PowerFlex 4 nameplate; Cat. 22A-B8P0N104, Series A.
+Source file: IMG_A84788D5-2D9E-4AB2-847A-F6091267B2E2.jpeg | SHA-256: b8b048b2c3dc0636dc36d9d794e0b8a7d9edadb95635fc30535fe72e4aab3f25
+<PARSED TEXT FOR PAGE: 30 / 35>
+Appendix 3 - Original photographic evidence Photo 6 of 11
+IMG_2781(1).jpeg
+Allen-Bradley PowerFlex 4 front/operator interface.
+Source file: IMG_2781(1).jpeg | SHA-256: 30064ded645850c45fbc4b10a3c32597bdc8e47de960c58e23e1ec2bb9a5f278
+<PARSED TEXT FOR PAGE: 31 / 35>
+Appendix 3 - Original photographic evidence Photo 7 of 11
+IMG_2782(1).jpeg
+PowerFlex 4 fault-code and common-parameter label.
+Source file: IMG_2782(1).jpeg | SHA-256: fff8983e9a61259738f3c7242e6399ca178a853a22bc96d1a43cdfc2365c6231
+<PARSED TEXT FOR PAGE: 32 / 35>
+Appendix 3 - Original photographic evidence Photo 8 of 11
+IMG_2783(1).jpeg
+PowerFlex 4 power and control terminal blocks; factory jumper visible.
+Source file: IMG_2783(1).jpeg | SHA-256: 0b38607f7740ce9a39daf87f55ffeb06dfcb80216a81856ad80d564c62bf8f3c
+<PARSED TEXT FOR PAGE: 33 / 35>
+Appendix 3 - Original photographic evidence Photo 9 of 11
+IMG_6DCB3F63-804E-40E8-B664-45F9620BD401.jpeg
+PowerFlex 4 catalog/rating label alternate field view.
+Source file: IMG_6DCB3F63-804E-40E8-B664-45F9620BD401.jpeg | SHA-256: 3bd27bebe36ed95bc2ec19c5ae96cf5697f4f121e18f88327095aa2759c9b7a1
+<PARSED TEXT FOR PAGE: 34 / 35>
+Appendix 3 - Original photographic evidence Photo 10 of 11
+IMG_2784.jpeg
+PowerFlex 4 inside-cover terminal diagram and SNK/SRC definitions.
+Source file: IMG_2784.jpeg | SHA-256: 9dd1bcce5589d8d0287f23d66fb8bb2b68040796bb67b295adc03f2a281e1e63
+<PARSED TEXT FOR PAGE: 35 / 35>
+Appendix 3 - Original photographic evidence Photo 11 of 11
+IMG_2788.jpeg
+Second outfeed conveyor motor nameplate. Sterling Electric model SH0014PCA; 1 HP, 1750 RPM, 3-phase, 60 Hz, 208-230/460 V, 3.2-2.9/1.45
+A, 85.5% efficiency, code K and SF 1.15. Some printed fields remain obscured by glare.
+Source file: IMG_2788.jpeg | SHA-256: 556d995157fcc5ee8192e7edbd2e8d488a68268d2919454574e07a19ab0a2c9e

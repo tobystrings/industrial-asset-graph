@@ -1,0 +1,190 @@
+[
+  {
+    "source_id": "S01",
+    "name": "Industrial_Asset_Graph_Machine_Documentation_Review_Package.md",
+    "library_file_id": "libfile_9fb9575bc56c8191a678955b39495c58",
+    "created_at": "2026-07-30T23:26:30.888626Z",
+    "modified_at": "2026-07-30T23:26:30.888626Z",
+    "extracted_text": "source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md"
+    ]
+  },
+  {
+    "source_id": "S02",
+    "name": "Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf",
+    "library_file_id": "libfile_539b9efbfa548191b86d12591b8b21c6",
+    "created_at": "2026-09-05T03:35:24.522784Z",
+    "modified_at": "2026-09-05T03:54:13.772245Z",
+    "extracted_text": "source_text/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf"
+    ]
+  },
+  {
+    "source_id": "S03",
+    "name": "J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf",
+    "library_file_id": "libfile_493ff1a8ef408191abd45170b58d3af0",
+    "created_at": "2026-09-01T18:02:44.614719Z",
+    "modified_at": "2026-09-01T18:02:44.614719Z",
+    "extracted_text": "source_text/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf"
+    ]
+  },
+  {
+    "source_id": "S04",
+    "name": "Line_2_HOT_FILLER_Manual_Review_Packet.pdf",
+    "library_file_id": "libfile_279db9520d7c8191bbaf6adb921c4083",
+    "created_at": "2026-08-31T18:35:33.700043Z",
+    "modified_at": "2026-08-31T18:35:33.700043Z",
+    "extracted_text": "source_text/Line_2_HOT_FILLER_Manual_Review_Packet.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Line_2_HOT_FILLER_Manual_Review_Packet.pdf"
+    ]
+  },
+  {
+    "source_id": "S05",
+    "name": "Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md",
+    "library_file_id": "libfile_4b1ce3150a988191b5b8333766817185",
+    "created_at": "2026-09-02T18:28:27.577533Z",
+    "modified_at": "2026-09-02T18:28:27.577533Z",
+    "extracted_text": "source_text/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md"
+    ]
+  },
+  {
+    "source_id": "S06",
+    "name": "Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt",
+    "library_file_id": "libfile_af8276eeb2848191bfae40fcdb2142bc",
+    "created_at": "2026-08-31T18:54:56.558101Z",
+    "modified_at": "2026-08-31T18:54:56.558101Z",
+    "extracted_text": "source_text/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt"
+    ]
+  },
+  {
+    "source_id": "S07",
+    "name": "Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf",
+    "library_file_id": "libfile_b4011ce081dc8191a6261f82dbb2fb59",
+    "created_at": "2026-07-30T23:26:28.857173Z",
+    "modified_at": "2026-07-30T23:26:28.857173Z",
+    "extracted_text": "source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf"
+    ]
+  },
+  {
+    "source_id": "S08",
+    "name": "Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf",
+    "library_file_id": "libfile_101d2c3dc54c8191831b5fbd44815dc0",
+    "created_at": "2026-09-05T02:48:49.032858Z",
+    "modified_at": "2026-09-05T02:58:17.804122Z",
+    "extracted_text": "source_text/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf"
+    ]
+  },
+  {
+    "source_id": "S09",
+    "name": "Line_2_Hot_Filler_HMI_Correction_Prompt.txt",
+    "library_file_id": "libfile_2a9df852063c8191aa2150334e55d864",
+    "created_at": "2026-08-31T20:41:29.925059Z",
+    "modified_at": "2026-08-31T20:41:29.925059Z",
+    "extracted_text": "source_text/Line_2_Hot_Filler_HMI_Correction_Prompt.txt.extracted.txt",
+    "complete_text": true,
+    "originals": []
+  },
+  {
+    "source_id": "S10",
+    "name": "Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md",
+    "library_file_id": "libfile_c2d7138f4ec08191a365373e16f86b16",
+    "created_at": "2026-09-02T18:35:58.377841Z",
+    "modified_at": "2026-09-02T19:27:27.039038Z",
+    "extracted_text": "source_text/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/00 Project Control/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md"
+    ]
+  },
+  {
+    "source_id": "S11",
+    "name": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "library_file_id": "libfile_731876554100819188c78b014d60ecf7",
+    "created_at": "2026-09-03T01:27:44.778645Z",
+    "modified_at": "2026-09-03T01:27:44.778645Z",
+    "extracted_text": "source_text/Kosme_CR30_Selected_Card_01_Data_Readout.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/KOSME/Kosme_CR30_Selected_Card_01_Data_Readout.pdf"
+    ]
+  },
+  {
+    "source_id": "S12",
+    "name": "industrial_asset_graph_merged_codex_goal_prompt.txt",
+    "library_file_id": "libfile_0298cfb12f208191b8a3c8009e5fe288",
+    "created_at": "2026-08-28T05:41:01.209335Z",
+    "modified_at": "2026-08-28T05:41:01.209335Z",
+    "extracted_text": "source_text/industrial_asset_graph_merged_codex_goal_prompt.txt.extracted.txt",
+    "complete_text": true,
+    "originals": []
+  },
+  {
+    "source_id": "S13",
+    "name": "J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf",
+    "library_file_id": "libfile_4c5142d5151481919f7524f2347948a0",
+    "created_at": "2026-08-07T22:46:08.007374Z",
+    "modified_at": "2026-08-07T22:46:08.007374Z",
+    "extracted_text": "source_text/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf"
+    ]
+  },
+  {
+    "source_id": "S14",
+    "name": "Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md",
+    "library_file_id": "libfile_f9773f6d6fc4819197f82e1c0d9724ac",
+    "created_at": "2026-09-02T19:07:40.323038Z",
+    "modified_at": "2026-09-02T19:27:33.090602Z",
+    "extracted_text": "source_text/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/03 Live Troubleshooting/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md"
+    ]
+  },
+  {
+    "source_id": "S15",
+    "name": "Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md",
+    "library_file_id": "libfile_cf4ec911885881919cc03b60e8c37160",
+    "created_at": "2026-09-02T19:03:35.022864Z",
+    "modified_at": "2026-09-02T19:27:30.841179Z",
+    "extracted_text": "source_text/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md"
+    ]
+  },
+  {
+    "source_id": "S16",
+    "name": "Kosme_TOP_II_AD_Authoritative_Asset_Identity.md",
+    "library_file_id": "libfile_82206cc4d7bc8191ac5e33bf9cc9e240",
+    "created_at": "2026-09-02T17:40:52.388616Z",
+    "modified_at": "2026-09-02T17:40:52.388616Z",
+    "extracted_text": "source_text/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md.extracted.txt",
+    "complete_text": true,
+    "originals": [
+      "original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md"
+    ]
+  }
+]

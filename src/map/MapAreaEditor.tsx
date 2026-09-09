@@ -8,9 +8,10 @@ import {
   validateMapDraft, type MapEditorHistory, type MapEditorTool, type MapObjectRef, type MapPoint,
 } from './mapEditor';
 import './mapAreaEditor.css';
+import { openPlantDb } from '../facility/runtimeDb';
 
 const tools: Array<[MapEditorTool, string]> = [
-  ['select', 'Select'], ['multi-select', 'Multi-select'], ['pan', 'Pan'], ['add-area', 'Add Area'], ['add-rectangle', 'Add Rectangle'],
+  ['select', 'Select'], ['multi-select', 'Multi-select'], ['pan', 'Cursor / Pan'], ['add-area', 'Add Area'], ['add-rectangle', 'Add Rectangle'],
   ['add-polygon', 'Add Polygon'], ['edit-shape', 'Edit Shape'], ['move', 'Move'], ['resize', 'Resize'],
   ['wall', 'Wall / Line'], ['erase', 'Delete'], ['merge', 'Merge Areas'], ['split', 'Split Area'],
   ['text', 'Text / Label'], ['note', 'Note'], ['pen', 'Freehand'], ['line', 'Markup Line'],
@@ -31,10 +32,11 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
   const facility = useFacility();
   const editor = useFacilityEditor();
   const baseline = useRef(draftFromPackage(facility));
+  const assetBaseline = useRef(structuredClone(facility.assets));
   const [history, setHistory] = useState<MapEditorHistory>(() => createHistory(baseline.current));
   const [assets, setAssets] = useState(() => structuredClone(facility.assets));
   const [saving, setSaving] = useState(false);
-  const [tool, setTool] = useState<MapEditorTool>('select');
+  const [tool, setTool] = useState<MapEditorTool>('pan');
   const [selection, setSelection] = useState<MapObjectRef[]>([]);
   const [message, setMessage] = useState('Select an editing tool. Structural geometry and manual markup are separate layers.');
   const [workingPoints, setWorkingPoints] = useState<MapPoint[]>([]);
@@ -43,11 +45,19 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
   useEffect(() => {
     if (!active) return;
     baseline.current = draftFromPackage(facility);
+    assetBaseline.current = structuredClone(facility.assets);
     setHistory(createHistory(baseline.current));
     setAssets(structuredClone(facility.assets));
     setSelection([]);
-    setTool('select');
+    setTool('pan');
     setWorkingPoints([]);
+    let alive=true;
+    void openPlantDb(facility.facility.id).then(db=>{
+      const tx=db.transaction('publication-state');const r=tx.objectStore('publication-state').get('map-draft');
+      r.onsuccess=()=>{const saved=r.result;if(alive&&saved?.facilityId===facility.facility.id&&JSON.stringify(saved.baseline)===JSON.stringify(baseline.current)&&!validateMapDraft({...facility,assets:saved.assets},saved.draft).length){setHistory(createHistory(saved.draft));setAssets(saved.assets);setMessage('Restored your saved working draft. Save Changes publishes it as the current map.');}};
+      tx.oncomplete=()=>db.close();
+    });
+    return()=>{alive=false;};
   }, [active, facility.facility.id]);
 
   const commit = (next: MapEditorHistory['present'], text: string) => { setHistory((current) => pushHistory(current, next)); setMessage(text); };
@@ -56,6 +66,12 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
   const selectedArea = selectedAreas.length === 1 ? selectedAreas[0] : undefined;
   const dirty = JSON.stringify(history.present) !== JSON.stringify(baseline.current) || JSON.stringify(assets) !== JSON.stringify(facility.assets);
   const errors = useMemo(() => validateMapDraft({ ...facility, assets }, history.present), [assets, facility, history.present]);
+  useEffect(()=>{
+    if(!active||!dirty||saving||errors.length)return;
+    const timer=setTimeout(()=>void openPlantDb(facility.facility.id).then(db=>{const tx=db.transaction('publication-state','readwrite');tx.objectStore('publication-state').put({id:'map-draft',facilityId:facility.facility.id,baseline:baseline.current,draft:history.present,assets});tx.oncomplete=()=>db.close();}),350);
+    return()=>clearTimeout(timer);
+  },[active,dirty,saving,errors.length,history.present,assets,facility.facility.id]);
+  const clearSavedDraft=async()=>{const db=await openPlantDb(facility.facility.id);await new Promise<void>((resolve,reject)=>{const tx=db.transaction('publication-state','readwrite');tx.objectStore('publication-state').delete('map-draft');tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});db.close();};
 
   const selectTool = (next: MapEditorTool) => {
     setTool(next); setWorkingPoints([]);
@@ -190,28 +206,42 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
   };
   const save = async () => {
     if (saving) return false;
+    if(JSON.stringify(draftFromPackage(facility))!==JSON.stringify(baseline.current)||JSON.stringify(facility.assets)!==JSON.stringify(assetBaseline.current)){setMessage('The shared map changed while this draft was open. Your draft is preserved; review the newer map before applying it.');return false;}
     if (errors.length) { setMessage(errors[0]); return false; }
     setSaving(true);
     const summary = mapChangeSummary(baseline.current, history.present);
-    try { await editor.saveMapDraft({ ...history.present, assets }, summary); baseline.current = structuredClone(history.present); setHistory(createHistory(history.present)); setMessage(`Saved on this device: ${summary.length} structural or markup change${summary.length === 1 ? '' : 's'}.`); return true; }
+    try { await editor.saveMapDraft({ ...history.present, assets }, summary); await clearSavedDraft(); const shared = await editor.publishNow(); baseline.current = structuredClone(history.present); assetBaseline.current = structuredClone(assets); setHistory(createHistory(history.present)); setMessage(editor.publication.phase === 'DISABLED' ? `Saved on this device: ${summary.length} structural or markup change${summary.length === 1 ? '' : 's'}.` : shared ? 'Map saved across devices. GitHub publication is queued.' : 'Map saved locally. Shared publication needs attention; your changes are preserved.'); return shared; }
     catch (error) { setMessage(error instanceof Error ? error.message : 'Map changes could not be saved.'); return false; }
     finally { setSaving(false); }
   };
   const finish = async () => { if (saving) return; if (!dirty || await save()) onExit(); };
-  const cancel = () => { setHistory(createHistory(baseline.current)); setAssets(structuredClone(facility.assets)); setSelection([]); setWorkingPoints([]); onExit(); };
+  const cancel = () => { void clearSavedDraft(); setHistory(createHistory(baseline.current)); setAssets(structuredClone(facility.assets)); setSelection([]); setWorkingPoints([]); onExit(); };
   return { active, saving, finish, editor, history, assets, tool, selection, selectedArea, selectedAreas, dirty, errors, message, workingPoints, choose, selectTool, setSelection, updateSelectedArea, nudge, resize, moveSelection, editVertex, addVertex, removeVertex, pointerDown, pointerMove, pointerUp, finishPolygon, setDrag, save, cancel, undo: () => setHistory(undoHistory), redo: () => setHistory(redoHistory), canUndo: history.past.length > 0, canRedo: history.future.length > 0 };
 }
 
 export function MapEditorToolbar({ session }: { session: MapEditorSession }) {
+  const [panel, setPanel] = useState<'areas' | 'drawing' | 'properties' | null>(null);
+  useEffect(() => { if (session.selectedArea) setPanel('properties'); }, [session.selectedArea?.id]);
   if (!session.active) return null;
   const area = session.selectedArea;
+  const areaTools = ['multi-select','add-area','add-rectangle','add-polygon','edit-shape','move','resize','merge','split','erase'];
+  const visibleTools = tools.filter(([id]) => panel === 'areas' ? areaTools.includes(id) : panel === 'drawing' ? !areaTools.includes(id) && !['select','pan'].includes(id) : false);
   return <div className="map-editor-shell" aria-label="Map and area editor">
-    <div className="map-editor-mode"><b>STRUCTURAL MAP</b><span>Areas, walls, labels</span><i/><b>MANUAL MARKUP</b><span>Non-authoritative notes and drawing</span></div>
-    <div className="map-editor-tools" role="toolbar" aria-label="Map editing tools">{tools.map(([id, label]) => <button key={id} type="button" className={session.tool === id ? 'active' : ''} aria-pressed={session.tool === id} onClick={() => session.selectTool(id)}>{label}</button>)}<button type="button" onClick={session.finishPolygon} disabled={session.tool !== 'add-polygon' || session.workingPoints.length < 3}>Finish Polygon</button></div>
+    <div className="map-studio-tabs" aria-label="Map Studio tool panels">
+      <button type="button" className={session.tool === 'pan' ? 'active' : ''} aria-pressed={session.tool === 'pan'} onClick={() => { session.selectTool('pan'); setPanel(null); }}>Cursor / Pan</button>
+      <button type="button" className={session.tool === 'select' ? 'active' : ''} aria-pressed={session.tool === 'select'} onClick={() => session.selectTool('select')}>Select</button>
+      {(['areas','drawing','properties'] as const).map(id => <button key={id} type="button" aria-expanded={panel === id} aria-controls="map-studio-panel" className={panel === id ? 'active' : ''} onClick={() => setPanel(panel === id ? null : id)}>{id === 'areas' ? 'Areas & shapes' : id === 'drawing' ? 'Drawing & notes' : 'Properties'} {panel === id ? '−' : '+'}</button>)}
+      {panel && <button type="button" onClick={() => setPanel(null)}>Collapse tools</button>}
+    </div>
+    {panel && <div id="map-studio-panel" className="map-studio-panel">
+      {visibleTools.length > 0 && <div className="map-editor-tools" role="toolbar" aria-label="Map editing tools">{visibleTools.map(([id,label]) => <button key={id} type="button" className={session.tool === id ? 'active' : ''} aria-pressed={session.tool === id} onClick={() => session.selectTool(id)}>{label}</button>)}{panel === 'areas' && <button type="button" onClick={session.finishPolygon} disabled={session.tool !== 'add-polygon' || session.workingPoints.length < 3}>Finish Polygon</button>}</div>}
+      {panel === 'drawing' && <small>Manual markup is separate from structural geometry and verified equipment facts.</small>}
+      {panel === 'properties' && !area && <p>Choose Select, then click an area to edit its name and shape.</p>}
+    </div>}
     <div className="map-editor-session"><button type="button" onClick={session.undo} disabled={!session.canUndo}>Undo</button><button type="button" onClick={session.redo} disabled={!session.canRedo}>Redo</button><span className={session.dirty ? 'dirty' : ''}>{session.dirty ? 'Unsaved changes' : 'Draft matches saved map'}</span><button type="button" onClick={session.cancel}>Cancel / Exit</button><button className="primary" type="button" disabled={session.saving || !session.dirty || session.errors.length > 0} onClick={() => void session.save()}>Save Changes</button><button type="button" disabled={session.saving} onClick={() => void session.finish()}>Done</button></div>
     <div className="map-editor-message" role="status">{session.errors[0] ?? session.message}</div>
     {session.selection.length > 0 && <div className="map-editor-selection-actions"><b>{session.selection.length} selected</b><span>Move selection:</span><button onClick={() => session.moveSelection(-1, 0)}>←</button><button onClick={() => session.moveSelection(0, -1)}>↑</button><button onClick={() => session.moveSelection(0, 1)}>↓</button><button onClick={() => session.moveSelection(1, 0)}>→</button></div>}
-    {area && <aside className="map-area-properties" aria-label="Area Properties"><header><b>Area Properties</b><small>{area.id} · stable ID locked</small></header><label>Area name<input value={area.name} onChange={(event) => session.updateSelectedArea({ name: event.target.value }, `Renamed ${area.name}.`)}/></label><small>Area name updates the map label. You can shorten the display label afterward.</small><label>Display label<input value={area.shortName} onChange={(event) => session.updateSelectedArea({ shortName: event.target.value }, `Changed label for ${area.name}.`)}/></label><label>Notes<textarea rows={2} value={area.notes ?? ''} onChange={(event) => session.updateSelectedArea({ notes: event.target.value }, `Changed notes for ${area.name}.`)}/></label><label className="inline"><input type="checkbox" checked={area.visible !== false} onChange={(event) => session.updateSelectedArea({ visible: event.target.checked }, `Changed visibility for ${area.name}.`)}/>Visible</label><div className="map-area-nudges"><button onClick={() => session.nudge(-1, 0)}>←</button><button onClick={() => session.nudge(0, -1)}>↑</button><button onClick={() => session.nudge(0, 1)}>↓</button><button onClick={() => session.nudge(1, 0)}>→</button><button onClick={() => session.resize(-1, -1)}>Smaller</button><button onClick={() => session.resize(1, 1)}>Larger</button><button onClick={session.addVertex}>Add vertex</button></div>{area.overlay.polygon && <div className="map-vertex-list"><b>Shape vertices</b>{area.overlay.polygon.map((point, index) => <div key={index}><label>X<input type="number" min="0" max="100" step="0.1" value={point.x} onChange={(event) => session.editVertex(index, { ...point, x: Number(event.target.value) })}/></label><label>Y<input type="number" min="0" max="100" step="0.1" value={point.y} onChange={(event) => session.editVertex(index, { ...point, y: Number(event.target.value) })}/></label><button onClick={() => session.removeVertex(index)} aria-label={`Remove vertex ${index + 1}`}>×</button></div>)}</div>}<small>{area.assetIds.length} assigned asset{area.assetIds.length === 1 ? '' : 's'}; delete is blocked until dependencies are resolved.</small></aside>}
+    {area && panel === 'properties' && <aside className="map-area-properties" aria-label="Area Properties"><header><b>Area Properties</b><small>{area.id} · stable ID locked</small></header><label>Area name<input value={area.name} onChange={(event) => session.updateSelectedArea({ name: event.target.value }, `Renamed ${area.name}.`)}/></label><small>Area name updates the map label. You can shorten the display label afterward.</small><label>Display label<input value={area.shortName} onChange={(event) => session.updateSelectedArea({ shortName: event.target.value }, `Changed label for ${area.name}.`)}/></label><label>Notes<textarea rows={2} value={area.notes ?? ''} onChange={(event) => session.updateSelectedArea({ notes: event.target.value }, `Changed notes for ${area.name}.`)}/></label><label className="inline"><input type="checkbox" checked={area.visible !== false} onChange={(event) => session.updateSelectedArea({ visible: event.target.checked }, `Changed visibility for ${area.name}.`)}/>Visible</label><div className="map-area-nudges"><button onClick={() => session.nudge(-1, 0)}>←</button><button onClick={() => session.nudge(0, -1)}>↑</button><button onClick={() => session.nudge(0, 1)}>↓</button><button onClick={() => session.nudge(1, 0)}>→</button><button onClick={() => session.resize(-1, -1)}>Smaller</button><button onClick={() => session.resize(1, 1)}>Larger</button><button onClick={session.addVertex}>Add vertex</button></div>{area.overlay.polygon && <div className="map-vertex-list"><b>Shape vertices</b>{area.overlay.polygon.map((point, index) => <div key={index}><label>X<input type="number" min="0" max="100" step="0.1" value={point.x} onChange={(event) => session.editVertex(index, { ...point, x: Number(event.target.value) })}/></label><label>Y<input type="number" min="0" max="100" step="0.1" value={point.y} onChange={(event) => session.editVertex(index, { ...point, y: Number(event.target.value) })}/></label><button onClick={() => session.removeVertex(index)} aria-label={`Remove vertex ${index + 1}`}>×</button></div>)}</div>}<small>{area.assetIds.length} assigned asset{area.assetIds.length === 1 ? '' : 's'}; delete is blocked until dependencies are resolved.</small></aside>}
   </div>;
 }
 

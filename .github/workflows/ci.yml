@@ -45,6 +45,7 @@ jobs:
 
       - name: Build
         env:
+          VITE_IAG_PUBLICATION: 'true'
           # Synthetic endpoint; Playwright intercepts Auth requests, never real credentials.
           VITE_SUPABASE_URL: https://iag-auth-test.supabase.co
           VITE_SUPABASE_ANON_KEY: synthetic-visual-test-key
@@ -52,6 +53,12 @@ jobs:
 
       - name: Run dashboard visual verification
         run: npm run test:visual
+
+      - name: Verify Map Studio workflows
+        run: npm run test:map-editor
+
+      - name: Verify shared publication across browsers
+        run: npm run test:publication
 
       - name: Upload visual audit screenshots
         if: always()

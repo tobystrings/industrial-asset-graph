@@ -1,0 +1,1352 @@
+[
+  {
+    "parameter": "P001",
+    "raw_value": "0",
+    "source_description": "Display mode - output frequency",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P002",
+    "raw_value": "1.5",
+    "source_description": "Ramp-up time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P003",
+    "raw_value": "1",
+    "source_description": "Ramp-down time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P004",
+    "raw_value": "0",
+    "source_description": "Smoothing time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P005",
+    "raw_value": "5",
+    "source_description": "Digital frequency setpoint (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P006",
+    "raw_value": "2",
+    "source_description": "Frequency source - fixed frequencies",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P007",
+    "raw_value": "0",
+    "source_description": "Keypad control disabled / terminal control",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P009",
+    "raw_value": "3",
+    "source_description": "All parameters readable and adjustable",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P010",
+    "raw_value": "1",
+    "source_description": "Display scaling",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P011",
+    "raw_value": "0",
+    "source_description": "Frequency setpoint memory disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P012",
+    "raw_value": "0",
+    "source_description": "Minimum motor frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P013",
+    "raw_value": "60",
+    "source_description": "Maximum motor frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P014",
+    "raw_value": "0",
+    "source_description": "Skip frequency 1 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P015",
+    "raw_value": "0",
+    "source_description": "Automatic restart after mains failure disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P016",
+    "raw_value": "0",
+    "source_description": "Start on the fly disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P017",
+    "raw_value": "1",
+    "source_description": "Continuous smoothing",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P018",
+    "raw_value": "0",
+    "source_description": "Automatic restart after fault disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P019",
+    "raw_value": "2",
+    "source_description": "Skip-frequency bandwidth (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P021",
+    "raw_value": "0",
+    "source_description": "Minimum analogue frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P022",
+    "raw_value": "60",
+    "source_description": "Maximum analogue frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P023",
+    "raw_value": "0",
+    "source_description": "Analogue input 1 type - 0-10 V / 0-20 mA",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P024",
+    "raw_value": "0",
+    "source_description": "No analogue setpoint addition",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P025",
+    "raw_value": "0",
+    "source_description": "Analogue output 1 - output frequency",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P027",
+    "raw_value": "0",
+    "source_description": "Skip frequency 2 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P028",
+    "raw_value": "0",
+    "source_description": "Skip frequency 3 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P029",
+    "raw_value": "0",
+    "source_description": "Skip frequency 4 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P031",
+    "raw_value": "60",
+    "source_description": "Jog frequency right (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P032",
+    "raw_value": "5",
+    "source_description": "Jog frequency left (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P033",
+    "raw_value": "1",
+    "source_description": "Jog ramp-up time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P034",
+    "raw_value": "1",
+    "source_description": "Jog ramp-down time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P040",
+    "raw_value": "0",
+    "source_description": "Positioning function disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P041",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 1 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P042",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 2 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P043",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 3 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P044",
+    "raw_value": "56",
+    "source_description": "Fixed frequency 4 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P045",
+    "raw_value": "0",
+    "source_description": "Fixed-frequency 1-4 inversion selection",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P046",
+    "raw_value": "55",
+    "source_description": "Fixed frequency 5 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P047",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 6 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P048",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 7 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P049",
+    "raw_value": "0",
+    "source_description": "Fixed frequency 8 (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P050",
+    "raw_value": "1",
+    "source_description": "Fixed-frequency 5 inverted; 6-8 normal",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P051",
+    "raw_value": "18",
+    "source_description": "DIN1 terminal 5 - fixed frequency 5 plus RUN",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P052",
+    "raw_value": "18",
+    "source_description": "DIN2 terminal 6 - fixed frequency 4 plus RUN",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P053",
+    "raw_value": "0",
+    "source_description": "DIN3 terminal 7 disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P054",
+    "raw_value": "0",
+    "source_description": "DIN4 terminal 8 disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P055",
+    "raw_value": "0",
+    "source_description": "DIN5 terminal 16 disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P056",
+    "raw_value": "0",
+    "source_description": "Digital-input debounce - 12.5 ms",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P057",
+    "raw_value": "1",
+    "source_description": "Digital-input watchdog interval (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P061",
+    "raw_value": "6",
+    "source_description": "Relay RL1 - fault indication",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P062",
+    "raw_value": "8",
+    "source_description": "Relay RL2 - warning active",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P063",
+    "raw_value": "1",
+    "source_description": "External-brake release delay (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P064",
+    "raw_value": "1",
+    "source_description": "External-brake stopping time (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P065",
+    "raw_value": "1",
+    "source_description": "Current threshold for relay (A)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P066",
+    "raw_value": "100",
+    "source_description": "Compound braking (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P069",
+    "raw_value": "1",
+    "source_description": "Ramp extension enabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P070",
+    "raw_value": "4",
+    "source_description": "Braking-resistor duty cycle - 100% (MMV only)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P071",
+    "raw_value": "0",
+    "source_description": "Slip compensation (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P072",
+    "raw_value": "250",
+    "source_description": "Slip limit (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P073",
+    "raw_value": "0",
+    "source_description": "DC injection braking (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P074",
+    "raw_value": "1",
+    "source_description": "I2t motor protection curve",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P075",
+    "raw_value": "0",
+    "source_description": "External braking resistor not connected",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P076",
+    "raw_value": "0",
+    "source_description": "Pulse frequency - 16 kHz, normal modulation",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P077",
+    "raw_value": "1",
+    "source_description": "FCC control mode",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P078",
+    "raw_value": "100",
+    "source_description": "Continuous boost (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P079",
+    "raw_value": "50",
+    "source_description": "Starting boost (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P080",
+    "raw_value": "0.80",
+    "source_description": "Motor power factor",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P081",
+    "raw_value": "60",
+    "source_description": "Motor nameplate frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P082",
+    "raw_value": "1725",
+    "source_description": "Motor nameplate speed (RPM)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P083",
+    "raw_value": "3.2",
+    "source_description": "Motor nameplate current (A)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P084",
+    "raw_value": "230",
+    "source_description": "Motor nameplate voltage (V)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P085",
+    "raw_value": "1",
+    "source_description": "Motor nameplate power (hp with P101=1)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P086",
+    "raw_value": "150",
+    "source_description": "Motor current limit (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P087",
+    "raw_value": "0",
+    "source_description": "Motor PTC disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P088",
+    "raw_value": "0",
+    "source_description": "Automatic stator calibration inactive",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P089",
+    "raw_value": "4.6",
+    "source_description": "Stator resistance (ohm)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P091",
+    "raw_value": "0",
+    "source_description": "USS serial slave address",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P092",
+    "raw_value": "6",
+    "source_description": "USS baud rate - 9600",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P093",
+    "raw_value": "0",
+    "source_description": "Serial timeout disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P094",
+    "raw_value": "60",
+    "source_description": "USS nominal system setpoint (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P095",
+    "raw_value": "0",
+    "source_description": "USS compatibility - 0.1 Hz resolution",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P099",
+    "raw_value": "0",
+    "source_description": "No option module",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P101",
+    "raw_value": "1",
+    "source_description": "North American operation - 60 Hz / hp",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P111",
+    "raw_value": "1.01",
+    "source_description": "Inverter power rating (hp), read-only",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P112",
+    "raw_value": "6",
+    "source_description": "Inverter type - MICROMASTER Vector",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P113",
+    "raw_value": "14",
+    "source_description": "Drive model - MMV75/2",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P121",
+    "raw_value": "1",
+    "source_description": "RUN button enabled when P007=1",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P122",
+    "raw_value": "1",
+    "source_description": "Forward/reverse button enabled when P007=1",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P123",
+    "raw_value": "1",
+    "source_description": "JOG button enabled when P007=1",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P124",
+    "raw_value": "1",
+    "source_description": "Up/down buttons enabled when P007=1",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P125",
+    "raw_value": "1",
+    "source_description": "Forward and reverse operation allowed",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P128",
+    "raw_value": "120",
+    "source_description": "Fan switch-off delay (s)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P131",
+    "raw_value": "0",
+    "source_description": "Frequency setpoint (Hz), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P132",
+    "raw_value": "0",
+    "source_description": "Motor current (A), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P133",
+    "raw_value": "0",
+    "source_description": "Motor torque (%), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P134",
+    "raw_value": "303",
+    "source_description": "DC-link voltage (V), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P135",
+    "raw_value": "0",
+    "source_description": "Motor speed (RPM), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P137",
+    "raw_value": "0",
+    "source_description": "Output voltage (V), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P138",
+    "raw_value": "0",
+    "source_description": "Rotor/shaft frequency (Hz), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P139",
+    "raw_value": "0",
+    "source_description": "Peak output-current record",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P140",
+    "raw_value": "231",
+    "source_description": "Most recent fault - F231",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P141",
+    "raw_value": "231",
+    "source_description": "Previous fault - F231",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P142",
+    "raw_value": "231",
+    "source_description": "Second previous fault - F231",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P143",
+    "raw_value": "231",
+    "source_description": "Third previous fault - F231",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P186",
+    "raw_value": "200",
+    "source_description": "Instantaneous motor-current limit (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P201",
+    "raw_value": "0",
+    "source_description": "PID closed-loop mode disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P202",
+    "raw_value": "1",
+    "source_description": "PID proportional gain",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P203",
+    "raw_value": "0",
+    "source_description": "PID integral gain",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P204",
+    "raw_value": "0",
+    "source_description": "PID derivative gain",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P205",
+    "raw_value": "1",
+    "source_description": "PID sample interval - 25 ms",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P206",
+    "raw_value": "0",
+    "source_description": "PID transducer filtering off",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P207",
+    "raw_value": "100",
+    "source_description": "PID integral capture range (%)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P208",
+    "raw_value": "0",
+    "source_description": "Transducer type - direct acting",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P210",
+    "raw_value": "1.4",
+    "source_description": "Transducer reading (%), read-only snapshot",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P211",
+    "raw_value": "0",
+    "source_description": "PID 0% setpoint",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P212",
+    "raw_value": "100",
+    "source_description": "PID 100% setpoint",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P220",
+    "raw_value": "0",
+    "source_description": "Frequency cutoff disabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P321",
+    "raw_value": "0",
+    "source_description": "Analogue-input-2 minimum frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P322",
+    "raw_value": "60",
+    "source_description": "Analogue-input-2 maximum frequency (Hz)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P323",
+    "raw_value": "0",
+    "source_description": "Analogue input 2 - 0-10 V / 0-20 mA",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P356",
+    "raw_value": "6",
+    "source_description": "DIN6 terminal 17 - fixed frequency 6",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P386",
+    "raw_value": "1",
+    "source_description": "Vector speed-loop proportional gain",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P387",
+    "raw_value": "1",
+    "source_description": "Vector speed-loop integral gain",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P720",
+    "raw_value": "0",
+    "source_description": "Direct I/O functions - normal operation",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P721",
+    "raw_value": "0",
+    "source_description": "Analogue-input-1 voltage (V), read-only",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P722",
+    "raw_value": "0",
+    "source_description": "Analogue-output-1 current (mA)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P723",
+    "raw_value": "0",
+    "source_description": "Digital-input state (hex) - all inputs off",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P724",
+    "raw_value": "0",
+    "source_description": "Direct relay control - both off",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P725",
+    "raw_value": "0",
+    "source_description": "Analogue-input-2 voltage (V), read-only",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P910",
+    "raw_value": "0",
+    "source_description": "Local control mode",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P922",
+    "raw_value": "2.04",
+    "source_description": "Software version, read-only",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P923",
+    "raw_value": "0",
+    "source_description": "Equipment system/reference number",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P930",
+    "raw_value": "231",
+    "source_description": "Most recent fault - F231 (copy of P140)",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P931",
+    "raw_value": "0",
+    "source_description": "Most recent warning - none",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P944",
+    "raw_value": "0",
+    "source_description": "Factory reset inactive",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  },
+  {
+    "parameter": "P971",
+    "raw_value": "1",
+    "source_description": "EEPROM storage enabled",
+    "source_id": "S08",
+    "status": "RECORDED_SECONDARY_TRANSCRIPTION",
+    "device_attribution": "PDF labels VFD7; related wiring conflicts with Drive6 reference",
+    "observation_time": "unknown",
+    "operational_use": "Historical record, not recommended settings"
+  }
+]

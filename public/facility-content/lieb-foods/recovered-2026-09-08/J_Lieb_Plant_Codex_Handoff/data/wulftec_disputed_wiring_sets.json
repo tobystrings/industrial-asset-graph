@@ -1,0 +1,209 @@
+[
+  {
+    "set": "A",
+    "terminal": "2",
+    "wire": "6",
+    "role_as_reported": "common",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "5",
+    "wire": "128",
+    "role_as_reported": "DIN1",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "6",
+    "wire": "129",
+    "role_as_reported": "DIN2",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "19",
+    "wire": "188",
+    "role_as_reported": "relay",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "20",
+    "wire": "187",
+    "role_as_reported": "relay",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "A/L1",
+    "wire": "591",
+    "role_as_reported": "line",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "B/L2",
+    "wire": "593",
+    "role_as_reported": "line",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "C/L3",
+    "wire": "595",
+    "role_as_reported": "line",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "U",
+    "wire": "592",
+    "role_as_reported": "motor",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "V",
+    "wire": "594",
+    "role_as_reported": "motor",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "A",
+    "terminal": "W",
+    "wire": "596",
+    "role_as_reported": "motor",
+    "device": "DISPUTED: Drive6 reference versus VFD7",
+    "source": "Wulftec master packet pages 2/5 versus 12-15",
+    "status": "DISPUTED"
+  },
+  {
+    "set": "B",
+    "terminal": "1",
+    "wire": "182",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "2",
+    "wire": "6",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "3",
+    "wire": "183",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "4",
+    "wire": "6",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "5",
+    "wire": "160",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "6",
+    "wire": "161",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "7",
+    "wire": "146",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "19",
+    "wire": "184",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "20",
+    "wire": "180",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "L1",
+    "wire": "5-6-7",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "L2",
+    "wire": "5-6-9",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  },
+  {
+    "set": "B",
+    "terminal": "L3",
+    "wire": "5-7-1",
+    "role_as_reported": "unresolved",
+    "device": "Unknown; do not assign PowerFlex4 by assumption",
+    "source": "Supplied September voice-history summary",
+    "status": "USER_REPORTED_ATTRIBUTION_UNRESOLVED"
+  }
+]

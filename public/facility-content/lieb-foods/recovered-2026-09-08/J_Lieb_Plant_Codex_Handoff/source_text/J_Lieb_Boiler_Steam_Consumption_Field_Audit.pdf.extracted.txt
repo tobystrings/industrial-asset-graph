@@ -1,0 +1,157 @@
+<PARSED TEXT FOR PAGE: 1 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 1
+BOILER STEAM CONSUMPTION & CHEMICAL
+EFFICIENCY
+FIELD AUDIT / MEASUREMENT INSTRUCTIONS
+J Lieb Foods - Forest Grove, Oregon
+Prepared from the Aqua Analytics boiler service report dated August 12, 2026
+PRIMARY QUESTION
+How much steam does the factory actually produce/consume, and how much boiler-treatment chemical is being used relative to
+that steam load?
+IMPORTANT: The existing water meter gives makeup-water consumption. Makeup water alone does not equal total steam
+production when condensate is returned and water is lost through blowdown.
+1. WHAT WE ALREADY KNOW
+Item Report value Field significance
+Water meter 6,253,811.7 gal current
+6,165,009 gal previous
+88,802.7 gal increase since 7/23/2026
+Reported daily average 4,440.14 gal/day Makeup-water baseline; NOT confirmed steam production
+Feedwater temperature 150 F Report states feedwater needs to be 180 F
+Feedwater conductivity 1,335 umhos Report calls high FW conductivity abnormal
+Boiler conductivity 4,547 umhos Report target shown: 2,500-3,500
+Boiler chloride 100 ppm as Cl Report target shown: 30-65
+Boiler sulfite 36 Report target shown: 60-80
+Boiler condition Overcycled / insufficient blowdown Report recommends increasing blowdowns
+Softener / feedwater Salt leaving softener Report recommends increasing softener rinse time
+C41 treatment pump Changed 12 sec -> 6 sec Record this setting before making further dosing comparisons
+Source note: Values above are transcribed from the Aqua Analytics report dated August 12, 2026. The report also notes foaming and a strong
+chemical odor in the feedwater and says overall chemical results were nominal while the feedwater conductivity was abnormal. Do not treat the
+4,440.14 gal/day makeup-water average as measured steam flow.
+2. WHAT MUST BE MEASURED TO ANSWER THE STEAM QUESTION
+Required measurement How to obtain it Why it matters
+Makeup water Record boiler water-meter start/end readings at the same time each day. Establishes new water entering the boiler system.
+Boiler runtime Record burner/boiler operating hours for the same measurement period. Converts daily totals into operating-hour rates.
+Condensate return Use a condensate-return meter if installed. If none exists, measure/estimate tank inflow only by a documented method. Returned condensate can be reused and converted to steam repeatedly.
+Blowdown Record continuous blowdown flow if metered. For manual blowdown, log every event, duration, and known/measured flow. Blowdown consumes boiler water without becoming useful plant steam.
+Feedwater Record feedwater temperature at consistent operating conditions. Needed to track system condition and report's 180 F recommendation.
+Chemical use Record tank/drum level or weight at start/end plus pump settings. Allows chemical consumption to be normalized to water and steam load.
+Boiler load Record steam pressure and, if available, burner firing rate or steam-flow meter. Provides operating context; a steam-flow meter is the preferred direct measurement.
+<PARSED TEXT FOR PAGE: 2 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 2
+3. FIELD PROCEDURE - RUN THIS AUDIT FOR AT LEAST 7 NORMAL
+PRODUCTION DAYS
+1. Pick one consistent daily reading time. Use the same time every day.
+2. Before changing chemical settings, document the current chemical products, pump names, stroke/speed/timer settings, drum
+levels, and any controller setpoints.
+3. Record the makeup-water meter reading.
+4. Record boiler operating hours for the previous 24 hours.
+5. Record feedwater temperature, boiler pressure, feedwater conductivity, boiler conductivity, and other treatment tests normally
+used by the site.
+6. Record every manual blowdown event. If there is continuous blowdown, determine its actual flow rate if safely measurable.
+7. Record condensate return quantity if a meter exists. If no meter exists, mark it UNKNOWN rather than inventing a percentage.
+8. Record chemical drum/tank usage. A marked sight level, scale/weight, calibrated tank volume, or verified pump delivery can be
+used.
+9. Note production shutdowns, sanitation/CIP, steam leaks, failed traps, unusual venting, boiler trips, water-softener regeneration,
+or major load changes.
+10. After the audit period, calculate averages. Compare chemical usage against BOTH makeup water and estimated/measured
+steam.
+4. DAILY FIELD LOG
+Date / Time Water Meter
+(gal)
+Boiler
+Run Hrs
+FW Temp
+(F)
+Boiler
+PSI FW Cond. Boiler
+Cond.
+Condensate
+Return
+Blowdown
+Qty
+Chemical
+Used
+Daily notes / unusual conditions:
+__________________________________________________________________________________________________________
+__________________________________________________________________________________________________________
+__________________________________________________________________________________________________________
+__________________________________________________________________________________________________________
+__________________________________________________________________________________________________________
+<PARSED TEXT FOR PAGE: 3 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 3
+5. BLOWDOWN & CONDENSATE AUDIT
+Do not guess these values. If a measurement cannot be obtained, write UNKNOWN and identify what meter/test is needed.
+Manual / intermittent blowdown log
+Date/Time Valve / Location Duration Flow if known Calculated gallons Reason / Notes
+Condensate return check
+Question Answer / Measurement
+Is there a condensate-return flow meter?
+Meter/tag/location
+24-hour condensate return, gal/day
+Condensate tank level/volume method used
+Known steam users that do NOT return condensate
+Known leaking/failed steam traps or open vents
+6. CALCULATIONS
+A. Makeup water used (gal) = Ending water-meter reading - Starting water-meter reading
+B. Makeup water rate (gal/day) = Makeup gallons / number of days
+C. Makeup water mass (lb/day) = Makeup gal/day x 8.34 lb/gal (approximate water density for field estimating)
+D. Blowdown gallons = Blowdown flow (gal/min) x total blowdown minutes
+E. Condensate return % - calculate only when total condensate returned and total steam/condensate basis are actually
+measured on a consistent basis. Do not back-calculate a 'precise' percentage from makeup water alone.
+F. Steam production - BEST METHOD: use a calibrated steam-flow meter and totalize lb/day or lb/hr. If no steam meter exists,
+steam must be estimated from a defensible mass balance using measured makeup, condensate return, blowdown, and other
+<PARSED TEXT FOR PAGE: 4 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 4
+known losses. Document all assumptions.
+G. Chemical per 1,000 gal makeup = Chemical used / Makeup gal x 1,000
+H. Chemical per 1,000 lb steam = Chemical used / Steam lb x 1,000
+BASELINE REFERENCE ONLY - NOT A STEAM-FLOW RESULT
+Reported makeup-water average = 4,440.14 gal/day. Approximate makeup-water mass = 4,440.14 x 8.34 = 37,031 lb/day.
+This is the mass of NEW water entering the system, not proof that steam production is 37,031 lb/day. Condensate reuse and
+blowdown must be accounted for.
+<PARSED TEXT FOR PAGE: 5 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 5
+7. CHEMICAL DOSING AUDIT
+Chemical / Product Pump / Tag Current Setting Start Qty End Qty Used Basis / Notes
+C41 6 sec (per 8/12 report)
+GWT-16
+Other
+Other
+Normalize each chemical two ways:
+1. Chemical per 1,000 gallons of makeup water - useful for treatment-feed comparison.
+2. Chemical per 1,000 lb of measured/defensibly estimated steam - useful for comparing chemical consumption against actual
+plant steam load.
+Do not change treatment solely from this worksheet. Use the site's approved water-treatment limits, treatment provider
+guidance, boiler manufacturer requirements, and actual water-test results. This audit is intended to establish consumption and
+dosing baselines.
+8. CURRENT RED FLAGS TO VERIFY
+■ Feedwater temperature was 150 F; report states 180 F is needed.
+■ Boiler conductivity was 4,547 umhos against the report's 2,500-3,500 range.
+■ Feedwater conductivity was 1,335 umhos and was specifically called abnormal.
+■ Report states boiler is overcycled and insufficient blowdown is causing sludge deposits/carry-over; recommendation was to
+increase blowdowns.
+■ Report observed foaming and an overwhelming chemical smell in feedwater.
+■ Report says salt/chloride is leaving the softener and recommends increasing softener rinse time.
+■ C41 pump was reduced from 12 seconds to 6 seconds on August 12; verify present setting before evaluating chemical
+consumption.
+■ Treatment pumps were found unprimed during the service visit and were reprimed; verify reliable chemical delivery before
+drawing dosing conclusions.
+9. FINAL ANSWER SHEET
+Audit period ________________________ to ________________________
+Average makeup water ________________ gal/day
+Average boiler runtime ________________ hr/day
+Measured condensate return ________________ gal/day OR UNKNOWN
+Measured/estimated blowdown ________________ gal/day OR UNKNOWN
+<PARSED TEXT FOR PAGE: 6 / 6>
+J Lieb Foods - Boiler Steam Consumption & Chemical Efficiency Field Audit Page 6
+Measured steam total (preferred) ________________ lb/day; meter/tag: __________________
+Estimated steam total (if required) ________________ lb/day; method attached: YES / NO
+Average steam rate while operating ________________ lb/hr
+Condensate return percentage ________________ % OR UNKNOWN
+Chemical #1 normalized use ________________ per 1,000 gal makeup / ________________ per 1,000 lb steam
+Chemical #2 normalized use ________________ per 1,000 gal makeup / ________________ per 1,000 lb steam
+Major losses/problems found ____________________________________________________________
+Recommended follow-up ____________________________________________________________
+Source: Aqua Analytics, J Lieb Foods boiler report, August 12, 2026, pages 1, 3, and 4. This field audit preserves the report's stated observations and
+targets. Any steam-production value not obtained from a steam-flow meter must be labeled as an estimate and accompanied by the measurement
+method and assumptions.

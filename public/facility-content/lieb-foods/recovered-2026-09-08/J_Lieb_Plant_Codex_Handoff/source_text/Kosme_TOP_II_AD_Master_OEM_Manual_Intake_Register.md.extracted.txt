@@ -1,0 +1,213 @@
+# Kosme TOP II AD — Master OEM Manual Intake Register
+
+## Document control
+
+| Field | Value |
+|---|---|
+| Project | Industrial Asset Graph — Kosme Sensicol Labeler Reliability |
+| Register purpose | Canonical intake, coverage, provenance, and extraction control for photographed OEM documentation |
+| Machine manufacturer | KOSME S.r.l. Unipersonale |
+| Machine model | `TOP II AD TANDEM 20/1056 CE SA4 E2` |
+| Registration number | `L05358` |
+| Operating-manual code | `K966-749` |
+| Manual page revision marking | `REV. 01-06` |
+| Separate maintenance-plan cover | Krones/Kosme Sensicol, date `05/04/2015`, revision `00`; publication number not yet established |
+| Total images received and controlled | 34 |
+| Operating-manual images | 33 |
+| Separate maintenance-plan image | 1 |
+| Current evidence cutoff | Manual page 80 among captured content; pages 65–80 are now continuous; index establishes manual through page 135 |
+
+## Evidence-status vocabulary
+
+| Status | Meaning |
+|---|---|
+| `OEM_EXPLICIT` | Directly printed in a captured OEM source page |
+| `OEM_INDEX_ONLY` | Topic/page existence proven by the index; detailed content not captured |
+| `GENERIC_OPTION` | OEM manual describes it, but installation on this exact machine is not confirmed |
+| `FIELD_VERIFY` | Must be checked against the physical machine, nameplate, drawing, HMI, or measurement |
+| `TRANSCRIPTION_UNCERTAIN` | Visible source is unclear or handwritten and requires confirmation |
+| `MISSING_SOURCE` | Required page/document has not been captured |
+| `NO_CONTENT` | Intentionally blank reverse/divider page |
+
+## Complete image intake inventory
+
+| Intake ID | Controlled filename | Source/page | Content | Extraction status | Primary destination |
+|---|---|---|---|---|---|
+| IMG-001 | `IMG_9A5BB786-588D-45B3-A1E0-F4231CCE362C.jpeg` | Separate binder cover | Krones/Kosme Sensicol maintenance-plan cover; date 05/04/2015; Rev. 00 | Partial; publication number unresolved | OEM-document identity/search |
+| IMG-002 | `Kosme_TOP_II_AD_Operating_Manual_Cover_L05358_K966-749.jpeg` | Operating-manual cover | TOP II AD; KOSME; L05358; K966-749 | Complete for visible fields | Document node and machine/document relationship |
+| IMG-003 | `Kosme_TOP_II_AD_Manual_Index_1_Chapters_1-3.jpeg` | Index page 1 | Chapters 1–3 and page routing | Complete | Capture roadmap and source coverage |
+| IMG-004 | `Kosme_TOP_II_AD_Manual_Index_2_Chapters_4-6.jpeg` | Index page 2 | Chapters 4–6 and page routing | Complete | Capture roadmap and source coverage |
+| IMG-005 | `Kosme_TOP_II_AD_Manual_Index_3_Chapters_7-9.jpeg` | Index page 3 | Chapters 7–9; index calls the cam display KET39, while page 69 calls it CR30 | Complete; terminology discrepancy retained | Controls/diagnostics roadmap |
+| IMG-006 | `Kosme_TOP_II_AD_Manual_Index_4_Chapters_10-12.jpeg` | Index page 4 | Maintenance, lubrication, speed optimization | Complete | Maintenance-engine roadmap |
+| IMG-007 | `Kosme_TOP_II_AD_Page_5_Technical_Specifications.jpeg` | Manual page 5 | Model, registration, output, electrical, pneumatic, acoustic, environment | Complete | Canonical asset identity and utilities |
+| IMG-008 | `Kosme_TOP_II_AD_Page_6_Environment_and_Model_Decoding.jpeg` | Manual page 6 | Environment and model-string interpretation | Complete | Configuration nodes and constraints |
+| IMG-009 | `Kosme_TOP_II_AD_Page_7_Nameplate_Location.jpeg` | Manual page 7 | Identification-plate definitions and location | Complete | Field-verification task |
+| IMG-010 | `Kosme_TOP_II_AD_Page_8_Declaration_of_Conformity.jpeg` | Manual page 8 | Declaration and directive/standard references | Complete with specific-certificate limitation | Compliance-document node |
+| IMG-011 | `Kosme_TOP_II_AD_Page_57_General_Operating_Principle.jpeg` | Manual page 57 | Product path and rotary-labeling topology | Complete | Process graph |
+| IMG-012 | `Kosme_TOP_II_AD_Page_58_Blank.jpeg` | Manual page 58 | Blank reverse/divider | `NO_CONTENT` | Evidence continuity only |
+| IMG-013 | `Kosme_TOP_II_AD_Page_59_Controls_Selectors.jpeg` | Manual page 59 | Panel overview; line power, inlet block, Syncro | Complete | Control nodes and 0–10 VDC synchronization |
+| IMG-014 | `Kosme_TOP_II_AD_Page_60_Controls_and_Start_Stop.jpeg` | Manual page 60 | Glue pump, labeling unit, date, jog, head height, machine start/stop | Complete; option applicability flagged | Control nodes |
+| IMG-015 | `Kosme_TOP_II_AD_Page_61_Controls_EStop_and_Temperature.jpeg` | Manual page 61 | Conveyor start/stop, reset, oil discharge, E-stops, speed, motor temperature | Complete; option applicability flagged | Safety/drive/control nodes |
+| IMG-016 | `Kosme_TOP_II_AD_Page_62_Alarm_Indicators.jpeg` | Manual page 62 | Block, guards, plate block, air, glue temperature, self-adhesive alarms, head security | Complete; option applicability flagged | Alarm/fault-tree nodes |
+| IMG-017 | `Kosme_TOP_II_AD_Page_63_Beacon_States.jpeg` | Manual page 63 | Red/yellow/green/light-blue beacon behavior and siren | Complete | Machine-state model |
+| IMG-018 | `Kosme_TOP_II_AD_Page_64_Blank.jpeg` | Manual page 64 | Blank reverse/divider | `NO_CONTENT` | Evidence continuity only |
+| IMG-019 | `Kosme_TOP_II_AD_Page_65_CR27_Description_and_Connections.jpeg` | Manual page 65 | CR27 function, signals and terminal map | Complete | Synchronizer signal graph |
+| IMG-020 | `Kosme_TOP_II_AD_Page_66_CR27_Zero_Sensor_and_Programming.jpeg` | Manual page 66 | Zero sequence and plate-delay programming | Complete | Diagnostic procedure/configuration |
+| IMG-021 | `Kosme_TOP_II_AD_Page_67_CR27_Operating_Mode_and_Parameters.jpeg` | Manual page 67 | Missing-zero behavior; Fo, Pi, th and Pt | Complete | Fault tree and parameter schema |
+| IMG-022 | `Kosme_TOP_II_AD_Page_68_CR27_Mode_Transition_Logic.jpeg` | Manual page 68 | CR27 programming-state flow | Complete | Control-state graph |
+| IMG-023 | `Kosme_TOP_II_AD_Page_69_CR30_Display_and_Keyboard.jpeg` | Manual page 69 | CR30 electronic-cam display and keys | Complete; corrects earlier index-only device name | Electronic-cam component |
+| IMG-024 | `Kosme_TOP_II_AD_Page_70_CR30_Terminal_Board_and_Cam_Selection.jpeg` | Manual page 70 | CR30 terminal map and cam selection | Complete | Signal graph and cam configuration |
+| IMG-025 | `Kosme_TOP_II_AD_Page_71_CR30_Cam_and_Parameter_Programming.jpeg` | Manual page 71 | Cam name, R1 and Fu programming | Complete | Parameter schema |
+| IMG-026 | `Kosme_TOP_II_AD_Page_72_CR30_Me_and_Mp_Programming.jpeg` | Manual page 72 | Center/edge and multiplier programming | Complete | Centering configuration |
+| IMG-027 | `Kosme_TOP_II_AD_Page_73_CR30_Sp_SL_Sr_Sg_Programming.jpeg` | Manual page 73 | Spot mode/length and measured values | Complete with instruction inconsistency flagged | Sensor/centering diagnostics |
+| IMG-028 | `Kosme_TOP_II_AD_Page_74_CR30_Parameter_Descriptions.jpeg` | Manual page 74 | R1, Fu, Me, Mp, Sp and SL definitions | Complete | Parameter semantics |
+| IMG-029 | `Kosme_TOP_II_AD_Page_76_Card_Data_Readout.jpeg` | Manual page 76 | Card diagnostics En, Tc, Pc, Nc, Tp, Sx, Ve and Se | Complete | Per-card diagnostic schema |
+| IMG-030 | `Kosme_TOP_II_AD_Page_77_Cam_Card_Installation_and_Replacement.jpeg` | Manual page 77 | First installation, replacement, DIP address and duplication | Complete | Replacement-event procedure |
+| IMG-031 | `Kosme_TOP_II_AD_Page_78_Cam_Card_Program_Copy_and_Computer_Connection.jpeg` | Manual page 78 | Network-wide copy, serial code, DB9 computer connection and error navigation | Complete | Program-copy/network control |
+| IMG-032 | `Kosme_TOP_II_AD_Page_79_Errors_24_to_26.jpeg` | Manual page 79 | Software, hardware and high-temperature errors | Complete | Fault tree |
+| IMG-033 | `Kosme_TOP_II_AD_Page_80_Errors_27_and_28.jpeg` | Manual page 80 | Communication-error isolation and inactive faulty-line message | Complete | Communication fault tree |
+| IMG-034 | `Kosme_TOP_II_AD_Page_75_Empty_Plate_Rotation_and_Centering_Compensation.jpeg` | Manual page 75 | Empty-plate test rotation; Sr/Sg definitions; per-platform Cp correction | Complete | Test mode and centering-adjustment graph |
+
+## Manual coverage ledger
+
+The index pages are separately numbered as index pages. They do not mean that main-content pages 1–4 have been captured.
+
+| Manual range | Topic | Coverage | Current status |
+|---|---|---|---|
+| Cover | Manual identity | Captured | Extracted |
+| Index 1–4 | Full chapter/page map | Captured | Extracted |
+| 1–4 | Introduction and early technical material | Not captured | `MISSING_SOURCE` |
+| 5–8 | Technical specifications and identity | Captured | Extracted |
+| 9–28 | General warnings and safety | Not captured | `MISSING_SOURCE` |
+| 29–46 | Transport, positioning, utilities, startup/shutdown | Not captured | `MISSING_SOURCE` |
+| 47–56 | SMC 2062455 pneumatic unit | Not captured | `MISSING_SOURCE` |
+| 57–64 | Operating principle and initial controls | Captured | Extracted; pages 58 and 64 blank |
+| 65–74 | CR27 synchronizer and CR30 cam/centering controls | Captured | Extracted |
+| 65–80 | CR27 synchronization, CR30 cam/centering controls, card data, replacement/copy, computer connection and errors | Captured continuously | Extracted; immediate diagnostic source |
+| 81–102 | Format change | Not captured | `MISSING_SOURCE` |
+| 103–118 | Operation, cleaning, maintenance plan and points | Not captured | `MISSING_SOURCE` — highest maintenance priority |
+| 119–130 | Lubrication system, table, plans and points | Not captured | `MISSING_SOURCE` — highest maintenance priority |
+| 131–135 | Automatic speed adjustment and line optimization | Not captured | `MISSING_SOURCE` |
+
+## Extracted authoritative facts
+
+### Machine and utilities
+
+| Fact | Value | Status | Source |
+|---|---|---|---|
+| Full model | TOP II AD TANDEM 20/1056 CE SA4 E2 | `OEM_EXPLICIT` | Page 5 |
+| Registration | L05358 | `OEM_EXPLICIT` | Cover/page 5 |
+| Manual/order code | K966-749 | `OEM_EXPLICIT` | Cover |
+| Maximum output | 18,000 pieces/hour | `OEM_EXPLICIT` | Page 5 |
+| Supply | 400 V, 3×400 N-PE, 60 Hz | `OEM_EXPLICIT` | Page 5 |
+| Auxiliary voltage | 24 V AC | `OEM_EXPLICIT` | Page 5 |
+| Rated power | 6.5 kW | `OEM_EXPLICIT` | Page 5 |
+| Air | 15 Nl/min at nominal 6–7 bar | `OEM_EXPLICIT` | Page 5 |
+| Plate count | 20 | `OEM_EXPLICIT` model diagram | Page 6 |
+| Labeling-unit designation | SA4 | `OEM_EXPLICIT` model diagram | Page 6 |
+| Applied-label designation | E2 | `OEM_EXPLICIT` model diagram | Page 6 |
+| Meaning of 1056 | Unknown | `FIELD_VERIFY` | Page 6 does not decode it |
+| Handwritten code | Appears to be K5001696 | `TRANSCRIPTION_UNCERTAIN` | Page 5 |
+
+### Process path
+
+`Infeed conveyor → feedscrew A → infeed starwheel B → turntable C → labeling unit D → rollers/brushes E → exit starwheel F → exit conveyor G`
+
+Status: `OEM_EXPLICIT`, page 57.
+
+### Diagnostic/state branches currently proven
+
+| Branch | OEM evidence | Installed status |
+|---|---|---|
+| Bottle inflow blocked | Block indication | Field-device/tag mapping required |
+| Guard open | Machine protections (4) | Count and switches require field verification |
+| Plate rotation incomplete | Head plate block; machine stop | Sensor/mechanism mapping required |
+| Air insufficient | Air alarm | Pressure switch and threshold mapping required |
+| Label web ending | Self-adhesive unit pre-alarm | Installed self-adhesive function strongly relevant; exact device mapping required |
+| Self-adhesive station malfunction | Self-adhesive unit alarm; immediate stop | Exact station/error mapping required |
+| Centering-jack position incorrect | Head security | `GENERIC_OPTION` until physical confirmation |
+| Motor overheated | Temperature light; stop/reset behavior | Motor/overload mapping required |
+| Emergency stop | Manual states ten E-stops; power and air disabled | Count and safety architecture require field verification |
+| Reset required | Light-blue beacon/reset control | HMI and safety-relay sequence required |
+
+## Asset-graph ingestion targets
+
+### Node classes
+
+- `Machine`: TOP II AD labeler L05358
+- `Document`: operating manual K966-749; separate Sensicol maintenance plan
+- `Subsystem`: conveyor, feedscrew, infeed starwheel, carousel/turntable, plate, label station, rollers/brushes, exit starwheel, pneumatic unit, control panel, beacon, safety system
+- `Control`: selector, pushbutton, key selector, speed trimmer, synchronization input
+- `Alarm`: block, guard, plate block, low air, web pre-alarm, label-unit alarm, head security, motor temperature
+- `MachineState`: stopped fault, warning, running normal, reset required
+- `Utility`: electrical supply, auxiliary control power, compressed air
+- `Evidence`: photographed page with filename, page number, revision, and extraction timestamp
+- `VerificationTask`: physical or drawing-based checks still required
+
+### Core relationships
+
+- Machine `HAS_DOCUMENT` operating manual
+- Machine `HAS_SUBSYSTEM` each installed mechanism
+- Process component `FEEDS` / `METERS_TO` / `TRANSFERS_TO` / `POSITIONS_AT` next component
+- Control `COMMANDS` subsystem
+- Sensor/alarm `MONITORS` condition
+- Alarm `CAUSES_STATE` warning or machine stop
+- Beacon segment `INDICATES_STATE` machine state
+- Utility `SUPPLIES` machine/subsystem
+- Evidence page `SUPPORTS_ASSERTION` extracted fact
+- Verification task `VALIDATES` candidate installed node/relationship
+
+## Installed-versus-generic guardrail
+
+The operator manual covers multiple configurations. Glue pumps, hot-melt temperature, oil discharge, headlift, date marker, centering devices, and other conditional features remain `GENERIC_OPTION` until confirmed. Graphify must not create them as installed assets without a physical photograph, machine-specific drawing/BOM, I/O list, or verified field observation.
+
+## RTK, Token Manager, and Graphify control
+
+### Canonical retrieval layers
+
+1. **Hot context:** this master register plus current troubleshooting symptom and verified asset identity.
+2. **Warm context:** compact topic extractions for identity, controls/alarms, maintenance, lubrication, and diagnostics.
+3. **Cold evidence:** original page photographs and future complete PDF; retrieve only the pages needed to confirm a claim.
+
+### Token-control requirements
+
+- RTK should compact repetitive page narration into the tables in this register.
+- Token Manager must deduplicate facts by `machine + property + value + source page`.
+- Conflicting values must remain separate assertions until resolved; never overwrite silently.
+- Graphify receives structured rows and explicit relationships, not full OCR dumps.
+- Every graph fact carries provenance and one of the evidence statuses defined above.
+- Blank pages remain in the evidence ledger but are excluded from semantic retrieval.
+- No workflow may claim Token Manager is fully implemented until the project acceptance checklist passes against an actual ingestion/retrieval run.
+
+## Next capture queue
+
+### Batch 1 — maintenance engine
+
+Capture pages 103–130. Chapter 7 pages 65–80 are now continuous and controlled. The next priority is the cleaning/maintenance plan, maintenance-point list, lubricant table, centralized/manual lubrication and lubrication-point list.
+
+### Batch 2 — maintenance engine
+
+Capture pages 103–130. This should expose operating use, cleaning, maintenance intervals/points, lubricants, centralized/manual lubrication, and point lists.
+
+### Batch 3 — safety, electrical, and pneumatics
+
+Capture pages 9–56, emphasizing pages 13–23, 39–45, and 47–56.
+
+### Batch 4 — formats and production optimization
+
+Capture pages 81–102 and 131–135.
+
+### Required non-manual evidence
+
+- Physical machine nameplate
+- Full control-panel exterior and interior
+- HMI home, alarm-history, diagnostics, recipe/format, and software-version screens
+- Every E-stop and guard switch
+- Label-station manufacturer/model plates and web path
+- CR27 and CR30/KET39-associated hardware; reconcile the page-69 CR30 heading with the index's KET39 terminology
+- SMC air unit, gauge reading at rest and under production, and pressure-switch details
+- Electrical drawing set, I/O list, BOM/spares list, service invoices, and recurring failure description
+
+## Current register decision
+
+The documentation now supports a reliable identity record, process topology, control/alarm taxonomy, CR27 signal model, CR30 centering parameters, empty-plate test mode, per-platform compensation, electronic-cam replacement/copy procedure and OEM communication fault tree. It does not yet support a final root-cause conclusion because the exact HMI/CR30 fault text, installed wiring/address map, board-by-board diagnostic data and before/after records are still missing.

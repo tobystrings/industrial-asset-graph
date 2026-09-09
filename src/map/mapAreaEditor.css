@@ -9,3 +9,32 @@
 .reference-drawing-sheet.is-editing .svg-zone-layer{opacity:.18;pointer-events:none}.reference-drawing-sheet.is-editing .map-floating-controls{display:none}
 @media(max-width:900px){.map-editor-shell{border-radius:0;padding:8px}.map-editor-mode span{display:none}.map-editor-session{overflow-x:auto;justify-content:flex-start}.map-editor-session .primary{order:-2}.map-editor-session span{flex:0 0 auto;margin:0}.map-area-properties{position:relative;top:auto;right:auto;width:auto}.map-editor-tools button,.map-editor-session button{min-height:44px}.map-editor-message{font-size:12px}.map-editor-svg{touch-action:none}}
 @media(max-width:520px){.map-editor-mode{flex-wrap:wrap}.map-editor-session{padding-bottom:4px}.map-area-properties{max-height:38vh;overflow:auto}.map-editor-tools{scroll-snap-type:x proximity}.map-editor-tools button{scroll-snap-align:start}}
+
+/* Map Studio keeps controls in normal flow; tabs collapse completely. */
+.map-studio-tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.map-studio-tabs button{min-height:44px;padding:8px 12px;border:1px solid #526579;border-radius:8px;background:#122437;color:#eef8ff;font-weight:700;cursor:pointer}
+.map-studio-tabs button.active{background:#075985;border-color:#7dd3fc;color:white}
+.map-studio-panel{min-width:0}.map-studio-panel .map-editor-tools{flex-wrap:wrap;overflow:visible}.map-studio-panel small{display:block;padding:6px;color:#d2e3ef}
+.map-editor-shell .map-area-properties{position:relative;top:auto;right:auto;width:auto;max-height:none;box-shadow:none;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:8px}
+.map-area-properties header,.map-area-properties>small,.map-area-properties .map-area-nudges,.map-area-properties .map-vertex-list{grid-column:1/-1}
+.reference-plan-wrap.cursor-pan{cursor:grab!important}.reference-plan-wrap.cursor-pan.is-panning{cursor:grabbing!important}
+.reference-plan-wrap.cursor-pan .facility-map-svg{pointer-events:none}
+.page-map:has(.map-editor-shell) .page-title p,.page-map:has(.map-editor-shell) .map-honesty-note{display:none}
+.page-map:has(.map-editor-shell) .publication-status{padding:8px 12px;margin-bottom:8px}
+.page-map:has(.map-editor-shell) .reference-layout-head h2{font-size:18px!important}
+.map-editor-session{flex-wrap:wrap;overflow:visible}.map-editor-session button{min-height:44px}
+@media(max-width:600px){.map-editor-shell .map-area-properties{grid-template-columns:1fr}.map-studio-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.map-studio-tabs button{padding:6px;font-size:12px}.map-editor-session{gap:5px}.map-editor-session span{width:100%;order:2}.map-editor-selection-actions{flex-wrap:wrap}}
+
+/* Focused Map Studio: a compact tool strip, then the contained drawing. */
+.page-map:has(.map-editor-shell) .page-title{display:none}
+.reference-layout:has(.map-editor-shell)>.reference-layout-head{display:none!important}
+.page-map:has(.map-editor-shell) .publication-status:not(.phase-conflict):not(.phase-error) .publication-actions,.page-map:has(.map-editor-shell) .publication-status:not(.phase-conflict):not(.phase-error) strong{display:none}
+.page-map:has(.map-editor-shell) .publication-status p{margin:0;font-size:12px}
+.map-editor-shell .map-studio-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}
+.map-studio-tabs button{flex:0 0 auto;white-space:nowrap}
+.map-editor-shell .map-editor-session{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding-bottom:3px}
+.map-editor-session>span{display:none}.map-editor-session>.primary{order:-2}.map-editor-session>button:last-child{order:-1}
+.map-editor-message{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+.reference-drawing-sheet.is-editing .reference-map-status,.reference-drawing-sheet.is-editing .reference-info-strip,.reference-drawing-sheet.is-editing .mobile-map-meta-tabs,.reference-drawing-sheet.is-editing .mobile-map-meta-panel,.reference-drawing-sheet.is-editing .reference-title-block{display:none!important}
+.reference-drawing-sheet.is-editing .map-floating-controls{display:flex!important}
+html body #root .app-shell.app-pages .reference-drawing-sheet.is-editing .reference-plan-wrap{height:calc(100dvh - 290px)!important;min-height:280px!important;max-height:none!important}

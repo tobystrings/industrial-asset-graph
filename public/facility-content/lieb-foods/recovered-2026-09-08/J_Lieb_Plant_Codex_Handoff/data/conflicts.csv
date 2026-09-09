@@ -1,0 +1,21 @@
+id,issue,required_treatment,status
+C01,Drive 6 vs VFD7 ownership of Set A,Retain both source assertions; trace original labels/drawing,OPEN
+C02,Set B drive identity and terminal scheme,Keep separate; recover unambiguous device photograph/readback,OPEN
+C03,Sterling 208 V current 3.0 vs 3.2 A,Read original glare-free plate,OPEN
+C04,Siemens P021/P022 snapshots 0/60 vs 4/56,Resolve device and chronological context,OPEN
+C05,480 V upstream vs transformed drive supply,Preserve separate voltage domains; trace transformer,OPEN
+C06,Proposed replacement settings vs actual entries/final export,Keep recommendation/readback/final states distinct,OPEN
+C07,WCRT/WRTC and A6882 identifier meaning,Reconcile machine plate and manual,OPEN
+C08,Kosme L05358 vs older EG05245/05358 references,Prefer OEM registration for documented machine; retain unresolved alternate,OPEN
+C09,CR30 vs index KET39,Alias at document level; inspect installed hardware,OPEN
+C10,Network address 01 vs physical head 1,Do not equate without mapping,OPEN
+C11,25-digit transcript vs five-digit OEM code,Retain discrepancy; do not treat transcript as procedure,OPEN
+C12,Hot-filler corrected drawings vs unaudited HMI topology,Audit source HMI and sheet interfaces before verification,OPEN
+C13,Duplicate FP302; CP301/SRV101/MVP101 unknown,Preserve exact tags and open tasks,OPEN
+C14,Old cabinet placeholders and cooler boundary,Apply later user correction; archive old map as historical,OPEN
+C15,H1/H2/H3 panel ratings lack recovered plates,Mark supplied-history only,OPEN
+C16,Water meter identity and steam estimates,Do not treat makeup/water totals as measured steam,OPEN
+C17,Generated cabinet drawing parts vs original photos,Keep candidate-only until primary evidence recovered,OPEN
+C18,Historical deployment/test claims vs current software,Verify repository state; do not claim tests rerun,OPEN
+C19,Boiler tag vs serial; META serial uncertain,Preserve literal tag and field-verification state,OPEN
+C20,Kosme OEM requirements vs actual plant supply/configuration,Do not infer installed transformer or optional systems,OPEN

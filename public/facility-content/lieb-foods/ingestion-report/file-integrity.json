@@ -1,0 +1,667 @@
+[
+  {
+    "path": "evidence/CODEX_PROMPT.txt",
+    "sha256": "ddda9549881ae651224a58434dcb595391d5e26cd59aea336eceb2e1b0f683da",
+    "size": 2146,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/asset_reconciliation_queue.csv",
+    "sha256": "6d968c7b38fc5ecb2481748f654b5a04b27999883ced09a45441265a7f1e3f76",
+    "size": 733,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/asset_reconciliation_queue.json",
+    "sha256": "b90727ead6d952e1771553bd42d9a99e2e96282e899500d56e7bd4e861633195",
+    "size": 1394,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/conflicts.csv",
+    "sha256": "fc8ee4f56c56636ff1f9756cc78cf394adc51425cc083f65654427b811b71845",
+    "size": 2108,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/conflicts.json",
+    "sha256": "7cce8f438f6a1832525289f66f91890bd9dc799d436fd5f56d229148219f6f49",
+    "size": 3714,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/kosme_card01_baseline.csv",
+    "sha256": "3740892171e7735d76e689fa40940b52053e7fe1f9fc2ae2c9ac25e9751fdf72",
+    "size": 1472,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/kosme_card01_baseline.json",
+    "sha256": "cbf6a2748b347560011aa468fbca41ac4eb8a13db20515f3874681502540281b",
+    "size": 3516,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/line2_hot_filler_snapshots.csv",
+    "sha256": "8471544a39dde7f06ca125e3c36809813cb4f631dda8b3298d60d70749f2a17e",
+    "size": 2423,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/line2_hot_filler_snapshots.json",
+    "sha256": "c7239a47c67aa1ed6683aea19042be12e4f4a3d31807ce37286fa6a2b260639f",
+    "size": 8173,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/README.md",
+    "sha256": "597c9f07625f51c067b4b05e1925053a0a3d5e241fc82e0de1a54935db218937",
+    "size": 363,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/siemens_recorded_parameters.csv",
+    "sha256": "f6406a8be3753311092c583c30bf60612d9586fd94ab1530444a358c3edc5e54",
+    "size": 26246,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/siemens_recorded_parameters.json",
+    "sha256": "13f5a577a5d1699b6d6b4a59f6feb6df9099c82e1e67346fe665a69f65e0eb9d",
+    "size": 52168,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/source_register.json",
+    "sha256": "097337d7bbc387f6a39c4793fe1468cbef575c1321e41d001a4f99fbb965156b",
+    "size": 8412,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/wulftec_disputed_wiring_sets.csv",
+    "sha256": "bc03736a605c4113fc0e60b361f01fe37eddb994273e0916d6d91534e90d3bcb",
+    "size": 3009,
+    "mimeType": "application/vnd.ms-excel",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/data/wulftec_disputed_wiring_sets.json",
+    "sha256": "2e09314cd29ba4d58bf67f4ba002173dcda56fe973625ff035617e3f4e9d5d4f",
+    "size": 6013,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/MANIFEST.json",
+    "sha256": "ddd457c86bede0477ebfb921ebce208c324e4167acfc790a4e8c5930065d6a4e",
+    "size": 21919,
+    "mimeType": "application/json",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Boiler_Steam_Consumption_Audit.pdf",
+    "sha256": "9b9deea23272718affce6026d71b238d1c72c470a26a24b17478dedc3b36250e",
+    "size": 212780,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/00 Project Control/Kosme_Sensicol_Project_Charter.md",
+    "sha256": "f7a694eaf0cc23e1a91e430a3e977d88852240e06d87066eaf1ad8d898933083",
+    "size": 8731,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/00 Project Control/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md",
+    "sha256": "dbfc1b8a18170f071fd9b1dce020924c5a2f5025794af272c60c31e9a5245ab6",
+    "size": 16760,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_1_Chapters_1-3.jpeg",
+    "sha256": "179862625a1096c52181e200628eef297ead59c81aaa5d06812f23ac093a9ecd",
+    "size": 445189,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_2_Chapters_4-6.jpeg",
+    "sha256": "63f0c44d3a9ceb5e98a4e24f1dc2183f64a6fa6f1163841cd5472afad3a802c5",
+    "size": 521408,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_3_Chapters_7-9.jpeg",
+    "sha256": "0c082737659a3b4634a69349e33dbf7f301b0f153198e16a21255ac0ecd179d9",
+    "size": 466242,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_4_Chapters_10-12.jpeg",
+    "sha256": "593b110462202851311078db44331be03f75f41aa162e724f5553f412b001b78",
+    "size": 402395,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_and_Extraction_Roadmap.md",
+    "sha256": "5942c9c7fbdb0e79545fa46fca21131bc1fe77c3fd226a3268063d52e4d8e5b7",
+    "size": 6914,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Operating_Manual_Cover_L05358_K966-749.jpeg",
+    "sha256": "ad38b4ca2631f97d3a032f004f52c05c9b1367d003be52cdee17d3b9ddad19e9",
+    "size": 239655,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_57_General_Operating_Principle.jpeg",
+    "sha256": "94280df84ec9d0f84e45e90f189a7248c618bd58cb427447d76cd8636be4f302",
+    "size": 416906,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_58_Blank.jpeg",
+    "sha256": "ac46d60640af1d2fb622db87136fd09876420e43535841beeec12d291a1da3e1",
+    "size": 252817,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_59_Controls_Selectors.jpeg",
+    "sha256": "25ae72da7f0d4bf444452ef5013766e237ac99a04894a1df456cf2af65ce8b53",
+    "size": 360558,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_60_Controls_and_Start_Stop.jpeg",
+    "sha256": "bbb55bda7b4ce152c0e5f35005aa45b31ce6a3159e75436ddfe90b73fdab5054",
+    "size": 339531,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_61_Controls_EStop_and_Temperature.jpeg",
+    "sha256": "7d4b0c1d3a441419d7118758e260c424bfc31bf2b2ae819d5581785ade2aaea5",
+    "size": 362562,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_62_Alarm_Indicators.jpeg",
+    "sha256": "ef62f02aeb71a7aaa279bd14edcc07d37abc929c20ad6646649e82c7d4203cff",
+    "size": 368270,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_63_Beacon_States.jpeg",
+    "sha256": "ba628b0ed220a643b10092bccd4b6d948ea8717e7f5b4c9d878eb6be879d44b6",
+    "size": 354793,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_64_Blank.jpeg",
+    "sha256": "2563cb7f2324c354036f5d72bccae495e7f040cd3a85446799bd036067e3038b",
+    "size": 192555,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_65_CR27_Description_and_Connections.jpeg",
+    "sha256": "d4c4237ee8c8b8630cd9495e19326e9d9aff85ba211d5ad3254849f42772f81e",
+    "size": 392036,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_66_CR27_Zero_Sensor_and_Programming.jpeg",
+    "sha256": "d9dfdee9452571faa1a6f0e8d46204c27e2e49dfb49822fb5377de4351051f89",
+    "size": 587683,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_67_CR27_Operating_Mode_and_Parameters.jpeg",
+    "sha256": "d54d343fed6c4132dd2920a1bd63461c01137f466e868a5cd1c5815a8ffcd6c1",
+    "size": 436413,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_68_CR27_Mode_Transition_Logic.jpeg",
+    "sha256": "0c1febd3344bb97fd0b3af8ffcfb6377c585f02325351158f11fe7f10dae672d",
+    "size": 353783,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_69_CR30_Display_and_Keyboard.jpeg",
+    "sha256": "c41975910b130f9d776a3ce68ebf92cd67bca3de387c20ba930721ccc2dc56f4",
+    "size": 343840,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_70_CR30_Terminal_Board_and_Cam_Selection.jpeg",
+    "sha256": "93f72790bf4ac90d2a201b07da5817a7cff9f37ab6dd70968f9c3d31d5d1f60c",
+    "size": 372796,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_71_CR30_Cam_and_Parameter_Programming.jpeg",
+    "sha256": "6e4232a05110a3c8ab9bc4c925b3e4f95d014cf8e1ed4a21f8e9d018acb1f951",
+    "size": 383897,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_72_CR30_Me_and_Mp_Programming.jpeg",
+    "sha256": "60145296d9ce9dcaec6c8d2405db258c3c687b584a1544eacbe2b405b28f2e14",
+    "size": 351367,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_73_CR30_Sp_SL_Sr_Sg_Programming.jpeg",
+    "sha256": "df83a960e533d1f64bf35e725bdae984680e5e708fe4b9e551e7a881ac45e427",
+    "size": 343926,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_74_CR30_Parameter_Descriptions.jpeg",
+    "sha256": "22323487170feeae92f42402fa4275be6541db91f649d1b6e6a27b176b44a011",
+    "size": 578371,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_75_Empty_Plate_Rotation_and_Centering_Compensation.jpeg",
+    "sha256": "2fd4cf9cadd63d403e69f5008a2b2230a4fa75ef9e24e55b3b8743c62bc9fd23",
+    "size": 544776,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_76_Card_Data_Readout.jpeg",
+    "sha256": "8830ffbf6c968eef2657a22a127037143bdcd79cf95038b3762247206b57a353",
+    "size": 568077,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_77_Cam_Card_Installation_and_Replacement.jpeg",
+    "sha256": "e10594092a6a1f3eb079ef58c8d345fd9ee3fa6576c6dccdd526224f3b216bf1",
+    "size": 580973,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_78_Cam_Card_Program_Copy_and_Computer_Connection.jpeg",
+    "sha256": "e72b35ffe3b1531ad22bb7cd3275dcf61526724b8e6fd7c7c04fa5ddc06c4938",
+    "size": 579652,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_79_Errors_24_to_26.jpeg",
+    "sha256": "d0cf798153fd30f90cd950d30410f4ec364d23364206165650f8ae4841b59c5c",
+    "size": 589368,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_80_Errors_27_and_28.jpeg",
+    "sha256": "939d155675fa75ae17d321bd622296336aa062501056d1b5e16d313a63837ea5",
+    "size": 571676,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_80_Errors_27_and_28.jpeg.openai-download-593d112dfcaa4f878a65e59a35295da3",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md",
+    "sha256": "d6b12ae8666514f356ee66bc1946a75a4da3b9c1443e05eaaab7039e13f8ecfa",
+    "size": 6194,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md.openai-download-a3661a30c19a45e890e9b7db43841f7b",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md",
+    "sha256": "0b74b6837e31be81d9d7ff5c44e4c9e7e8ec3ce3599e2bfda8f6d010aa210f09",
+    "size": 8501,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md",
+    "sha256": "befc156e0ae86ef1370c786f9cf771506e7273e700a8441af2dc464d3be82280",
+    "size": 6831,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_5_Technical_Specifications.jpeg",
+    "sha256": "b487acd37a98344996dd998b4999c514ef2cfa0bd6460356119800ee99324592",
+    "size": 489529,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_5_Technical_Specifications.jpeg.openai-download-c9936af2f219456d81a0f12a27fb2393",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_6_Environment_and_Model_Decoding.jpeg",
+    "sha256": "942fbd10ada8f16550d0f7fcc6315599155f698a4f7c9414f49241e8be02b255",
+    "size": 426205,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_6_Environment_and_Model_Decoding.jpeg.openai-download-d4febcc93ce04c60a6cda213de1ccb70",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_7_Nameplate_Location.jpeg",
+    "sha256": "f25d30f210be23b50259a8206f055416551c456ef256892d73bc8598dc96bebe",
+    "size": 326922,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_7_Nameplate_Location.jpeg.openai-download-fc8eb343ac334195a762550b712556ad",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_8_Declaration_of_Conformity.jpeg",
+    "sha256": "1cd37e06f231c8b5a049d4f89ea438964a9ca9387a313811626228bb168e456e",
+    "size": 421901,
+    "mimeType": "image/jpeg",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_8_Declaration_of_Conformity.jpeg.openai-download-977f3d5b473840cca03ac2f26cdc9940",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/03 Live Troubleshooting/Kosme_TOP_II_AD_CR30_Field_Audit_Cheat_Sheet.pdf",
+    "sha256": "0586422d338dad78f114f18cb764bb6eeae8e58e046ecf1a349c8894fbdd8583",
+    "size": 52818,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/03 Live Troubleshooting/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md",
+    "sha256": "61779228e74864cb374eb13763591687e58009f92cb87e831387b21f5a64ef06",
+    "size": 8998,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md",
+    "sha256": "2cea2ef5ea781209efec7d217d33d06c7d0b27fcfd3c3b6bf554b5980bf6b7c8",
+    "size": 3125,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf",
+    "sha256": "5658a01b29d7e680a2a5ad0922987bd713bbfb353f126e29811cb1092753ebb4",
+    "size": 180377,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf",
+    "sha256": "027610d2cbd37573d6151c773f770be84591a38e23667d3a72859fb8b02d8848",
+    "size": 35925,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf",
+    "sha256": "402c5405c36b38602544f3d2ddf596279e6c7eaea402d9fd8109d7254aeb0535",
+    "size": 5148,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/KOSME/Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "sha256": "4c34219589b350578ca43a02afe3f3afabd4aec48d33f370b33969ba6fb68ecb",
+    "size": 7896701,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/KOSME/Kosme_CR30_Selected_Card_01_Data_Readout.pdf.openai-download-d571b63ad58b4006b9e0bb6cdcb704be",
+    "sha256": "98d5e6f4001846cc74973224de0ef1bbc69375b8b03625f745adc61c7a72f6a5",
+    "size": 983040,
+    "mimeType": "application/octet-stream",
+    "incomplete": true
+  },
+  {
+    "path": "evidence/original_sources/Kosme_TOP_II_AD_CR30_Field_Audit_Large_Print_Grayscale.pdf",
+    "sha256": "113bc4e2c8290fb1269a7bd714f426ff30eee72b047389ba68da221b2aa6f7e1",
+    "size": 38727,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/LINE_2_HOT_FILLER_CORRECTED_3_SHEET_PACKAGE.pdf",
+    "sha256": "d2da43b3f7ea5ccfd63f2b55b3ebb4ffd89fb0feb517b63fe3daccf43d87ff4b",
+    "size": 487146,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Line_2_HOT_FILLER_Manual_Review_Packet.pdf",
+    "sha256": "4585fc773ffe04963dfaca16b7cb6f364e707bbf3a9cc17907ebc10b1ffbdfbd",
+    "size": 50916,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt",
+    "sha256": "6fecdb75ca436b72fd687d02a42d8a529317fef8b2d71235300b6229342b09f4",
+    "size": 1125,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf",
+    "sha256": "e5b1e23915e3fd107e8a8cb5f16ff26676bb7e149afc043b8751c57be98ffaeb",
+    "size": 42906,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/original_sources/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf",
+    "sha256": "876f970c797d9704f1ea6d8f63493e53e5edf2fa21817ef5f46ee53985b74454",
+    "size": 10379192,
+    "mimeType": "application/pdf",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/PLANT_DOSSIER.md",
+    "sha256": "c8ead1a396fca629c448318ec20030a4f844973879d8f6c4b1ea5c33ef789611",
+    "size": 33975,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/README.md",
+    "sha256": "d1c3236e8edf8b75440a9fc87bf8c0502e40f81e49e619da89d2148554b2b234",
+    "size": 948,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/SOURCE_REGISTER.md",
+    "sha256": "d393041914775c8bb13364182867d7bd2e2c8ae0e9d9414d6804215298eda4d9",
+    "size": 16780,
+    "mimeType": "text/markdown",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md.extracted.txt",
+    "sha256": "cf2e26a94b5a93f9355ee375cf317d68efbaa320b7b003d9d801cc5af7bd5665",
+    "size": 3124,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf.extracted.txt",
+    "sha256": "ec258855267fb308d51b650ea5e304f0f4dd27e008a605168cfcd84c3a78dc16",
+    "size": 17693,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/industrial_asset_graph_merged_codex_goal_prompt.txt.extracted.txt",
+    "sha256": "bff4f2716829908184ad4f6e7f2919bb389a61d8a3ccbdcf62d574afbbe2aaec",
+    "size": 37990,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf.extracted.txt",
+    "sha256": "bba76194ad74fdb2cda9fe724c866f508ed05c3319e325c7c8a5df1cf91c51fd",
+    "size": 10302,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf.extracted.txt",
+    "sha256": "4af1ec57aa021cc129f642b79c295556c67cd079aa37d4236eaa4eda2e7b2ffb",
+    "size": 2209,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_CR30_Selected_Card_01_Data_Readout.pdf.extracted.txt",
+    "sha256": "4ff0e892b87de8af1eda9965c75e71097b51a7d219bcd21b68c71666c332253f",
+    "size": 4223,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md.extracted.txt",
+    "sha256": "8344a0dccffe3fecb3992010fe8f54e592c7e8775b8ff6d3d560073ff33d7709",
+    "size": 6193,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md.extracted.txt",
+    "sha256": "d858ee4423328bc80a0c17b7af85d0ea68fa4a00b4651f1b3f05ef0a9e812934",
+    "size": 8500,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md.extracted.txt",
+    "sha256": "cbd1e9226c64800a568e03cc72f1766baebfdffdbd2279c69a312ca829bd098b",
+    "size": 8997,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md.extracted.txt",
+    "sha256": "a349cf870fe8ea382aa7b50af63f8c87176e53f7df0fe2824443ae4189d33d19",
+    "size": 16759,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md.extracted.txt",
+    "sha256": "2e86004f72d25053b2792439b23988211753f682e9f235a678915db4bd7e2ee5",
+    "size": 6830,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Line_2_Hot_Filler_HMI_Correction_Prompt.txt.extracted.txt",
+    "sha256": "e26d3f42c9e9e3514d578d60d09bb0ff4a083a2d9f50fad8fb45389482b70ba0",
+    "size": 11225,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Line_2_HOT_FILLER_Manual_Review_Packet.pdf.extracted.txt",
+    "sha256": "f6d4dcc529f954ef40a063bfb72d8aa8fd50ef71c86152880a692074d6675a3b",
+    "size": 17544,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt.extracted.txt",
+    "sha256": "1d54bfd25621865bc3a1957c5ac4bfc8403615705a03f935c348e5a34507858b",
+    "size": 1124,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf.extracted.txt",
+    "sha256": "94f9a5edc3fbdf2df44c1d279af2c1b1cae1d640824209313aab48cefdc2963b",
+    "size": 8953,
+    "mimeType": "text/plain",
+    "incomplete": false
+  },
+  {
+    "path": "evidence/source_text/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf.extracted.txt",
+    "sha256": "e35c7eee3ce00aefe7b1d7d00e29363d8a60639404efa1bd5ac2e829ae8ff8b0",
+    "size": 41491,
+    "mimeType": "text/plain",
+    "incomplete": false
+  }
+]

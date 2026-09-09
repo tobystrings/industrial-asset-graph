@@ -1,0 +1,98 @@
+<PARSED TEXT FOR PAGE: 1 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 1
+CR30 ELECTRONIC-CAM DATA READOUT
+SELECTED CARD 01 - RECORDED BASELINE
+Machine: KOSME TOP II AD TANDEM 20/1056 CE SA4 E2 Registration: L05358
+Source procedure: OEM Operator Manual, Chapter 7, Section 7.18, page 76
+Code Recorded display Meaning
+En 0144.2 deg Selected head-position angle
+Tc 00000 pcs/h Output/speed; zero during the captured stopped condition
+Pc 0374 Program counter / instruction pointer
+Nc 1.45 Last analog sample from motor-pitch photocell
+Tp 036 C Electronic-cam card temperature
+Sx 01 AUX/digital-signal status code
+Ve 02.8 Electronic-cam card firmware/version
+HV 161 High-voltage reading; unit not displayed
+LV 25.0 V Low-voltage supply
+LA 07.4 mH Channel A inductance
+IA 02.8 A Channel A current
+LB 07.0 mH Channel B inductance
+IB 02.8 A Channel B current
+<PARSED TEXT FOR PAGE: 2 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 2
+CURRENT INTERPRETATION
+• Communication: Card 01 is online and returning detailed live data to the CR30.
+• Temperature: 36 C is far below the manual's approximate 85 C high-temperature threshold.
+• Low-voltage supply: 25.0 V is consistent with a nominal 24 V control supply.
+• Motor-channel balance: IA and IB are both 2.8 A. LA is 7.4 mH and LB is 7.0 mH; the two channels
+are close, with no obvious missing phase in this snapshot.
+• Program activity: Pc was captured at 374. A second reading while the machine operates is required
+to prove that the instruction pointer advances.
+• Sensor/input behavior: Nc=1.45 and Sx=01 are snapshots. Their diagnostic meaning depends on
+whether they change with the associated photocell and input states.
+• Address versus physical head: CARD 01 is confirmed as network address 01. It must not be
+assumed to be physical platform/head 1 until the DIP-switch address or physical mapping is verified.
+COMPARISON REQUIRED FOR THE SUSPECTED CARD
+Capture the same complete sequence under the same machine condition. Compare Ve, LV, LA/LB,
+IA/IB, Tp, Pc, Nc, Sx and En. A firmware mismatch, abnormal supply, missing motor channel, high
+temperature, frozen program counter, or missing sensor response will materially narrow the fault.
+<PARSED TEXT FOR PAGE: 3 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 3
+PHOTO 1 OF 15
+Card-data readout menu opened by holding Enter for approximately 3 seconds.
+<PARSED TEXT FOR PAGE: 4 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 4
+PHOTO 2 OF 15
+Selected electronic-cam network address: CARD 01.
+<PARSED TEXT FOR PAGE: 5 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 5
+PHOTO 3 OF 15
+En - head position: 0144.2 degrees.
+<PARSED TEXT FOR PAGE: 6 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 6
+PHOTO 4 OF 15
+Tc - speed/output: 00000 pieces per hour.
+<PARSED TEXT FOR PAGE: 7 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 7
+PHOTO 5 OF 15
+Pc - program counter: 0374.
+<PARSED TEXT FOR PAGE: 8 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 8
+PHOTO 6 OF 15
+Nc - new analog sample: 1.45.
+<PARSED TEXT FOR PAGE: 9 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 9
+PHOTO 7 OF 15
+Tp - electronic-cam card temperature: 036 C.
+<PARSED TEXT FOR PAGE: 10 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 10
+PHOTO 8 OF 15
+Sx - auxiliary/digital-signal status: 01.
+<PARSED TEXT FOR PAGE: 11 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 11
+PHOTO 9 OF 15
+Ve - card firmware/version: 02.8.
+<PARSED TEXT FOR PAGE: 12 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 12
+PHOTO 10 OF 15
+HV - high-voltage reading: 161 (display provides no unit).
+<PARSED TEXT FOR PAGE: 13 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 13
+PHOTO 11 OF 15
+LV - low-voltage supply: 25.0 V.
+<PARSED TEXT FOR PAGE: 14 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 14
+PHOTO 12 OF 15
+LA - channel A inductance: 07.4 mH.
+<PARSED TEXT FOR PAGE: 15 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 15
+PHOTO 13 OF 15
+IA - channel A current: 02.8 A.
+<PARSED TEXT FOR PAGE: 16 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 16
+PHOTO 14 OF 15
+LB - channel B inductance: 07.0 mH.
+<PARSED TEXT FOR PAGE: 17 / 17>
+KOSME TOP II AD - CR30 SELECTED CARD 01 Page 17
+PHOTO 15 OF 15
+IB - channel B current: 02.8 A.

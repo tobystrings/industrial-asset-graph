@@ -1,0 +1,22 @@
+RAW PRODUCT FLOW — LINE 2 HOT FILLER
+
+1.  PRODUCT SUPPLY 1 / 2 ↓
+2.  PMP105 — Raw Product Supply Pump • HMI speed: 0 Hz ↓
+3.  150 GAL BALANCE TANK — LT301 • LT301 — level transmitter / tank
+    level: 109 GAL • AG301 — agitator (working identification) • AV102 —
+    actuated valve (working identification) ↓
+4.  PMP101 • HMI speed: 0 Hz • PT101 — pressure transmitter: 0 PSI ↓
+5.  PMP102 — Recirculation Pump • HMI speed: 29 Hz • Associated: AV103 •
+    Associated: SRV101 ↓
+6.  FP302 • Exact device/function to verify ↓
+7.  FILTER SET • Mechanical valves ↓
+8.  FP302 / PROCESS PATH • Handwritten sequence repeats FP302 here —
+    verify whether this is the same FP302 or a second device/tag • FM101
+    — flow meter: 19.5 GPM ↓
+9.  HEAT EXCHANGER • PT102 — pressure transmitter: 2 PSI ↓
+10. HOLD TUBE
+
+FIELD-VERIFY: • Exact meaning/function of FP302. • Whether FP302 appears
+twice physically or was repeated in the handwritten trace. • Exact
+expansions/functions of AV102 and SRV101. • Exact upstream/downstream
+order where piping branches occur.

@@ -1,0 +1,300 @@
+<PARSED TEXT FOR PAGE: 1 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 1
+LINE 2 HOT FILLER
+Printable System Review Packet - HMI Inventory, Process Relationships, Controls, Field Verification and Reference Literature
+Review status: WORKING DOCUMENT - HMI-derived information and field observations. It is not an as-built P&ID; or validated PLC program. Anything inferred is confidence-marked and should be
+field-verified before being treated as authoritative.
+SYSTEM Line 2 HOT FILLER
+FACILITY J. Lieb Foods / facility context from supplied HMI material
+PRIMARY REVIEW AREAS Raw product, product heating, hold, cooling, return, filler, CIP/water, steam, condensate, electrical/pneumatic control
+CURRENT PRIORITY TV101 steam/heating behavior and physical heat-delivery chain
+FIELD DEVICE IDENTIFIED Fairchild TT6000-401 electro-pneumatic transducer
+CONFIDENCE KEY CONFIRMED = directly observed; LIKELY = strong context/standard usage; BEST GUESS = useful working interpretation; UNKNOWN =
+unresolved
+REVIEWER ________________________________________
+DATE ________________________________________
+PACKET CONTENTS
+1. Review method and confidence rules 2. HMI snapshot inventory 3. Acronym dictionary 4. Circuit-by-circuit review 5. Relationship graph edge list 6. TV101 / Fairchild control chain
+ 7. Fairchild TT6000-401 literature notes 8. Troubleshooting worksheet 9. Field walkdown sheets 10. Markup / correction pages
+<PARSED TEXT FOR PAGE: 2 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 2
+1. REVIEW METHOD
+Use the HMI snapshot as a point-in-time operating record. Keep the tag identity separate from its temporary reading. Example: PMP104 is the device; 49 Hz is the snapshot value. A
+relationship such as PMP104 CIRCULATES heating water is separately confidence-marked.
+MARK MEANING HOW TO USE IT
+CONFIRMED Directly visible on HMI/nameplate or otherwise
+established
+May be used as a working fact; still verify before hazardous work.
+LIKELY Strongly supported by HMI placement, standard
+instrumentation usage, or physical context
+Use for mapping; field-check piping/tubing/wiring.
+BEST GUESS Plausible expansion/function but not established Keep in graph so nothing is lost; actively verify.
+UNKNOWN Not enough evidence Do not expand or invent. Record exact tag and investigate.
+Important correction rule: Never invent PLC I/O addresses, ladder rungs, interlocks, valve fail action, or exact pipe routing from appearance alone. Any earlier conceptual ladder drawing containing
+addresses should be treated as illustrative only, not machine logic.
+<PARSED TEXT FOR PAGE: 3 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 3
+2. HMI SNAPSHOT - DEVICES, SENSORS AND READINGS
+These values are from the working HMI snapshot already extracted for this review packet. They are not design setpoints unless specifically identified as such.
+TAG WORKING TYPE / MEANING SNAPSHOT ASSOCIATION CONF.
+DP1 Differential pressure indication 2 PSI Process differential pressure LIKELY
+DP2 Differential pressure indication 9 PSI Process differential pressure LIKELY
+DP3 Differential pressure indication 1 PSI Process differential pressure LIKELY
+PT101 Pressure transmitter 0 PSI Product line LIKELY
+PT102 Pressure transmitter 2 PSI Hold/product section LIKELY
+PT103 Pressure transmitter 34 PSI Heating loop area LIKELY
+PT103A Pressure transmitter / indication 0 PSI Upper heating area LIKELY
+PT104 Pressure transmitter 9 PSI Cooling/process section LIKELY
+PT105 Pressure transmitter 1 PSI Upper process section LIKELY
+PT106 Pressure transmitter 1 PSI Process/water section LIKELY
+PT107 Pressure transmitter 0 PSI Process/water section LIKELY
+TT101 Temperature transmitter 185.2 F Hold/product temperature LIKELY
+TT102 Temperature transmitter 184.5 F Heating/cooling process LIKELY
+TT103 Temperature transmitter 188.8 F Upper heating/process LIKELY
+RTD103 Resistance temperature detector 182.2 F Process/return area LIKELY
+RTD105 Resistance temperature detector 140.9 F Water/process area LIKELY
+RTD310 Resistance temperature detector 107.3 F Balance tank association LIKELY
+FM101 Flow meter 19.5 G/M Process/product flow LIKELY
+LT301 Level transmitter 109 GAL 150 GAL balance tank LIKELY
+LT302 Level transmitter 21 GAL Collection tank LIKELY
+PMP105 Raw product supply pump 0 Hz RAW PROD SUPPLY CONFIRMED FUNCTION
+PMP101 Pump 0 Hz Product/process line CONFIRMED TYPE
+PMP102 Pump 29 Hz; PID nearby Process/product CONFIRMED TYPE
+PMP103 Pump 16 Hz; PID nearby Return/collection side CONFIRMED TYPE
+PMP104 Pump 49 Hz Heating circulation association CONFIRMED TYPE
+TV101 Modulating control valve PID; ~5% Steam/heating control LIKELY FUNCTION
+TV102 Modulating control valve PID; 0% Cooling water LIKELY FUNCTION
+TV103 Modulating control valve PID; 100% Process/water LIKELY FUNCTION
+TV104 Modulating control valve PID; 10% Process/water LIKELY FUNCTION
+TV108 Modulating control valve PID; 100% Heating/cooling section LIKELY FUNCTION
+AG301 Agitator - Balance tank LIKELY
+AV102/103/104/1
+05/106
+Actuated/automatic valves - Product/process/collection areas LIKELY
+AV107/108/109/1
+10/111/113
+Actuated/automatic valves - Water/cooling areas LIKELY
+AV112 Actuated/automatic valve - Steam area LIKELY
+FP302 Facility process designation - Process path UNKNOWN
+SRV101 Valve designation - Product/process path BEST GUESS
+MVP101 Modulating/process valve designation - H2O/process supply BEST GUESS
+CP301 Facility control/process designation 0.0% Process section UNKNOWN
+<PARSED TEXT FOR PAGE: 4 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 4
+TAG WORKING TYPE / MEANING SNAPSHOT ASSOCIATION CONF.
+BT1 Tank/batch indication 317 GAL HMI tank indication BEST GUESS
+EXPANSION
+BT2 Tank/batch indication 3034 GAL HMI tank indication BEST GUESS
+EXPANSION
+<PARSED TEXT FOR PAGE: 5 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 5
+3. ACRONYM / TAG DICTIONARY
+TAG WORKING EXPANSION CONFIDENCE
+PMP Pump CONFIRMED
+PT Pressure Transmitter LIKELY
+TT Temperature Transmitter LIKELY
+RTD Resistance Temperature Detector CONFIRMED standard term
+LT Level Transmitter LIKELY
+FM Flow Meter LIKELY
+DP Differential Pressure LIKELY
+AV Automatic / Actuated Valve LIKELY
+TV Control valve; Temperature Valve is a possible facility expansion BEST GUESS expansion / LIKELY function
+AG Agitator LIKELY
+BT Batch/Balance Tank or related tank designation BEST GUESS
+MVP Modulating Valve / process valve designation BEST GUESS
+CP Control / Process designation UNKNOWN
+FP Flow / Process designation UNKNOWN
+SRV Sanitary / Return / Relief Valve possible BEST GUESS
+PID Proportional-Integral-Derivative CONFIRMED
+CIP Clean-In-Place CONFIRMED
+RTN Return CONFIRMED
+COND. Condensate CONFIRMED
+PROD Product CONFIRMED
+H2O Water CONFIRMED
+Hz Hertz CONFIRMED
+PSI / PSIG Pounds per square inch / gauge CONFIRMED
+GAL Gallons CONFIRMED
+G/M Displayed flow unit; likely gallons/minute LIKELY
+<PARSED TEXT FOR PAGE: 6 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 6
+4. CIRCUIT-BY-CIRCUIT REVIEW
+CIRCUIT KNOWN / VISIBLE ELEMENTS MANUAL REVIEW QUESTIONS
+RAW PRODUCT / PRODUCT RAW PROD SUPPLY, PMP105, balance tank, AG301, LT301, RTD310, AV102, PMP101, PT101,
+inline devices, FP302, SRV101, AV103, hold/product path, filler
+Where does raw product enter? Which valve establishes source?
+Which pump hands off to pasteurizer? Mark every tee, check valve,
+sanitary valve and bypass.
+STEAM / HEATING Steam supply, TV101, AV112, steam-side heat exchanger, COND., PT103/PT103A area,
+TT103/TT102/TT101 context, PMP104 circulation association
+At 100% TV101 command, is 20 mA present? Is I/P output near its
+commanded end? Does actuator fully stroke? Is steam pressure
+available? Is condensate leaving exchanger?
+COOLING WATER COOL H2O, TV102, AV111, AV113, AV110, AV109, cooling exchanger connections Identify supply vs return and normal valve state. Mark utility
+pressure/temperature and which product section it cools.
+H2O / CIP / RETURN H2O SUPPLY, RAW CIP RTN, MVP101, AV107, AV108, RTD105, CP301, TV103, TV104, PT106,
+PT107
+Separate product piping from CIP/water piping. Mark
+cross-connections and route-dependent valves.
+RETURN / COLLECTION /
+FILLER
+Return cooler, PMP103, AV105, LT302 collection tank, AV106, END PROCESS, FILLER Identify every condition that routes product to return, collection, drain,
+or filler. Verify physically.
+FIELD MARKUP: Circle anything that does not match the machine. Cross out wrong relationships. Write the actual upstream/downstream device directly beside the row.
+<PARSED TEXT FOR PAGE: 7 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 7
+5. RELATIONSHIP GRAPH - WORKING EDGE LIST
+FROM RELATIONSHIP TO EVIDENCE CONF.
+LT301 MEASURES Balance tank level 109 GAL CONFIRMED
+DISPLAY
+RTD310 MEASURES Balance tank/process temperature 107.3 F LIKELY
+AG301 AGITATES Balance tank HMI placement LIKELY
+AV102 CONNECTED_TO Balance tank/product outlet path HMI line LIKELY
+PMP105 SUPPLIES Raw product circuit RAW PROD SUPPLY; 0 Hz CONFIRMED
+FUNCTION
+PMP101 PUMPS / DISCHARGES_TO Product process path 0 Hz LIKELY EDGE
+PT101 MEASURES Product-line pressure 0 PSI LIKELY
+FM101 MEASURES Process/product flow 19.5 G/M LIKELY
+TV101 MODULATES Steam/heating energy PID; ~5% snapshot LIKELY
+Steam supply SUPPLIES TV101 / steam heat exchanger path HMI circuit LIKELY
+Steam exchanger TRANSFERS_HEAT_TO Heating circulation/process HMI arrangement LIKELY
+COND. RETURNS_FROM Steam heat exchanger Visible condensate path LIKELY
+PMP104 CIRCULATES Heating loop 49 Hz LIKELY
+TT101 MEASURES Hold/product temperature 185.2 F LIKELY
+TT102 MEASURES Process temperature 184.5 F LIKELY
+TT103 MEASURES Upper heating/process temperature 188.8 F LIKELY
+Fairchild TT6000-401 CONVERTS 4-20 mA to 3-15 PSIG Nameplate CONFIRMED
+Fairchild pneumatic output ACTUATES Associated pneumatic valve actuator Exact valve not traced UNVERIFIED
+Graph vocabulary: FEEDS, CONNECTED_TO, DISCHARGES_TO, RETURNS_TO, MEASURES, CONTROLS, COMMANDS, ACTUATES, SUPPLIES, DRAINS_TO, CIRCULATES,
+TRANSFERS_HEAT_TO, ASSOCIATED_WITH, INTERLOCKS_WITH.
+<PARSED TEXT FOR PAGE: 8 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 8
+6. TV101 STEAM CONTROL - ELECTRICAL / PNEUMATIC / PROCESS CHAIN
+STAGE DEVICE / SIGNAL KNOWN MANUAL CHECK
+1 HMI / PID - TV101 Normally observed around 5-8%; reported excursions to 100% while process remains
+too cold
+Trend command with TT101/TT102/TT103 and steam-side
+pressure
+2 PLC analog output Expected control architecture uses 4-20 mA to the I/P; exact PLC channel is not
+established
+Identify AO channel and measure command without
+breaking loop unless procedure allows
+3 Fairchild TT6000-401 Electro-pneumatic I/P; 4-20 mA input; 3-15 PSIG output; terminal-block model Identify the exact transducer serving TV101 by tracing
+tubing/wiring
+4 Instrument air supply TT6000-401 nameplate observed: supply 20-120 PSIG Measure supply under demand; inspect filters/regulators
+5 Pneumatic output Nominal 3-15 PSIG for -401 configuration Compare output pressure with electrical command
+6 Valve actuator / positioner Pneumatic pressure produces mechanical valve movement Verify full stroke, linkage, diaphragm, leaks, sticking and fail
+action
+7 TV101 steam valve Modulates heating steam function in HMI context Compare command with actual stem/position
+8 Steam heat exchanger Provides heat to process/heating circulation Check steam inlet, heat transfer, fouling and condensate
+removal
+9 COND. path / steam trap Removes condensate Check flooding, restriction, failed trap, blocked return
+10 PMP104 / circulation 49 Hz snapshot Verify actual circulation/flow rather than frequency command
+only
+Working chain: HMI/PID -> PLC analog output -> 4-20 mA -> Fairchild TT6000-401 -> 3-15 PSIG -> pneumatic actuator/positioner -> TV101 -> steam flow -> heat exchanger -> circulation ->
+product heat transfer.
+<PARSED TEXT FOR PAGE: 9 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 9
+7. ASSOCIATED LITERATURE - FAIRCHILD TT6000-401 REVIEW NOTES
+This section condenses the manufacturer-family information most useful at the cabinet. It is a review aid, not a substitute for the manufacturer's complete IOM.
+ITEM REFERENCE NOTE FOR MANUAL REVIEW
+Manufacturer / family Fairchild Industrial Products - Model T6000 family; observed unit marked TT6000-401.
+Device function Electro-pneumatic transducer: converts a DC electrical input signal into a proportional pneumatic output.
+Observed -401 configuration 4-20 mA input; 3-15 PSIG output; observed nameplate supply range 20-120 PSIG.
+TT prefix TT6000 is the terminal-block version in the T6000 family.
+Mounting T6000 literature describes DIN-rail mounting using the 16893 mounting kit; this matches the cabinet installation style being reviewed.
+Pneumatic ports T6000 documentation shows IN and OUT ports and a vent. Unused ports are plugged. The vent/exhaust must not be treated as a
+process-air connection.
+Why air can be heard at the
+body/back
+The T6000 is a pneumatic relay/nozzle-flapper device and has a vent/exhaust path. A small operational bleed/exhaust can be normal; a large
+continuous leak at steady command should be compared against the IOM and checked for contamination, damaged internals, supply issues,
+or downstream behavior.
+Calibration ZERO and SPAN adjustments exist. Do not adjust until input current, supply pressure, output pressure, direction of action, and downstream
+actuator behavior are verified.
+Direction T6000 family literature supports forward/direct and reverse-acting adjustment. Therefore 15 PSIG cannot automatically be called 'valve open'
+until the actuator/valve action is verified.
+Safety Steam, hot product, instrument air and energized control circuits can injure personnel. Use plant LOTO/process procedures and rated test
+equipment; do not defeat interlocks for troubleshooting.
+Manufacturer literature to keep with this packet: Fairchild T6000 Electro-Pneumatic Transducer Installation, Operation & Maintenance Instructions. Search/print the current T6000 IOM from
+Fairchild/Rotork or an authorized distributor and verify that it covers the exact TT6000-401 revision/date code installed.
+<PARSED TEXT FOR PAGE: 10 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 10
+8. TV101 / HEATING TROUBLESHOOTING WORKSHEET
+Reported symptom: TV101 often sits around 5-8%, then may command 100% while the system is still too cold. At 100% controller output, first prove the physical heat-delivery chain before
+changing PID tuning.
+TEST POINT NORMAL / EXPECTED RELATIONSHIP ACTUAL PASS? NOTES / NEXT ACTION
+HMI TV101 command 0-100% PID output ________________ _____ ________________________________
+I/P input current Approx. 4-20 mA across command range ________________ _____ ________________________________
+I/P supply air Within device requirement; stable under demand ________________ _____ ________________________________
+I/P output pressure Approx. 3-15 PSIG across configured range ________________ _____ ________________________________
+Valve stem / position Moves smoothly to commanded endpoint ________________ _____ ________________________________
+Steam upstream pressure Stable and adequate for process ________________ _____ ________________________________
+Steam downstream of valve Responds to valve movement ________________ _____ ________________________________
+Exchanger steam-side temperature Responds strongly at high command ________________ _____ ________________________________
+Condensate removal No evidence of flooded exchanger / blocked return ________________ _____ ________________________________
+PMP104 actual circulation Flow established, not merely Hz indication ________________ _____ ________________________________
+TT103 Compare against command and heat input ________________ _____ ________________________________
+TT102 Compare against command and heat input ________________ _____ ________________________________
+TT101 Compare against hold/product condition ________________ _____ ________________________________
+<PARSED TEXT FOR PAGE: 11 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 11
+9. FIELD WALKDOWN - CIRCUIT TRACE
+Circuit: ______________________________ Date: __________________ Reviewer: ______________________________ HMI state/product: ______________________________
+SEQ TAG / DEVICE TYPE READING UPSTREAM DOWNSTREAM ASSOCIATED DEVICE / CONTROL CONF. CORRECTION / NOTES
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+<PARSED TEXT FOR PAGE: 12 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 12
+9B. FIELD WALKDOWN - ADDITIONAL CIRCUIT TRACE
+Circuit: ______________________________ Date: __________________ Reviewer: ______________________________ HMI state/product: ______________________________
+SEQ TAG / DEVICE TYPE READING UPSTREAM DOWNSTREAM ASSOCIATED DEVICE / CONTROL CONF. CORRECTION / NOTES
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+<PARSED TEXT FOR PAGE: 13 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 13
+10. CORRECTION / VERIFICATION REGISTER
+ITEM TO VERIFY CURRENT WORKING ASSUMPTION FIELD CORRECTION / EVIDENCE
+TV acronym Control valve; exact expansion TBD
+FP302 Exact expansion/function unresolved
+CP301 Exact expansion/function unresolved
+SRV101 Exact valve designation unresolved
+MVP101 Exact expansion unresolved
+BT1 / BT2 Tank/batch designation; exact meaning TBD
+TV101 I/P association Fairchild unit association not yet physically traced
+TV101 fail action Unknown
+PMP104 exact loop Heating circulation association likely
+Steam trap / condensate device Exact device/tag not yet established
+Raw product full route Needs device-by-device field trace
+Additional notes / sketch:
+<PARSED TEXT FOR PAGE: 14 / 14>
+LINE 2 HOT FILLER - MANUAL REVIEW PACKET Page 14

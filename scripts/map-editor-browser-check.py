@@ -24,10 +24,20 @@ def drag_percent(page, selector: str, start: tuple[float, float], end: tuple[flo
 def enter_editor(page):
     page.get_by_role('button', name='Edit map', exact=True).click()
     page.locator('.map-editor-shell').wait_for(state='visible', timeout=10000)
+    page.get_by_role('button', name='Select', exact=True).click()
+
+
+def tool(page, name):
+    drawing = {'Wall / Line','Freehand','Text / Label','Freehand Eraser'}
+    button = page.get_by_role('button', name=name, exact=True)
+    if not button.is_visible():
+        page.get_by_role('button', name=('Drawing & notes' if name in drawing else 'Areas & shapes'), exact=False).click()
+    button.click()
 
 def save(page):
     page.get_by_role('button', name='Save Changes', exact=True).click()
-    page.get_by_text('Draft matches saved map', exact=True).wait_for(state='visible', timeout=10000)
+    page.get_by_role('button',name='Save Changes',exact=True).wait_for(state='visible')
+    page.wait_for_function("() => [...document.querySelectorAll('button')].some(b=>b.textContent==='Save Changes' && b.disabled)")
 
 try:
     time.sleep(1.5)
@@ -56,22 +66,22 @@ try:
         dialogs = iter(['Browser Added Area', 'browser-added-area'])
         def accept_add_area(dialog): dialog.accept(next(dialogs))
         page.on('dialog', accept_add_area)
-        page.get_by_role('button', name='Add Rectangle', exact=True).click()
+        tool(page, 'Add Rectangle')
         drag_percent(page, '.map-editor-svg', (.251, .05), (.42, .25))
         page.wait_for_timeout(200)
         page.remove_listener('dialog', accept_add_area)
         assert page.locator('[aria-label="Edit area Browser Added Area"]').count() == 1
-        page.get_by_role('button', name='Wall / Line', exact=True).click()
+        tool(page, 'Wall / Line')
         drag_percent(page, '.map-editor-svg', (.251, .05), (.251, .25))
         wall = page.locator('.map-editor-walls polyline').last
         wall.click(force=True)
-        page.get_by_role('button', name='Delete', exact=True).click()
+        tool(page, 'Delete')
         assert page.locator('.map-editor-walls polyline').count() == 0
-        page.get_by_role('button', name='Multi-select', exact=True).click()
+        tool(page, 'Multi-select')
         page.locator('[aria-label="Edit area Browser Renamed Test Area"]').click()
         page.locator('[aria-label="Edit area Browser Added Area"]').click()
         page.once('dialog', lambda dialog: dialog.accept('Browser Combined Area'))
-        page.get_by_role('button', name='Merge Areas', exact=True).click()
+        tool(page, 'Merge Areas')
         save(page)
         page.reload(wait_until='networkidle')
         assert page.get_by_text('Browser Combined Area', exact=True).count() > 0
@@ -93,15 +103,15 @@ try:
 
         # Scenario 5: non-authoritative freehand + text markup, erasure, and persisted markup.
         enter_editor(page)
-        page.get_by_role('button', name='Freehand', exact=True).click()
+        tool(page, 'Freehand')
         drag_percent(page, '.map-editor-svg', (.58, .18), (.68, .28))
-        page.get_by_role('button', name='Text / Label', exact=True).click()
+        tool(page, 'Text / Label')
         page.once('dialog', lambda dialog: dialog.accept('Synthetic markup only'))
         page.locator('.map-editor-svg').scroll_into_view_if_needed()
         box = page.locator('.map-editor-svg').bounding_box(); assert box
         page.mouse.click(box['x'] + box['width'] * .65, box['y'] + box['height'] * .35)
         page.get_by_text('Synthetic markup only', exact=True).click()
-        page.get_by_role('button', name='Freehand Eraser', exact=True).click()
+        tool(page, 'Freehand Eraser')
         assert page.get_by_text('Synthetic markup only', exact=True).count() == 0
         save(page)
         page.reload(wait_until='networkidle')
@@ -113,10 +123,10 @@ try:
         for width, height in [(1024, 768), (390, 844)]:
             page.set_viewport_size({'width': width, 'height': height})
             page.wait_for_timeout(150)
-            metrics = page.evaluate("""() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, save: !![...document.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Save Changes' && b.getBoundingClientRect().right <= innerWidth + 1), toolbar: getComputedStyle(document.querySelector('.map-editor-tools')).overflowX })""")
+            metrics = page.evaluate("""() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, save: !![...document.querySelectorAll('button')].find(b => b.textContent?.trim() === 'Save Changes' && b.getBoundingClientRect().right <= innerWidth + 1), toolbar: getComputedStyle(document.querySelector('.map-studio-tabs')).display })""")
             assert metrics['overflow'] <= 1, metrics
             assert metrics['save'], metrics
-            assert metrics['toolbar'] in ('auto', 'scroll'), metrics
+            assert metrics['toolbar'] in ('flex', 'grid'), metrics
 
         # Remove only this script's synthetic browser data and identity.
         page.evaluate("""() => new Promise((resolve, reject) => { const request = indexedDB.deleteDatabase('industrial-asset-graph-runtime--facility-synthetic-test'); request.onsuccess = () => resolve(true); request.onerror = () => reject(request.error); request.onblocked = () => resolve(false); })""")

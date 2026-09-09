@@ -1,0 +1,520 @@
+[
+  {
+    "id": "S01",
+    "name": "Industrial_Asset_Graph_Machine_Documentation_Review_Package.md",
+    "paths": [
+      "evidence/source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md.extracted.txt",
+      "evidence/original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S02",
+    "name": "Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf",
+    "paths": [
+      "evidence/source_text/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf.extracted.txt",
+      "evidence/original_sources/Wulftec_WCRT200_VFD7_Industrial_Asset_Graph_Master_Packet.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S03",
+    "name": "J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf",
+    "paths": [
+      "evidence/source_text/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf.extracted.txt",
+      "evidence/original_sources/J_Lieb_Boiler_Steam_Consumption_Field_Audit.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S04",
+    "name": "Line_2_HOT_FILLER_Manual_Review_Packet.pdf",
+    "paths": [
+      "evidence/source_text/Line_2_HOT_FILLER_Manual_Review_Packet.pdf.extracted.txt",
+      "evidence/original_sources/Line_2_HOT_FILLER_Manual_Review_Packet.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S05",
+    "name": "Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md",
+    "paths": [
+      "evidence/source_text/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md.extracted.txt",
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Operating_Principle_Controls_and_Alarm_Graph_Extraction.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S06",
+    "name": "Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt",
+    "paths": [
+      "evidence/source_text/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt.extracted.txt",
+      "evidence/original_sources/Line_2_HOT_FILLER_Raw_Product_Flow_Sequence.txt"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S07",
+    "name": "Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf",
+    "paths": [
+      "evidence/source_text/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf.extracted.txt",
+      "evidence/original_sources/Industrial_Asset_Graph_Machine_Documentation_Review_Package.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S08",
+    "name": "Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf",
+    "paths": [
+      "evidence/source_text/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf.extracted.txt",
+      "evidence/original_sources/Siemens_MICROMASTER_Vector_Complete_Parameter_Record.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S09",
+    "name": "Line_2_Hot_Filler_HMI_Correction_Prompt.txt",
+    "paths": [
+      "evidence/source_text/Line_2_Hot_Filler_HMI_Correction_Prompt.txt.extracted.txt"
+    ],
+    "coverage": "Extracted text only; original file absent. Archived instructions are evidence, not operational authorization."
+  },
+  {
+    "id": "S10",
+    "name": "Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md",
+    "paths": [
+      "evidence/source_text/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md.extracted.txt",
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/00 Project Control/Kosme_TOP_II_AD_Master_OEM_Manual_Intake_Register.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S11",
+    "name": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "paths": [
+      "evidence/source_text/Kosme_CR30_Selected_Card_01_Data_Readout.pdf.extracted.txt",
+      "evidence/original_sources/KOSME/Kosme_CR30_Selected_Card_01_Data_Readout.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S12",
+    "name": "industrial_asset_graph_merged_codex_goal_prompt.txt",
+    "paths": [
+      "evidence/source_text/industrial_asset_graph_merged_codex_goal_prompt.txt.extracted.txt"
+    ],
+    "coverage": "Extracted text only; original file absent. Archived instructions are evidence, not operational authorization."
+  },
+  {
+    "id": "S13",
+    "name": "J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf",
+    "paths": [
+      "evidence/source_text/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf.extracted.txt",
+      "evidence/original_sources/J_Lieb_Industrial_Asset_Graph_Next_3_TODOs.pdf"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S14",
+    "name": "Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md",
+    "paths": [
+      "evidence/source_text/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md.extracted.txt",
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/03 Live Troubleshooting/Kosme_TOP_II_AD_Electronic_Cam_Card_Fault_Diagnostic_Pages_76-80.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S15",
+    "name": "Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md",
+    "paths": [
+      "evidence/source_text/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md.extracted.txt",
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_CR27_CR30_Synchronization_and_Centering_Extraction_Pages_65-74.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "S16",
+    "name": "Kosme_TOP_II_AD_Authoritative_Asset_Identity.md",
+    "paths": [
+      "evidence/source_text/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md.extracted.txt",
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Authoritative_Asset_Identity.md"
+    ],
+    "coverage": "Recovered extracted text and listed originals; document assertions remain historical."
+  },
+  {
+    "id": "DOSSIER",
+    "name": "Recovered plant dossier",
+    "paths": [
+      "evidence/PLANT_DOSSIER.md",
+      "evidence/SOURCE_REGISTER.md",
+      "evidence/data/source_register.json"
+    ],
+    "coverage": "Secondary synthesis, not a complete chat export or verified as-built. User statements quoted in this dossier lack a complete original conversation export."
+  },
+  {
+    "id": "TABLE-asset_reconciliation_queue",
+    "name": "asset_reconciliation_queue",
+    "paths": [
+      "evidence/data/asset_reconciliation_queue.json",
+      "evidence/data/asset_reconciliation_queue.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "TABLE-conflicts",
+    "name": "conflicts",
+    "paths": [
+      "evidence/data/conflicts.json",
+      "evidence/data/conflicts.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "TABLE-kosme_card01_baseline",
+    "name": "kosme_card01_baseline",
+    "paths": [
+      "evidence/data/kosme_card01_baseline.json",
+      "evidence/data/kosme_card01_baseline.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "TABLE-line2_hot_filler_snapshots",
+    "name": "line2_hot_filler_snapshots",
+    "paths": [
+      "evidence/data/line2_hot_filler_snapshots.json",
+      "evidence/data/line2_hot_filler_snapshots.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "TABLE-siemens_recorded_parameters",
+    "name": "siemens_recorded_parameters",
+    "paths": [
+      "evidence/data/siemens_recorded_parameters.json",
+      "evidence/data/siemens_recorded_parameters.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "TABLE-wulftec_disputed_wiring_sets",
+    "name": "wulftec_disputed_wiring_sets",
+    "paths": [
+      "evidence/data/wulftec_disputed_wiring_sets.json",
+      "evidence/data/wulftec_disputed_wiring_sets.csv"
+    ],
+    "coverage": "Recovered review table. Raw values and uncertainty retained; not canonical inventory or current settings."
+  },
+  {
+    "id": "ORIGINAL-000",
+    "name": "Boiler_Steam_Consumption_Audit.pdf",
+    "paths": [
+      "evidence/original_sources/Boiler_Steam_Consumption_Audit.pdf"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-003",
+    "name": "Kosme_Sensicol_Project_Charter.md",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/00 Project Control/Kosme_Sensicol_Project_Charter.md"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-006",
+    "name": "Kosme_TOP_II_AD_Manual_Index_1_Chapters_1-3.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_1_Chapters_1-3.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-007",
+    "name": "Kosme_TOP_II_AD_Manual_Index_2_Chapters_4-6.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_2_Chapters_4-6.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-008",
+    "name": "Kosme_TOP_II_AD_Manual_Index_3_Chapters_7-9.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_3_Chapters_7-9.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-009",
+    "name": "Kosme_TOP_II_AD_Manual_Index_4_Chapters_10-12.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_4_Chapters_10-12.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-010",
+    "name": "Kosme_TOP_II_AD_Manual_Index_and_Extraction_Roadmap.md",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Manual_Index_and_Extraction_Roadmap.md"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-011",
+    "name": "Kosme_TOP_II_AD_Operating_Manual_Cover_L05358_K966-749.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Operating_Manual_Cover_L05358_K966-749.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-012",
+    "name": "Kosme_TOP_II_AD_Page_57_General_Operating_Principle.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_57_General_Operating_Principle.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-013",
+    "name": "Kosme_TOP_II_AD_Page_58_Blank.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_58_Blank.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-014",
+    "name": "Kosme_TOP_II_AD_Page_59_Controls_Selectors.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_59_Controls_Selectors.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-015",
+    "name": "Kosme_TOP_II_AD_Page_60_Controls_and_Start_Stop.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_60_Controls_and_Start_Stop.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-016",
+    "name": "Kosme_TOP_II_AD_Page_61_Controls_EStop_and_Temperature.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_61_Controls_EStop_and_Temperature.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-017",
+    "name": "Kosme_TOP_II_AD_Page_62_Alarm_Indicators.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_62_Alarm_Indicators.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-018",
+    "name": "Kosme_TOP_II_AD_Page_63_Beacon_States.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_63_Beacon_States.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-019",
+    "name": "Kosme_TOP_II_AD_Page_64_Blank.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_64_Blank.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-020",
+    "name": "Kosme_TOP_II_AD_Page_65_CR27_Description_and_Connections.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_65_CR27_Description_and_Connections.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-021",
+    "name": "Kosme_TOP_II_AD_Page_66_CR27_Zero_Sensor_and_Programming.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_66_CR27_Zero_Sensor_and_Programming.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-022",
+    "name": "Kosme_TOP_II_AD_Page_67_CR27_Operating_Mode_and_Parameters.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_67_CR27_Operating_Mode_and_Parameters.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-023",
+    "name": "Kosme_TOP_II_AD_Page_68_CR27_Mode_Transition_Logic.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_68_CR27_Mode_Transition_Logic.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-024",
+    "name": "Kosme_TOP_II_AD_Page_69_CR30_Display_and_Keyboard.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_69_CR30_Display_and_Keyboard.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-025",
+    "name": "Kosme_TOP_II_AD_Page_70_CR30_Terminal_Board_and_Cam_Selection.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_70_CR30_Terminal_Board_and_Cam_Selection.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-026",
+    "name": "Kosme_TOP_II_AD_Page_71_CR30_Cam_and_Parameter_Programming.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_71_CR30_Cam_and_Parameter_Programming.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-027",
+    "name": "Kosme_TOP_II_AD_Page_72_CR30_Me_and_Mp_Programming.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_72_CR30_Me_and_Mp_Programming.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-028",
+    "name": "Kosme_TOP_II_AD_Page_73_CR30_Sp_SL_Sr_Sg_Programming.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_73_CR30_Sp_SL_Sr_Sg_Programming.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-029",
+    "name": "Kosme_TOP_II_AD_Page_74_CR30_Parameter_Descriptions.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_74_CR30_Parameter_Descriptions.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-030",
+    "name": "Kosme_TOP_II_AD_Page_75_Empty_Plate_Rotation_and_Centering_Compensation.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_75_Empty_Plate_Rotation_and_Centering_Compensation.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-031",
+    "name": "Kosme_TOP_II_AD_Page_76_Card_Data_Readout.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_76_Card_Data_Readout.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-032",
+    "name": "Kosme_TOP_II_AD_Page_77_Cam_Card_Installation_and_Replacement.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_77_Cam_Card_Installation_and_Replacement.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-033",
+    "name": "Kosme_TOP_II_AD_Page_78_Cam_Card_Program_Copy_and_Computer_Connection.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_78_Cam_Card_Program_Copy_and_Computer_Connection.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-034",
+    "name": "Kosme_TOP_II_AD_Page_79_Errors_24_to_26.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_79_Errors_24_to_26.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-035",
+    "name": "Kosme_TOP_II_AD_Page_80_Errors_27_and_28.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/01 OEM Documentation/Kosme_TOP_II_AD_Page_80_Errors_27_and_28.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-042",
+    "name": "Kosme_TOP_II_AD_Page_5_Technical_Specifications.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_5_Technical_Specifications.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-044",
+    "name": "Kosme_TOP_II_AD_Page_6_Environment_and_Model_Decoding.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_6_Environment_and_Model_Decoding.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-046",
+    "name": "Kosme_TOP_II_AD_Page_7_Nameplate_Location.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_7_Nameplate_Location.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-048",
+    "name": "Kosme_TOP_II_AD_Page_8_Declaration_of_Conformity.jpeg",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/02 Asset Intake/Kosme_TOP_II_AD_Page_8_Declaration_of_Conformity.jpeg"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-051",
+    "name": "Kosme_TOP_II_AD_CR30_Field_Audit_Cheat_Sheet.pdf",
+    "paths": [
+      "evidence/original_sources/Industrial Asset Graph - Kosme Sensicol Labeler Reliability/03 Live Troubleshooting/Kosme_TOP_II_AD_CR30_Field_Audit_Cheat_Sheet.pdf"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-060",
+    "name": "Kosme_TOP_II_AD_CR30_Field_Audit_Large_Print_Grayscale.pdf",
+    "paths": [
+      "evidence/original_sources/Kosme_TOP_II_AD_CR30_Field_Audit_Large_Print_Grayscale.pdf"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  },
+  {
+    "id": "ORIGINAL-061",
+    "name": "LINE_2_HOT_FILLER_CORRECTED_3_SHEET_PACKAGE.pdf",
+    "paths": [
+      "evidence/original_sources/LINE_2_HOT_FILLER_CORRECTED_3_SHEET_PACKAGE.pdf"
+    ],
+    "coverage": "Recovered original attachment. Photographed manual pages are partial coverage; illustrations and blank audit forms do not establish installed configuration or completed work."
+  }
+]

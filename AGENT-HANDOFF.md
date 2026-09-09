@@ -1,5 +1,7 @@
 # Industrial Asset Graph — agent handoff
 
+**September 9 owner authorization:** All available J. Lieb plant content is now approved for public GitHub publication. See `docs/PUBLICATION-AND-MAP-STUDIO.md`. Earlier private-evidence restrictions below describe the original handoff and are superseded for this facility; credentials remain excluded. Other facilities remain isolated. Map Studio now uses collapsible tools and Cursor / Pan. Shared saves use versioned publication snapshots and an automatic GitHub publication workflow.
+
 **September 8 production extension:** Home and More now expose Production lines, Documentation queue, Equipment field sheet, and Dependency records. See `docs/PRODUCTION-MAINTENANCE.md` for data, evidence, persistence, and field follow-up details. Seeded unused dependency types remain zero; technicians can explicitly author evidenced typed dependencies through review. The new potential-impact explorer traverses only verified dependency edges and verified line memberships; it never establishes shutdown or isolation consequences. Survey categories remain separate from inventory. Preserve these production extensions when editing existing assets or facility identity.
 
 **Date:** 2026-09-07
