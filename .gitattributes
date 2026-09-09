@@ -1,0 +1,2 @@
+# Preserve evidence bytes and their SHA-256 integrity across platforms.
+public/facility-content/** -text

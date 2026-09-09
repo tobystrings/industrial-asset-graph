@@ -40,6 +40,9 @@ jobs:
       - name: Verify facility data
         run: npm run verify:data
 
+      - name: Verify public evidence integrity
+        run: npm run verify:publication
+
       - name: Verify permanent visual contract
         run: npm run verify:visual-contract
 
