@@ -12,7 +12,7 @@ Move the replacement by dragging; resize using its corner handle or X/Y/width/he
 
 Source cleanup is independently selectable in the Objects list and has editable bounds. Moving or deleting the replacement never moves/deletes its cleanup. Delete the cleanup separately to restore the original pixels. Hide reference feature adds cleanup without a replacement. Layer visibility hides cleanup outlines, not the cleanup itself.
 
-Walls have editable endpoints in Objects. Areas retain existing rename, merge, split and polygon-vertex tools. Grid snapping is configurable in Layers. Existing equipment can be placed from the equipment tray without creating duplicate assets. Moving its marker does not assert a new physical area assignment; change that record explicitly in the existing equipment editor.
+Walls have editable endpoints in Objects. Areas retain existing rename, merge, split and polygon-vertex tools. Grid snapping is configurable in Layers. Walls also snap to nearby editable wall endpoints and room corners; hold Shift while drawing to constrain a wall horizontally or vertically. Existing equipment can be placed from the equipment tray without creating duplicate assets. Moving its marker does not assert a new physical area assignment; change that record explicitly in the existing equipment editor.
 
 ## Text edits
 

@@ -4,7 +4,7 @@ import { buildTestFacilityPackage } from '../../facilities/test-facility';
 import { createHistory, draftFromPackage, mergeAreas, pushHistory, redoHistory, splitArea, undoHistory } from './mapEditor';
 import { applyActions, changeStudio, makeSymbol, validateStudio } from './studioModel';
 import { parseCommands } from './studioCommands';
-import { loadPlant, savePlant } from '../facility/runtimeDb';
+import { exportPlantArchive, importPlantArchive, loadPlant, savePlant } from '../facility/runtimeDb';
 import { validateFacilityPackage } from '../facility/schema';
 import { applyCanonicalEntities } from '../facility/syncClient';
 
@@ -69,6 +69,9 @@ describe('Map Studio editing transactions',()=>{
   const pkg=buildTestFacilityPackage();const d=changeStudio(draftFromPackage(pkg),{symbols:[makeSymbol('stairs')],masks:[{id:'mask',label:'Old stairs',x:40,y:40,width:3,height:5}],templates:[{...makeSymbol('custom'),id:'template'}],layers:{reference:{visible:false,locked:true}},snap:.25});
   const next={...pkg,...d};validateFacilityPackage(next);await savePlant(next,pkg.facility.id);
   expect((await loadPlant(pkg.facility.id))?.mapConfig).toEqual(next.mapConfig);
+  const archive=await exportPlantArchive(pkg.facility.id);
+  const restored=await importPlantArchive(archive,'replace',pkg.facility.id);
+  expect(restored.mapConfig?.studio).toEqual(next.mapConfig?.studio);
   const synced=applyCanonicalEntities(pkg,[{entityId:'map-config:'+pkg.facility.id,entityType:'map_config',version:1,deleted:false,value:d} as never]);
   expect(synced.mapConfig).toEqual(next.mapConfig);
  });

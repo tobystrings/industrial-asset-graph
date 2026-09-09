@@ -48,7 +48,14 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
   const [equipmentId, setEquipmentId] = useState('');
   const [previewDraft, setPreviewDraft] = useState<MapEditorHistory['present'] | null>(null);
   const liveAtStart = useRef('');
-  const snap = (point: MapPoint) => snapPoint(point, history.present.mapConfig.studio?.snap ?? .5);
+  const snap = (point: MapPoint) => {
+    const spacing=history.present.mapConfig.studio?.snap ?? .5;
+    const snapped=snapPoint(point,spacing);
+    if(tool!=='wall'||!spacing) return snapped;
+    const anchors=[...(history.present.mapConfig.walls??[]).flatMap(w=>w.points),...history.present.areas.flatMap(a=>a.overlay.polygon??[{x:a.overlay.x,y:a.overlay.y},{x:a.overlay.x+a.overlay.width,y:a.overlay.y},{x:a.overlay.x,y:a.overlay.y+a.overlay.height},{x:a.overlay.x+a.overlay.width,y:a.overlay.y+a.overlay.height}])];
+    const nearest=anchors.filter(p=>Math.hypot(p.x-point.x,p.y-point.y)<=spacing).sort((a,b)=>Math.hypot(a.x-point.x,a.y-point.y)-Math.hypot(b.x-point.x,b.y-point.y))[0];
+    return nearest??snapped;
+  };
   const startDrag = (event: React.PointerEvent<SVGElement>, ref: MapObjectRef) => {
     if (layerState(history.present.mapConfig,layerOf(ref)).locked || saving) return;
     if (!['select','multi-select','move','resize'].includes(tool)) return;
@@ -86,7 +93,7 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
     if(saving) return;
     const prior=history.present;
     const contents=(draft:typeof prior,layer:string)=>layer==='areas'?draft.areas:layer==='walls'?draft.mapConfig.walls:layer==='symbols'?draft.mapConfig.studio?.symbols:layer==='masks'?draft.mapConfig.studio?.masks:layer==='equipment'?draft.mapConfig.markers:draft.mapConfig.annotations;
-    for(const layer of ['areas','walls','symbols','masks','equipment','markup'] as const) if(layerState(prior.mapConfig,layer).locked && JSON.stringify(contents(prior,layer))!==JSON.stringify(contents(next,layer))) {setMessage('Unlock the '+layer+' layer before editing.');return;}
+    for(const layer of ['areas','walls','symbols','masks','equipment','markup'] as const) if((layerState(prior.mapConfig,layer).locked||!layerState(prior.mapConfig,layer).visible) && JSON.stringify(contents(prior,layer))!==JSON.stringify(contents(next,layer))) {setMessage('Show and unlock the '+layer+' layer before editing.');return;}
     setPreviewDraft(null);
     setHistory((current) => pushHistory(current, next)); setMessage(text);
   };
@@ -186,7 +193,8 @@ export function useMapEditorSession(active: boolean, onExit: () => void) {
     }
   };
   const pointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
-    const point = snap(pointFromEvent(event));
+    let point = snap(pointFromEvent(event));
+    if(tool==='wall'&&event.shiftKey&&workingPoints.length) {const start=workingPoints[0];point=Math.abs(point.x-start.x)>Math.abs(point.y-start.y)?{x:point.x,y:start.y}:{x:start.x,y:point.y};}
     if (workingPoints.length && ['symbol','replace-symbol','mask','add-area', 'add-rectangle', 'pen', 'highlight', 'line', 'arrow', 'wall'].includes(tool)) setWorkingPoints((points) => tool === 'pen' || tool === 'highlight' ? [...points, point] : [points[0], point]);
     if (drag) {
       try {

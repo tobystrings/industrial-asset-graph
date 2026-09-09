@@ -43,7 +43,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(() => new URLSearchParams(location.search).get('edit') === '1');
   const [gridOpen, setGridOpen] = useState(false);
-  const [gridPoint, setGridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
+  const [gridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
   const [mapSearch, setMapSearch] = useState('');
   const [layers, setLayers] = useState({ cabinets: true, machines: true, reference: false });
   const [layerOpen, setLayerOpen] = useState(false);
@@ -182,16 +182,6 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     setView((current) => ({ ...current, scale: clampScale(current.scale + (event.deltaY < 0 ? .12 : -.12)) }));
   };
 
-  const addAtClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (!editMode || (event.target as Element).closest('.map-hotspot')) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width * 100;
-    const y = (event.clientY - rect.top) / rect.height * 100;
-    const point = { x, y, label: mapCoordinateLabel(x, y) };
-    setGridPoint(point);
-    window.dispatchEvent(new CustomEvent('iag-map-add-asset', { detail: point }));
-  };
-
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       const button = (event.target as HTMLElement | null)?.closest('button') as HTMLButtonElement | null;
@@ -224,7 +214,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
       <div ref={planWrapRef} className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" style={{ '--facility-drawing-width': `${drawingWidth}px`, '--facility-drawing-ratio': `${drawingWidth} / ${drawingHeight}` } as React.CSSProperties}>
-            <svg className="facility-map-svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} role="img" aria-label={`${facility.name} interactive facility layout`} onClick={addAtClick}>
+            <svg className="facility-map-svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} role="img" aria-label={`${facility.name} interactive facility layout`}>
             <image opacity={layerState(displayConfig,'reference').visible ? displayConfig.studio?.referenceOpacity ?? 1 : 0} href={buildingLayoutImage} width={drawingWidth} height={drawingHeight} preserveAspectRatio="xMinYMin meet" onLoad={(event) => { const image = event.currentTarget as SVGImageElement; const box = image.getBBox(); if (box.width && box.height) setNaturalSize({ width: box.width, height: box.height }); }}/>
             <g aria-hidden="true" pointerEvents="none">{referenceLabelMasks.map(([x,y,width,height], i) => <rect key={i} x={x / 1536 * drawingWidth} y={y / 1024 * drawingHeight} width={width / 1536 * drawingWidth} height={height / 1024 * drawingHeight} fill="#fff" rx="3"/>)}</g>
             <ReferenceCleanup config={displayConfig} width={drawingWidth} height={drawingHeight}/>
