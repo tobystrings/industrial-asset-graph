@@ -18,7 +18,7 @@ export interface HistoryManifest {
   sources: HistorySource[]; files: HistoryFile[]; assertions: HistoryAssertion[]; tasks: HistoryTask[];
 }
 export interface HistoryReview { assertionId: string; state: 'REVIEWED' | 'REJECTED' | 'PENDING'; note: string; actor: string; at: string }
-export interface HistoryRecord { id: string; facilityId: string; digest: string; manifest: HistoryManifest; importedAt: string; importedBy: string; reviews: HistoryReview[] }
+export interface HistoryRecord { id: string; facilityId: string; digest: string; manifest: HistoryManifest; importedAt: string; importedBy: string; reviews: HistoryReview[]; publicSourceBase?: string }
 export interface HistoryBundle { manifest: HistoryManifest; digest: string; files: Map<string, Blob> }
 const storeName = 'historical-evidence';
 function authorize(user: IagUser | null, admin = false) {
@@ -83,5 +83,19 @@ export async function reviewHistory(facilityId: string, batchId: string, review:
     const tx = db.transaction(storeName, 'readwrite'); tx.oncomplete = () => resolve(); tx.onabort = () => reject(new Error('Unknown historical assertion.')); tx.onerror = () => reject(tx.error);
     const store = tx.objectStore(storeName); const request = store.get(batchId);
     request.onsuccess = () => { const record = request.result as HistoryRecord; if (!record || record.facilityId !== facilityId || !record.manifest.assertions.some(a => a.id === review.assertionId)) { tx.abort(); return; } record.reviews.push({ ...review, actor: user!.id, at: new Date().toISOString() }); store.put(record); };
+  }); } finally { db.close(); }
+}
+
+export async function seedPublishedHistory(facilityId: string): Promise<void> {
+  if (facilityId !== 'facility-j-lieb') return;
+  const response = await fetch(`${import.meta.env.BASE_URL}facility-content/lieb-foods/history.json`);
+  if (!response.ok) return;
+  const manifest = await response.json() as HistoryManifest;
+  validateHistory(manifest, facilityId);
+  const db = await openPlantDb(facilityId);
+  try { await new Promise<void>((resolve,reject) => {
+    const tx=db.transaction('historical-evidence','readwrite'); const store=tx.objectStore('historical-evidence');const request=store.get(manifest.id);
+    request.onsuccess=()=>{ const existing = request.result as HistoryRecord | undefined; const publicSourceBase = 'facility-content/lieb-foods/recovered-2026-09-08/J_Lieb_Plant_Codex_Handoff/'; if(!existing) store.add({id:manifest.id,facilityId,digest:(manifest as HistoryManifest & {publication:{originalDigest:string}}).publication.originalDigest,manifest,importedAt:'2026-09-09T00:00:00Z',importedBy:'Owner-authorized GitHub publication',reviews:[],publicSourceBase}); else if(!existing.publicSourceBase) store.put({...existing,publicSourceBase}); };
+    tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);
   }); } finally { db.close(); }
 }

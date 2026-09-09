@@ -1,0 +1,252 @@
+[
+  {
+    "id": "VERIFY-C01",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Retain both source assertions; trace original labels/drawing. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C01"
+    ]
+  },
+  {
+    "id": "VERIFY-C02",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Keep separate; recover unambiguous device photograph/readback. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C02"
+    ]
+  },
+  {
+    "id": "VERIFY-C03",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Read original glare-free plate. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C03"
+    ]
+  },
+  {
+    "id": "VERIFY-C04",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Resolve device and chronological context. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C04"
+    ]
+  },
+  {
+    "id": "VERIFY-C05",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Preserve separate voltage domains; trace transformer. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C05"
+    ]
+  },
+  {
+    "id": "VERIFY-C06",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Keep recommendation/readback/final states distinct. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C06"
+    ]
+  },
+  {
+    "id": "VERIFY-C07",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Reconcile machine plate and manual. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C07"
+    ]
+  },
+  {
+    "id": "VERIFY-C08",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Prefer OEM registration for documented machine; retain unresolved alternate. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C08"
+    ]
+  },
+  {
+    "id": "VERIFY-C09",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Alias at document level; inspect installed hardware. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C09"
+    ]
+  },
+  {
+    "id": "VERIFY-C10",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Do not equate without mapping. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C10"
+    ]
+  },
+  {
+    "id": "VERIFY-C11",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Retain discrepancy; do not treat transcript as procedure. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C11"
+    ]
+  },
+  {
+    "id": "VERIFY-C12",
+    "subject": "candidate-line2-hot-filler",
+    "priority": 1,
+    "action": "Audit source HMI and sheet interfaces before verification. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C12"
+    ]
+  },
+  {
+    "id": "VERIFY-C13",
+    "subject": "candidate-line2-hot-filler",
+    "priority": 1,
+    "action": "Preserve exact tags and open tasks. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C13"
+    ]
+  },
+  {
+    "id": "VERIFY-C14",
+    "subject": "facility-history",
+    "priority": 1,
+    "action": "Apply later user correction; archive old map as historical. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C14"
+    ]
+  },
+  {
+    "id": "VERIFY-C15",
+    "subject": "facility-history",
+    "priority": 1,
+    "action": "Mark supplied-history only. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C15"
+    ]
+  },
+  {
+    "id": "VERIFY-C16",
+    "subject": "candidate-superior-boiler",
+    "priority": 1,
+    "action": "Do not treat makeup/water totals as measured steam. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C16"
+    ]
+  },
+  {
+    "id": "VERIFY-C17",
+    "subject": "L2-CC-001",
+    "priority": 1,
+    "action": "Keep candidate-only until primary evidence recovered. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C17"
+    ]
+  },
+  {
+    "id": "VERIFY-C18",
+    "subject": "facility-history",
+    "priority": 1,
+    "action": "Verify repository state; do not claim tests rerun. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C18"
+    ]
+  },
+  {
+    "id": "VERIFY-C19",
+    "subject": "FG-L4-MTN-001",
+    "priority": 1,
+    "action": "Preserve literal tag and field-verification state. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C19"
+    ]
+  },
+  {
+    "id": "VERIFY-C20",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Do not infer installed transformer or optional systems. Keep conflict open until identified primary evidence and reviewer rationale are attached; archived procedures are not work authorization.",
+    "assertionIds": [
+      "C20"
+    ]
+  },
+  {
+    "id": "CAPTURE-21",
+    "subject": "FG-L4-MTN-001",
+    "priority": 1,
+    "action": "Line 4: photograph final machine/servo plates; capture feeds, disconnect, safety, PLC/HMI backups and axis mapping.",
+    "assertionIds": [
+      "META-IDENTITY",
+      "META-CONTROLS"
+    ]
+  },
+  {
+    "id": "CAPTURE-22",
+    "subject": "L2-CC-001",
+    "priority": 1,
+    "action": "Line 2: photograph actual cabinet and each drive, confirm PLC and modules against generated drawing; preserve L2-CC-001.",
+    "assertionIds": [
+      "CAB-IDENTITY",
+      "CAB-ILLUSTRATION"
+    ]
+  },
+  {
+    "id": "CAPTURE-23",
+    "subject": "candidate-line2-hot-filler",
+    "priority": 1,
+    "action": "Line 2: recover timestamped HMI originals and trace instrument associations / TV101 signal route under approved site procedures; identify unknown tags.",
+    "assertionIds": [
+      "FILL-TOPOLOGY",
+      "FILL-TV101",
+      "FILL-IP"
+    ]
+  },
+  {
+    "id": "CAPTURE-24",
+    "subject": "candidate-superior-boiler",
+    "priority": 1,
+    "action": "Shared steam: recover original Aqua Analytics report; identify water meter, condensate return, blowdown and chemical usage logs before estimating steam or assigning supported lines.",
+    "assertionIds": [
+      "BOILER-WATER",
+      "BOILER-SERVICE"
+    ]
+  },
+  {
+    "id": "CAPTURE-25",
+    "subject": "candidate-kosme-L05358",
+    "priority": 2,
+    "action": "Recover OEM maintenance and lubrication pages 103–130, then safety/utility pages 9–56; capture installed plate, line assignment, address-to-head map and card 15/20 before/after history.",
+    "assertionIds": [
+      "KOSME-COVERAGE",
+      "KOSME-SERVICE"
+    ]
+  },
+  {
+    "id": "CAPTURE-26",
+    "subject": "candidate-wulftec-A6882",
+    "priority": 1,
+    "action": "Obtain original labeled Drive 6/VFD7 photos, final parameter export, motor plate and commissioning signoff. Preserve reference/proposal/final evidence separately.",
+    "assertionIds": [
+      "WULF-WIRING-OWNERSHIP",
+      "WULF-SERVICE"
+    ]
+  },
+  {
+    "id": "CAPTURE-27",
+    "subject": "facility-history",
+    "priority": 1,
+    "action": "Confirm actual dependencies supporting Lines 2 and 4 with source-backed field records; do not infer flow or line membership from asset names.",
+    "assertionIds": [
+      "MAP-CORRECTION"
+    ]
+  }
+]

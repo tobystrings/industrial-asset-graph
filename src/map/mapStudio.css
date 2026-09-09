@@ -59,3 +59,26 @@ html body #root .app-shell.app-pages .detailed-map-stage:has(.map-studio),html b
 html body #root .app-shell.app-pages .reference-layout.map-studio{background:#0c1725!important;color:#e2e8f0!important}
 html body #root .app-shell.app-pages .map-studio>.reference-layout-head h2{color:#f1f5f9!important}
 html body #root .map-studio:fullscreen{height:100dvh!important;max-width:none!important;min-height:0!important}
+
+/* Collapsible tool strips leave the full drawing width available. */
+html body #root .reference-layout.map-studio{display:flex;flex-direction:column;height:auto!important;min-height:0!important}
+html body #root .map-studio>.reference-layout-head{display:none!important}
+html body #root .map-studio>.map-editor-shell{display:flex!important;order:1;max-height:45dvh;width:100%;padding:8px;flex:none}
+html body #root .map-studio>.map-studio-panel{display:block!important;order:2;width:100%;min-height:0;max-height:45dvh;flex:none}
+html body #root .map-studio>.reference-drawing-sheet{order:3;width:100%;height:65dvh!important;min-height:350px;flex:none}
+html body #root .map-studio .reference-plan-wrap{height:100%!important;min-height:0!important}
+.map-studio .studio-mobile-nav{display:none!important}
+.map-studio .studio-window-actions{order:0}
+.map-studio .map-editor-session{order:0;border:0;padding:0}
+.map-studio .map-editor-message{order:0;margin:0}
+.map-studio .map-editor-tools{display:flex;flex-wrap:wrap}
+.map-studio .map-studio-tabs{display:flex;gap:5px;overflow-x:auto;flex:none}
+.map-studio .map-studio-tabs button{min-height:44px;white-space:nowrap}
+.map-studio .studio-tabs{position:static;padding:4px;border:0}
+.map-studio .studio-tab-body{max-width:900px}
+html body #root .map-studio:fullscreen>.reference-drawing-sheet{flex:1;height:auto!important;min-height:200px}
+@media(max-width:600px){html body #root .map-studio>.reference-drawing-sheet{height:60dvh!important;min-height:300px}.map-studio .map-editor-session{flex-wrap:nowrap;overflow-x:auto}.map-studio .map-editor-session button{flex:none}.map-studio .map-editor-session span{display:none}.map-studio .studio-window-actions span{display:none}}
+
+@media(min-width:1100px){html body #root .map-studio>.map-editor-shell{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:6px}.map-studio .map-studio-tabs{grid-column:1}.map-studio .map-editor-session{grid-column:2;grid-row:1}.map-studio .map-editor-message,.map-studio .map-tool-panel,.map-studio .map-area-properties,.map-studio .map-editor-selection-actions{grid-column:1/-1}.map-studio .map-editor-session span{display:none}}
+html body #root .app-shell.app-pages .reference-layout.map-studio{height:auto!important;min-height:0!important}
+html body #root .app-shell.app-pages .map-studio:fullscreen{height:100dvh!important}

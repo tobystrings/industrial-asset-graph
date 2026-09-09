@@ -94,6 +94,27 @@ def exercise_area_rename(page, label):
     page.get_by_text('Permissions refreshed from your account.', exact=True).wait_for()
     open_page(page, 'map')
     page.get_by_role('button', name='Edit map', exact=True).click()
+    studio = page.locator('.map-editor-shell')
+    collapsed_height = studio.bounding_box()['height']
+    page.get_by_role('button', name='Areas & shapes', exact=False).click()
+    assert studio.bounding_box()['height'] > collapsed_height
+    page.get_by_role('button', name='Collapse tools', exact=True).click()
+    assert page.locator('#map-studio-panel').count() == 0
+    page.get_by_role('button', name='Cursor / Pan', exact=True).click()
+    surface = page.locator('.reference-plan-wrap')
+    surface.scroll_into_view_if_needed()
+    box = surface.bounding_box()
+    content = page.locator('.page-scroll').bounding_box()
+    x = max(box['x'],0) + min(box['width'],page.viewport_size['width']) * .5
+    top = max(box['y'],content['y']); bottom = min(box['y']+box['height'],content['y']+content['height'])
+    y = (top+bottom)/2
+    transform = page.locator('.reference-plan-transform').get_attribute('style')
+    page.mouse.move(x,y); page.mouse.down(); page.mouse.move(x+65,y+35,steps=8); page.mouse.up()
+    assert page.locator('.reference-plan-transform').get_attribute('style') != transform, 'Cursor/Pan did not move the map'
+    assert studio.count() == 1 and 'page=map' in page.url, 'Pan activated a room or asset'
+    screenshot(page, f'{label}-map-studio-collapsed-pan')
+    page.locator('.map-floating-controls').get_by_role('button', name='Fit', exact=True).click()
+    page.get_by_role('button', name='Select', exact=True).click()
     page.locator('[aria-label="Edit area Warehouse E"]').click(force=True)
     studio_pane(page, 'Drawing tools')
     props = page.get_by_role('complementary', name='Area Properties')
@@ -628,7 +649,7 @@ try:
                         walkdown.get_by_label('Typed value').fill('Observed during production-readiness walkthrough')
                         walkdown.locator('input[placeholder="Initials"]').first.fill('VTT')
                         walkdown.get_by_role('button', name='Save capture', exact=True).click()
-                        walkdown.get_by_text('Saved locally. Not in the graph yet.', exact=True).wait_for(state='visible')
+                        walkdown.get_by_text('Capture and photo saved for public publication. Not in the graph yet.', exact=True).wait_for(state='visible')
                         screenshot(page, f'{label}-walkthrough')
 
                     for route in ['home','more','field','observation','evidence','assetAdd','setup','settings','review','help']:

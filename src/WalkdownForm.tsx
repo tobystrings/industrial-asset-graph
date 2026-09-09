@@ -5,6 +5,8 @@ import { walkdownMoreDefaultOpen } from './lib/hrefMatrix';
 import { loadLastWho, recordWalkdownCapture, saveLastWho } from './lib/walkdown';
 import { promptForUnknown } from './lib/walkdownPrompts';
 import type { WalkdownField } from './types/facility';
+import { useFacility, useFacilityEditor } from './facility';
+import { putAttachment } from './facility/runtimeDb';
 
 export default function WalkdownForm({
   targetId,
@@ -19,6 +21,8 @@ export default function WalkdownForm({
   onSaved?: () => void;
   compact?: boolean;
 }) {
+  const facility=useFacility();const editor=useFacilityEditor();
+  const [photoFile,setPhotoFile]=useState<File>();
   const prompt = promptSource ? promptForUnknown(promptSource) : null;
   const [field, setField] = useState<WalkdownField>(prompt?.field ?? defaultField);
   const [value, setValue] = useState('');
@@ -55,11 +59,16 @@ export default function WalkdownForm({
           setMessage('Need a who and a target.');
           return;
         }
+        if(photoFile) {
+          const asset=facility.assets.find(a=>targetId===a.id||targetId.startsWith(`${a.id}:`));
+          await putAttachment({id:`capture-${saved.id}`,assetId:asset?.id??`walkdown:${targetId}`,name:photoFile.name,mimeType:photoFile.type,size:photoFile.size,blob:photoFile,category:'PHOTO',verificationStatus:'FIELD_VERIFY',access:editor.publication.phase==='DISABLED'?'LOCAL_ONLY':'PUBLIC_APP',createdAt:saved.capturedAt},facility.facility.id);
+        }
         saveLastWho(who || 'field');
         setValue('');
         setPhotoRef('');
         setPhotoHash(undefined);
-        setMessage('Saved locally. Not in the graph yet.');
+        setPhotoFile(undefined);
+        setMessage(editor.publication.phase==='DISABLED'?'Saved locally. Not in the graph yet.':'Capture and photo saved for public publication. Not in the graph yet.');
         onSaved?.();
       }}
     >
@@ -76,7 +85,7 @@ export default function WalkdownForm({
           accept="image/*"
           capture="environment"
           onChange={async (event) => {
-            const file = event.target.files?.[0];
+            const file = event.target.files?.[0];setPhotoFile(file);
             if (!file) {
               setPhotoRef('');
               setPhotoHash(undefined);
@@ -87,7 +96,7 @@ export default function WalkdownForm({
             setPhotoHash(print.sha256);
           }}
         />
-        <small>{photoRef ? `${photoRef} · hashed · not uploaded` : 'Not uploaded · local hash only'}</small>
+        <small>{photoRef ? `${photoRef} · hashed · included when you save` : 'Photo bytes are preserved with the saved capture.'}</small>
       </label>
       <details className="walkdown-more" data-testid="walkdown-more" open={moreOpen} onToggle={(event) => setMoreOpen((event.target as HTMLDetailsElement).open)}>
         <summary>More · field, initials, dest</summary>

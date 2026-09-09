@@ -1,0 +1,1238 @@
+You are working in the repository:
+
+https://github.com/tobystrings/industrial-asset-graph
+
+Product: Industrial Asset Graph — J. Lieb Foods facility knowledge system.
+
+MISSION
+
+Evolve the current high-quality, single-technician, map-first cabinet/documentation tool into a plant-wide living asset graph that can safely scale to hundreds or thousands of assets and multiple technicians without sacrificing the project's evidence discipline, field usability, existing 2D visual identity, or current working demo.
+
+This is an evolution of the existing product, not a rewrite.
+
+The final architecture and product must provide:
+
+1. A scalable, versioned facility graph data model.
+2. A shared multi-user source of truth with excellent offline field capability.
+3. Real evidence-backed relationship population and graph traversal.
+4. A technician-friendly Draft → Review → Canonical workflow.
+5. Clear local/save/sync/conflict state feedback.
+6. Plant-scale search, filtering, health/coverage, and verification workflows.
+7. Strong accessibility, responsive behavior, error handling, and visual regression protection.
+8. A safe migration path from all current FacilityPackage / IndexedDB / .iag data.
+
+ABSOLUTE HONESTY RULE
+
+Never invent plant facts.
+
+Do not invent equipment, machines, motors, HP, wiring, destinations, feeds, controls, sensors, interlocks, LOTO steps, surveyed locations, upstream/downstream paths, relationship instances, or any other facility fact.
+
+Unknown information must remain unknown or be explicitly represented as FIELD_VERIFY, INFERRED, DISPUTED, or another existing evidence state as appropriate.
+
+Do not populate relationship instances merely because the new schema supports their relationship types.
+
+Do not create fake J. Lieb facility data simply to make a new graph view look populated.
+
+Synthetic fixtures are allowed only for testing scale/performance and must be clearly separated from canonical facility truth.
+
+==================================================
+CURRENT REPOSITORY RULES — MUST REMAIN TRUE
+==================================================
+
+Read and obey before implementation:
+
+- AGENTS.md
+- START-HERE.md
+- AGENT-HANDOFF.md
+- docs/VISUAL-LAYOUT-CONTRACT.md
+
+The current product intentionally has these constraints:
+
+- Only two documented machines/assets are currently established:
+  - L2-CC-001
+  - FG-L4-MTN-001
+- Most semantic relationship types intentionally remain at zero count under relationshipHonesty.ts.
+- Runtime plant edits currently live in browser IndexedDB.
+- Portable .iag ZIP packages are the current backup/import/export mechanism.
+- The building map is strict 2D only.
+- No 3D map mode may return.
+- Existing visual-layout checks are mandatory.
+- Existing evidence states and evidence discipline must remain intact.
+- LOCAL_ONLY is an evidence/access discipline and must never be silently uploaded, bundled, published, or promoted.
+- Keep/review/field observations must never automatically become canonical plant truth.
+- Existing seeded facilities under facilities/ and existing typed data under src/facility/, src/types/, and src/facilityData.ts must continue to work.
+- Existing phone/tablet/desktop behavior must not be casually redesigned around a new architecture.
+- The existing product should still feel like Industrial Asset Graph after this work.
+
+STRICTLY FORBIDDEN
+
+- Do not reintroduce Three.js-driven plant mapping, 3D plant views, orbital map controls, or a 2D/3D toggle.
+- Do not weaken or remove the visual layout contract.
+- Do not bypass tests to make CI green.
+- Do not automatically convert FIELD_VERIFY or INFERRED data into VERIFIED truth.
+- Do not auto-promote field observations into the canonical graph.
+- Do not automatically upload LOCAL_ONLY evidence.
+- Do not silently use last-write-wins for conflicting canonical edits.
+- Do not replace the current product with a generic graph-database/node-link demo.
+- Do not populate empty relationship types simply to demonstrate graph features.
+- Do not assume schematic coordinates are surveyed physical coordinates.
+- Do not spend the run on a light-theme redesign, Storybook rollout, decorative animation system, or other unrelated polish.
+- Do not create arbitrary success claims such as “verification time improved by 50%” without real measured evidence.
+- Do not chase arbitrary code metrics such as every file being below a specific line count if that harms cohesion.
+
+==================================================
+IMPORTANT ARCHITECTURAL PRINCIPLE
+==================================================
+
+Do not create a disconnected second data model.
+
+The repository already contains useful concepts such as:
+
+- VerificationState
+- VerifiedFact
+- EvidenceRecord
+- RelationshipRecord
+- RevisionRecord
+- FacilityPackage
+- IndexedDB persistence
+- .iag archive import/export
+
+Extend, normalize, and version these concepts where appropriate.
+
+Create compatibility adapters and explicit migrations so the existing application and seed facility can move forward incrementally.
+
+Do not strand the current UI on a legacy schema while building a separate theoretical graph system beside it.
+
+Separate these concepts clearly:
+
+1. Verification/documentation truth:
+   - VERIFIED
+   - FIELD_VERIFY
+   - INFERRED
+   - DISPUTED
+   - RETIRED
+   - existing documentation states where appropriate
+
+2. Evidence/access scope:
+   - PUBLIC_APP
+   - LOCAL_ONLY
+   - RESTRICTED
+   - other existing access states
+
+3. Workflow/review state:
+   - draft/local capture
+   - submitted for review
+   - approved/canonical
+   - rejected
+   - conflict/pending resolution where appropriate
+
+Do not overload one enum to represent all three concerns.
+
+==================================================
+EXECUTION STRATEGY
+==================================================
+
+Do not attempt a giant rewrite.
+
+Work in reviewable vertical slices and keep the current demo functional at every meaningful checkpoint.
+
+Order of work:
+
+PHASE 0 — REPOSITORY AUDIT AND ARCHITECTURE DECISION
+PHASE 1 — VERSIONED GRAPH MODEL + MIGRATION
+PHASE 2 — SHARED SOURCE OF TRUTH + OFFLINE SYNC THIN SLICE
+PHASE 3 — DRAFT / REVIEW / CANONICAL WORKFLOW + EVIDENCE UX
+PHASE 4 — RELATIONSHIP AUTHORING + GRAPH TRAVERSAL
+PHASE 5 — PLANT-SCALE UX + GRAPH HEALTH + ACCESSIBILITY
+PHASE 6 — HARDENING, REFACTORING, DOCUMENTATION, AND CLEANUP
+
+Before major implementation, inspect the actual code and write a concise architecture note describing:
+
+- current data flow
+- current FacilityPackage shape
+- current IndexedDB persistence
+- current .iag archive behavior
+- current Keep/review/walkdown behavior
+- relationshipHonesty invariants
+- current facility seed/package model
+- current visual/layout constraints
+- current testing/visual audit pipeline
+- current large/overloaded components and responsibilities
+- proposed target architecture
+- migration sequence
+- major risks
+- explicit non-goals
+
+Then implement the plan.
+
+Do not stop after writing the proposal unless a genuine repository blocker makes implementation unsafe.
+
+==================================================
+PHASE 1 — VERSIONED FACILITY GRAPH MODEL
+==================================================
+
+Design and implement a scalable schema capable of representing:
+
+FACILITY STRUCTURE
+
+- Facility
+- Area
+- Location
+- Production line or logical grouping where appropriate
+- Asset / machine / equipment
+- Component / device
+- Parent-child equipment hierarchy
+
+COMPONENT CAPABILITY
+
+The schema must be capable of representing device categories such as:
+
+- PLC
+- PLC rack/module
+- VFD
+- starter
+- breaker
+- disconnect
+- transformer
+- relay
+- contactor
+- sensor
+- valve
+- motor
+- control cabinet
+- network device
+- utility equipment
+
+Do not add real instances of these devices unless evidence exists.
+
+RELATIONSHIPS
+
+Support typed relationships with explicit semantics, including current and future types such as:
+
+- LOCATED_IN
+- CONTAINS
+- FEEDS
+- CONTROLS
+- SENSES
+- INTERLOCKS_WITH
+- SUPPLIES
+- UPSTREAM_OF
+- DOWNSTREAM_OF
+- ISOLATES
+- SENDS_DATA_TO
+- MECHANICALLY_DRIVES
+- HAS_DOCUMENT
+- SUPPORTED_BY_EVIDENCE
+
+Define:
+
+- relationship direction
+- allowable endpoint categories
+- inverse semantics where useful
+- useful cardinality constraints where practical
+- verification requirements
+- evidence/provenance references
+
+Do not confuse schema capability with evidence that a relationship exists.
+
+FACTS AND PROVENANCE
+
+A plant fact must be capable of carrying:
+
+- value
+- verification/documentation state
+- evidence references
+- source/provenance
+- author/actor
+- created timestamp
+- updated timestamp
+- entity/revision version
+- optional note
+- optional unit
+- review state where appropriate
+
+Support incomplete records and progressive verification.
+
+EVIDENCE
+
+Support evidence such as:
+
+- photos
+- nameplates
+- drawings
+- manuals
+- PDFs
+- CMMS records
+- field tests
+- field observations
+- structured imports
+- other evidence types
+
+Preserve access state including LOCAL_ONLY and RESTRICTED semantics.
+
+Stable evidence IDs must survive revision and synchronization.
+
+REVISION AND DELETION MODEL
+
+Introduce stable IDs and revision/version semantics suitable for synchronization.
+
+Prefer non-destructive history for canonical plant facts.
+
+Where deletion is needed for shared entities, use a deliberate deletion/tombstone strategy so offline clients cannot accidentally resurrect deleted records.
+
+SCHEMA VERSIONING
+
+Add an explicit schema/package version.
+
+Create migration functions rather than scattered compatibility conditionals.
+
+Provide automated tests that:
+
+- load the current seed package
+- migrate it to the new schema
+- validate it
+- preserve known facts
+- preserve verification states
+- preserve relationship honesty
+- do not invent new facility truth
+
+Preserve compatibility with existing .iag packages.
+
+If the archive format advances, support reading the existing archive version and intentionally exporting the new version.
+
+RUNTIME VALIDATION
+
+Keep TypeScript types as the application contract and add machine-validatable runtime schema validation where useful.
+
+Do not let TypeScript-only typing create a false assumption that imported JSON is valid.
+
+verify:data must continue to validate facility content.
+
+==================================================
+PHASE 2 — SHARED SOURCE OF TRUTH + OFFLINE SYNC
+==================================================
+
+Implement the simplest robust multi-user architecture appropriate for this repository.
+
+PREFERRED V1 DIRECTION
+
+Unless the repository audit reveals a strong reason otherwise, prefer:
+
+- central backend API
+- PostgreSQL as the canonical shared store
+- IndexedDB retained as the offline/local cache
+- IndexedDB or equivalent local outbox/mutation queue
+- optimistic concurrency using entity version/base revision
+- stable actor/user/device identity
+- server-side audit trail
+- explicit conflict detection
+- WebSocket or SSE only where it provides clear value
+- portable .iag import/export retained as backup/handoff
+
+Do NOT introduce CRDT complexity by default.
+
+Use a CRDT or third-party sync engine only if the audit demonstrates that field-level collaborative editing genuinely requires it and the added operational complexity is justified.
+
+Do NOT introduce Neo4j merely because this is called a graph.
+
+A relational canonical store with indexed node/edge tables and recursive graph queries is acceptable and preferred unless measured requirements prove otherwise.
+
+BACKEND DEVELOPMENT EXPERIENCE
+
+Make the backend easy to run locally.
+
+A Docker Compose development path for PostgreSQL is acceptable.
+
+Keep the public GitHub Pages demo capable of running in read-only/seeded/local mode without requiring the private production backend.
+
+The frontend should have a clear persistence/data-service abstraction so GitHub Pages demo mode, local/offline mode, and shared-backend mode do not require scattered conditionals across UI components.
+
+SYNC MODEL
+
+Implement a real synchronization contract.
+
+Do not relabel the existing ID-based .iag/import merge as multi-user synchronization.
+
+A client mutation should carry enough information to safely detect stale or duplicate edits, such as:
+
+- mutation ID
+- entity ID
+- entity type
+- actor ID
+- device/client ID
+- base entity version
+- operation
+- timestamp
+- changed fields or patch
+- verification/review metadata when relevant
+
+The server must either:
+
+- accept the mutation and return the new canonical version, or
+- reject/flag it as a conflict with enough information for the UI to resolve it.
+
+Mutations must be idempotent so retries do not create duplicate changes.
+
+OFFLINE
+
+A field technician must be able to:
+
+- open previously cached facility data
+- capture observations
+- create draft assets/components/relationships
+- attach LOCAL_ONLY evidence
+- continue working without network access
+- clearly see what is saved locally
+- clearly see what is pending synchronization
+- reconnect later
+- sync eligible changes without losing data
+- review conflicts created while offline
+
+LOCAL_ONLY TRANSPORT INVARIANT
+
+LOCAL_ONLY evidence must be excluded from automatic upload at the sync boundary itself.
+
+Do not rely only on hiding it in the UI.
+
+The synchronization layer must have an explicit automated test proving LOCAL_ONLY attachments/evidence are not transmitted unless the user deliberately promotes them through the approved workflow.
+
+IDENTITY
+
+Create a practical v1 identity model with:
+
+- user ID
+- display name
+- role
+- device/client identity
+
+Design for roles such as:
+
+- viewer
+- field technician
+- engineer
+- admin
+
+A prototype may use simplified local/development authentication, but do not represent display-name-only identity as production-grade security.
+
+Keep authentication boundaries replaceable and document what is and is not secure in v1.
+
+AUDIT
+
+Canonical shared changes must preserve:
+
+- who changed it
+- when
+- previous version
+- new version
+- reason/evidence where relevant
+- review/approval information where relevant
+
+CONFLICT UX
+
+Implement at least one real end-to-end conflict scenario.
+
+Example:
+
+Technician A and Technician B edit the same canonical fact from the same base version.
+
+The second incompatible update must not silently overwrite the first.
+
+Surface:
+
+- current canonical/server value
+- technician's attempted value
+- verification state
+- evidence/provenance
+- author
+- timestamp
+- base revision
+- current revision
+
+Allow an explicit resolution action.
+
+Never automatically resolve safety-, evidence-, or plant-truth-relevant conflicts by last-write-wins.
+
+==================================================
+PHASE 3 — DRAFT / REVIEW / CANONICAL WORKFLOW + EVIDENCE UX
+==================================================
+
+Create a clear technician workflow that distinguishes capture from truth.
+
+Use an explicit progression such as:
+
+LOCAL DRAFT / OBSERVATION
+→ PENDING SYNC
+→ SHARED DRAFT OR SUBMITTED FOR REVIEW
+→ REVIEWED / APPROVED
+→ CANONICAL GRAPH
+
+The exact labels may adapt to existing product language, but the separation must be obvious.
+
+WALKDOWN / OBSERVATION ACTIONS
+
+Make the differences between actions explicit.
+
+Where appropriate, use actions conceptually equivalent to:
+
+- Save Draft
+- Save Observation
+- Submit for Review
+- Apply / Promote to Graph
+- Reject
+- Resolve Conflict
+
+Do not use one vague “Apply” action for multiple meanings.
+
+Before promoting a field observation or proposed change into canonical truth:
+
+- show a clear diff preview
+- show current value
+- show proposed value
+- show verification state
+- show evidence references
+- show who captured it
+- show when it was captured
+- require an explicit review/promotion action
+
+Keep the existing honesty rule that Keep/review capture does not automatically alter canonical facilityData/graph truth.
+
+EVIDENCE ATTACHMENT WORKFLOW
+
+Improve evidence capture for field use.
+
+Where appropriate, support:
+
+- drag/drop or simple file selection
+- phone-friendly photo/document attachment
+- thumbnail/preview for images
+- attachment filename/type display
+- evidence counts
+- evidence type display
+- verification badges
+- access-state display including LOCAL_ONLY
+- removal before submission
+- clear upload/sync state
+
+Evidence UI should make these concepts visibly different:
+
+- VERIFIED
+- FIELD_VERIFY
+- INFERRED
+- DISPUTED
+- LOCAL_ONLY access
+
+Do not visually imply LOCAL_ONLY is a verification state.
+
+PROMOTION GUIDANCE
+
+When a fact is FIELD_VERIFY, the UI may explain that supporting evidence/review is required before promotion to VERIFIED.
+
+It must not automatically make that promotion.
+
+OBSERVATION HISTORY
+
+Show useful history for an asset/fact/relationship:
+
+- captured observations
+- revisions
+- review decisions
+- evidence additions
+- canonical changes
+- actor/timestamp
+
+Keep this usable rather than turning every asset screen into an audit-log dump.
+
+==================================================
+GLOBAL USER FEEDBACK / SAVE / SYNC STATE
+==================================================
+
+Implement a centralized, accessible user-feedback mechanism using existing patterns or a lightweight approach appropriate for the repo.
+
+Do not add a toast library solely because this prompt mentions notifications if a small internal system is better.
+
+Support meaningful feedback for:
+
+- local save success/failure
+- shared save/sync success/failure
+- queued offline changes
+- conflicts
+- asset create/update/delete where allowed
+- relationship create/update/delete
+- evidence attachment
+- import/export
+- validation failures
+- review/promotion actions
+
+Use accessible aria-live announcements where appropriate.
+
+Do not spam users with a toast for every tiny state change.
+
+More important than generic “Saved Successfully” messages is a persistent, truthful save/sync state.
+
+The user should be able to distinguish states such as:
+
+- Saved locally
+- Offline
+- Changes waiting to sync
+- Syncing
+- Synced
+- Conflict requires review
+- LOCAL_ONLY — will not upload
+- Draft
+- Submitted for review
+- Canonical / approved
+
+Use clear timestamps where useful.
+
+Never display “Synced” unless the shared source of truth actually accepted the relevant change.
+
+==================================================
+PHASE 4 — REAL RELATIONSHIP AUTHORING + GRAPH POWER
+==================================================
+
+Create a repeatable evidence-aware process for populating real relationships from:
+
+- drawings
+- photos
+- nameplates
+- field walkdowns
+- existing documentation
+- structured imports
+- future CMMS extracts
+
+Do not fabricate relationship data for demonstration purposes.
+
+RELATIONSHIP AUTHORING
+
+A relationship editor must require:
+
+- source
+- relationship type
+- target
+- verification state
+- provenance/evidence state
+
+For semantic plant relationships such as:
+
+- FEEDS
+- CONTROLS
+- SENSES
+- INTERLOCKS_WITH
+- SUPPLIES
+- UPSTREAM_OF
+- DOWNSTREAM_OF
+- ISOLATES
+- SENDS_DATA_TO
+- MECHANICALLY_DRIVES
+
+never:
+
+- silently create a VERIFIED relationship
+- infer endpoints as truth
+- populate missing destination IDs without evidence
+- weaken relationshipHonesty to make the product appear more complete
+
+Preserve FIELD_VERIFY when evidence is incomplete.
+
+Make evidence/provenance visible.
+
+Evolve relationshipHonesty.ts so it remains meaningful against the new canonical graph.
+
+BULK IMPORT
+
+Add a structured import path for CSV or similarly simple tabular data where useful.
+
+Imported plant facts and relationships must default to FIELD_VERIFY unless the import explicitly contains trustworthy verification metadata that the user deliberately accepts.
+
+Provide an import preview before canonical commit.
+
+The preview should show:
+
+- records to create
+- records to update
+- unresolved references
+- duplicates
+- validation failures
+- verification status
+- evidence/provenance implications
+
+Do not allow a malformed bulk import to silently overwrite canonical truth.
+
+GRAPH QUERY CAPABILITIES
+
+Implement useful traversal over real relationships, including:
+
+- upstream
+- downstream
+- what feeds this?
+- what does this feed?
+- what controls this?
+- what does this control?
+- containment hierarchy
+- impact analysis
+- shortest/relevant dependency path where meaningful
+
+Traversal must respect relationship direction and type.
+
+Do not imply certainty beyond the verification state of the traversed edges.
+
+A path containing FIELD_VERIFY or DISPUTED edges must visibly communicate that uncertainty.
+
+IMPACT ANALYSIS
+
+“What is affected if this fails?” must return evidence-aware results.
+
+Do not produce a definitive impact statement from uncertain edges.
+
+Separate or label:
+
+- verified impact
+- possible impact requiring field verification
+- disputed/uncertain path segments
+
+==================================================
+PHASE 5 — PLANT-SCALE PRODUCT AND UX
+==================================================
+
+Keep the existing product identity.
+
+The 2D map remains the primary spatial surface.
+
+The cabinet workspace remains first-class.
+
+Do not replace the product with a generic graph visualization.
+
+Scale existing product areas such as:
+
+- Plant Manager
+- Inspector
+- Relationships workspace
+- Guide
+- Asset Directory
+- search
+- filters
+- area navigation
+- mobile/field workflow
+
+PLANT-SCALE REQUIREMENTS
+
+The UI should remain usable with hundreds or thousands of assets.
+
+Use techniques such as:
+
+- search-first navigation
+- filtering
+- area/line scoping
+- asset-type filtering
+- verification-state filtering
+- review-state filtering
+- progressive disclosure
+- virtualization for genuinely long lists
+- lazy loading/code splitting where beneficial
+- clear empty states
+- relevance sorting
+- alphabetical/status sorting where useful
+
+Do not prematurely add React.memo/useMemo/useCallback everywhere.
+
+Measure or identify expensive paths and optimize intentionally.
+
+Do not render every plant relationship on the map simultaneously.
+
+ASSET DIRECTORY / INFORMATION HIERARCHY
+
+Improve information hierarchy without performing a wholesale visual redesign.
+
+Make important identity information easy to scan:
+
+- Asset ID / drawing number
+- asset name
+- area/location
+- type
+- verification/documentation state
+- open field-verification items
+- relevant relationship/evidence counts
+
+Use secondary styling for lower-priority technical details.
+
+Add sorting/filtering that remains useful at plant scale.
+
+CONTROL CABINET WORKSPACE
+
+Preserve the current cabinet workspace.
+
+Where evidence supports it, allow useful relationship visualization/filtering around cabinet devices without inventing conductors or connections.
+
+Do not overlay guessed wiring.
+
+MAP RELATIONSHIP OVERLAYS
+
+Add useful relationship overlays to the 2D plant map and cabinet/equipment views where appropriate.
+
+Overlays must be:
+
+- evidence-aware
+- filterable
+- scoped
+- visually restrained
+- capable of showing verification state
+
+Do not render a plant-wide spaghetti graph.
+
+MAP LEGEND / FILTERING
+
+Improve legend/navigation only where it supports real plant-scale use.
+
+Legend items may become interactive filters/highlights.
+
+Allow search by asset/area/name.
+
+Do not create a coordinate-centric workflow that implies the schematic uses surveyed coordinates.
+
+If an area has not been mapped/documented:
+
+- say so clearly
+- show known asset/documentation counts if real
+- offer an action such as “Document this area” or “Start field verification”
+- link into the appropriate map/editor/capture workflow
+- do not invent coordinates or geometry
+
+GRAPH HEALTH / DATA HEALTH / COVERAGE
+
+Create a meaningful Data Health / Graph Health surface.
+
+It may include indicators such as:
+
+- schema/data validation state
+- documented assets
+- assets requiring verification
+- verified relationships
+- FIELD_VERIFY relationships
+- disputed facts
+- open field items
+- conflicts awaiting review
+- pending sync mutations
+- LOCAL_ONLY evidence counts where useful
+- areas with low documentation coverage
+- recently changed records
+
+Separate technical validation health from documentation coverage.
+
+For example:
+
+DATA VALIDATION
+- Valid
+- Warnings
+- Errors
+
+DOCUMENTATION / GRAPH COVERAGE
+- known/documented entities
+- open verification work
+- relationship coverage
+- disputed facts
+
+Do not fake a single “health score” if it has no meaningful denominator.
+
+Clearly define every percentage or count.
+
+If a denominator is not trustworthy, show counts instead of fake precision.
+
+Provide a manual “Run Verification” action if useful.
+
+Show last successful validation timestamp.
+
+NEXT VERIFICATION TARGETS
+
+Use known gaps to help technicians decide what to verify next.
+
+Examples:
+
+- unresolved relationship endpoint
+- unknown destination
+- undocumented upstream source
+- missing nameplate
+- relationship with FIELD_VERIFY state
+- record with disputed fact
+- submitted observation awaiting review
+
+This is a work queue, not an inference engine.
+
+Do not manufacture missing facts.
+
+==================================================
+RESPONSIVENESS AND MOBILE FIELD USE
+==================================================
+
+Mobile/field experience remains first-class.
+
+Phone layouts must be deliberately designed rather than scaled-down desktop layouts.
+
+Respect the existing visual layout contract.
+
+Expand representative visual regression coverage where needed for major new states.
+
+Use current project standards first, but ensure representative coverage across:
+
+- phone portrait
+- large phone
+- tablet portrait
+- tablet landscape
+- common desktop
+- large desktop
+
+Do not create redundant test infrastructure merely to hit a viewport count.
+
+Important new states should include combinations such as:
+
+- offline with pending changes
+- conflict requiring review
+- evidence attachment/review
+- graph health
+- relationship authoring
+- large asset directory
+- read-only/demo mode
+
+Fixed/sticky chrome must never cover workspaces or critical actions.
+
+Large technical drawings may pan/zoom only inside their contained drawing surface according to the existing visual contract.
+
+==================================================
+ACCESSIBILITY
+==================================================
+
+Audit new and materially changed workflows for accessibility.
+
+Prioritize:
+
+- keyboard navigation
+- logical focus order
+- visible focus
+- modal/dialog focus management
+- aria labels for icon-only controls
+- aria-expanded where appropriate
+- aria-live announcements for important async save/sync/error states
+- skip/navigation semantics where useful
+- contrast
+- touch target usability
+- screen-reader understandable status labels
+
+Use automated tooling such as axe/Lighthouse where practical, but do not treat a single numeric accessibility score as proof of accessibility.
+
+Do not redesign the entire app solely to chase a score.
+
+==================================================
+ERROR HANDLING AND RESILIENCE
+==================================================
+
+Add robust user-facing error handling around meaningful failure boundaries.
+
+Use error boundaries where they isolate real major UI surfaces without masking application-wide corruption.
+
+Provide:
+
+- useful loading states
+- user-friendly error messages
+- retry where safe
+- technical detail/logging for development
+- clear recovery paths
+
+Be careful with retry on writes.
+
+Write retries must be idempotent and must not duplicate mutations, uploads, revisions, or relationships.
+
+Do not expose sensitive backend or stack information in normal production-facing error messages.
+
+==================================================
+PHASE 6 — HARDENING, REFACTORING, DOCUMENTATION, CLEANUP
+==================================================
+
+LARGE COMPONENT / PLANT MANAGER AUDIT
+
+Audit PlantManager and other overloaded components.
+
+Refactor by responsibility when it materially improves maintainability.
+
+Potential responsibility boundaries may include concepts such as:
+
+- asset editing
+- relationship management
+- package/import/export
+- verification/data health
+- evidence/review workflow
+- sync/conflict state
+
+Do not mechanically create these exact folders if the actual code suggests better boundaries.
+
+Do not refactor simply to meet an arbitrary line-count target.
+
+Prefer:
+
+- cohesive components
+- focused hooks/services
+- shared data operations
+- persistence/sync logic outside visual components
+- clear error/loading boundaries
+
+Avoid broad unrelated rewrites.
+
+DESIGN CONSISTENCY
+
+Audit newly changed UI against the existing visual language and CSS/design tokens.
+
+Prefer extending existing CSS variables/tokens rather than introducing a parallel design system.
+
+Standardize inconsistent spacing, state styling, buttons, form controls, badges, and verification indicators where doing so is safe.
+
+Do not force glassmorphism onto every surface.
+
+Do not alter contrast/readability merely to make every panel translucent.
+
+Preserve reduced-motion behavior.
+
+Micro-interactions are secondary and must not consume substantial effort before architecture, data integrity, sync, and field workflows work.
+
+TESTING
+
+Before considering work complete, run and pass:
+
+npm test
+npm run verify:data
+npm run verify:visual-contract
+npm run build
+npm run test:visual
+
+Add representative visual-audit states for any new major UI surface.
+
+Add or strengthen automated tests for at minimum:
+
+- legacy FacilityPackage migration
+- .iag legacy import compatibility
+- new schema validation
+- relationship honesty invariants
+- evidence-state preservation
+- LOCAL_ONLY sync exclusion
+- optimistic concurrency conflict
+- conflict resolution
+- offline mutation queue replay
+- duplicate mutation/idempotency behavior
+- graph traversal direction
+- traversal uncertainty propagation
+- bulk import FIELD_VERIFY default
+- read-only/demo fallback behavior
+- Draft → Review → Canonical workflow
+- canonical diff/review behavior
+- save/sync state transitions
+- import validation
+- critical Asset Directory filtering/search behavior
+- critical walkdown/evidence workflow
+- relationship creation validation
+
+Prefer high-value behavioral tests over gaming a global code-coverage number.
+
+PERFORMANCE
+
+Test with generated synthetic data for scale behavior, but label synthetic fixtures clearly and keep them out of canonical J. Lieb facility truth.
+
+Synthetic scale fixtures may be used only for performance/testing.
+
+They must never appear as actual plant assets in the production facility package.
+
+Evaluate:
+
+- large asset lists
+- filtered searches
+- relationship query/traversal behavior
+- graph health aggregation
+- IndexedDB cache behavior
+- sync queue behavior
+- map overlay rendering
+
+Use virtualization/lazy loading where it produces a real benefit.
+
+DEPENDENCY CLEANUP
+
+Remove unused Three.js / react-three dependencies if they are still present and truly unused.
+
+Do not remove dependencies merely because they look suspicious without confirming usage.
+
+Do not add large UI/state/sync libraries when a smaller existing-project-compatible solution is sufficient.
+
+DOCUMENTATION
+
+Update:
+
+- README
+- AGENT-HANDOFF.md
+- architecture documentation
+- migration documentation
+- local backend setup
+- persistence abstraction
+- sync behavior
+- offline workflow
+- conflict workflow
+- Draft / Review / Canonical workflow
+- relationship/evidence authoring workflow
+- Data Health / Graph Health definitions
+- .iag backup/import/export behavior
+- security limitations of the v1 identity/auth approach
+
+Create a concise field-tech workflow describing:
+
+1. Find or create the target asset.
+2. Capture an observation/evidence.
+3. Mark verification state honestly.
+4. Save locally if offline.
+5. Submit eligible information for review/sync.
+6. Create or propose a relationship if evidence supports it.
+7. Review the diff before canonical promotion.
+8. Resolve conflicts if required.
+9. Promote reviewed information into shared canonical truth.
+10. Continue using .iag for backup/export/handoff when needed.
+
+==================================================
+NON-NEGOTIABLE CONSTRAINTS
+==================================================
+
+- Never invent plant facts.
+- Never reintroduce 3D mapping.
+- Never add a 2D/3D map toggle.
+- Never weaken or delete visual layout contract checks.
+- Never bypass tests to make CI green.
+- Never automatically merge Keep/field observations into canonical truth.
+- Never automatically upload LOCAL_ONLY evidence.
+- Never silently last-write-wins over conflicting canonical edits.
+- Never replace the current app with a generic graph database demo.
+- Never break the existing demo facility while pursuing the target architecture.
+- Never populate unused relationship types just to demonstrate features.
+- Never treat FIELD_VERIFY as VERIFIED.
+- Never convert INFERRED data into VERIFIED truth without explicit evidence/review.
+- Never imply schematic coordinates are surveyed coordinates.
+- Preserve .iag as a portable backup/import/export/handoff format.
+- Preserve GitHub Pages read-only/seeded operation where practical.
+- Preserve the current map-first, cabinet-first, evidence-aware product identity.
+- Preserve mobile field usability.
+- Keep LOCAL_ONLY enforcement in the data/sync boundary, not merely in the presentation layer.
+
+==================================================
+DEFINITION OF DONE
+==================================================
+
+The goal is not complete merely because new types, architecture documents, or decorative UI exist.
+
+A successful implementation must demonstrate at least one working end-to-end vertical slice:
+
+1. Existing J. Lieb seed data migrates to the versioned model.
+2. Existing UI still loads and behaves correctly.
+3. A technician identity can capture an evidence-aware draft/observation.
+4. The draft is clearly distinguished from canonical truth.
+5. The change can be saved locally and queued while offline.
+6. Eligible non-LOCAL_ONLY data can synchronize to the shared backend.
+7. The UI truthfully reports local/pending/synced state.
+8. A second client can receive/read the shared change.
+9. A conflicting second edit is detected instead of silently overwritten.
+10. The conflict can be explicitly reviewed and resolved.
+11. A reviewer can inspect a diff before promoting a proposed fact/change.
+12. The promoted canonical fact retains actor, evidence, verification, and revision history.
+13. A real existing relationship can be traversed.
+14. Unused semantic relationship types remain honestly empty.
+15. Graph traversal communicates FIELD_VERIFY/DISPUTED uncertainty.
+16. .iag export/import still works.
+17. LOCAL_ONLY evidence remains local and is proven by an automated sync-boundary test.
+18. Data Health/Graph Health shows meaningful validation/coverage information without fake precision.
+19. New major workflows remain usable on representative phone/tablet/desktop layouts.
+20. Required test, build, data, and visual pipelines pass.
+
+==================================================
+IMPLEMENTATION PRIORITY
+==================================================
+
+If the full goal is too large for one run, prioritize in this exact order:
+
+1. architecture/repository audit
+2. schema/versioning/migration
+3. persistence abstraction
+4. PostgreSQL backend thin slice
+5. IndexedDB offline cache + mutation queue
+6. optimistic concurrency + idempotency
+7. conflict handling
+8. Draft / Review / Canonical workflow
+9. evidence attachment/review improvements
+10. truthful save/sync/offline status
+11. relationship authoring
+12. graph traversal/impact analysis
+13. Data Health / Graph Health
+14. plant-scale search/filter/list performance
+15. accessibility/responsive/error hardening
+16. selective component refactoring
+17. secondary visual polish
+
+Do not spend the majority of the run on:
+
+- decorative UI
+- new theme systems
+- animation
+- arbitrary component restructuring
+- Storybook
+- 3D
+- coordinate tools
+- vanity metrics
+
+before the storage, migration, sync, conflict, review, and honesty foundations are real.
+
+==================================================
+COMMIT / WORK STYLE
+==================================================
+
+- Prefer incremental, reviewable commits.
+- Keep migrations explicit.
+- Avoid broad unrelated refactors.
+- Preserve working behavior at each checkpoint.
+- Do not delete legacy code until its replacement is working and migration/compatibility tests exist.
+- Reuse current visual components and interaction patterns where practical.
+- Explain major architecture deviations in documentation.
+- Keep persistence/sync logic separated from presentation logic.
+- Prefer clear and boring data integrity over clever distributed-system behavior.
+- Favor evidence discipline, maintainability, and field usability over clever graph features.
+- Make architecture decisions based on the actual repository, not assumptions in this prompt.
+- If a requested implementation detail conflicts with current repo policy, preserve repo policy and document the decision.
+
+==================================================
+BEGIN
+==================================================
+
+Start by deeply inspecting:
+
+- AGENTS.md
+- START-HERE.md
+- AGENT-HANDOFF.md
+- docs/VISUAL-LAYOUT-CONTRACT.md
+- src/types/
+- src/facility/
+- src/facilityData.ts
+- src/lib/relationshipHonesty.ts
+- IndexedDB/runtime persistence
+- .iag archive code
+- facility packages under facilities/
+- Plant Manager
+- Inspector
+- Walkdown / Keep / observation workflows
+- Relationships workspace
+- Asset Directory
+- cabinet workspace
+- map implementation
+- current tests
+- visual audit scripts
+- package.json dependencies
+
+Then:
+
+1. Write the concise architecture/migration proposal.
+2. Identify the smallest safe end-to-end vertical slice.
+3. Implement it rather than stopping at design.
+4. Preserve compatibility with the current demo.
+5. Run the required verification suite.
+6. Continue through the priority list as far as can be completed safely.
+7. Refactor only where the implementation creates a clear maintainability need.
+8. Update documentation as architecture becomes real.
+9. Leave the repository in a working, tested, documented state.
+10. Do not leave fabricated facility truth, silent sync ambiguity, or partially connected parallel architecture behind.

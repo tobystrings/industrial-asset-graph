@@ -15,7 +15,9 @@
     "test:visual": "python scripts/dashboard-visual-check.py",
     "test:map-editor": "python scripts/map-editor-browser-check.py",
     "verify:data": "tsx scripts/verify-facility.ts",
-    "verify:visual-contract": "python scripts/verify-visual-contract.py"
+    "verify:visual-contract": "python scripts/verify-visual-contract.py",
+    "test:publication": "python scripts/publication-browser-check.py",
+    "verify:publication": "tsx scripts/verify-publication.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",

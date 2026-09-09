@@ -1,0 +1,82 @@
+# Industrial Asset Graph - Machine Documentation and Knowledge Preservation Project
+
+**Repository:** https://github.com/tobystrings/industrial-asset-graph  
+**First asset:** FG-L4-MTN-001 - META 150 HS  
+**Status:** Working review draft; designed for continuing corrections and additions  
+**Revision:** 0.2 - July 30, 2026
+
+## Project purpose
+
+Build one central, searchable facility knowledge system containing equipment records, electrical systems, controls, utilities, photographs, drawings, procedures, repair history, and practical knowledge from experienced maintenance personnel.
+
+The first machine establishes the reusable documentation pattern. This is not a one-off static page.
+
+## Verification states
+
+- **Verified:** confirmed by reliable evidence.
+- **Field Verify:** likely correct but still needs field inspection or testing.
+- **Inferred:** reasonable conclusion that must not be presented as confirmed.
+- **Disputed:** sources disagree.
+- **Retired:** no longer active but retained for history.
+
+Do not convert assumptions into confirmed facts. Record the source of every important fact when possible.
+
+## Current first-machine record
+
+- Asset ID: FG-L4-MTN-001
+- Machine: META 150 HS case-forming machine
+- Manufacturer: Smurfit-Stone Packaging Systems
+- Location: Line 4
+- Main supply: 480 VAC, 3-phase, 60 Hz
+- Full-load current: 34.2 A
+- Recommended branch protection: 40 A
+- Control voltage: 24 VDC
+- Compressed air: 80 PSI, 30 SCFM
+- Observed controls: Allen-Bradley PowerFlex drive, Control Techniques servo drives, Bosch Rexroth inline I/O and 24 VDC supply
+- Evidence collected: machine, nameplate, HMI, and control-panel photographs
+
+Several component functions and axis assignments remain **Field Verify** or **Inferred**.
+
+## Immediate work
+
+1. Review the record with the experienced electrician.
+2. Correct inaccuracies and mark all unknowns.
+3. Photograph missing labels, motors, sensors, valves, and isolation points.
+4. Locate drawings, manuals, PLC/HMI backups, and drive parameters.
+5. Capture common failures, quickest checks, resets, modifications, and critical spare parts.
+6. Approve the human-readable record.
+7. Convert approved facts into structured asset and relationship data.
+8. Add and validate the machine package in the Industrial Asset Graph.
+9. Reuse the completed package as the template for future machines.
+
+## Required package pattern
+
+```text
+machines/<machine-id>/
+  README.md
+  asset.json
+  relationships.json
+  electrical.md
+  controls.md
+  operation.md
+  troubleshooting.md
+  loto.md
+  parts.md
+  verification-checklist.md
+  photos/
+  drawings/
+  manuals/
+  plc/
+  vfd/
+```
+
+## Repository rules
+
+- Inspect existing architecture before major changes.
+- Preserve working functionality.
+- Keep machine data separate from application code.
+- Extend schemas only when necessary.
+- Validate required fields and broken relationships.
+- Separate sample or fictional data from verified facility records.
+- Keep labels and navigation straightforward for maintenance personnel.
+- Record revision date, author, reason, previous value, new value, evidence, and approval status.

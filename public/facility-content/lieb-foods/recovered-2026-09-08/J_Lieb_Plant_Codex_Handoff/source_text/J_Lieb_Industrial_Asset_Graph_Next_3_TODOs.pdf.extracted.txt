@@ -1,0 +1,52 @@
+<PARSED TEXT FOR PAGE: 1 / 3>
+J. LIEB FOODS - INDUSTRIAL ASSET GRAPH
+TODO 1
+COMPLETE THE LINE 2 CONTROL CABINET
+WHY THIS MATTERS
+Make one real cabinet the standard that every future cabinet will follow.
+TARGET
+From the facility map, open the Line 2 cabinet and immediately understand what it is and
+what is inside it.
+DO THIS
+Add the cabinet name / ID and exact plant location.
+Add the black-and-white cabinet layout.
+Attach the real cabinet photos.
+Add the device list and known manufacturer / model information.
+Add supply voltage, control voltage, status, and useful notes.
+DONE WHEN: The deployed site lets you click the Line 2 cabinet and see a useful, organized cabinet record.
+FIELD / CODEX NOTES
+Finish TODO 1 before moving to TODO 2. COMPLETE
+<PARSED TEXT FOR PAGE: 2 / 3>
+J. LIEB FOODS - INDUSTRIAL ASSET GRAPH
+TODO 2
+MAKE THE CABINET DRILL DOWN INTO DEVICES
+WHY THIS MATTERS
+Turn the cabinet from a picture into a usable equipment map.
+TARGET
+Build the path: Facility -> Area/Line -> Cabinet -> Device.
+DO THIS
+Create a device record for the PLC.
+Create device records for VFDs, power supplies, relays, contactors, terminal
+blocks, and other major components.
+Connect each device to the cabinet with CONTAINS / PART OF relationships.
+Make each device clickable from the cabinet view.
+DONE WHEN: You can open the Line 2 cabinet, click a device, and see that device's own record.
+FIELD / CODEX NOTES
+Finish TODO 2 before moving to TODO 3. COMPLETE
+<PARSED TEXT FOR PAGE: 3 / 3>
+J. LIEB FOODS - INDUSTRIAL ASSET GRAPH
+TODO 3
+ATTACH EVIDENCE TO IMPORTANT INFORMATION
+WHY THIS MATTERS
+Separate what is known from what still needs field verification.
+TARGET
+Every important claim can show where the information came from.
+DO THIS
+Use simple statuses: VERIFIED, FIELD VERIFY, INFERRED, UNKNOWN.
+Allow records to reference photos, drawings, nameplates, field notes, and
+manuals.
+Mark uncertain information instead of treating it as fact.
+Use the Line 2 cabinet as the first fully evidence-backed example.
+DONE WHEN: A user can tell what is verified, what needs checking, and what evidence supports the record.
+FIELD / CODEX NOTES
+Milestone complete - review the deployed result before adding more. COMPLETE

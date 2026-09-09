@@ -1,0 +1,7 @@
+recovery_key,name,line,status,source,canonical_import
+FG-L4-MTN-001,META 150 HS,Line 4,EXISTING_ID_SOURCE_DOCUMENTED,Machine review package,False
+L2-CC-001,Line 2 conveyor control cabinet,Line 2,EXISTING_ID_USER_REPORTED,2026-08-06 user statement,False
+candidate-line2-hot-filler,Line 2 HOT FILLER,Line 2,CANDIDATE_RECONCILE_EXISTING_ID,Hot filler review packet,False
+candidate-superior-boiler,Superior X6-5-1250,unassigned/shared service,USER_REPORTED_CANDIDATE,2026-07-24 user statements,False
+candidate-kosme-L05358,Kosme TOP II AD TANDEM 20/1056 CE SA4 E2,unknown,OEM_DOCUMENTED_CANDIDATE,OEM identity register,False
+candidate-wulftec-A6882,Wulftec WCRT-200,unknown,SOURCE_DOCUMENTED_CANDIDATE,Wulftec master packet,False

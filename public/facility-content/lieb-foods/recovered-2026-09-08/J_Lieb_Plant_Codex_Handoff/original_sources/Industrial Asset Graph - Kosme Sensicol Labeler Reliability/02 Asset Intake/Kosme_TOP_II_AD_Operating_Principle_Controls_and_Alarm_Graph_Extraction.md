@@ -1,0 +1,108 @@
+# Kosme TOP II AD — Operating Principle, Controls, and Alarm Graph Extraction
+
+## Source scope
+
+OEM Operator Manual, revision marking `REV. 01-06`, photographed pages 57–64. Pages 58 and 64 are blank chapter-divider/reverse pages and contain no additional operating data.
+
+Machine identity remains governed by the authoritative identity record:
+
+- Manufacturer: KOSME
+- Model: TOP II AD TANDEM 20/1056 CE SA4 E2
+- Registration number: L05358
+- Manual/order code: K966-749
+
+## OEM-defined process topology
+
+The automatic rotary labeling sequence is:
+
+1. Infeed conveyor carries containers to the product-separating feedscrew (A).
+2. Feedscrew meters containers to the infeed starwheel (B).
+3. Infeed starwheel transfers containers to the central-head turntable (C).
+4. Turntable rotates containers toward the labeling unit (D).
+5. Labeling unit applies labels/accessories.
+6. Rollers and brushes (E) complete adhesion and ironing.
+7. Exit starwheel (F) removes containers from the rotary section.
+8. Exit conveyor belt (G) carries containers downstream.
+
+### Graph-ready relationships
+
+| Source node | Relationship | Target node | Evidence class |
+|---|---|---|---|
+| Infeed conveyor | FEEDS | Product-separating feedscrew A | OEM explicit |
+| Feedscrew A | METERS_TO | Infeed starwheel B | OEM explicit |
+| Infeed starwheel B | TRANSFERS_TO | Turntable C | OEM explicit |
+| Turntable C | POSITIONS_AT | Labeling unit D | OEM explicit |
+| Labeling unit D | APPLIES_LABEL_TO | Container | OEM explicit |
+| Rollers/brushes E | COMPLETES_ADHESION_ON | Container | OEM explicit |
+| Exit starwheel F | TRANSFERS_TO | Exit conveyor G | OEM explicit |
+
+## Operator controls
+
+| Control | Type/state | OEM function |
+|---|---|---|
+| Line power | Lighted selector | Enables control-panel power when the main switch is enabled; green indicates operation. |
+| Inlet block | Selector | Position 0 enables manual inlet blocking; position 1 allows overflow/bottle-detector control. |
+| Syncro | Selector | Enables conveyor synchronization from an external 0–10 VDC signal. |
+| Glue pump | Selector | Enables/disables each glue pump; applicability to this self-adhesive configuration must be field-verified. |
+| Labeling unit | Selector | Enables/disables each labeling unit. |
+| Date selection | Selector | Enables/disables the date marker. |
+| Jog mode | Key selector | Enables machine jogging through a mobile-panel pushbutton. |
+| Head-height adjustment | Key selector | Enables automatic head-height adjustment on machines equipped with headlift. |
+| Machine start | White pushbutton | Starts the labeling machine. |
+| Machine stop | Black pushbutton | Stops the labeling machine. |
+| Conveyor start | White pushbutton | Starts the labeling-machine conveyor. |
+| Conveyor stop | Black pushbutton | Stops the labeling-machine conveyor. |
+| Emergency reset | Blue illuminated pushbutton | Permits restart after an emergency-stop event once the condition is cleared. |
+| Oil discharge | Pushbutton, hot-melt models | Stops the pump and permits operation long enough to remove oil from cams; configuration applicability unverified. |
+| Emergency stop | Ten devices stated | Stops the machine by disabling power and compressed-air supply. |
+| Speed adjustment | Trimmer | Selects production speed; OEM states speed 2 is the manufacturer-set minimum via a cabinet potentiometer. |
+
+## Fault and status inputs
+
+| Signal | Indication | Consequence / diagnostic branch |
+|---|---|---|
+| Temperature | Orange pilot light | A motor is overheated; machine stops; relevant cabinet switch must be reset after cause is corrected. |
+| Block | Red pilot light | Bottle inflow is blocked. |
+| Machine protections (4) | Pilot light | One or more plexiglass guards are open. |
+| Head plate block | Red pilot light | A plate did not complete rotation; machine stop. |
+| Air | Red pilot light | Pneumatic pressure/air availability is insufficient. |
+| Glue application temperature | Red pilot light | Hot-melt temperature state; applicability to this configuration must be field-verified. |
+| Self-adhesive unit pre-alarm | Red pilot light | Label tape/web is ending; OEM states this triggers the jack to close. |
+| Self-adhesive unit alarm | Red pilot light | Self-adhesive unit malfunction; immediate machine stop. |
+| Head security | Red pilot light | Centering-jack position is incorrect on equipped machines. |
+
+## Beacon state model
+
+| Beacon state | OEM meaning | Graph/state interpretation |
+|---|---|---|
+| Red illuminated | Fault with machine stop; fault shown on touchscreen | `FAULT_STOPPED` |
+| Yellow illuminated | Warning during operation, including no-container infeed or discharge jam; shown on touchscreen | `WARNING` |
+| Green illuminated | Normal production; no fault warnings | `RUNNING_NORMAL` |
+| Light blue illuminated | Reset required | `RESET_REQUIRED` |
+| Siren | Audible annunciation device; exact triggering conditions not defined on these pages | `AUDIBLE_ALARM_DEVICE` |
+
+## Initial fault-tree routing for maintenance engine
+
+1. Record touchscreen message and beacon color before resetting.
+2. Determine whether the machine stopped or remained operational.
+3. Route the event to one of these primary branches:
+   - Container flow: inlet block, no-container condition, discharge jam.
+   - Guarding/safety: four machine protections, emergency-stop chain, reset required.
+   - Rotary mechanics: head plate did not complete rotation.
+   - Pneumatics: inadequate air pressure or supply.
+   - Label station: web/tape ending or self-adhesive-unit malfunction.
+   - Centering system: centering-jack position incorrect.
+   - Drive/thermal: motor overtemperature.
+4. Capture actual sensor/tag, PLC input, field device, adjustment, measured value, corrective action, and recurrence before closing the event.
+
+## Required field verification
+
+The manual describes controls shared across machine variants. Do not create installed-asset claims for glue pumps, hot-melt functions, headlift, date marker, centering devices, or every listed pilot light until the physical machine, electrical drawings, or I/O list confirms them. Emergency-stop count is stated as ten in the manual and must be reconciled against the installed machine.
+
+## Graphify and token-governance handling
+
+- Treat each control, sensor/alarm, mechanism, state, and process segment as a candidate node.
+- Preserve OEM terminology as aliases while assigning stable plant identifiers after field verification.
+- Mark every extracted assertion with provenance: manual page, revision, photograph filename, and verification status.
+- Graphify should ingest the compact tables and relationships rather than full OCR text.
+- RTK/Token Manager should retain the structured extraction as the canonical context block and retrieve photographs only when visual reinspection is required.

@@ -1,0 +1,14 @@
+GOAL
+Integrate the recovered J. Lieb Foods plant knowledge in this package into the existing Industrial Asset Graph, prioritizing Lines 2 and 4 while preserving evidence, uncertainty, existing records, and facility isolation.
+
+Read PLANT_DOSSIER.md, SOURCE_REGISTER.md, the data tables, and relevant source_text and original_sources files. This is a historical evidence package, not a complete chat export or verified as-built inventory.
+
+Inspect the current repository, AGENTS.md, handoff documents, schemas, facility loader, permissions, and import/export behavior before editing. Reconcile existing IDs, especially FG-L4-MTN-001 and L2-CC-001. Extend the current application; preserve its strict 2D map and working data.
+
+Implement a reviewable ingestion of the META case former, Line 2 hot filler, Superior boiler, Kosme labeler, Wulftec service history, instrument observations, document coverage, and verification tasks. Distinguish OEM requirements, user observations, historical snapshots, generated illustrations, proposals, and completed work. Keep sources attached to individual assertions.
+
+Do not promote disputed wiring, inferred process connections, unverified line assignments, old cabinet placeholders, or historical recommendations into canonical plant facts. Preserve the Cooler 2/3 merge correction. Keep the Wulftec Drive 6/VFD7 wiring conflict explicit. Do not use archived machine procedures to change real equipment.
+
+Keep facility data separate from reusable code. Respect LOCAL_ONLY evidence, permissions, and review states. Stage uncertain information for review without inventing values. Make repeated ingestion idempotent and preserve existing attachments and revision history.
+
+Complete the implementation and meaningful validation. Deliver an import/change report, source coverage, unresolved conflicts, and prioritized field-verification tasks. Verify persistence, duplicate prevention, existing-record preservation, and facility isolation. Do not claim current deployment, completed repairs, or tests that were not actually verified. Do not publish or deploy this handoff's contents unless separately authorized.

@@ -10,7 +10,7 @@ import './mapStudio.css';
 
 const apiUrl=(import.meta.env.VITE_IAG_API_URL??'').replace(/\/$/,'');
 export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
-  const [tab,setTab]=useState('Text edits'),[input,setInput]=useState(''),[reply,setReply]=useState('Select an object or use an exact room name. Preview an edit before applying it.');
+  const [tab,setTab]=useState<string | null>(null),[input,setInput]=useState(''),[reply,setReply]=useState('Select an object or use an exact room name. Preview an edit before applying it.');
   const [busy,setBusy]=useState(false),[useAI,setUseAI]=useState(false),[query,setQuery]=useState('');
   const [preview,setPreview]=useState<{base:string;draft:MapEditorDraft;summary:string[]}|null>(null);
   const requestId=useRef(0);
@@ -63,7 +63,7 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
     patch({templates:[...(studio.templates??[]),template]},'Saved custom symbol template.');s.setTemplate(template);s.setSymbolKind('custom');
   };
   return <aside className="map-studio-panel" aria-label="Map Studio assistant and properties">
-    <div className="studio-tabs" role="tablist" aria-label="Studio panels">{['Text edits','Objects','Layers'].map(t=><button key={t} role="tab" aria-selected={tab===t} onClick={()=>setTab(t)}>{t}</button>)}</div>
+    <div className="studio-tabs" role="tablist" aria-label="Studio panels">{['Text edits','Objects','Layers'].map(t=><button key={t} role="tab" aria-selected={tab===t} aria-expanded={tab===t} onClick={()=>setTab(tab===t?null:t)}>{t}</button>)}</div>
     {tab==='Text edits'&&<section className="studio-tab-body" aria-label="Text edits">
       <h3>Describe your edit</h3><p>Click or multi-select objects, then refer to “this” or “these”.</p>
       <div className="studio-selection-context">{s.selection.length?s.selection.map(r=>objectLabel(d,r)).join(' · '):'Nothing selected — exact room names also work.'}</div>
@@ -95,6 +95,6 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
       <label>Snap spacing<select aria-label="Snap spacing" value={studio.snap??.5} onChange={e=>patch({snap:Number(e.target.value)},'Changed snapping.')}><option value="0">Off</option><option value="0.25">0.25 map units</option><option value="0.5">0.5 map units</option><option value="1">1 map unit</option><option value="2">2 map units</option></select></label>
       <p>Reference pixels are locked artwork. Replace symbols or hide features to rebuild individual portions. Hiding cleanup outlines does not reveal removed source pixels.</p>
     </section>}
-    <details className="studio-draft-history"><summary>Draft & recovery</summary><p>{s.history.past.length} undo steps · {s.history.future.length} redo steps</p><button onClick={exportDraft}>Export current draft</button><label>Restore draft<input type="file" accept=".json" onChange={async e=>{const file=e.target.files?.[0];if(!file) return;try {const value=JSON.parse(await file.text());if(value.format!=='iag-map-studio-draft'||value.version!==1||value.facilityId!==s.facility.facility.id) throw new Error('Choose a draft exported from this facility.');const next=value.draft as MapEditorDraft;const {loadFacilityPackage}=await import('../facility/schema');loadFacilityPackage({...s.facility,...next});s.commit(next,'Restored draft. Save Changes to keep it.');}catch(e){s.setMessage((e as Error).message);}}}/></label><ul>{mapChangeSummary({areas:s.facility.areas,mapConfig:s.facility.mapConfig??{}},d).map((t,i)=><li key={i}>{t}</li>)}</ul></details>
+    {tab&&<details className="studio-draft-history"><summary>Draft & recovery</summary><p>{s.history.past.length} undo steps · {s.history.future.length} redo steps</p><button onClick={exportDraft}>Export current draft</button><label>Restore draft<input type="file" accept=".json" onChange={async e=>{const file=e.target.files?.[0];if(!file) return;try {const value=JSON.parse(await file.text());if(value.format!=='iag-map-studio-draft'||value.version!==1||value.facilityId!==s.facility.facility.id) throw new Error('Choose a draft exported from this facility.');const next=value.draft as MapEditorDraft;const {loadFacilityPackage}=await import('../facility/schema');loadFacilityPackage({...s.facility,...next});s.commit(next,'Restored draft. Save Changes to keep it.');}catch(e){s.setMessage((e as Error).message);}}}/></label><ul>{mapChangeSummary({areas:s.facility.areas,mapConfig:s.facility.mapConfig??{}},d).map((t,i)=><li key={i}>{t}</li>)}</ul></details>}
   </aside>;
 }

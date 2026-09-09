@@ -64,7 +64,7 @@ def exercise_map_studio(page,label,open_page,screenshot,assert_geometry):
     assert page.locator('.studio-symbols>g').count()==0
     tools.get_by_role('button',name='Undo',exact=True).click()
     tools.get_by_role('button',name='Save Changes',exact=True).click()
-    page.get_by_role('status').filter(has_text='Saved on this device:').wait_for()
+    page.wait_for_function("() => [...document.querySelectorAll('button')].some(b=>b.textContent==='Save Changes' && b.disabled)")
     tools.get_by_role('button',name='Done',exact=True).click()
     page.reload(wait_until='networkidle')
     assert page.locator('[aria-label="Saved editable symbols"]>g').count()==1

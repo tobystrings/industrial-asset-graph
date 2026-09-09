@@ -1,0 +1,287 @@
+<PARSED TEXT FOR PAGE: 1 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 1
+INDUSTRIAL ASSET GRAPH
+Machine Documentation and Knowledge Preservation
+Project
+First Machine Review Package
+[TABLE_CONTENT_EXTRACTION_START page_index=0 candidate_index=0]
+| Repository        | https://github.com/tobystrings/industrial-asset-graph     |
+| ----------------- | --------------------------------------------------------- |
+| First asset       | FG-L4-MTN-001 - META 150 HS case-forming machine          |
+| Document status   | Working review draft - built to be corrected and expanded |
+| Verification rule | Do not treat assumptions as confirmed facts               |
+| Primary reviewer  | Experienced facility electrician                          |
+| Revision          | 0.2 - July 30,2026                                        |
+[TABLE_CONTENT_EXTRACTION_END]
+Purpose: preserve the practical knowledge needed to operate, troubleshoot, repair, modify, and
+expand facility equipment.
+<PARSED TEXT FOR PAGE: 2 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 2
+1. Project Summary
+We are building one central equipment-knowledge system for the facility. It will hold machine records, electrical information,
+controls, utilities, photographs, drawings, procedures, repair history, and the practical knowledge learned by experienced 
+maintenance personnel.
+The first machine is being documented completely so it can become the repeatable pattern for every other machine. The 
+system must remain editable because field corrections, machine changes, replacements, and additions are inevitable.
+What this project is meant to prevent
+ Losing years of practical knowledge when an experienced electrician retires.
+ Wasting time tracing the same wires, identifying the same parts, and rediscovering the same faults.
+ Treating guesses, old drawings, or undocumented changes as verified facts.
+ Keeping important information scattered across binders, phones, computers, and individual memory.
+What the finished system should answer
+ What panel and circuit feed this machine?
+ What shuts this motor down?
+ Which PLC input receives this sensor?
+ What devices are in the safety circuit?
+ Where are the disconnect and isolation points?
+ What usually causes this alarm or failure?
+ What part was used previously, and what was changed?
+ Which information is confirmed and which still needs field verification?
+2. Instructions for the Electrician Reviewing This
+Please review this as a practical maintenance record, not as an engineering report. Mark up anything that is wrong, 
+incomplete, or misleading.
+☐ Correct machine names, component names, and functions.
+☐ Cross out anything that is only a guess or is not true.
+☐ Add the first things you normally check when the machine fails.
+☐ Add recurring problems, odd behavior, and known weak points.
+☐ Add startup, shutdown, reset, and recovery steps that are not in the manual.
+☐ Identify important parts that should be kept on the shelf.
+☐ Point out any modifications that do not match the original drawings.
+☐ Mark anything that still needs to be traced, tested, photographed, or confirmed.
+Most valuable information: the practical details that an experienced electrician knows but the OEM manual does not 
+explain.
+3. Evidence and Verification Rules
+Every important fact should show how certain it is. Unknown information stays unknown until somebody verifies it.
+[TABLE_CONTENT_EXTRACTION_START page_index=1 candidate_index=0]
+| State        | Meaning                                                       | Use                                     |
+| ------------ | ------------------------------------------------------------- | --------------------------------------- |
+| Verified     | Confirmed from reliable evidence.                             | Use as established machine information. |
+| Field Verify | Expected to be correct but still needs inspection or testing. | Keep on the field checklist.            |
+| Inferred     | Reasonable conclusion from photos or system layout.           | Do not present as confirmed.            |
+| Disputed     | Sources or people disagree.                                   | Keep both positions until resolved.     |
+| Retired      | No longer active or installed.                                | Keep for history and old-document       |
+[TABLE_CONTENT_EXTRACTION_END]
+<PARSED TEXT FOR PAGE: 3 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 3
+Acceptable evidence
+ Equipment nameplate or component label.
+ Field photograph.
+ Electrical or pneumatic drawing.
+ Manufacturer manual.
+ PLC program or HMI project.
+ VFD or servo parameter file.
+ Maintenance or CMMS record.
+ Interview with experienced personnel.
+ Direct testing, wire tracing, and panel inspection.
+4. Current Progress - First Machine
+Item Current record
+Asset ID FG-L4-MTN-001 - shown on facility asset label
+Machine META 150 HS case-forming machine
+Manufacturer Smurfit-Stone Packaging Systems - based on visible machine 
+identification
+Serial number MT081619A - requires final nameplate confirmation
+Location Line 4
+Main supply 480 VAC, 3-phase, 60 Hz
+Full-load current 34.2 A
+Recommended branch protection 40 A
+Control voltage 24 VDC
+Compressed air 80 PSI, 30 SCFM
+Observed controls Allen-Bradley PowerFlex drive; Control Techniques servo drives; 
+Bosch Rexroth inline I/O and power supply
+Documentation collected Machine photos, nameplate photos, HMI screens, and electrical￾panel photos
+Important caution
+The exact function of several components and servo axes has not yet been confirmed. Descriptions based only on 
+panel photographs must remain marked Field Verify or Inferred until drawings, labels, programs, or field operation confirm 
+them.
+5. Current Machine Summary
+Purpose
+The machine appears to form corrugated cartons from flat blanks. It uses powered motion, servo-controlled assemblies, 
+pneumatics, vacuum, and adhesive-related functions. The exact production sequence must be reviewed with the electrician
+and operators.
+Working operating sequence - Field Verify
+ Flat corrugated blanks are loaded into the magazine.
+ A blank is picked or pulled into the forming area.
+ The blank is opened and positioned around the forming section or mandrel.
+ Flaps are folded in the programmed sequence.
+ Adhesive is applied where required.
+ The joint or flaps are pressed long enough to hold.
+ The finished carton is discharged to the next section.
+Observed major control equipment
+ One Allen-Bradley PowerFlex 70 variable-frequency drive, labeled VFD1.
+ Three Control Techniques servo drives. Exact model numbers and axis assignments require close-up label 
+photographs and field confirmation.
+
+[TABLE_CONTENT_EXTRACTION_START page_index=2 candidate_index=0]
+| Item                          | Current record                                                                                            |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Asset ID                      | FG-L4-MTN-001 - shown on facility asset label                                                             |
+| Machine                       | META 150 HS case-forming machine                                                                          |
+| Manufacturer                  | Smurfit-Stone Packaging Systems - based on visible machine identification                                 |
+| Serial number                 | MT081619A - requires final nameplate confirmation                                                         |
+| Location                      | Line 4                                                                                                    |
+| Main supply                   | 480 VAC,3-phase,60 Hz                                                                                     |
+| Full-load current             | 34.2 A                                                                                                    |
+| Recommended branch protection | 40 A                                                                                                      |
+| Control voltage               | 24 VDC                                                                                                    |
+| Compressed air                | 80 PSI,30 SCFM                                                                                            |
+| Observed controls             | Allen-Bradley PowerFlex drive; Control Techniques servo drives; Bosch Rexroth inline I/O and power supply |
+| Documentation collected       | Machine photos,nameplate photos,HMI screens,and electrical                                                |
+[TABLE_CONTENT_EXTRACTION_END]
+<PARSED TEXT FOR PAGE: 4 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 4
+ Bosch Rexroth inline remote I/O modules.
+ Bosch Rexroth 24 VDC power supply.
+ Branch protective devices, contactors, control relays, terminal blocks, grounding, wire duct, and cabinet cooling.
+6. Information Still Required
+Electrical and controls
+☐ Incoming disconnect manufacturer, model, rating, and upstream source.
+☐ Exact panel, MCC, transformer, breaker, and circuit feeding the machine.
+☐ PLC or controller manufacturer, model, firmware, and program-backup location.
+☐ HMI manufacturer, model, software version, password-control method, and backup location.
+☐ Complete remote-I/O module list, node information, and I/O map.
+☐ VFD catalog number, motor served, horsepower, wiring, and parameter backup.
+☐ Each servo-drive model, motor served, encoder type, home method, and parameter backup.
+☐ Safety relay or safety-controller information and a verified safety-circuit description.
+☐ Network devices, addresses, communication protocols, and cable routing.
+☐ Terminal-strip map and field-wire destinations.
+☐ Any undocumented jumpers, bypasses, field modifications, or abandoned wiring.
+Motors, sensors, pneumatics, and mechanical items
+☐ Every motor and gearbox nameplate, location, function, rotation, and driven assembly.
+☐ Every photoeye, proximity switch, limit switch, pressure switch, vacuum switch, and safety switch.
+☐ Every solenoid valve, cylinder, regulator, vacuum device, and normal pressure setting.
+☐ Air-isolation point and method for releasing stored pneumatic energy.
+☐ Belts, chains, bearings, lubrication points, tension guidance, and common wear items.
+☐ Glue-system manufacturer, model, operating settings, isolation points, and common faults.
+Operation and maintenance knowledge
+☐ Normal startup and shutdown procedure.
+☐ Restart after power loss or emergency stop.
+☐ Recipe list and product/changeover information.
+☐ Normal speed and important operator settings.
+☐ Top recurring failures and quickest checks.
+☐ Alarm list with plain-language causes and recovery steps.
+☐ Preventive-maintenance schedule based on actual plant conditions.
+☐ Critical spare parts and known substitute parts.
+☐ Repair and modification history.
+☐ Anything the retiring electrician considers important but undocumented.
+7. Industrial Asset Graph Repository Integration
+This machine package will become part of the existing Industrial Asset Graph repository. The repository is the facility's 
+long-term industrial knowledge base, and the graph is one way to view equipment and its relationships.
+Basic asset hierarchy
+Facility -> Building -> Area -> Production Line -> Machine -> Assembly -> Panel or Component
+<PARSED TEXT FOR PAGE: 5 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 5
+Assets must also support relationships outside that hierarchy, such as: panel feeds VFD, VFD controls motor, sensor 
+reports to PLC input, safety relay removes enable power, compressor supplies machine air, and upstream equipment 
+enables downstream equipment.
+Required machine package
+ A human-readable document for electricians, mechanics, supervisors, contractors, training, and printed use.
+ A machine-readable record for search, filtering, dependency tracing, reports, AI assistance, and future CMMS 
+integration.
+ Evidence files such as photographs, manuals, drawings, PLC backups, and VFD parameters.
+ Relationships connecting the machine to panels, utilities, controls, components, and other equipment.
+ A verification checklist separating confirmed information from assumptions.
+Proposed machine folder pattern
+machines/<machine-id>/
+ README.md
+ asset.json
+ relationships.json
+ electrical.md
+ controls.md
+ operation.md
+ troubleshooting.md
+ loto.md
+ parts.md
+ verification-checklist.md
+ photos/
+ drawings/
+ manuals/
+ plc/
+ vfd/
+Development rules
+ Inspect the current repository before changing its architecture.
+ Preserve working functions and map new data into existing schemas where possible.
+ Keep machine data separate from application code.
+ Extend schemas only when needed and validate required fields and broken relationships.
+ Keep fictional or sample data clearly separated from verified facility data.
+ Favor plain labels and practical navigation over unnecessary software complexity.
+ Do not build the first machine as a one-off static screen.
+8. Change and Revision Rules
+Every correction or alteration should be traceable. The system should preserve the current value and enough history to 
+understand what changed and why.
+ Date of change.
+ Person making the change.
+ Reason for change.
+ Previous value.
+ New value.
+ Evidence supporting the change.
+ Review and approval status.
+Date Changed by Item Old value New value Evidence Approved
+<PARSED TEXT FOR PAGE: 6 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 6
+9. Immediate Next Steps
+1. Review this package with the experienced electrician.
+2. Correct inaccurate information and mark every uncertain statement.
+3. Walk the machine and photograph all missing labels, motors, sensors, valves, and isolation points.
+4. Locate the electrical drawings, manuals, PLC/HMI files, and drive parameters.
+5. Record the electrician's common-failure and troubleshooting knowledge.
+6. Create the approved human-readable machine record.
+7. Convert approved facts into structured asset and relationship records.
+8. Validate the machine package and add it to the Industrial Asset Graph.
+9. Use the completed package as the template for the next machine.
+<PARSED TEXT FOR PAGE: 7 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 7
+10. Electrician Field Review Notes
+Machine: FG-L4-MTN-001 - META 150 HS
+What is wrong or misleading?
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+Common failures and first checks
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+Startup, shutdown, and reset knowledge
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+Known modifications or drawing errors
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+Parts we should keep in stock
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+Other information that must not be lost
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+<PARSED TEXT FOR PAGE: 8 / 8>
+Industrial Asset Graph - Machine Documentation Project
+Page 8
+Review Signoff
+[TABLE_CONTENT_EXTRACTION_START page_index=7 candidate_index=0]
+| Reviewed by             | Date     |
+| ----------------------- | -------- |
+| Corrections entered by  | Date     |
+| Approved for repository | Revision |
+[TABLE_CONTENT_EXTRACTION_END]

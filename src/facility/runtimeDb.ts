@@ -4,7 +4,7 @@ import { loadFacilityPackage } from './schema';
 import type { SyncMutation } from './syncContract';
 
 const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const PLANT_STORE = 'plant';
 const ATTACHMENT_STORE = 'attachments';
 const OBSERVATION_STORE = 'observations';
@@ -88,6 +88,7 @@ export function openPlantDb(facilityId?: string): Promise<IDBDatabase> {
     const request = indexedDB.open(facilityDatabaseName(facilityId), DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
+      if (!db.objectStoreNames.contains('publication-state')) db.createObjectStore('publication-state', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('historical-evidence')) db.createObjectStore('historical-evidence', { keyPath: 'id' });
       if (!db.objectStoreNames.contains(PLANT_STORE)) db.createObjectStore(PLANT_STORE);
       if (!db.objectStoreNames.contains(ATTACHMENT_STORE)) {

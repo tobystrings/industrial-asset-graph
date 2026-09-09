@@ -1,0 +1,234 @@
+<PARSED TEXT FOR PAGE: 1 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 1
+SIEMENS MICROMASTER VECTOR
+Complete Recorded Parameter Set - VFD 7 / Second Outfeed Conveyor
+Field values transcribed from the operator's direct keypad readings. Values are recorded settings or live read-only snapshots, not assumed factory
+defaults.
+P Number Value Siemens function / interpretation
+P001 0 Display mode - output frequency
+P002 1.5 Ramp-up time (s)
+P003 1 Ramp-down time (s)
+P004 0 Smoothing time (s)
+P005 5 Digital frequency setpoint (Hz)
+P006 2 Frequency source - fixed frequencies
+P007 0 Keypad control disabled / terminal control
+P009 3 All parameters readable and adjustable
+P010 1 Display scaling
+P011 0 Frequency setpoint memory disabled
+P012 0 Minimum motor frequency (Hz)
+P013 60 Maximum motor frequency (Hz)
+P014 0 Skip frequency 1 (Hz)
+P015 0 Automatic restart after mains failure disabled
+P016 0 Start on the fly disabled
+P017 1 Continuous smoothing
+P018 0 Automatic restart after fault disabled
+P019 2 Skip-frequency bandwidth (Hz)
+P021 0 Minimum analogue frequency (Hz)
+P022 60 Maximum analogue frequency (Hz)
+P023 0 Analogue input 1 type - 0-10 V / 0-20 mA
+P024 0 No analogue setpoint addition
+P025 0 Analogue output 1 - output frequency
+P027 0 Skip frequency 2 (Hz)
+P028 0 Skip frequency 3 (Hz)
+P029 0 Skip frequency 4 (Hz)
+P031 60 Jog frequency right (Hz)
+P032 5 Jog frequency left (Hz)
+P033 1 Jog ramp-up time (s)
+P034 1 Jog ramp-down time (s)
+P040 0 Positioning function disabled
+P041 0 Fixed frequency 1 (Hz)
+P042 0 Fixed frequency 2 (Hz)
+P043 0 Fixed frequency 3 (Hz)
+P044 56 Fixed frequency 4 (Hz)
+P045 0 Fixed-frequency 1-4 inversion selection
+P046 55 Fixed frequency 5 (Hz)
+<PARSED TEXT FOR PAGE: 2 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 2
+P Number Value Siemens function / interpretation
+P047 0 Fixed frequency 6 (Hz)
+P048 0 Fixed frequency 7 (Hz)
+P049 0 Fixed frequency 8 (Hz)
+P050 1 Fixed-frequency 5 inverted; 6-8 normal
+P051 18 DIN1 terminal 5 - fixed frequency 5 plus RUN
+P052 18 DIN2 terminal 6 - fixed frequency 4 plus RUN
+P053 0 DIN3 terminal 7 disabled
+P054 0 DIN4 terminal 8 disabled
+P055 0 DIN5 terminal 16 disabled
+P056 0 Digital-input debounce - 12.5 ms
+P057 1 Digital-input watchdog interval (s)
+P061 6 Relay RL1 - fault indication
+P062 8 Relay RL2 - warning active
+P063 1 External-brake release delay (s)
+P064 1 External-brake stopping time (s)
+P065 1 Current threshold for relay (A)
+P066 100 Compound braking (%)
+P069 1 Ramp extension enabled
+P070 4 Braking-resistor duty cycle - 100% (MMV only)
+P071 0 Slip compensation (%)
+P072 250 Slip limit (%)
+P073 0 DC injection braking (%)
+P074 1 I2t motor protection curve
+P075 0 External braking resistor not connected
+P076 0 Pulse frequency - 16 kHz, normal modulation
+P077 1 FCC control mode
+P078 100 Continuous boost (%)
+P079 50 Starting boost (%)
+P080 0.80 Motor power factor
+P081 60 Motor nameplate frequency (Hz)
+P082 1725 Motor nameplate speed (RPM)
+P083 3.2 Motor nameplate current (A)
+P084 230 Motor nameplate voltage (V)
+P085 1 Motor nameplate power (hp with P101=1)
+P086 150 Motor current limit (%)
+P087 0 Motor PTC disabled
+P088 0 Automatic stator calibration inactive
+P089 4.6 Stator resistance (ohm)
+P091 0 USS serial slave address
+P092 6 USS baud rate - 9600
+P093 0 Serial timeout disabled
+P094 60 USS nominal system setpoint (Hz)
+<PARSED TEXT FOR PAGE: 3 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 3
+P Number Value Siemens function / interpretation
+P095 0 USS compatibility - 0.1 Hz resolution
+P099 0 No option module
+P101 1 North American operation - 60 Hz / hp
+P111 1.01 Inverter power rating (hp), read-only
+P112 6 Inverter type - MICROMASTER Vector
+P113 14 Drive model - MMV75/2
+P121 1 RUN button enabled when P007=1
+P122 1 Forward/reverse button enabled when P007=1
+P123 1 JOG button enabled when P007=1
+P124 1 Up/down buttons enabled when P007=1
+P125 1 Forward and reverse operation allowed
+P128 120 Fan switch-off delay (s)
+P131 0 Frequency setpoint (Hz), read-only snapshot
+P132 0 Motor current (A), read-only snapshot
+P133 0 Motor torque (%), read-only snapshot
+P134 303 DC-link voltage (V), read-only snapshot
+P135 0 Motor speed (RPM), read-only snapshot
+P137 0 Output voltage (V), read-only snapshot
+P138 0 Rotor/shaft frequency (Hz), read-only snapshot
+P139 0 Peak output-current record
+P140 231 Most recent fault - F231
+P141 231 Previous fault - F231
+P142 231 Second previous fault - F231
+P143 231 Third previous fault - F231
+P186 200 Instantaneous motor-current limit (%)
+P201 0 PID closed-loop mode disabled
+P202 1 PID proportional gain
+P203 0 PID integral gain
+P204 0 PID derivative gain
+P205 1 PID sample interval - 25 ms
+P206 0 PID transducer filtering off
+P207 100 PID integral capture range (%)
+P208 0 Transducer type - direct acting
+P210 1.4 Transducer reading (%), read-only snapshot
+P211 0 PID 0% setpoint
+P212 100 PID 100% setpoint
+P220 0 Frequency cutoff disabled
+P321 0 Analogue-input-2 minimum frequency (Hz)
+P322 60 Analogue-input-2 maximum frequency (Hz)
+P323 0 Analogue input 2 - 0-10 V / 0-20 mA
+P356 6 DIN6 terminal 17 - fixed frequency 6
+P386 1 Vector speed-loop proportional gain
+<PARSED TEXT FOR PAGE: 4 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 4
+P Number Value Siemens function / interpretation
+P387 1 Vector speed-loop integral gain
+P720 0 Direct I/O functions - normal operation
+P721 0 Analogue-input-1 voltage (V), read-only
+P722 0 Analogue-output-1 current (mA)
+P723 0 Digital-input state (hex) - all inputs off
+P724 0 Direct relay control - both off
+P725 0 Analogue-input-2 voltage (V), read-only
+P910 0 Local control mode
+P922 2.04 Software version, read-only
+P923 0 Equipment system/reference number
+P930 231 Most recent fault - F231 (copy of P140)
+P931 0 Most recent warning - none
+P944 0 Factory reset inactive
+P971 1 EEPROM storage enabled
+Critical retained readings: P082 = 1725 RPM; P128 = 120 s; P922 = software 2.04; P140-P143 and P930 = F231. P944 must remain 0 unless an
+intentional factory reset is required.
+Literature: Siemens MICROMASTER Vector / MIDIMASTER Vector Operating Instructions, G85139-H1751-U529-D1; compact guide
+G85139-H1751-U568-D1, May 1999.
+<PARSED TEXT FOR PAGE: 5 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 5
+VFD 7 WIRING CROSS-REFERENCE
+Second Outfeed Conveyor - confirmed field wire landings
+Wire Siemens landing Function from wiring + parameter set Allen-Bradley
+cross-reference
+Field notes
+6 Control terminal 2 Control 0 V / signal common Rack ___ Slot ___ Point
+___
+Source/common:
+__________________
+128 Control terminal 5 -
+DIN1
+P051=18: RUN + fixed frequency 5; P046=55 Hz;
+P050=1 reverses FF5
+Rack ___ Slot ___ Point
+___
+Relay/terminal:
+_________________
+129 Control terminal 6 -
+DIN2
+P052=18: RUN + fixed frequency 4; P044=56 Hz;
+normal direction
+Rack ___ Slot ___ Point
+___
+Relay/terminal:
+_________________
+188 Control terminal 19
+- RL1
+RL1 switched contact; P061=6 fault indication
+(active-low function)
+Rack ___ Slot ___ Point
+___
+Cross-ref with wire 187
+187 Control terminal 20
+- RL1
+RL1 common/contact circuit; P061=6 fault
+indication
+Rack ___ Slot ___ Point
+___
+Cross-ref with wire 188
+POWER AND MOTOR CONDUCTORS
+Wire Drive terminal Circuit Upstream/downstream cross-reference
+591 A / L1 Incoming three-phase line Panel __________ Disconnect __________ Fuse __________
+593 B / L2 Incoming three-phase line Panel __________ Disconnect __________ Fuse __________
+595 C / L3 Incoming three-phase line Panel __________ Disconnect __________ Fuse __________
+592 U VFD output to motor Motor/J-box terminal __________ Splice __________
+594 V VFD output to motor Motor/J-box terminal __________ Splice __________
+596 W VFD output to motor Motor/J-box terminal __________ Splice __________
+Not
+recorded PE / ground Protective earth Wire ID __________ Ground point __________
+Safety/verification note: Confirm conductor IDs and terminal markings de-energized under LOTO before moving the replacement drive wiring. Do not
+megger conductors while connected to the VFD. The RL1 contact arrangement should be verified against the terminal symbol on this exact drive
+before energization.
+<PARSED TEXT FOR PAGE: 6 / 6>
+Siemens MICROMASTER Vector - field-recorded parameter set Page 6
+ALLEN-BRADLEY PLC CROSS-REFERENCE WORKSHEET
+Use this page while tracing the VFD conductors through interposing relays and the SLC 5/03 I/O rack.
+VFD
+wire From / to Relay ID Rack Slot I/O point PLC address Drawing rung/page Verified
+6 T2 - 0 V common [ ]
+128 T5 - DIN1 / 55 Hz reverse [ ]
+129 T6 - DIN2 / 56 Hz forward [ ]
+188 T19 - RL1 contact [ ]
+187 T20 - RL1 contact/common [ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+[ ]
+PLC cabinet / rack identification: ____________________________________________ Drawing set: __________________________
+Verified by: __________________________________ Date: __________________ Machine state during verification:
+__________________________

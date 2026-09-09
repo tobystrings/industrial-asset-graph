@@ -1,0 +1,10 @@
+import { mkdirSync,readFileSync,writeFileSync } from 'node:fs';
+import { buildLiebFoodsPackage } from '../facilities/lieb-foods';
+import { emptyPublication,validatePublication } from '../src/facility/publicationModel';
+const payload=emptyPublication(buildLiebFoodsPackage());
+const manifest=JSON.parse(readFileSync('public/facility-content/lieb-foods/history.json','utf8'));
+payload.history=[{id:manifest.id,facilityId:payload.facilityId,digest:manifest.publication.originalDigest,manifest,importedAt:'2026-09-09T00:00:00Z',importedBy:'Owner-authorized GitHub publication',reviews:[],publicSourceBase:'facility-content/lieb-foods/recovered-2026-09-08/J_Lieb_Plant_Codex_Handoff/'}];
+validatePublication(payload,payload.facilityId);
+mkdirSync('public/facility-state/facility-j-lieb',{recursive:true});
+writeFileSync('public/facility-state/facility-j-lieb/current.json',JSON.stringify({facility_id:payload.facilityId,revision:0,payload,updated_at:'2026-09-09T00:00:00Z'},null,2)+'\n');
+console.log('Prepared a public seed without changing any existing browser data.');

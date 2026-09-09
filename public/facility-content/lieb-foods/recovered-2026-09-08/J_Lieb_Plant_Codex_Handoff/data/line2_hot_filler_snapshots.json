@@ -1,0 +1,332 @@
+[
+  {
+    "tag": "DP1",
+    "raw_value": "2",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "DP2",
+    "raw_value": "9",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "DP3",
+    "raw_value": "1",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT101",
+    "raw_value": "0",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT102",
+    "raw_value": "2",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT103",
+    "raw_value": "34",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT103A",
+    "raw_value": "0",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT104",
+    "raw_value": "9",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT105",
+    "raw_value": "1",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT106",
+    "raw_value": "1",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PT107",
+    "raw_value": "0",
+    "unit_as_recorded": "PSI",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TT101",
+    "raw_value": "185.2",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TT102",
+    "raw_value": "184.5",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TT103",
+    "raw_value": "188.8",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "RTD103",
+    "raw_value": "182.2",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "RTD105",
+    "raw_value": "140.9",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "RTD310",
+    "raw_value": "107.3",
+    "unit_as_recorded": "F",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "FM101",
+    "raw_value": "19.5",
+    "unit_as_recorded": "G/M",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "LT301",
+    "raw_value": "109",
+    "unit_as_recorded": "GAL",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "LT302",
+    "raw_value": "21",
+    "unit_as_recorded": "GAL",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "BT1",
+    "raw_value": "317",
+    "unit_as_recorded": "GAL",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "BT2",
+    "raw_value": "3034",
+    "unit_as_recorded": "GAL",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PMP105",
+    "raw_value": "0",
+    "unit_as_recorded": "Hz",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PMP101",
+    "raw_value": "0",
+    "unit_as_recorded": "Hz",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PMP102",
+    "raw_value": "29",
+    "unit_as_recorded": "Hz",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PMP103",
+    "raw_value": "16",
+    "unit_as_recorded": "Hz",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "PMP104",
+    "raw_value": "49",
+    "unit_as_recorded": "Hz",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TV101",
+    "raw_value": "~5",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TV102",
+    "raw_value": "0",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TV103",
+    "raw_value": "100",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TV104",
+    "raw_value": "10",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "TV108",
+    "raw_value": "100",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  },
+  {
+    "tag": "CP301",
+    "raw_value": "0.0",
+    "unit_as_recorded": "percent",
+    "source_id": "S04",
+    "source_pages": "3-4",
+    "status": "HISTORICAL_HMI_SNAPSHOT_SECONDARY",
+    "observed_at": "unknown",
+    "is_design_setpoint": false
+  }
+]

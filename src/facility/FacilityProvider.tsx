@@ -38,10 +38,16 @@ import { validateFacilityPackage } from './schema';
 import { iagUserFromSupabase, supabase } from './supabaseAuth';
 import type { User } from '@supabase/supabase-js';
 import { importPrivateAssetBundle, type ImportConflict } from './additivePackage';
+import { usePublicationSync, type PublicationStatus } from './usePublicationSync';
+import { capturePublication, receiveSharedProposals } from './publication';
 
 const FacilityContext = createContext<FacilityPackage | null>(null);
 
 export interface FacilityEditorApi {
+  publication: PublicationStatus;
+  publishNow(): Promise<boolean>;
+  resolvePublication(choice: 'local' | 'shared'): Promise<void>;
+  receiveProposals(): Promise<number>;
   ready: boolean;
   currentUser: IagUser | null;
   pendingChanges: PendingChange[];
@@ -164,6 +170,10 @@ export function FacilityProvider({
   const syncInFlight = useRef(false);
 
   const apiUrl = ((import.meta as ImportMeta & { env?: { VITE_IAG_API_URL?: string } }).env?.VITE_IAG_API_URL ?? '').trim();
+  const publication = usePublicationSync(ready, value, currentUser, (next) => {
+    syncActiveFacilityPackage(next); pkgRef.current = next; setPkg(next);
+    const pending=loadPendingChanges(next.facility.id); pendingRef.current=pending; setPendingChanges(pending); setAuditLog(loadAuditEvents(next.facility.id));
+  });
 
   useEffect(() => {
     let alive = true;
@@ -314,13 +324,22 @@ export function FacilityProvider({
   }, [appendAudit, commitCanonical, currentUser, pkg.packageRevision, savePending]);
 
   const editor = useMemo<FacilityEditorApi>(() => ({
+    publication: publication.state,
+    publishNow: publication.syncNow,
+    resolvePublication: publication.resolve,
+    async receiveProposals() {
+      if(currentUser?.role!=='admin') throw new Error('Administrator review is required.');
+      const result=await receiveSharedProposals(await capturePublication(pkgRef.current));
+      pendingRef.current=result.payload.pending;setPendingChanges(result.payload.pending);setAuditLog(result.payload.audit);
+      return result.count;
+    },
     ready,
     currentUser,
     pendingChanges,
     auditLog,
-    sync,
-    queuedMutationCount,
-    syncNow,
+    sync: publication.state.phase === 'DISABLED' ? sync : { ...sync, phase: publication.state.phase === 'SAVED' ? 'SYNCED' : publication.state.phase === 'CONFLICT' ? 'CONFLICT' : publication.state.phase === 'ERROR' ? 'ERROR' : 'PENDING', error: publication.state.phase === 'ERROR' ? publication.state.message : undefined },
+    queuedMutationCount: publication.state.phase === 'SAVED' ? 0 : queuedMutationCount,
+    syncNow: publication.state.phase === 'DISABLED' ? syncNow : async () => { await publication.syncNow(); },
     resolveConflict,
     async approveChange(id) {
       if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required to approve changes.');
@@ -442,7 +461,7 @@ export function FacilityProvider({
       const category: AttachmentRecord['category'] = file.type.startsWith('image/') ? 'PHOTO' : file.type === 'application/pdf' || lower.endsWith('.pdf') ? 'PDF' : lower.match(/\.(dwg|dxf|svg)$/) ? 'DRAWING' : 'OTHER';
       const record: AttachmentRecord = {
         id: crypto.randomUUID(), assetId, name: file.name, mimeType: file.type || 'application/octet-stream', size: file.size,
-        blob: file, category, verificationStatus, access: 'LOCAL_ONLY', createdAt: new Date().toISOString(),
+        blob: file, category, verificationStatus, access: publication.state.phase === 'DISABLED' ? 'LOCAL_ONLY' : 'PUBLIC_APP', createdAt: new Date().toISOString(),
       };
       await putAttachment(record, pkg.facility.id);
       const evidenceId = `EV-${record.id}`;
@@ -451,7 +470,7 @@ export function FacilityProvider({
         type: category === 'PHOTO' ? 'PHOTO' as const : category === 'DRAWING' ? 'DRAWING' as const : category === 'PDF' ? 'MANUAL' as const : 'OTHER' as const,
         title: `${assetId} · ${file.name}`,
         pathOrUrl: `indexeddb://attachment/${record.id}`,
-        access: 'LOCAL_ONLY' as const,
+        access: record.access,
       }];
       const documents = category === 'PDF' || category === 'DRAWING' ? [...pkg.documents, {
         id: `DOC-${record.id}`,
@@ -474,7 +493,7 @@ export function FacilityProvider({
         ...pkg,
         evidence: pkg.evidence.filter((item) => item.pathOrUrl !== uri),
         documents: pkg.documents.filter((item) => item.path !== uri),
-      }, id, 'Local evidence removed in application', { entityType: 'evidence', operation: 'DELETE', value: { access: 'LOCAL_ONLY' } });
+      }, `EV-${id}`, 'Evidence removed in application', { entityType: 'evidence', operation: 'DELETE', value: { access: publication.state.phase === 'DISABLED' ? 'LOCAL_ONLY' : 'PUBLIC_APP' } });
     },
     attachments: (assetId) => listAttachments(assetId, pkg.facility.id),
     async addObservation(input) {
@@ -521,7 +540,7 @@ export function FacilityProvider({
       pkgRef.current = next;
       setPkg(next);
     },
-  }), [ready, pkg, value, commitCanonical, currentUser, pendingChanges, auditLog, sync, queuedMutationCount, syncNow, resolveConflict, appendAudit, recordChange, savePending]);
+  }), [publication.state, publication.syncNow, publication.resolve, ready, pkg, value, commitCanonical, currentUser, pendingChanges, auditLog, sync, queuedMutationCount, syncNow, resolveConflict, appendAudit, recordChange, savePending]);
 
   return (
     <FacilityContext.Provider value={pkg}>

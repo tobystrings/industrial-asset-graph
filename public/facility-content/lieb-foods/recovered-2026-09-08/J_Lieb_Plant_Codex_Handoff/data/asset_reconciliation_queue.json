@@ -1,0 +1,50 @@
+[
+  {
+    "recovery_key": "FG-L4-MTN-001",
+    "name": "META 150 HS",
+    "line": "Line 4",
+    "status": "EXISTING_ID_SOURCE_DOCUMENTED",
+    "source": "Machine review package",
+    "canonical_import": false
+  },
+  {
+    "recovery_key": "L2-CC-001",
+    "name": "Line 2 conveyor control cabinet",
+    "line": "Line 2",
+    "status": "EXISTING_ID_USER_REPORTED",
+    "source": "2026-08-06 user statement",
+    "canonical_import": false
+  },
+  {
+    "recovery_key": "candidate-line2-hot-filler",
+    "name": "Line 2 HOT FILLER",
+    "line": "Line 2",
+    "status": "CANDIDATE_RECONCILE_EXISTING_ID",
+    "source": "Hot filler review packet",
+    "canonical_import": false
+  },
+  {
+    "recovery_key": "candidate-superior-boiler",
+    "name": "Superior X6-5-1250",
+    "line": "unassigned/shared service",
+    "status": "USER_REPORTED_CANDIDATE",
+    "source": "2026-07-24 user statements",
+    "canonical_import": false
+  },
+  {
+    "recovery_key": "candidate-kosme-L05358",
+    "name": "Kosme TOP II AD TANDEM 20/1056 CE SA4 E2",
+    "line": "unknown",
+    "status": "OEM_DOCUMENTED_CANDIDATE",
+    "source": "OEM identity register",
+    "canonical_import": false
+  },
+  {
+    "recovery_key": "candidate-wulftec-A6882",
+    "name": "Wulftec WCRT-200",
+    "line": "unknown",
+    "status": "SOURCE_DOCUMENTED_CANDIDATE",
+    "source": "Wulftec master packet",
+    "canonical_import": false
+  }
+]

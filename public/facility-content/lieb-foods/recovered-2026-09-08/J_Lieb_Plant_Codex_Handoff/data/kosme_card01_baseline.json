@@ -1,0 +1,132 @@
+[
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "En",
+    "raw_value": "0144.2",
+    "unit": "degrees",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Tc",
+    "raw_value": "00000",
+    "unit": "pcs/h display",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Pc",
+    "raw_value": "0374",
+    "unit": "",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Nc",
+    "raw_value": "1.45",
+    "unit": "",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Tp",
+    "raw_value": "036",
+    "unit": "C",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Sx",
+    "raw_value": "01",
+    "unit": "",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "Ve",
+    "raw_value": "02.8",
+    "unit": "firmware display",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "HV",
+    "raw_value": "161",
+    "unit": "not displayed",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "LV",
+    "raw_value": "25.0",
+    "unit": "V",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "LA",
+    "raw_value": "07.4",
+    "unit": "mH",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "IA",
+    "raw_value": "02.8",
+    "unit": "A",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "LB",
+    "raw_value": "07.0",
+    "unit": "mH",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  },
+  {
+    "network_address": "01",
+    "physical_head": "unknown",
+    "code": "IB",
+    "raw_value": "02.8",
+    "unit": "A",
+    "observed_at": "unknown",
+    "source": "Kosme_CR30_Selected_Card_01_Data_Readout.pdf",
+    "status": "HISTORICAL_RECORDED_BASELINE"
+  }
+]

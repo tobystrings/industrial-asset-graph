@@ -150,7 +150,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   };
 
   const pointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if ((editMode && mapEditor.tool !== 'pan') || (event.target as Element).closest('.map-hotspot')) return;
+    if ((editMode && mapEditor.tool !== 'pan') || (event.target as Element).closest('button, input, .map-hotspot')) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     didPan.current = false;
@@ -217,7 +217,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     {editMode&&<div className="studio-window-actions"><button onClick={()=>{const section=planWrapRef.current?.closest('section.reference-layout');if(document.fullscreenElement) void document.exitFullscreen();else if(section?.requestFullscreen) void section.requestFullscreen().catch(()=>mapEditor.setMessage('Full screen is unavailable in this browser.'));}}>Full screen</button><button onClick={()=>{if(mapEditor.dirty){mapEditor.setMessage('Save Changes before opening another editor window.');return;}window.open(`${location.pathname}?page=map&edit=1`,'iag-map-studio','popup,width=1600,height=1000');}}>Pop out</button><span>{mapEditor.previewDraft?'Preview — apply or discard in Text edits':mapEditor.tool==='pan'?'Drag to pan · scroll to zoom':'Drag to draw or move · scroll to zoom'}</span></div>}
     <MapEditorToolbar session={mapEditor}/>
     <div className={`reference-drawing-sheet ${editMode ? 'is-editing' : ''}`}>
-      <div ref={planWrapRef} className="reference-plan-wrap" tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
+      <div ref={planWrapRef} className={`reference-plan-wrap ${mapEditor.tool === 'pan' && editMode ? 'cursor-pan' : ''} ${gesturing ? 'is-panning' : ''}`} tabIndex={0} onKeyDown={handleKeyDown} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp} onWheel={wheelZoom}>
         <div className={`reference-plan-transform ${gesturing ? 'is-gesturing' : ''}`} style={{ transform: `translate3d(${view.x}px,${view.y}px,0) scale(${view.scale})` }}>
           <div className="reference-plan-image-stage" style={{ '--facility-drawing-width': `${drawingWidth}px`, '--facility-drawing-ratio': `${drawingWidth} / ${drawingHeight}` } as React.CSSProperties}>
             <svg className="facility-map-svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} role="img" aria-label={`${facility.name} interactive facility layout`}>

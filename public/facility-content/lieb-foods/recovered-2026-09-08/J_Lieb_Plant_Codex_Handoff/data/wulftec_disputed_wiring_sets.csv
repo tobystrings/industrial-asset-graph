@@ -1,0 +1,24 @@
+set,terminal,wire,role_as_reported,device,source,status
+A,2,6,common,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,5,128,DIN1,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,6,129,DIN2,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,19,188,relay,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,20,187,relay,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,A/L1,591,line,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,B/L2,593,line,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,C/L3,595,line,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,U,592,motor,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,V,594,motor,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+A,W,596,motor,DISPUTED: Drive6 reference versus VFD7,Wulftec master packet pages 2/5 versus 12-15,DISPUTED
+B,1,182,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,2,6,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,3,183,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,4,6,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,5,160,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,6,161,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,7,146,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,19,184,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,20,180,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,L1,5-6-7,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,L2,5-6-9,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED
+B,L3,5-7-1,unresolved,Unknown; do not assign PowerFlex4 by assumption,Supplied September voice-history summary,USER_REPORTED_ATTRIBUTION_UNRESOLVED

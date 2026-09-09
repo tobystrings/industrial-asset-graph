@@ -1,0 +1,122 @@
+[
+  {
+    "id": "C01",
+    "issue": "Drive 6 vs VFD7 ownership of Set A",
+    "required_treatment": "Retain both source assertions; trace original labels/drawing",
+    "status": "OPEN"
+  },
+  {
+    "id": "C02",
+    "issue": "Set B drive identity and terminal scheme",
+    "required_treatment": "Keep separate; recover unambiguous device photograph/readback",
+    "status": "OPEN"
+  },
+  {
+    "id": "C03",
+    "issue": "Sterling 208 V current 3.0 vs 3.2 A",
+    "required_treatment": "Read original glare-free plate",
+    "status": "OPEN"
+  },
+  {
+    "id": "C04",
+    "issue": "Siemens P021/P022 snapshots 0/60 vs 4/56",
+    "required_treatment": "Resolve device and chronological context",
+    "status": "OPEN"
+  },
+  {
+    "id": "C05",
+    "issue": "480 V upstream vs transformed drive supply",
+    "required_treatment": "Preserve separate voltage domains; trace transformer",
+    "status": "OPEN"
+  },
+  {
+    "id": "C06",
+    "issue": "Proposed replacement settings vs actual entries/final export",
+    "required_treatment": "Keep recommendation/readback/final states distinct",
+    "status": "OPEN"
+  },
+  {
+    "id": "C07",
+    "issue": "WCRT/WRTC and A6882 identifier meaning",
+    "required_treatment": "Reconcile machine plate and manual",
+    "status": "OPEN"
+  },
+  {
+    "id": "C08",
+    "issue": "Kosme L05358 vs older EG05245/05358 references",
+    "required_treatment": "Prefer OEM registration for documented machine; retain unresolved alternate",
+    "status": "OPEN"
+  },
+  {
+    "id": "C09",
+    "issue": "CR30 vs index KET39",
+    "required_treatment": "Alias at document level; inspect installed hardware",
+    "status": "OPEN"
+  },
+  {
+    "id": "C10",
+    "issue": "Network address 01 vs physical head 1",
+    "required_treatment": "Do not equate without mapping",
+    "status": "OPEN"
+  },
+  {
+    "id": "C11",
+    "issue": "25-digit transcript vs five-digit OEM code",
+    "required_treatment": "Retain discrepancy; do not treat transcript as procedure",
+    "status": "OPEN"
+  },
+  {
+    "id": "C12",
+    "issue": "Hot-filler corrected drawings vs unaudited HMI topology",
+    "required_treatment": "Audit source HMI and sheet interfaces before verification",
+    "status": "OPEN"
+  },
+  {
+    "id": "C13",
+    "issue": "Duplicate FP302; CP301/SRV101/MVP101 unknown",
+    "required_treatment": "Preserve exact tags and open tasks",
+    "status": "OPEN"
+  },
+  {
+    "id": "C14",
+    "issue": "Old cabinet placeholders and cooler boundary",
+    "required_treatment": "Apply later user correction; archive old map as historical",
+    "status": "OPEN"
+  },
+  {
+    "id": "C15",
+    "issue": "H1/H2/H3 panel ratings lack recovered plates",
+    "required_treatment": "Mark supplied-history only",
+    "status": "OPEN"
+  },
+  {
+    "id": "C16",
+    "issue": "Water meter identity and steam estimates",
+    "required_treatment": "Do not treat makeup/water totals as measured steam",
+    "status": "OPEN"
+  },
+  {
+    "id": "C17",
+    "issue": "Generated cabinet drawing parts vs original photos",
+    "required_treatment": "Keep candidate-only until primary evidence recovered",
+    "status": "OPEN"
+  },
+  {
+    "id": "C18",
+    "issue": "Historical deployment/test claims vs current software",
+    "required_treatment": "Verify repository state; do not claim tests rerun",
+    "status": "OPEN"
+  },
+  {
+    "id": "C19",
+    "issue": "Boiler tag vs serial; META serial uncertain",
+    "required_treatment": "Preserve literal tag and field-verification state",
+    "status": "OPEN"
+  },
+  {
+    "id": "C20",
+    "issue": "Kosme OEM requirements vs actual plant supply/configuration",
+    "required_treatment": "Do not infer installed transformer or optional systems",
+    "status": "OPEN"
+  }
+]

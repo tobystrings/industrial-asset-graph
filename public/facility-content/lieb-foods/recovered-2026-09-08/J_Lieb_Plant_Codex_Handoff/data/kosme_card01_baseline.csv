@@ -1,0 +1,14 @@
+network_address,physical_head,code,raw_value,unit,observed_at,source,status
+01,unknown,En,0144.2,degrees,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Tc,00000,pcs/h display,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Pc,0374,,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Nc,1.45,,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Tp,036,C,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Sx,01,,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,Ve,02.8,firmware display,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,HV,161,not displayed,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,LV,25.0,V,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,LA,07.4,mH,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,IA,02.8,A,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,LB,07.0,mH,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
+01,unknown,IB,02.8,A,unknown,Kosme_CR30_Selected_Card_01_Data_Readout.pdf,HISTORICAL_RECORDED_BASELINE
