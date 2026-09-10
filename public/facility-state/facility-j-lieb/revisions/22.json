@@ -1,6 +1,6 @@
 {
   "facility_id": "facility-j-lieb",
-  "revision": 23,
+  "revision": 22,
   "payload": {
     "audit": [
       {
@@ -142,9 +142,7 @@
               }
             ]
           },
-          "assetIds": [
-            "LIEB-KOSME-TOPIIAD-L05358"
-          ],
+          "assetIds": [],
           "shortName": "Building C"
         },
         {
@@ -450,7 +448,9 @@
             "height": 4
           },
           "visible": false,
-          "assetIds": [],
+          "assetIds": [
+            "LIEB-KOSME-TOPIIAD-L05358"
+          ],
           "shortName": "Unconfirmed"
         }
       ],
@@ -755,9 +755,9 @@
         },
         {
           "id": "LIEB-KOSME-TOPIIAD-L05358",
-          "line": "LINE 2",
+          "line": "Line unconfirmed",
           "name": "Kosme TOP II AD Tandem Labeler",
-          "type": "LABELER",
+          "type": "Labeler",
           "facts": [
             {
               "label": "Maximum rated output",
@@ -783,7 +783,7 @@
               "label": "Auxiliary voltage",
               "value": {
                 "unit": "VAC",
-                "value": "24",
+                "value": 24,
                 "evidenceIds": [
                   "ev-kosme-oem-intake"
                 ],
@@ -818,7 +818,7 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "areaId": "area-building-c",
+          "areaId": "area-location-unconfirmed",
           "unknowns": [
             "Confirm production-line membership",
             "Confirm exact floor-map location",
@@ -849,7 +849,7 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "verificationStatus": "VERIFIED"
+          "verificationStatus": "FIELD_VERIFY"
         }
       ],
       "evidence": [
@@ -1640,16 +1640,6 @@
           "reason": "Asset saved in application",
           "entityId": "LIEB-WULFTEC-A6882",
           "changedAt": "2026-09-10T06:22:06.187Z",
-          "changedBy": "tobystrings@gmail.com",
-          "fieldPath": "*",
-          "evidenceIds": [],
-          "reviewState": "APPROVED"
-        },
-        {
-          "id": "2a6eab6c-82fd-4c83-a0d6-c65b6d54d419",
-          "reason": "Asset saved in application",
-          "entityId": "LIEB-KOSME-TOPIIAD-L05358",
-          "changedAt": "2026-09-10T06:23:07.077Z",
           "changedBy": "tobystrings@gmail.com",
           "fieldPath": "*",
           "evidenceIds": [],
@@ -2550,10 +2540,9 @@
       "schemaVersion": 2,
       "entityVersions": {
         "LIEB-WULFTEC-A6882": 1,
-        "LIEB-KOSME-TOPIIAD-L05358": 1,
         "map-config:facility-j-lieb": 9
       },
-      "packageRevision": 12,
+      "packageRevision": 11,
       "assetSerialSources": [
         {
           "id": "serial-l4-nameplate",
@@ -14267,7 +14256,7 @@
     "attachments": [],
     "observations": []
   },
-  "request_id": "be0b331a-20b7-4180-bd9b-49c91d56ac65",
-  "updated_at": "2026-09-10T06:23:15.55649+00:00",
+  "request_id": "91f6b204-168c-4aef-aa73-11db2949db8b",
+  "updated_at": "2026-09-10T06:22:33.129402+00:00",
   "updated_by": "b9c51a03-935e-41a7-ab2e-68d735e8888f"
 }

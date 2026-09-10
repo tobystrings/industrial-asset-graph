@@ -1,6 +1,6 @@
 {
   "facility_id": "facility-j-lieb",
-  "revision": 23,
+  "revision": 15,
   "payload": {
     "audit": [
       {
@@ -93,9 +93,7 @@
             "width": 20.5,
             "height": 36
           },
-          "assetIds": [
-            "LIEB-WULFTEC-A6882"
-          ],
+          "assetIds": [],
           "shortName": "Warehouse B"
         },
         {
@@ -142,9 +140,7 @@
               }
             ]
           },
-          "assetIds": [
-            "LIEB-KOSME-TOPIIAD-L05358"
-          ],
+          "assetIds": [],
           "shortName": "Building C"
         },
         {
@@ -450,7 +446,10 @@
             "height": 4
           },
           "visible": false,
-          "assetIds": [],
+          "assetIds": [
+            "LIEB-WULFTEC-A6882",
+            "LIEB-KOSME-TOPIIAD-L05358"
+          ],
           "shortName": "Unconfirmed"
         }
       ],
@@ -671,9 +670,9 @@
         },
         {
           "id": "LIEB-WULFTEC-A6882",
-          "line": "LINE 4",
+          "line": "Line unconfirmed",
           "name": "Wulftec WCRT-200 Stretch Wrapper",
-          "type": "STRETCH WRAPPER",
+          "type": "Stretch Wrapper",
           "facts": [
             {
               "label": "Electrical source",
@@ -723,7 +722,7 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "areaId": "area-warehouse-b",
+          "areaId": "area-location-unconfirmed",
           "unknowns": [
             "Confirm production-line membership",
             "Confirm exact floor-map location",
@@ -751,13 +750,13 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "verificationStatus": "VERIFIED"
+          "verificationStatus": "FIELD_VERIFY"
         },
         {
           "id": "LIEB-KOSME-TOPIIAD-L05358",
-          "line": "LINE 2",
+          "line": "Line unconfirmed",
           "name": "Kosme TOP II AD Tandem Labeler",
-          "type": "LABELER",
+          "type": "Labeler",
           "facts": [
             {
               "label": "Maximum rated output",
@@ -783,7 +782,7 @@
               "label": "Auxiliary voltage",
               "value": {
                 "unit": "VAC",
-                "value": "24",
+                "value": 24,
                 "evidenceIds": [
                   "ev-kosme-oem-intake"
                 ],
@@ -818,7 +817,7 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "areaId": "area-building-c",
+          "areaId": "area-location-unconfirmed",
           "unknowns": [
             "Confirm production-line membership",
             "Confirm exact floor-map location",
@@ -849,7 +848,7 @@
             ],
             "verificationStatus": "VERIFIED"
           },
-          "verificationStatus": "VERIFIED"
+          "verificationStatus": "FIELD_VERIFY"
         }
       ],
       "evidence": [
@@ -1630,26 +1629,6 @@
           "reason": "Map editor: Updated map studio",
           "entityId": "map-config:facility-j-lieb",
           "changedAt": "2026-09-10T06:08:22.621Z",
-          "changedBy": "tobystrings@gmail.com",
-          "fieldPath": "*",
-          "evidenceIds": [],
-          "reviewState": "APPROVED"
-        },
-        {
-          "id": "0bfe7b33-4021-4c34-a4ba-952db2c3d0b2",
-          "reason": "Asset saved in application",
-          "entityId": "LIEB-WULFTEC-A6882",
-          "changedAt": "2026-09-10T06:22:06.187Z",
-          "changedBy": "tobystrings@gmail.com",
-          "fieldPath": "*",
-          "evidenceIds": [],
-          "reviewState": "APPROVED"
-        },
-        {
-          "id": "2a6eab6c-82fd-4c83-a0d6-c65b6d54d419",
-          "reason": "Asset saved in application",
-          "entityId": "LIEB-KOSME-TOPIIAD-L05358",
-          "changedAt": "2026-09-10T06:23:07.077Z",
           "changedBy": "tobystrings@gmail.com",
           "fieldPath": "*",
           "evidenceIds": [],
@@ -2549,11 +2528,9 @@
       ],
       "schemaVersion": 2,
       "entityVersions": {
-        "LIEB-WULFTEC-A6882": 1,
-        "LIEB-KOSME-TOPIIAD-L05358": 1,
         "map-config:facility-j-lieb": 9
       },
-      "packageRevision": 12,
+      "packageRevision": 10,
       "assetSerialSources": [
         {
           "id": "serial-l4-nameplate",
@@ -2583,8 +2560,8 @@
               "name": "Warehouse B",
               "status": "IN_PROGRESS",
               "overlay": {
-                "x": 8,
-                "y": 8,
+                "x": 7,
+                "y": 13.5,
                 "width": 20.5,
                 "height": 36
               },
@@ -2596,21 +2573,33 @@
               "name": "Building C (Production)",
               "status": "IN_PROGRESS",
               "overlay": {
-                "x": 24.5,
-                "y": 19.9,
-                "width": 31.299999999999997,
-                "height": 23.1,
+                "x": 24.2,
+                "y": 16,
+                "width": 31.500000000000004,
+                "height": 33.5,
                 "polygon": [
                   {
-                    "x": 55.7,
-                    "y": 19.9
+                    "x": 27.5,
+                    "y": 16
                   },
                   {
-                    "x": 55.8,
-                    "y": 42
+                    "x": 55.7,
+                    "y": 16
+                  },
+                  {
+                    "x": 55.7,
+                    "y": 49.5
                   },
                   {
                     "x": 27.5,
+                    "y": 49.5
+                  },
+                  {
+                    "x": 27.5,
+                    "y": 43
+                  },
+                  {
+                    "x": 24.2,
                     "y": 43
                   },
                   {
@@ -14267,7 +14256,7 @@
     "attachments": [],
     "observations": []
   },
-  "request_id": "be0b331a-20b7-4180-bd9b-49c91d56ac65",
-  "updated_at": "2026-09-10T06:23:15.55649+00:00",
+  "request_id": "03fdd003-edfb-4e2d-a3ea-b8addc6dfe8e",
+  "updated_at": "2026-09-10T06:12:33.177702+00:00",
   "updated_by": "b9c51a03-935e-41a7-ab2e-68d735e8888f"
 }
