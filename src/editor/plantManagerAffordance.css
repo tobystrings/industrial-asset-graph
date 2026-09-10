@@ -17,7 +17,7 @@
   }
 
   .iag-manager-bar::-webkit-scrollbar-thumb {
-    background: rgba(125, 211, 252, .42);
+    background: rgba(30, 30, 30, 0.42);
     border-radius: 999px;
   }
 

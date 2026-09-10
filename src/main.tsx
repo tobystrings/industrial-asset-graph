@@ -16,6 +16,7 @@ import AppErrorBoundary from './ui/AppErrorBoundary';
 import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
 import './navigation/pages.css';
+import './ui/dark-theme.css';
 import './ui/chrome-clearance.css';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { AuthGate } from './auth/LoginPage';
@@ -29,7 +30,7 @@ function SignedInWorkspace() {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   activeFacilitySelectionError
-    ? <main role="alert" style={{ maxWidth: 720, margin: '10vh auto', padding: 24, color: '#f4f7fb', background: '#17202a', fontFamily: 'system-ui' }}><h1>Facility could not be loaded</h1><p>{activeFacilitySelectionError.message}</p><p>Choose a registered facility ID or remove the facility parameter to load the default facility.</p></main>
+    ? <main role="alert" style={{ maxWidth: 720, margin: '10vh auto', padding: 24, color: '#f2f2f2', background: '#181818', fontFamily: 'system-ui' }}><h1>Facility could not be loaded</h1><p>{activeFacilitySelectionError.message}</p><p>Choose a registered facility ID or remove the facility parameter to load the default facility.</p></main>
     : <React.StrictMode><AppErrorBoundary><AuthProvider><AuthGate><SignedInWorkspace /></AuthGate></AuthProvider></AppErrorBoundary></React.StrictMode>,
 );
 

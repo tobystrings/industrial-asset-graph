@@ -1,21 +1,21 @@
 .machine-register { min-width: 0; overflow-wrap: anywhere; }
 .register-controls { display: flex; flex-wrap: wrap; gap: 12px; }
 .register-controls label { flex: 1 1 180px; min-width: 0; display: grid; gap: 6px; }
-.machine-register input, .machine-register select, .machine-register textarea { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px; color: #eef5fb; background: #172a3a; border: 1px solid #688095; border-radius: 6px; }
+.machine-register input, .machine-register select, .machine-register textarea { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px; color: #f2f2f2; background: #161616; border: 1px solid #696969; border-radius: 6px; }
 .register-entries { display: grid; gap: 12px; }
-.register-entries article { padding: 14px; background: #172735; border: 1px solid #486174; border-radius: 8px; min-width: 0; }
-.register-entries h4 { margin: 0 0 8px; color: #f5f9fc; }
+.register-entries article { padding: 14px; background: #151515; border: 1px solid #696969; border-radius: 8px; min-width: 0; }
+.register-entries h4 { margin: 0 0 8px; color: #f2f2f2; }
 .machine-register .register-entries article p,
 .machine-register .register-entries article dd,
 .machine-register .register-entries article summary,
-.machine-register .register-entries article label { color: #e2eef6; }
+.machine-register .register-entries article label { color: #f2f2f2; }
 /* The light document shell has a legacy !important paragraph color. */
-html body #root .app-shell.app-pages .document-detail .machine-register .register-entries article p { color: #e2eef6 !important; }
-html body #root .app-shell.app-pages .document-detail .machine-register .register-entries article p.register-missing { color: #ffce85 !important; }
-.register-entries dl > div { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 3fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid #385064; }
+html body #root .app-shell.app-pages .document-detail .machine-register .register-entries article p { color: #f2f2f2 !important; }
+html body #root .app-shell.app-pages .document-detail .machine-register .register-entries article p.register-missing { color: #dadada !important; }
+.register-entries dl > div { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 3fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid #484848; }
 .register-entries dd { margin: 0; white-space: pre-wrap; }
-.register-entries dt { color: #b6d4e8; }
+.register-entries dt { color: #dadada; }
 .register-sources { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
 .machine-register button, .machine-register summary { min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
-.machine-register .register-entries article .register-missing { color: #ffce85; }
+.machine-register .register-entries article .register-missing { color: #dadada; }
 @media (max-width: 600px) { .register-entries dl > div { grid-template-columns: minmax(0, 1fr); gap: 3px; } }

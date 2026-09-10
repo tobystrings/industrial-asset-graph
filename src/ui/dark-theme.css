@@ -1,0 +1,34 @@
+/* App-wide neutral dark theme. Keep chrome clearance and responsive geometry intact. */
+:root {
+  color-scheme: dark;
+  --theme-page: #101010;
+  --theme-surface: #181818;
+  --theme-raised: #242424;
+  --theme-border: #484848;
+  --theme-text: #f2f2f2;
+  --theme-muted: #bebebe;
+  accent-color: #d4d4d4;
+  scrollbar-color: #666 #181818;
+}
+html, body, #root { background: var(--theme-page); color: var(--theme-text); }
+html body #root .app-shell.app-pages { background: var(--theme-page); }
+::selection { background: #dedede; color: #101010; }
+input, select, textarea, button { color-scheme: dark; }
+input::placeholder, textarea::placeholder { color: #aaa; opacity: 1; }
+:focus-visible { outline-color: #eee !important; }
+/* Render the complete source drawing and its editable overlays in the same
+   polarity. Original evidence bytes and stored symbol colors remain untouched. */
+.facility-map-svg, .studio-saved-overlay, .map-editor-svg, .reference-plan {
+  filter: grayscale(1) invert(1);
+}
+.facility-map-svg, .reference-plan { background: #fff !important; }
+.studio-symbol-palette svg { filter: grayscale(1) invert(1); background: #fff; }
+.cabinet-raster { filter: grayscale(1) invert(1); }
+.page-brand > span:first-child { background: #ededed; color: #151515; }
+html body #root :is(button, a)[aria-current=page],
+html body #root button[aria-pressed=true] {
+  border-color: #999;
+}
+/* Neutral surfaces keep the navigation, editor and forms visually continuous. */
+html body #root .page-header, html body #root .page-navigation { background: #181818; }
+html body #root .page-navigation a[aria-current=page] { background: #353535; color: #fff; }

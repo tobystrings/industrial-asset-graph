@@ -64,7 +64,7 @@ export function cabinetDrawingContained(css: string): boolean {
     && css.includes('--genie-dock-height: 118px')
     && css.includes("data-show='mini'")
     && css.includes('bottom: calc(148px + 36px + var(--genie-dock-height, 118px) + var(--manager-bar-height, 0px) + env(safe-area-inset-bottom))')
-    && css.includes('background: rgba(9, 17, 32, .96)');
+    && css.includes('background: rgba(17, 17, 17, 0.96)');
 }
 
 export function phoneTabFromQuery(tab: string | null | undefined, command: string | null | undefined): 'map' | 'find' | 'queue' | 'cabinet' {
