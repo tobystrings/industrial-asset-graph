@@ -23,7 +23,7 @@ export default function WulftecViewer({ initialState = readModelState(location.s
     try { renderer = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); }
     catch { setError('The 3D viewer needs WebGL. Try opening this page in Chrome or Edge with graphics acceleration enabled.'); return; }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setClearColor('#e4ecee'); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+    renderer.setClearColor('#181818'); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
     renderer.domElement.setAttribute('aria-label', 'WCRT-200 3D model. Drag to rotate; pinch or scroll to zoom.');
     renderer.domElement.tabIndex = 0; container.appendChild(renderer.domElement);
     const scene = new T.Scene();

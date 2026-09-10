@@ -52,6 +52,18 @@ def screenshot(page, name: str) -> Path:
 
 
 def assert_manager_geometry(page) -> None:
+    theme = page.evaluate("""() => {
+      const rgb = value => (value.match(/[\\d.]+/g) || []).slice(0, 3).map(Number);
+      return ['.app-pages', '.page-header', '.page-navigation'].map(selector => {
+        const style = getComputedStyle(document.querySelector(selector));
+        return {selector, background: rgb(style.backgroundColor), text: rgb(style.color), scheme: style.colorScheme};
+      });
+    }""")
+    for surface in theme:
+        assert surface['scheme'] == 'dark', f'Native controls lost dark mode: {surface}'
+        assert max(surface['background']) <= 55, f'Light shell surface returned: {surface}'
+        assert max(surface['background']) - min(surface['background']) <= 3, f'Colored shell surface returned: {surface}'
+        assert min(surface['text']) >= 170, f'Dark shell text is unreadable: {surface}'
     metrics = page.evaluate("""() => {
       const nav = document.querySelector('.page-navigation').getBoundingClientRect();
       const header = document.querySelector('.page-header').getBoundingClientRect();
@@ -70,6 +82,25 @@ def assert_manager_geometry(page) -> None:
     assert metrics['content']['top']>=metrics['headerBottom']-1, f'Header covers workspace content: {metrics}'
     assert metrics['content']['bottom']<=metrics['nav']['top']+1 or metrics['content']['top']>=metrics['nav']['bottom']-1, f'Navigation covers workspace content: {metrics}'
     assert all(t['width']>=44 and t['height']>=44 for t in metrics['targets']), f'Navigation touch targets are too small: {metrics}'
+
+
+def assert_text_contrast(locator) -> None:
+    contrast = locator.evaluate("""el => {
+      const rgb = value => (value.match(/[\\d.]+/g) || []).map(Number);
+      const luminance = channels => channels.slice(0, 3).map(v => {
+        v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
+      }).reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
+      const text = luminance(rgb(getComputedStyle(el).color));
+      let node = el, bg;
+      while (node) {
+        const channels = rgb(getComputedStyle(node).backgroundColor);
+        if (channels.length === 3 || channels[3] === 1) { bg = luminance(channels); break; }
+        node = node.parentElement;
+      }
+      if (bg === undefined) return 0;
+      return (Math.max(text, bg) + .05) / (Math.min(text, bg) + .05);
+    }""")
+    assert contrast >= 4.5, f'Text contrast is below 4.5:1: {contrast}'
 
 
 def open_page(page, route):
@@ -156,7 +187,7 @@ def exercise_historical_evidence(page, label):
     page.get_by_label('Prepared evidence bundle').set_input_files({'name':'history.iag','mimeType':'application/zip','buffer':payload})
     page.get_by_test_id('history-preview').wait_for()
     assert_manager_geometry(page)
-    assert page.locator('.history-card').first.evaluate('e => getComputedStyle(e).color') == 'rgb(23, 44, 59)', 'Historical source text lost contrast'
+    assert_text_contrast(page.locator('.history-card').first)
     screenshot(page, f'{label}-history-preview')
     with page.expect_download():
         page.get_by_role('button', name='Stage local evidence', exact=True).click()
@@ -279,8 +310,7 @@ def exercise_manager_states(page, label: str) -> None:
 
     open_page(page, 'account')
     page.locator('.page-workspace').wait_for(state='visible')
-    account_label_color = page.locator('.account-security label').evaluate('el => getComputedStyle(el).color')
-    assert account_label_color == 'rgb(22, 51, 62)', f'Account label loses contrast: {account_label_color}'
+    assert_text_contrast(page.locator('.account-security label'))
     screenshot(page, f'{label}-users')
     close_editor(page)
     page.evaluate("() => { localStorage.removeItem('iag-change-control-user'); localStorage.removeItem('iag-change-control-pending-changes'); }")

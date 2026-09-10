@@ -8,7 +8,7 @@
   position: relative;
   width: var(--facility-drawing-width, 1210px);
   max-width: none;
-  background: #fff;
+  background: #181818;
   user-select: none;
 }
 
@@ -18,7 +18,7 @@
   height: auto;
   aspect-ratio: var(--facility-drawing-ratio, 1210 / 525);
   overflow: visible;
-  background: #fff;
+  background: #181818;
   touch-action: none;
 }
 
@@ -63,7 +63,7 @@
   top: 14.7%;
   width: .42%;
   height: 20.1%;
-  background: #fff;
+  background: #181818;
   pointer-events: none;
 }
 
@@ -82,9 +82,9 @@
 
 .map-hotspot:hover,
 .map-hotspot:focus-visible {
-  border-color: rgba(37, 99, 235, .72);
-  background: rgba(37, 99, 235, .08);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, .82) inset;
+  border-color: rgba(105, 105, 105, 0.72);
+  background: rgba(52, 52, 52, 0.08);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.82) inset;
   outline: none;
 }
 
@@ -93,14 +93,14 @@
 }
 
 .map-hotspot.selected {
-  border-color: #f59e0b;
-  background: rgba(245, 158, 11, .12);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, .88) inset;
+  border-color: #696969;
+  background: rgba(52, 52, 52, 0.12);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.88) inset;
 }
 
 .reference-drawing-sheet.is-editing .map-hotspot {
   border-style: dashed;
-  border-color: rgba(37, 99, 235, .4);
+  border-color: rgba(105, 105, 105, 0.4);
 }
 
 @media print {

@@ -4,7 +4,7 @@
   "start_url": "/industrial-asset-graph/?view=cabinet",
   "scope": "/industrial-asset-graph/",
   "display": "standalone",
-  "background_color": "#091120",
-  "theme_color": "#091120",
+  "background_color": "#101010",
+  "theme_color": "#101010",
   "lang": "en"
 }

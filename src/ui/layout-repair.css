@@ -141,7 +141,7 @@
   .dashboard.workspace-map .reference-info-strip > section {
     grid-column: auto !important;
     border-right: 0 !important;
-    border-bottom: 1px solid #d7dde4 !important;
+    border-bottom: 1px solid #404040 !important;
   }
 
   .dashboard.workspace-map .reference-title-block {

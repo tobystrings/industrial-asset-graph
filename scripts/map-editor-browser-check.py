@@ -3,7 +3,7 @@ import os
 import subprocess
 import time
 import socket
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 from auth_test_fixture import install_auth_fixture, sign_in
 
 npm = 'npm.cmd' if os.name == 'nt' else 'npm'
@@ -59,7 +59,7 @@ try:
         page.get_by_label('Area name').fill('Browser Renamed Test Area')
         save(page)
         page.reload(wait_until='networkidle')
-        assert page.get_by_text('Browser Renamed Test Area', exact=True).count() > 0
+        expect(page.get_by_text('Browser Renamed Test Area', exact=True).first).to_be_attached()
 
         # Scenario 2/3: add an area, create then remove a wall, merge, and preserve the asset.
         enter_editor(page)
@@ -85,7 +85,7 @@ try:
         tool(page, 'Merge Areas')
         save(page)
         page.reload(wait_until='networkidle')
-        assert page.get_by_text('Browser Combined Area', exact=True).count() > 0
+        expect(page.get_by_text('Browser Combined Area', exact=True).first).to_be_attached()
         assert page.get_by_text('SYNTH-ASSET-001', exact=True).count() == 0  # map view does not manufacture asset labels
         page.goto(f'{base}&view=assets', wait_until='networkidle')
         assert page.get_by_text('SYNTH-ASSET-001', exact=True).count() > 0
@@ -101,7 +101,7 @@ try:
         page.get_by_role('button', name='Cancel / Exit', exact=True).click()
         assert page.locator('.map-editor-shell').count() == 0
         page.reload(wait_until='networkidle')
-        assert page.get_by_text('Browser Combined Area', exact=True).count() > 0
+        expect(page.get_by_text('Browser Combined Area', exact=True).first).to_be_attached()
 
         # Scenario 5: non-authoritative freehand + text markup, erasure, and persisted markup.
         enter_editor(page)
