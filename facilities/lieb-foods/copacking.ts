@@ -26,4 +26,3 @@ export function liebCopacking(): Copacking {
   }
   return c;
 }
-
