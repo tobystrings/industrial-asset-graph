@@ -36,6 +36,10 @@ def tool(page, name):
 
 def save(page):
     page.get_by_role('button', name='Save Changes', exact=True).click()
+    # Save Changes is disabled during the write as well as after it. Wait for
+    # the clean baseline and completed save before exercising durable reload.
+    expect(page.get_by_text('Draft matches saved map', exact=True)).to_be_attached()
+    expect(page.get_by_role('button', name='Done', exact=True)).to_be_enabled()
     page.get_by_role('button',name='Save Changes',exact=True).wait_for(state='visible')
     page.wait_for_function("() => [...document.querySelectorAll('button')].some(b=>b.textContent==='Save Changes' && b.disabled)")
 
