@@ -12,6 +12,16 @@ def exercise_map_studio(page,label,open_page,screenshot,assert_geometry):
     page.wait_for_timeout(250)
     print(label+' studio geometry: '+str(page.locator('.map-studio').evaluate('e => {const r=e.getBoundingClientRect();return {top:r.top,left:r.left,width:r.width,height:r.height,viewport:innerHeight}}')),flush=True)
     assert_geometry(page)
+    legend=page.get_by_role('complementary',name='Map color legend')
+    assert legend.is_visible(), 'Readable legend is missing from Map Studio'
+    assert legend.bounding_box()['y'] < page.locator('.reference-drawing-sheet').bounding_box()['y'], 'Legend must precede the canvas'
+    assert page.locator('.facility-map-svg').evaluate('e=>getComputedStyle(e).filter') == 'none', 'Map color was removed by a whole-drawing filter'
+    legend_toggle=legend.get_by_role('button',name='Map legend',exact=False)
+    was_collapsed=legend_toggle.get_attribute('aria-expanded')=='false'
+    if was_collapsed: legend_toggle.click()
+    assert legend.locator('.legend-grid span').first.evaluate('e=>parseFloat(getComputedStyle(e).fontSize)') >= 16, 'Legend text is too small'
+    assert len(set(page.locator('.map-editor-areas>g').evaluate_all('els=>els.map(e=>getComputedStyle(e).getPropertyValue("--area-color"))'))) >= 3, 'Area colors are not distinguishable'
+    if was_collapsed: legend_toggle.click()
     screenshot(page,label+'-map-studio-canvas')
     studio_pane(page,'Text / objects / layers')
     panel=page.get_by_role('complementary',name='Map Studio assistant and properties')

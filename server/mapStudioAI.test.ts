@@ -1,8 +1,15 @@
 import { describe,it,expect,vi,afterEach } from 'vitest';
-import { planMapEdit,validateAIPlan,validatePlanningInput } from './mapStudioAI';
+import { mapAIStatus,planMapEdit,validateAIPlan,validatePlanningInput } from './mapStudioAI';
 const input={instruction:'flip this door',selection:[{kind:'symbol' as const,id:'door-1'}],objects:[{kind:'symbol' as const,id:'door-1',name:'Door'}]};
 afterEach(()=>vi.unstubAllEnvs());
 describe('map AI proposal boundary',()=>{
+ it('reports server readiness without exposing credentials and requires both key and model',()=>{
+  vi.stubEnv('OPENAI_API_KEY','synthetic-secret');vi.stubEnv('IAG_MAP_AI_MODEL','');
+  expect(mapAIStatus()).toEqual({configured:false});
+  vi.stubEnv('IAG_MAP_AI_MODEL','configured-model');
+  expect(mapAIStatus()).toEqual({configured:true});
+  expect(JSON.stringify(mapAIStatus())).not.toContain('synthetic-secret');
+ });
  it('rejects invented targets and malformed values',()=>{
   expect(()=>validateAIPlan({actions:[{op:'delete',targets:[{kind:'symbol',id:'other'}]}],clarification:''},input)).toThrow(/unknown/);
   expect(()=>validateAIPlan({actions:[{op:'move',targets:input.selection,dx:'ten',dy:0}],clarification:''},input)).toThrow(/movement/);

@@ -1,0 +1,129 @@
+/* Map-specific color and scale. The application shell can remain neutral. */
+.reference-layout { --map-paper:#090d18; --map-selection:#ffcf40; }
+html body #root .reference-layout :is(.facility-map-svg,.studio-saved-overlay,.map-editor-svg,.reference-plan){filter:none}
+html body #root .reference-layout .facility-map-svg{background:var(--map-paper)!important}
+.reference-layout .map-reference-artwork{filter:grayscale(1) invert(1)}
+.reference-layout :is(.map-reference-label-cleanup rect,[data-mask-id]){fill:var(--map-paper)}
+html body #root .reference-layout .reference-plan-image-stage::after{background:var(--map-paper)}
+html body #root .reference-layout .reference-plan-wrap{background:var(--map-paper)!important;border:1px solid #4b607b;border-radius:10px}
+.reference-layout .svg-zone>rect,.reference-layout .svg-zone>polygon,
+.reference-layout .map-editor-areas>g>rect:not(.selection-bounds),.reference-layout .map-editor-areas>g>polygon{
+ fill:var(--area-color);fill-opacity:.5;stroke:var(--area-color);stroke-opacity:.9;stroke-width:2;vector-effect:non-scaling-stroke;
+}
+.reference-layout .svg-zone:hover>rect,.reference-layout .svg-zone:hover>polygon,
+.reference-layout .svg-zone:focus-visible>rect,.reference-layout .svg-zone:focus-visible>polygon{fill-opacity:.65;stroke-width:3}
+.reference-layout .svg-zone.selected>rect,.reference-layout .svg-zone.selected>polygon,
+.reference-layout .map-editor-areas>g.selected>rect:not(.selection-bounds),.reference-layout .map-editor-areas>g.selected>polygon{stroke:var(--map-selection);stroke-width:4;fill-opacity:.5}
+.reference-layout .map-editor-areas .selection-bounds{stroke:var(--map-selection);stroke-width:3}
+.reference-layout .svg-zone text,.reference-layout .map-editor-areas text{fill:#fff;stroke:#090d18;stroke-width:5px;font-size:22px;font-weight:800;paint-order:stroke;stroke-linejoin:round}
+.reference-layout .svg-zone:hover text,.reference-layout .svg-zone.selected text{fill:#fff;stroke:#090d18}
+.reference-layout .map-editor-walls polyline{stroke:#f4f6ff}
+.reference-layout .map-editor-walls polyline.selected{stroke:var(--map-selection)}
+.reference-layout .studio-symbols svg>rect,.reference-layout [aria-label='Saved editable symbols'] svg>rect{fill:var(--map-paper)}
+.reference-layout .studio-symbol-geometry{stroke:#f6c7ef;stroke-width:4}
+.reference-layout .studio-symbol-geometry .stair-arrow{stroke:#35d5ff}
+.reference-layout .studio-equipment circle{fill:#35d5ff;stroke:#090d18}
+.reference-layout .studio-equipment text{fill:#fff;stroke:#090d18;font-size:18px}
+.reference-layout .svg-asset-marker.cabinet rect{fill:#246bff}
+.reference-layout .svg-asset-marker.machine rect{fill:#16ae80}
+.reference-layout .svg-asset-marker.power rect{fill:#ffc247}
+.reference-layout .svg-asset-marker.power text{fill:#111827}
+.reference-layout .svg-asset-marker text{font-size:13px}
+.reference-layout .svg-asset-marker.reference-only rect{fill:#263346;stroke:#cbd5e1}
+.reference-layout .svg-asset-marker.reference-only text{fill:#fff}
+.reference-layout .svg-coordinate-grid line{stroke:#8da6c855}
+.reference-layout .svg-coordinate-grid text{fill:#fff;stroke:#090d18;font-size:14px}
+html body #root .reference-layout .map-floating-controls{display:flex!important;gap:6px}
+html body #root .reference-layout .map-floating-controls button{min-width:48px;min-height:48px;font-size:18px;background:#172033;color:#fff;border:1px solid #86a5ce}
+.map-readable-legend{padding:12px 16px;margin:8px 0;border:1px solid #53627a;border-radius:10px;background:#151b28;color:#f3f7ff;min-width:0}
+.map-readable-legend>button{background:transparent;color:#fff;border:0;padding:0 10px 0 0;min-height:44px;font-size:18px;font-weight:800;cursor:pointer}
+.map-readable-legend>span{font-size:14px;line-height:1.4;color:#c4d0e3}
+.map-legend-content{display:grid;gap:12px;padding-top:8px}
+.map-readable-legend .legend-grid{display:flex;flex-wrap:wrap;gap:12px 24px}
+.map-readable-legend .legend-grid span{font-size:16px;color:#fff;white-space:normal;gap:10px}
+.map-readable-legend .swatch{width:22px;height:22px;border-radius:5px;border:2px solid #fff}
+.map-readable-legend .swatch.cabinet{background:#246bff}.map-readable-legend .swatch.machine{background:#16ae80}.map-readable-legend .swatch.power{background:#ffc247}
+.map-readable-legend .swatch.selection{background:transparent;border:3px dashed #ffcf40}
+.map-area-key{display:flex;gap:8px 20px;flex-wrap:wrap;max-height:112px;overflow:auto;border-top:1px solid #53627a;padding-top:12px}
+.map-area-key span{display:flex;align-items:center;gap:8px;font-size:16px;line-height:1.5;color:#fff}
+.map-area-key i{width:14px;height:14px;border-radius:3px;flex:none}
+html body #root .reference-layout .reference-info-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+html body #root .reference-layout :is(.directory-row,.area-grid,.notes-column li){font-size:16px}
+html body #root .reference-layout .reference-info-strip h3{font-size:16px;line-height:1.3}
+html body #root .reference-layout .directory-row{min-height:44px;gap:10px}
+html body #root .reference-layout .directory-row .tag{font-size:13px;padding:6px}
+html body #root .reference-layout .directory-row em{font-size:12px}
+html body #root .reference-layout .area-grid>button{min-height:44px}
+/* Canvas and assistant sit side by side, not beneath expanding tool stacks. */
+@media(min-width:1100px){
+ html body #root .app-shell.app-pages .reference-layout.map-studio{display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto auto auto minmax(570px,68dvh);gap:10px}
+ html body #root .map-studio>.studio-window-actions{grid-column:1/-1;grid-row:1;order:0}
+ html body #root .map-studio>.map-readable-legend{grid-column:1/-1;grid-row:2;margin:0}
+ html body #root .map-studio>.map-editor-shell{grid-column:1/-1;grid-row:3;max-height:34dvh}
+ html body #root .map-studio>.reference-drawing-sheet{grid-column:1;grid-row:4;height:100%!important;min-height:0}
+ html body #root .map-studio>.map-studio-panel{grid-column:2;grid-row:4;height:100%;max-height:none;overflow:auto}
+ html body #root .map-studio:fullscreen{overflow:auto}
+}
+html body #root .map-studio .studio-window-actions{font-size:16px}
+html body #root .map-studio .studio-window-actions b{font-size:22px;margin-right:auto}
+html body #root .map-studio :is(button,input,select,textarea){font-size:16px;min-height:48px}
+html body #root .map-studio :is(.studio-tab-body label,.map-area-properties label,.map-editor-message){font-size:16px}
+html body #root .map-studio .studio-tabs{position:sticky;top:0;z-index:10;background:#141414;padding:8px}
+html body #root .map-studio .studio-tabs button[aria-selected=true]{background:#2448ad;border-color:#91afff}
+html body #root .map-studio .studio-primary,html body #root .map-studio .map-editor-session .primary{background:#2452c9;color:#fff;border-color:#8caeff}
+html body #root .map-studio button[aria-pressed=true]{border-color:#35d5ff}
+html body #root .map-studio .studio-symbol-palette svg{filter:none;background:#090d18;width:48px;height:48px;border-radius:6px}
+.studio-connection{border:1px solid #d99b3a;border-radius:8px;padding:12px;display:grid;gap:8px;background:#2c2217;font-size:16px}
+.studio-connection[data-state=ready]{border-color:#53ceaf;background:#112b26}
+.studio-connection p{font-size:14px;line-height:1.5;margin:0;color:#fff}
+.studio-connection details{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.studio-connection code{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:1099px){
+ html body #root .map-studio>.map-readable-legend{order:0}
+ html body #root .map-studio>.map-studio-panel{order:4;max-height:65dvh}
+ html body #root .map-studio>.map-editor-shell{max-height:45dvh}
+ html body #root .reference-layout .reference-info-strip{grid-template-columns:1fr 1fr}
+ .map-area-key{max-height:100px}
+}
+@media(max-width:600px){
+ .map-readable-legend{padding:10px}.map-readable-legend>span{display:block}
+ html body #root .map-studio .map-editor-session{flex-wrap:wrap;overflow:visible}
+ html body #root .map-studio .map-editor-session button{flex:1 1 auto}
+ html body #root .map-studio>.map-editor-shell{max-height:55dvh}
+ .map-readable-legend .legend-grid{gap:10px}.map-readable-legend .legend-grid span{font-size:16px}
+}
+
+.map-area-key-details summary{font-size:16px;min-height:44px;display:flex;align-items:center;cursor:pointer;color:#e2eaff;text-decoration:underline;text-underline-offset:3px}
+@media(min-width:1100px){.map-legend-content{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding-top:0}.map-area-key-details[open]{flex-basis:100%}.map-readable-legend{padding:8px 14px}.map-readable-legend>button{min-height:36px}}
+
+/* Retire legacy 9.5px !important map text rules at the map boundary. */
+html body #root .reference-layout :is(.legend-grid span,.directory-row,.area-grid,.notes-column li){font-size:16px!important;line-height:1.4}
+html body #root .reference-layout .reference-info-strip h3{font-size:16px!important}
+html body #root .app-shell.app-pages .reference-layout-head>div:first-child{display:none}
+html body #root .app-shell.app-pages .reference-layout-head{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;align-items:center;justify-content:space-between;gap:8px;padding-top:0!important}
+html body #root .app-shell.app-pages .map-studio>.reference-layout-head{display:none!important}
+.page-map .page-title{margin-bottom:12px}.page-map .page-title p{display:none}
+.page-map .publication-status{padding:8px 12px;margin-bottom:8px}
+html body #root .reference-layout .reference-layout-actions button{font-size:16px!important}
+
+.reference-layout .studio-equipment .placement-cabinet circle{fill:#246bff;stroke:white}
+.reference-layout .studio-equipment .placement-machine circle{fill:#16ae80;stroke:white}
+.reference-layout .studio-equipment .placement-power circle{fill:#ffc247;stroke:white}
+.reference-layout .studio-equipment circle.selected{fill:#ffcf40;stroke:#fff;stroke-width:3}
+.reference-layout .studio-equipment circle.placement-hit{fill:transparent;stroke:none;pointer-events:all}
+.reference-layout .studio-equipment text{font-size:16px}
+
+.map-readable-legend:has(>button[aria-expanded=false])>span{display:none}
+html body #root .map-studio .studio-assistant-jump{background:#2448ad;border-color:#91afff;color:#fff}
+@media(max-width:600px){
+ html body #root .map-studio .studio-window-actions{display:grid;grid-template-columns:1fr auto;gap:6px}
+ html body #root .map-studio .studio-window-actions b{font-size:20px}
+ html body #root .map-studio .studio-window-actions button{min-height:44px;font-size:16px}
+ html body #root .map-studio .studio-window-actions>button:not(.studio-assistant-jump){display:none}
+ html body #root .map-studio .map-readable-legend{margin:0;padding:4px 10px}
+ html body #root .map-studio .map-editor-session button{flex:0 0 auto;min-height:44px;padding:6px 10px}
+ html body #root .map-studio .map-editor-message[data-initial=true]{display:none}
+ html body #root .map-studio .map-editor-message:has(+.map-editor-selection-actions){display:block}
+ html body #root .map-studio .map-editor-shell{padding:6px;gap:6px}
+ html body #root .map-studio>.reference-drawing-sheet{height:52dvh!important;min-height:300px}
+}

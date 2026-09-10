@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './ui/fonts.css';
 import './dashboard.css';
 import './ui/system.css';
 import './ui/layout-repair.css';
@@ -17,6 +18,7 @@ import { applyAppSettings } from './lib/appSettings';
 import './features/facility-guide/guide.css';
 import './navigation/pages.css';
 import './ui/dark-theme.css';
+import './map/map-workbench.css';
 import './ui/chrome-clearance.css';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { AuthGate } from './auth/LoginPage';
