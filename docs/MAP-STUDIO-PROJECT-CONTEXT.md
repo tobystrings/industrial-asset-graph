@@ -1,3 +1,5 @@
+> September 2026 Gemini update: the OpenAI activation instructions below are historical. Current setup is [GEMINI-MAP-SETUP.md](GEMINI-MAP-SETUP.md); the browser uses the existing Supabase project for AI, independently of shared-data sync.
+
 # Map Studio — Codex project context
 
 Recorded September 9, 2026 for `tobystrings/industrial-asset-graph`.

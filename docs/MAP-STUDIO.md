@@ -29,7 +29,7 @@ Select an object or use an exact room name. Supported offline commands include:
 
 Separate commands with semicolons. The entire request must parse; an unrecognized clause prevents all edits. Ambiguous names request clarification. The map displays the proposal, and Apply preview commits it into the same history used by manual edits. A draft change invalidates an older preview. Refinement means revising the instruction and previewing again against the current draft.
 
-Connected AI uses the existing shared API at `POST /api/map-studio/plan`, with verified administrator authentication. Configure `OPENAI_API_KEY` and `IAG_MAP_AI_MODEL` only on that server, and `VITE_IAG_API_URL` on the frontend. Without those external services, offline commands remain available and the interface does not claim AI is active. The planner sends only the entered instruction, selection, and object names/IDs, returns proposed actions or a clarification, and never writes the map. Unknown targets and invalid actions are rejected before preview. The API uses the [OpenAI Responses JSON format](https://developers.openai.com/api/docs/guides/structured-outputs), with application-side action validation and `store: false`.
+Connected AI now uses Gemini through the authenticated Supabase map-studio Edge Function. See [Gemini setup](GEMINI-MAP-SETUP.md). It returns validated proposals only; Apply preview and Save Changes remain explicit user actions.
 
 ## Saving and recovery
 
@@ -45,6 +45,4 @@ Map colors now identify areas and equipment; they do not indicate safety or veri
 
 Text edits opens by default with an explicit connection status. The authenticated GET /api/map-studio/status checks server configuration and administrator access without exposing credentials. A successful check is not a successful provider call; Preview edit validates that separately. Offline commands remain labeled as offline. The Pages workflow now passes the VITE_IAG_API_URL repository variable into the build.
 
-To activate freeform AI, deploy the existing server with SUPABASE_URL, IAG_ALLOWED_ORIGINS including the Pages origin, server-only OPENAI_API_KEY and IAG_MAP_AI_MODEL, and its existing server dependencies. Set the repository variable VITE_IAG_API_URL to the server HTTPS origin, rebuild Pages, sign in as admin, and use Check connection followed by an actual preview. Never put provider credentials in frontend variables. This code change does not provision those external services or assert they are connected.
-
-On phones the large legend opens from its control above the map; it starts collapsed to leave room for the drawing. AI / text edits opens and focuses the assistant. Source Sans 3 is bundled locally, so interface readability does not depend on a Google Fonts request. Area labels wrap within their mapped bounds; equipment placements show compact IDs with full names retained in their accessible labels, tooltips, and object list.
+To activate freeform AI, follow [Gemini setup](GEMINI-MAP-SETUP.md). No separate Node service or new database is needed for this planner. Existing shared-data synchronization is unchanged.

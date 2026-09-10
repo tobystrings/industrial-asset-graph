@@ -24,6 +24,10 @@ def install_auth_fixture(page, cloud=None):
         headers = {'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS'}
         def reply(data, status=200): route.fulfill(status=status, content_type='application/json', headers=headers, body=json.dumps(data))
         if request.method == 'OPTIONS': return reply({})
+        if '/functions/v1/map-studio/' in url.path:
+            if not state['authenticated']: return reply({'error':'Sign in'},401)
+            if state['role'] != 'admin': return reply({'error':'Administrator required'},403)
+            return reply({'configured':False,'provider':'gemini'})
         if '/storage/v1/object/' in url.path:
             path = url.path.split('/iag-public/', 1)[-1]
             if request.method == 'POST':
@@ -88,6 +92,7 @@ def install_auth_fixture(page, cloud=None):
     page.route('**/rest/v1/**', handler)
     page.route('**/storage/v1/object/**', handler)
     page.route('**/functions/v1/username-login', handler)
+    page.route('**/functions/v1/map-studio/**', handler)
     page.route('**/api/facilities/**', handler)
     return state
 

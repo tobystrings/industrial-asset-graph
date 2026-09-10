@@ -1,2 +1,6 @@
 [functions.username-login]
 verify_jwt = false
+
+# The handler verifies the bearer token through Supabase Auth before planning.
+[functions.map-studio]
+verify_jwt = false
