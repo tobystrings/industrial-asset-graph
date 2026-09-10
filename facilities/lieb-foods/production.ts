@@ -1,9 +1,11 @@
 import { emptyProduction, type ProductionConfig } from '../../src/facility/production';
+import { liebCopacking } from './copacking';
 
 /** User-confirmed line identities; taxonomy entries are investigation categories, never inventory. */
 export function liebProduction(): ProductionConfig {
   return {
     ...emptyProduction(),
+    copacking: liebCopacking(),
     lines: [1, 2, 4].map(n => ({ id: `line-${n}`, name: `Line ${n}`, importance: n === 1 ? 1 : 2, rationale: n === 1 ? 'Accessible supporting documentation priority' : 'Primary revenue-producing line; equal initial priority with the other primary line (owner report)' })),
     taxonomy: [
       'Container receiving', 'Depalletizer', 'Unscrambler', 'Conveyor', 'Accumulation', 'Air rinser',

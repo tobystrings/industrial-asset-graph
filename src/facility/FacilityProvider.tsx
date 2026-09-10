@@ -35,6 +35,7 @@ import {
 import { isTransportEligible, type MutationOperation, type SyncEntityType } from './syncContract';
 import { applyCanonicalEntities, HttpSyncTransport, syncMutationQueue, type SyncSummary } from './syncClient';
 import { validateFacilityPackage } from './schema';
+import { validateCopackingTransition } from './copacking';
 import { iagUserFromSupabase, supabase } from './supabaseAuth';
 import type { User } from '@supabase/supabase-js';
 import { importPrivateAssetBundle, type ImportConflict } from './additivePackage';
@@ -223,6 +224,8 @@ export function FacilityProvider({
 
   const commitCanonical = useCallback(async (next: FacilityPackage, entityId: string, reason: string, actor: IagUser, descriptor: ChangeDescriptor) => {
     const latest = pkgRef.current;
+    validateFacilityPackage(next);
+    validateCopackingTransition(latest, next);
     const baseVersion = latest.entityVersions[entityId] ?? 0;
     const versioned = stampRevision({ ...next, packageRevision: latest.packageRevision + 1, entityVersions: { ...latest.entityVersions, [entityId]: baseVersion + 1 } }, entityId, reason, actor.name, 'APPROVED');
     await commit(versioned);
@@ -359,6 +362,7 @@ export function FacilityProvider({
     },
     async saveFacility(facility) {
       validateFacilityPackage({ ...pkg, facility });
+      validateCopackingTransition(pkgRef.current, { ...pkg, facility });
       await recordChange({ ...pkg, facility }, facility.id, 'Facility identity saved in application', { entityType: 'facility', operation: 'UPSERT', value: facility as unknown as Record<string, unknown> });
     },
     async saveArea(area) {

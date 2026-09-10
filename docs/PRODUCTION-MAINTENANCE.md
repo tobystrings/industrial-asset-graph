@@ -1,5 +1,7 @@
 # Production and maintenance records
 
+The co-packing extension is documented in [COPACKING-IMPLEMENTATION.md](COPACKING-IMPLEMENTATION.md), including editable reported stages, packaging/specification revisions, runs, evidence-aware compatibility, and the current four-asset reconciliation. Its [revised facility reference](FACILITY_COPACKING_SPECS.md) supersedes earlier generic routing and candidate descriptions below.
+
 The existing application now has Production lines, Documentation queue, Equipment field sheet, and Dependency records pages. Open them from More, the Home line cards, or the link on an asset record.
 
 ## Facility data and evidence
@@ -10,7 +12,7 @@ Physical area remains `asset.areaId`. Multiple production memberships reside on 
 
 Taxonomy entries and survey items are separate from assets and map markers. A survey outcome never creates equipment. Record observed equipment through Add equipment, then open its Equipment field sheet to connect supported lines, capture electrical and utility notes, attach evidence, document components and assemblies, and save service history.
 
-Existing Wulftec package: `LIEB-WULFTEC-A6882`, WCRT-200 stretch wrapper. The private source explicitly leaves its line unconfirmed despite a reported Line 4 association. Reuse that ID after importing the existing private package; do not create a replacement. No Kosme documentation was found in this checkout; its source location and existing ID remain a field/documentation action.
+Existing Wulftec package: `LIEB-WULFTEC-A6882`, WCRT-200 stretch wrapper. Its source leaves the line unconfirmed despite a reported Line 4 association. Kosme is now present as `LIEB-KOSME-TOPIIAD-L05358`, with OEM, CR22 and photo evidence. Reuse these canonical IDs; their line assignments and actual routing remain field-verification actions.
 
 ## Dependencies and priority
 

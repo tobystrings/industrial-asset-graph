@@ -12,6 +12,7 @@ from PIL import Image, ImageStat
 from playwright.sync_api import sync_playwright
 from map_studio_visual import exercise_map_studio, studio_pane
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
+from copacking_visual import exercise_copacking
 
 output = Path('artifacts')
 output.mkdir(exist_ok=True)
@@ -626,6 +627,12 @@ try:
 
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 
+                open_page(page, 'lines&line=line-4')
+                page.locator('.copacking-workspace').wait_for()
+                page.locator('.copacking-workspace h2').first.scroll_into_view_if_needed()
+                assert_manager_geometry(page)
+                screenshot(page, f'{label}-copacking-line4')
+
                 if label in REPRESENTATIVE_STATES:
                     open_page(page, 'wulftec')
                     canvas = page.locator('.wulftec-canvas canvas')
@@ -695,6 +702,7 @@ try:
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)
                     exercise_production_records(page, label)
+                    exercise_copacking(page, label, open_page, screenshot, assert_manager_geometry, auth_state)
                     exercise_historical_evidence(page, label)
                     exercise_area_rename(page, label)
 

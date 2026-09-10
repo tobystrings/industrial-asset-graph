@@ -4,6 +4,7 @@ import type { FacilityAsset, VerificationState } from '../types/facility';
 export interface ProductionLine { id: string; name: string; importance: number; rationale: string; }
 export interface SurveyItem { id: string; category: string; action: string; lineId: string; state: 'OPEN' | 'RECORDED' | 'NOT_APPLICABLE'; notes: string; }
 export interface ProductionConfig {
+  copacking?: import('./copacking').Copacking;
   lines: ProductionLine[];
   taxonomy: string[];
   survey: SurveyItem[];

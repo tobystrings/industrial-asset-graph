@@ -1,4 +1,5 @@
 import { validateStudio } from '../map/studioModel';
+import { validateCopacking } from './copacking';
 import type { FacilityPackage } from './types';
 import type { VerificationState } from '../types/facility';
 import type { FacilityMapAnnotation, FacilityMapWall } from './types';
@@ -125,6 +126,7 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
     if (marker.areaId && !areaIds.has(marker.areaId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing area ${marker.areaId}.`);
   }
   const studioErrors = validateStudio(pkg.mapConfig ?? {});
+  validateCopacking(pkg as FacilityPackage);
   if (studioErrors.length) throw new Error(studioErrors[0]);
   const mapIds = new Set<string>();
   for (const object of [...(pkg.mapConfig?.walls ?? []) as FacilityMapWall[], ...(pkg.mapConfig?.annotations ?? []) as FacilityMapAnnotation[]]) {

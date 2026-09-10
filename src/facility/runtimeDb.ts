@@ -1,6 +1,7 @@
 import type { FacilityPackage } from './types';
 import { createStoredZip, readStoredZip } from './iagArchive';
 import { loadFacilityPackage } from './schema';
+import { mergeCopacking, portableCopacking } from './copacking';
 import type { SyncMutation } from './syncContract';
 
 const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
@@ -121,7 +122,9 @@ export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPa
   // Add newly introduced facility configuration once; never replace saved priorities or survey work.
   const addProduction = !loaded.facility.production && seed.facility.production;
   if (addProduction) loaded.facility.production = structuredClone(seed.facility.production);
-  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction)) await savePlant(loaded, seed.facility.id);
+  const addCopacking = loaded.facility.production && !loaded.facility.production.copacking && seed.facility.production?.copacking;
+  if (addCopacking) loaded.facility.production!.copacking = structuredClone(addCopacking);
+  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction || addCopacking)) await savePlant(loaded, seed.facility.id);
   return loaded;
 }
 
@@ -284,6 +287,7 @@ export function portablePlantPackage(plant: FacilityPackage): FacilityPackage {
   };
   return {
     ...structuredClone(plant), evidence, components, documents, relationships,
+    facility: { ...structuredClone(plant.facility), production: plant.facility.production ? { ...structuredClone(plant.facility.production), copacking: portableCopacking(plant.facility.production.copacking, allowedEvidence) } : undefined },
     assets: plant.assets.map((asset) => ({ ...asset, production: asset.production ? { ...asset.production, memberships: asset.production.memberships.map(m => ({ ...m, verificationStatus: evidenceAllowed(m.evidenceIds) ? m.verificationStatus : 'FIELD_VERIFY' as const, evidenceIds: m.evidenceIds.filter(id => allowedEvidence.has(id)), source: evidenceAllowed(m.evidenceIds) ? m.source : 'Supporting evidence excluded from portable package by access policy.' })), service: asset.production.service.filter(s => evidenceAllowed(s.evidenceIds)) } : undefined, componentIds: asset.componentIds.filter(id => components.some(component => component.id === id)), manufacturer: protectFact(asset.manufacturer), model: protectFact(asset.model), serialNumber: protectFact(asset.serialNumber), facts: asset.facts.map((item) => ({ ...item, value: protectFact(item.value) })) })),
     revisions: plant.revisions.filter((item) => evidenceAllowed(item.evidenceIds)),
     assetSerialSources: plant.assetSerialSources.filter((item) => allowedEvidence.has(item.evidenceId)),
@@ -295,7 +299,7 @@ function mergePlant(current: FacilityPackage | null, incoming: FacilityPackage, 
   return {
     ...current,
     ...incoming,
-    facility: { ...current.facility, ...incoming.facility },
+    facility: { ...current.facility, ...incoming.facility, production: incoming.facility.production || current.facility.production ? { ...(incoming.facility.production ?? current.facility.production!), copacking: mergeCopacking(current.facility.production?.copacking, incoming.facility.production?.copacking) } : undefined },
     featureConfig: { ...current.featureConfig, ...incoming.featureConfig },
     mapConfig: {
       ...(current.mapConfig ?? {}),
@@ -324,6 +328,7 @@ async function applyImportedPlant(
   if (attachments.some(a => a.id.startsWith('history-') || a.assetId.startsWith('history:'))) throw new Error('Historical sources require the dedicated local evidence importer.');
   const current = await loadPlant(facilityId);
   const next = mergePlant(current, incoming, mode);
+  loadFacilityPackage(next);
   await savePlant(next, facilityId);
   const db = await openPlantDb(facilityId);
   const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
