@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { planMapEdit } from './mapStudioAI.js';
+import { mapAIStatus, planMapEdit } from './mapStudioAI.js';
 import { pool } from './db.js';
 import { PostgresMutationStore } from './postgresMutationStore.js';
 import type { SyncMutation } from '../src/facility/syncContract.js';
@@ -56,11 +56,12 @@ const server = createServer(async (request, response) => {
       await pool.query('SELECT 1');
       return json(response, 200, { status: 'ok' });
     }
-    if (request.method === 'POST' && url.pathname === '/api/map-studio/plan') {
+    if ((request.method === 'POST' && url.pathname === '/api/map-studio/plan') || (request.method === 'GET' && url.pathname === '/api/map-studio/status')) {
       if(origin&&!allowedOrigins.has(origin)) return json(response,403,{error:'Origin is not allowed.'});
       const principal=await authenticateRequest(request.headers,writeToken,supabaseJwtSecret,supabaseUrl);
       if(!principal) return json(response,401,{error:'Sign in to use connected map editing.'});
       if(!canWriteCanonical(principal,'APPROVED')) return json(response,403,{error:'Administrator access is required for map planning.'});
+      if(request.method==='GET') return json(response,200,mapAIStatus());
       try { return json(response,200,await planMapEdit(await body(request))); }
       catch(error) {return json(response,400,{error:error instanceof Error?error.message:'Map planning failed.'});}
     }

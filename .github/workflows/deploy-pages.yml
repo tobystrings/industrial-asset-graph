@@ -39,6 +39,7 @@ jobs:
       - name: Build
         env:
           VITE_IAG_PUBLICATION: 'true'
+          VITE_IAG_API_URL: ${{ vars.VITE_IAG_API_URL }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build

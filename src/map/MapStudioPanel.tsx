@@ -10,10 +10,32 @@ import './mapStudio.css';
 
 const apiUrl=(import.meta.env.VITE_IAG_API_URL??'').replace(/\/$/,'');
 export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
-  const [tab,setTab]=useState<string | null>(null),[input,setInput]=useState(''),[reply,setReply]=useState('Select an object or use an exact room name. Preview an edit before applying it.');
+  const [tab,setTab]=useState<string | null>('Text edits'),[input,setInput]=useState(''),[reply,setReply]=useState('Select an object or use an exact room name. Preview an edit before applying it.');
   const [busy,setBusy]=useState(false),[useAI,setUseAI]=useState(false),[query,setQuery]=useState('');
   const [preview,setPreview]=useState<{base:string;draft:MapEditorDraft;summary:string[]}|null>(null);
   const requestId=useRef(0);
+  const [connection,setConnection]=useState<'missing'|'checking'|'ready'|'unavailable'>(apiUrl?'checking':'missing');
+  const [connectionMessage,setConnectionMessage]=useState('This build has no AI server address.');
+  const checkConnection=async()=>{
+    if(!apiUrl) {setConnection('missing');return;}
+    setConnection('checking');
+    try {
+      const token=(await supabase?.auth.getSession())?.data.session?.access_token;
+      if(!token) throw new Error('Sign in with an administrator account to check AI access.');
+      const response=await fetch(apiUrl+'/api/map-studio/status',{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(10000)});
+      if(!response.ok) throw new Error(response.status===404?'The server needs the Map Studio connection update.':response.status===403?'This account does not have administrator access.':'The AI server could not be reached or your session expired.');
+      const status=await response.json();
+      setConnection(status.configured===true?'ready':'unavailable');
+      setConnectionMessage(status.configured===true?'Server configuration and administrator access checked. Preview an edit to test the AI provider.':'The server is reachable, but its AI key or model is missing.');
+    } catch(e) {setConnection('unavailable');setConnectionMessage((e as Error).message);}
+  };
+  useEffect(()=>{void checkConnection();},[]);
+  const panelRef=useRef<HTMLElement>(null);
+  useEffect(()=>{
+    const focus=()=>{setTab('Text edits');requestAnimationFrame(()=>{panelRef.current?.scrollIntoView({block:'start',behavior:'smooth'});panelRef.current?.querySelector('textarea')?.focus({preventScroll:true});});};
+    window.addEventListener('iag-map-assistant',focus);
+    return()=>window.removeEventListener('iag-map-assistant',focus);
+  },[]);
   const d=s.history.present, studio=d.mapConfig.studio??{}, selected=s.selection[0];
   const symbol=selected?.kind==='symbol'?studio.symbols?.find(x=>x.id===selected.id):undefined;
   const mask=selected?.kind==='mask'?studio.masks?.find(x=>x.id===selected.id):undefined;
@@ -62,15 +84,16 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
     const template:FacilityMapSymbol={id:uid('template'),kind:'custom',label:label.trim(),x:0,y:0,width,height,rotation:0,paths:paths.map(path=>path.map(p=>({x:(p.x-x)/width*100,y:(p.y-y)/height*100})))};
     patch({templates:[...(studio.templates??[]),template]},'Saved custom symbol template.');s.setTemplate(template);s.setSymbolKind('custom');
   };
-  return <aside className="map-studio-panel" aria-label="Map Studio assistant and properties">
+  return <aside ref={panelRef} className="map-studio-panel" aria-label="Map Studio assistant and properties">
     <div className="studio-tabs" role="tablist" aria-label="Studio panels">{['Text edits','Objects','Layers'].map(t=><button key={t} role="tab" aria-selected={tab===t} aria-expanded={tab===t} onClick={()=>setTab(tab===t?null:t)}>{t}</button>)}</div>
     {tab==='Text edits'&&<section className="studio-tab-body" aria-label="Text edits">
+      <div className="studio-connection" data-state={connection} role="status"><b>{connection==='ready'?'AI server ready':connection==='checking'?'Checking AI connection…':'AI not connected'}</b><p>{connectionMessage}</p><button onClick={()=>void checkConnection()} disabled={!apiUrl||connection==='checking'}>Check connection</button>{connection!=='ready'&&<details><summary>Connection setup</summary><p>An administrator must deploy the authenticated map API, set its server-only OPENAI_API_KEY and IAG_MAP_AI_MODEL, and set the GitHub repository variable VITE_IAG_API_URL to that HTTPS server address. Rebuild Pages afterward. Never paste an API key into this editor.</p></details>}</div>
       <h3>Describe your edit</h3><p>Click or multi-select objects, then refer to “this” or “these”.</p>
       <div className="studio-selection-context">{s.selection.length?s.selection.map(r=>objectLabel(d,r)).join(' · '):'Nothing selected — exact room names also work.'}</div>
       <label>Edit instructions<textarea aria-label="Edit instructions" rows={5} value={input} onChange={e=>{setInput(e.target.value);requestId.current++;setBusy(false);setPreview(null);s.setPreviewDraft(null);}} placeholder="Rename this to Main Cooler"/></label>
-      <div className="studio-examples">{['Move this left 1','Flip this','Rotate this 90','Delete this'].map(t=><button key={t} onClick={()=>{setInput(t);setPreview(null);s.setPreviewDraft(null);}}>{t}</button>)}</div>
-      <label className="studio-check"><input type="checkbox" checked={useAI} disabled={!apiUrl} onChange={e=>setUseAI(e.target.checked)}/>Use connected AI</label>
-      <small>{apiUrl?'AI requires server configuration.':'Supported text commands are available offline. Connected AI is not configured for this deployment.'} Movement and sizes use percentages of the drawing, not surveyed feet.</small>
+      <div className="studio-examples">{['Move this left 1','Flip this','Rotate this 90','Delete this'].map(t=><button key={t} onClick={()=>{requestId.current++;setBusy(false);setInput(t);setPreview(null);s.setPreviewDraft(null);}}>{t}</button>)}</div>
+      <label className="studio-check"><input type="checkbox" checked={useAI} disabled={connection!=='ready'} onChange={e=>{requestId.current++;setBusy(false);setPreview(null);s.setPreviewDraft(null);setUseAI(e.target.checked);}}/>Use connected AI</label>
+      <small>{useAI?'Freeform AI proposes edits for your review.':'Using offline commands. This is not freeform AI.'} Movement and sizes use percentages of the drawing, not surveyed feet.</small>
       <button className="studio-primary" disabled={busy||!input.trim()||s.saving} onClick={()=>void runPreview()}>{busy?'Preparing preview…':'Preview edit'}</button>
       <p role="status" className="studio-reply">{stale?'The draft changed. Preview again before applying.':reply}</p>
       {preview&&<div className="studio-proposal"><b>Proposed changes</b><ul>{preview.summary.map((t,i)=><li key={i}>{t}</li>)}</ul><button className="studio-primary" disabled={stale||s.saving} onClick={()=>{if(preview.base!==JSON.stringify(s.history.present)) return;s.commit(preview.draft,'Applied text edit. Undo is available.');setPreview(null);s.setPreviewDraft(null);setReply('Applied to your draft. Save Changes to keep it.');}}>Apply preview</button><button onClick={()=>{setPreview(null);s.setPreviewDraft(null);}}>Discard preview</button></div>}

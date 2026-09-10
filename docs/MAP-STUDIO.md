@@ -38,3 +38,13 @@ Save Changes writes through the existing versioned plant editor; Done saves and 
 Undo/redo includes area geometry, asset assignments and relationship changes from merges/splits. Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z operate when focus is outside a text input. Layer locks prevent modifications. Map edits made after a preview require a new preview; newer saves from another window are rejected with a reconciliation message rather than overwritten.
 
 The original drawing still contains reference pixels until each required feature is deliberately replaced or hidden. This release does not automatically vectorize the entire plant drawing or calibrate dimensions to feet/meters.
+
+## September 10 readability and connection update
+
+Map colors now identify areas and equipment; they do not indicate safety or verification. The legend is above the canvas and available while editing. Area colors are stable by ID, so renaming a room does not change its color. Labels, controls, and symbol previews are enlarged. Desktop editing keeps the assistant beside the drawing; narrow screens stack the work areas without shrinking controls.
+
+Text edits opens by default with an explicit connection status. The authenticated GET /api/map-studio/status checks server configuration and administrator access without exposing credentials. A successful check is not a successful provider call; Preview edit validates that separately. Offline commands remain labeled as offline. The Pages workflow now passes the VITE_IAG_API_URL repository variable into the build.
+
+To activate freeform AI, deploy the existing server with SUPABASE_URL, IAG_ALLOWED_ORIGINS including the Pages origin, server-only OPENAI_API_KEY and IAG_MAP_AI_MODEL, and its existing server dependencies. Set the repository variable VITE_IAG_API_URL to the server HTTPS origin, rebuild Pages, sign in as admin, and use Check connection followed by an actual preview. Never put provider credentials in frontend variables. This code change does not provision those external services or assert they are connected.
+
+On phones the large legend opens from its control above the map; it starts collapsed to leave room for the drawing. AI / text edits opens and focuses the assistant. Source Sans 3 is bundled locally, so interface readability does not depend on a Google Fonts request. Area labels wrap within their mapped bounds; equipment placements show compact IDs with full names retained in their accessible labels, tooltips, and object list.

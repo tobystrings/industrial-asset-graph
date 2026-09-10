@@ -27,6 +27,9 @@ export function validateAIPlan(value:unknown,input:PlanningInput):{actions:Studi
   if(!plan.actions.length) throw new Error('AI did not propose an edit.');
   return {actions:plan.actions,clarification:''};
 }
+export function mapAIStatus() {
+  return {configured:Boolean(process.env.OPENAI_API_KEY?.trim() && process.env.IAG_MAP_AI_MODEL?.trim())};
+}
 export async function planMapEdit(raw:unknown,fetcher:typeof fetch=fetch) {
   const input=validatePlanningInput(raw);
   const key=process.env.OPENAI_API_KEY?.trim(),model=process.env.IAG_MAP_AI_MODEL?.trim();

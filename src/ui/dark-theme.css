@@ -16,13 +16,8 @@ html body #root .app-shell.app-pages { background: var(--theme-page); }
 input, select, textarea, button { color-scheme: dark; }
 input::placeholder, textarea::placeholder { color: #aaa; opacity: 1; }
 :focus-visible { outline-color: #eee !important; }
-/* Render the complete source drawing and its editable overlays in the same
-   polarity. Original evidence bytes and stored symbol colors remain untouched. */
-.facility-map-svg, .studio-saved-overlay, .map-editor-svg, .reference-plan {
-  filter: grayscale(1) invert(1);
-}
-.facility-map-svg, .reference-plan { background: #fff !important; }
-.studio-symbol-palette svg { filter: grayscale(1) invert(1); background: #fff; }
+/* Map color is owned by map-workbench.css. Never filter the entire drawing:
+   that destroys the meaning of area, equipment and selection colors. */
 .cabinet-raster { filter: grayscale(1) invert(1); }
 .page-brand > span:first-child { background: #ededed; color: #151515; }
 html body #root :is(button, a)[aria-current=page],

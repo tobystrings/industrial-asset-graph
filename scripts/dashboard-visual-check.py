@@ -400,7 +400,9 @@ def exercise_workspace_states(page, label: str) -> None:
     screenshot(page, f'{label}-documents')
     assert_manager_geometry(page)
     page.get_by_role('navigation', name='Main navigation').get_by_role('link',name='Assets',exact=True).click()
-    page.wait_for_url('**page=assets*')
+    # This is a same-document React/history transition, not a document load.
+    page.wait_for_function("() => new URLSearchParams(location.search).get('page') === 'assets'")
+    page.get_by_role('heading',name='Assets',exact=True).wait_for(state='visible')
     page.go_back(wait_until='networkidle')
     assert 'view=documents' in page.url, f'Back did not restore documents: {page.url}'
     assert_manager_geometry(page)
@@ -413,6 +415,7 @@ def exercise_workspace_states(page, label: str) -> None:
 
 
 def diagnostic(page, label: str) -> None:
+    print(f'{label} failure URL: {page.url}',flush=True)
     try:
         screenshot(page, f'FAIL-{label}')
     except Exception:
