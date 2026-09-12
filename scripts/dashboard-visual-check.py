@@ -13,6 +13,7 @@ from playwright.sync_api import sync_playwright
 from map_studio_visual import exercise_map_studio, studio_pane
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
 from copacking_visual import exercise_copacking
+from genie_visual import exercise_genie
 
 output = Path('artifacts')
 output.mkdir(exist_ok=True)
@@ -628,6 +629,7 @@ try:
                     assert_manager_geometry(page)
                     screenshot(page, f'{label}-page-{route}')
 
+                exercise_genie(page, label, open_page, screenshot, assert_manager_geometry, assert_text_contrast)
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 
                 open_page(page, 'lines&line=line-4')

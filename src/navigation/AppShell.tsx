@@ -3,6 +3,8 @@ import { useFacility, useFacilityEditor } from '../facility';
 import { navigate, pageSearch, pages, type PageId } from './pages';
 import { LineCards } from '../production/LineCards';
 import PublicationStatus from '../facility/PublicationStatus';
+import { useFacilityGuide } from '../features/facility-guide';
+import { GuideReminder } from '../features/facility-guide/GuideReminder';
 
 export function PageLink({ page, children, className = '', details = {}, current }: { page: PageId; children: ReactNode; className?: string; details?: Record<string, string>; current?: boolean }) {
   const click = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -15,6 +17,7 @@ const primary = [['home', 'Home', '⌂'], ['map', 'Map', '▦'], ['assets', 'Ass
 export default function AppShell({ page, children, navigationKey }: { page: PageId; children: ReactNode; navigationKey: number }) {
   const facility = useFacility();
   const { ready } = useFacilityEditor();
+  const guide = useFacilityGuide();
   const heading = useRef<HTMLHeadingElement>(null);
   const scroll = useRef<HTMLDivElement>(null);
   useEffect(() => { scroll.current?.scrollTo(0, 0); heading.current?.focus({ preventScroll: true }); document.title = `${pages[page][0]} · Industrial Asset Graph`; }, [page, navigationKey]);
@@ -24,8 +27,13 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
     <header className="page-header"><PageLink page="home" className="page-brand"><span aria-hidden="true">IAG</span><span>Industrial Asset Graph<small>{facility.facility.name}</small></span></PageLink><PageLink page="account" className="page-account-link">Account</PageLink></header>
     <nav className="page-navigation" aria-label="Main navigation">{primary.map(([id, label, icon]) => <PageLink key={id} page={id} current={group === id}><span aria-hidden="true">{icon}</span>{label}</PageLink>)}</nav>
     <div className="page-scroll" ref={scroll} id="page-content" tabIndex={-1}>
-      <div className="page-title"><div>{page !== 'home' && <PageLink page={page === 'asset' ? 'assets' : group === 'more' && page !== 'more' ? 'more' : 'home'} className="page-back">← {page === 'asset' ? 'Assets' : group === 'more' && page !== 'more' ? 'More' : 'Home'}</PageLink>}<h1 ref={heading} tabIndex={-1}>{pages[page][0]}</h1><p>{pages[page][1]}</p></div>{page === 'map' && <button type="button" disabled={!ready} onClick={() => dispatchEvent(new CustomEvent('iag-open-map-editor'))}>Edit map</button>}{page === 'assets' && <PageLink page="assetAdd" className="page-primary">Add equipment</PageLink>}</div>
-      <div className="page-workspace"><PublicationStatus/>{children}</div>
+      <div className="page-title"><div>{page !== 'home' && <PageLink page={page === 'asset' ? 'assets' : group === 'more' && page !== 'more' ? 'more' : 'home'} className="page-back">← {page === 'asset' ? 'Assets' : group === 'more' && page !== 'more' ? 'More' : 'Home'}</PageLink>}<h1 ref={heading} tabIndex={-1}>{pages[page][0]}</h1><p>{pages[page][1]}</p></div><div className="page-title-actions">{page === 'map' && <button type="button" disabled={!ready} onClick={() => dispatchEvent(new CustomEvent('iag-open-map-editor'))}>Edit map</button>}{page === 'assets' && <PageLink page="assetAdd" className="page-primary">Add equipment</PageLink>}
+      {page !== 'help' && <button type="button" onClick={() => {
+        const p = new URLSearchParams(location.search);
+        guide.setOpen(true);
+        navigate('help', { from: page, asset: p.get('asset') ?? (page === 'cabinet' ? facility.featureConfig.featuredCabinetAssetId ?? '' : ''), area: p.get('area') ?? '', connection: p.get('connection') ?? '', edit: p.get('edit') ?? '' });
+      }}>Ask Genie <span aria-hidden="true">↗</span></button>}</div></div>
+      <div className="page-workspace"><GuideReminder/><PublicationStatus/>{children}</div>
     </div>
   </div>;
 }

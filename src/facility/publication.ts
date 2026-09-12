@@ -1,7 +1,7 @@
 import type { FacilityPackage } from './types';
 import { openPlantDb, type AttachmentRecord, type ObservationRecord } from './runtimeDb';
 import { loadAuditEvents, loadPendingChanges, saveAuditEvents, savePendingChanges, type AuditEvent, type PendingChange } from './changeControl';
-import { type HistoryRecord } from './historicalEvidence';
+import { historyFileId, type HistoryRecord } from './historicalEvidence';
 import { sha256 } from './additivePackage';
 import { supabase } from './supabaseAuth';
 import { loadWalkdownCaptures, replaceWalkdownCaptures } from '../lib/walkdown';
@@ -14,6 +14,9 @@ export const publicationEnabled = import.meta.env.VITE_IAG_PUBLICATION === 'true
 async function rows<T>(db: IDBDatabase, store: string): Promise<T[]> {
   return new Promise((resolve,reject) => { const r=db.transaction(store).objectStore(store).getAll(); r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error); });
 }
+function historyIsShared(h: HistoryRecord, attachments: PublishedAttachment[], facilityId: string) {
+  return h.manifest.files.every(file => attachments.some(a => a.id === historyFileId(h.id,file) && a.access === 'PUBLIC_APP') || (h.publicSourceBase === 'facility-content/lieb-foods/recovered-2026-09-08/J_Lieb_Plant_Codex_Handoff/' && facilityId === 'facility-j-lieb'));
+}
 /** Only explicit plant stores are exported. No session, password, token, or arbitrary localStorage. */
 export async function capturePublication(plant: FacilityPackage, uploaded = new Map<string,PublishedAttachment>()): Promise<Publication> {
   const facilityId=plant.facility.id; const db=await openPlantDb(facilityId);
@@ -21,6 +24,8 @@ export async function capturePublication(plant: FacilityPackage, uploaded = new 
     const [attachments,observations,history,drafts]=await Promise.all([rows<AttachmentRecord>(db,'attachments'),rows<ObservationRecord>(db,'observations'),rows<HistoryRecord>(db,'historical-evidence'),rows<{id:string;facilityId:string;[key:string]:unknown}>(db,'publication-state').then(r=>r.filter(x=>x.id==='map-draft'))]);
     const published: PublishedAttachment[]=[];
     for (const a of attachments) {
+      // Access labels are an explicit boundary, including for previously cached uploads.
+      if (a.access !== 'PUBLIC_APP') continue;
       const digest=await sha256(a.blob); const key=`${a.id}:${digest}`;
       const cached=uploaded.get(key);
       if (cached) { const {blob:_,...metadata}=a; published.push({...cached,...metadata}); continue; }
@@ -34,7 +39,8 @@ export async function capturePublication(plant: FacilityPackage, uploaded = new 
       const record={...metadata,url:supabase.storage.from('iag-public').getPublicUrl(path).data.publicUrl,sha256:digest};
       uploaded.set(key,record); published.push(record);
     }
-    return {format:'iag-publication',version:1,facilityId,plant:structuredClone(plant),attachments:published,observations,history,pending:loadPendingChanges(facilityId),audit:loadAuditEvents(facilityId),drafts,walkdown:facilityId==='facility-j-lieb'?loadWalkdownCaptures():[]};
+    const publicHistory = history.filter(h => historyIsShared(h,published,facilityId));
+    return {format:'iag-publication',version:1,facilityId,plant:structuredClone(plant),attachments:published,observations,history:publicHistory,pending:loadPendingChanges(facilityId),audit:loadAuditEvents(facilityId),drafts,walkdown:facilityId==='facility-j-lieb'?loadWalkdownCaptures():[]};
   } finally { db.close(); }
 }
 
@@ -89,8 +95,13 @@ export async function applyPublication(payload: Publication) {
   const db=await openPlantDb(payload.facilityId);
   try {
     const old=new Map((await rows<AttachmentRecord>(db,'attachments')).map(a=>[a.id,a]));
-    const attachments:AttachmentRecord[]=[];
+    const privateHistory = (await rows<HistoryRecord>(db,'historical-evidence')).filter(h => !h.publicSourceBase && h.manifest.files.some(file => old.get(historyFileId(h.id,file))?.access !== 'PUBLIC_APP'));
+    const retainedHistory = [...payload.history.filter(h => historyIsShared(h,payload.attachments,payload.facilityId) && !privateHistory.some(local => local.id === h.id)), ...privateHistory];
+    // Receiving a shared snapshot must not erase device-local evidence.
+    const attachments:AttachmentRecord[]=[...old.values()].filter(a => a.access !== 'PUBLIC_APP');
     for (const a of payload.attachments) {
+      // Legacy snapshots may contain private files. Never download or promote those.
+      if (a.access !== 'PUBLIC_APP' || (old.has(a.id) && old.get(a.id)!.access !== 'PUBLIC_APP')) continue;
       let blob=old.get(a.id)?.blob;
       if (!blob || await sha256(blob)!==a.sha256) {
         const url=new URL(a.url); const configured=new URL(import.meta.env.VITE_SUPABASE_URL || a.url);
@@ -106,7 +117,7 @@ export async function applyPublication(payload: Publication) {
       tx.objectStore('plant').put(payload.plant,'active');
       tx.objectStore('publication-state').delete('map-draft');
       payload.drafts?.forEach(d=>tx.objectStore('publication-state').put(d));
-      for (const [name,values] of [['attachments',attachments],['observations',payload.observations],['historical-evidence',payload.history]] as const) {
+      for (const [name,values] of [['attachments',attachments],['observations',payload.observations],['historical-evidence',retainedHistory]] as const) {
         const store=tx.objectStore(name);store.clear();values.forEach(v=>store.put(v));
       }
     });

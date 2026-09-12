@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Dashboard, { type AppView } from './Dashboard';
 import { useFacility, useFacilityEditor } from './facility';
 import { ManagerPage } from './editor/PlantManager';
@@ -6,7 +6,8 @@ import './editor/plantManagerCrud.css';
 import { subscribeViewport } from './lib/viewport';
 import { FacilityGuide, useFacilityGuide, type GuideActionId } from './features/facility-guide';
 import AppShell, { HomePage, MorePage, PageLink } from './navigation/AppShell';
-import { navigate, readPage, type PageId } from './navigation/pages';
+import { navigate, readPage, pages, type PageId } from './navigation/pages';
+import { buildGuideContext } from './features/facility-guide/guideContext';
 import AccountSecurity from './auth/AccountSecurity';
 const ControlCabinetView = lazy(() => import('./ControlCabinetView'));
 const WulftecViewer = lazy(() => import('./machines/WulftecWorkspace'));
@@ -18,8 +19,11 @@ export default function App() {
   const [route, setRoute] = useState(() => ({ page: readPage(location.search), key: 0 }));
   const [mapPoint, setMapPoint] = useState<{x:number;y:number} | null>(null);
   const { ready, currentUser } = useFacilityEditor();
-  const { featureConfig } = useFacility();
+  const facility = useFacility();
+  const { featureConfig } = facility;
   const guide = useFacilityGuide();
+  const guideContextRef = useRef(guide.context);
+  guideContextRef.current = guide.context;
   const page = route.page;
   useLayoutEffect(() => subscribeViewport(() => undefined), []);
   useEffect(() => {
@@ -27,13 +31,23 @@ export default function App() {
     const account = () => navigate('account'); const settings = () => navigate('settings');
     const mapEdit = () => { if (currentUser?.role !== 'admin') { navigate('account'); return; } navigate('map', { edit: '1' }); };
     const addAsset = (event: Event) => { setMapPoint((event as CustomEvent<{x:number;y:number}>).detail); navigate('assetAdd'); };
-    const action = (event: Event) => { const id = (event as CustomEvent<GuideActionId>).detail; const target = ({'open-cabinet':'cabinet','show-map':'map','show-assets':'assets','show-relationships':'relationships','show-documents':'documents'} as Record<string,PageId>)[id]; if (target) navigate(target); };
+    const action = (event: Event) => {
+      const id = (event as CustomEvent<GuideActionId>).detail;
+      const target = ({'open-cabinet':'cabinet','show-map':'map','show-assets':'assets','show-relationships':'relationships','show-documents':'documents','capture-note':'observation','attach-evidence':'evidence','capture-electrical':'maintenance','link-asset':'connection','review':'review','service':'maintenance','reports':'database'} as Record<string,PageId>)[id];
+      if (target) { const p = new URLSearchParams(location.search); navigate(target, {asset:p.get('asset') ?? guideContextRef.current.assetId ?? '',area:p.get('area') ?? guideContextRef.current.areaId ?? '', section: id === 'capture-electrical' ? 'electrical' : ''}); }
+    };
     const shortcut = (event: KeyboardEvent) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); navigate('more'); } };
     const entries: [string, EventListener][] = [['popstate',pop],['iag-open-users',account],['iag-open-settings',settings],['iag-open-map-editor',mapEdit],['iag-map-add-asset',addAsset],['facility-guide-action',action],['keydown',shortcut as EventListener]];
     entries.forEach(([event,fn]) => addEventListener(event,fn));
     return () => entries.forEach(([event,fn]) => removeEventListener(event,fn));
   }, [currentUser?.role]);
-  useEffect(() => { guide.setContext({ page: page === 'cabinet' ? 'cabinet' : page === 'assets' || page === 'documents' || page === 'relationships' ? page : 'map', assetId: page === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined }); }, [page, featureConfig.featuredCabinetAssetId]);
+  useEffect(() => {
+    const p = new URLSearchParams(location.search);
+    const from = p.get('from');
+    guide.setContext(buildGuideContext(facility, { page: page === 'help' && from && Object.hasOwn(pages, from) ? from as PageId : page, routePage: page,
+      assetId: p.get('asset') ?? (page === 'cabinet' ? featureConfig.featuredCabinetAssetId : undefined),
+      areaId: p.get('area') ?? undefined, connectionId: p.get('connection') ?? undefined, editingMap: p.get('edit') === '1' }));
+  }, [page, route.key, facility]);
   const view: AppView = page === 'assets' || page === 'documents' ? page : 'dashboard';
   const dashboardPage = ['map','assets','asset','area','documents','field','relationships'].includes(page);
   const changeView = (next: AppView) => navigate(next === 'dashboard' ? 'map' : next);
@@ -41,7 +55,7 @@ export default function App() {
     {!ready ? <main className="workspace-loading" role="status">Loading local facility records…</main> :
     <Suspense fallback={<main className="workspace-loading" role="status">Opening page…</main>}>
       {page === 'history' ? <HistoricalWorkspace key={route.key}/> : ['lines','documentation','maintenance','dependencies'].includes(page) ? <ProductionWorkspace key={route.key} page={page}/> : page === 'wulftec' ? <WulftecViewer key={route.key}/> : page === 'component' ? <ComponentRecordPage key={route.key}/> : <>
-      {page === 'home' ? <HomePage/> : page === 'more' ? <MorePage/> : page === 'account' ? <main className="account-page"><AccountSecurity/></main> : page === 'help' ? <main className="help-page"><section className="destination-card"><h2>Project tour</h2><p>Watch the existing narrated facility tour at your own pace.</p><a className="page-primary" href={`${import.meta.env.BASE_URL}presentation/`} target="_blank" rel="noreferrer">Open project tour ↗</a></section><section className="destination-card"><h2>Facility guide</h2><p>Open the guide for help finding your next task.</p><FacilityGuide/></section><PageLink page="field">Open field documentation →</PageLink></main> : page === 'cabinet' ? <ControlCabinetView key={route.key} onBack={() => navigate('assets')}/> : dashboardPage ? <Dashboard key={`${page}-${route.key}`} pageMode={page} view={view} onView={changeView} onOpenCabinet={() => navigate('cabinet',{device:new URLSearchParams(location.search).get('device') ?? ''})} onRecord={id => navigate('asset',{asset:id,tab:'record'})}/> : <ManagerPage key={page} page={page} point={mapPoint} onDone={() => { setMapPoint(null); navigate('more'); }}/>}
+      {page === 'home' ? <HomePage/> : page === 'more' ? <MorePage/> : page === 'account' ? <main className="account-page"><AccountSecurity/></main> : page === 'help' ? <main className="help-page"><FacilityGuide/><section className="destination-card"><h2>Project tour</h2><p>Watch the existing narrated facility tour at your own pace.</p><a className="page-primary" href={`${import.meta.env.BASE_URL}presentation/`} target="_blank" rel="noreferrer">Open project tour ↗</a></section><PageLink page="field">Open field documentation →</PageLink></main> : page === 'cabinet' ? <ControlCabinetView key={route.key} onBack={() => navigate('assets')}/> : dashboardPage ? <Dashboard key={`${page}-${route.key}`} pageMode={page} view={view} onView={changeView} onOpenCabinet={() => navigate('cabinet',{device:new URLSearchParams(location.search).get('device') ?? ''})} onRecord={id => navigate('asset',{asset:id,tab:'record'})}/> : <ManagerPage key={page} page={page} point={mapPoint} onDone={() => { setMapPoint(null); navigate('more'); }}/>}
       </>}
     </Suspense>}
   </AppShell>;

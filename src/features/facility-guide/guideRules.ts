@@ -1,15 +1,23 @@
-import { guideDialogue } from './guideDialogue';
-import type { GuideContext, GuideRule } from './guideTypes';
-
+import type { GuideContext, GuideMessage, GuidePersonality, GuideRule } from './guideTypes';
+const action = (id: NonNullable<GuideMessage['actions']>[number]['id'], label: string) => [{ id, label, primary: true }];
 export const guideRules: GuideRule[] = [
-  { id: 'cabinet', priority: 90, matches: (c) => c.page === 'cabinet', message: guideDialogue.cabinet },
-  { id: 'relationships', priority: 80, matches: (c) => c.page === 'relationships', message: guideDialogue.relationships },
-  { id: 'documents', priority: 70, matches: (c) => c.page === 'documents', message: guideDialogue.documents },
-  { id: 'assets', priority: 60, matches: (c) => c.page === 'assets', message: guideDialogue.assets },
-  { id: 'map', priority: 50, matches: (c) => c.page === 'map', message: guideDialogue.map },
+  { id: 'conflict', priority: 100, matches: c => !!c.disputedCount, message: c => ({ id: 'conflict', title: 'Two stories. Keep both sources.', body: c.assetId + ' has ' + c.disputedCount + ' disputed record or fact entries. Capture what you observe and its source before requesting review. A confident guess is still a guess.', animation: 'warning', actions: action('capture-note', 'Record what I found') }) },
+  { id: 'electrical', priority: 90, matches: c => !!c.assetId && !!c.electricalGaps?.length, message: c => ({ id: 'electrical', title: 'One less mystery for the next shift.', body: 'The structured record for ' + c.assetId + ' has no entry for ' + c.electricalGaps!.slice(0,3).join(', ').toLowerCase() + '. These may exist in source drawings; check them before adding a field observation. What does the label actually say?', animation: 'point', actions: action('capture-electrical', 'Open electrical field sheet') }) },
+  { id: 'gaps', priority: 80, matches: c => !!c.missingFields?.length, message: c => ({ id: 'gaps', title: 'Give future-you a fighting chance.', body: 'Next recorded gap: ' + c.missingFields![0] + '. Save the source with your finding; an observation stays unverified until reviewed.', animation: 'point', actions: action('capture-note', 'Capture a finding') }) },
+  { id: 'cabinet', priority: 70, matches: c => c.page === 'cabinet', message: () => ({ id: 'cabinet', title: 'Labels beat cabinet folklore.', body: 'Start with the device label and its source drawing. Follow site LOTO and electrical safe-work procedures before accessing equipment. This guide does not establish isolation.', animation: 'warning', actions: action('open-cabinet', 'Open cabinet drawing') }) },
+  { id: 'relationships', priority: 95, matches: c => c.page === 'relationships' || c.page === 'dependencies' || !!c.connectionId, message: c => ({ id: 'relationships', title: 'Trace the record. Check the plant.', body: c.assetId ? c.assetId + ': ' + c.relationshipCount + ' direct recorded links; ' + c.verifiedRelationships + ' marked VERIFIED with an existing evidence reference. Location and containment are not electrical supply.' : 'Choose an asset before tracing. Only recorded connections are shown; missing connections stay unknown.', animation: 'point', actions: action('show-relationships', 'Inspect recorded connections') }) },
+  { id: 'map-edit', priority: 96, matches: c => !!c.editingMap, message: () => ({ id: 'map-edit', title: 'Measure twice. Move the wall once.', body: 'In Map Studio, choose Areas & shapes for rooms and walls, or Symbols for doors, stairs and equipment. Check the preview, then explicitly save. A placed symbol does not prove a connection.', animation: 'point', actions: action('show-map', 'Return to map') }) },
+  { id: 'documents', priority: 94, matches: c => c.page === 'documents', message: () => ({ id: 'documents', title: 'Bring receipts.', body: 'Find the correct manual or drawing for the selected equipment. Document progress measures required records, not safe operating condition or verified plant truth.', actions: action('show-documents', 'Find documents') }) },
+  { id: 'assets', priority: 40, matches: c => !!c.assetId || c.page === 'assets', message: c => ({ id: 'assets', title: c.assetName ?? 'Which machine are we working on?', body: c.assetId ? 'The asset record is marked ' + c.verification + '. Individual facts can have different verification states. Pick a question below to inspect the sources.' : 'Choose equipment below. I will pull its actual gaps, evidence references and connections into this workbench.', animation: 'talk', actions: action('show-assets', 'Open asset directory') }) },
+  { id: 'map', priority: 10, matches: () => true, message: c => ({ id: 'map', title: 'Less folklore. More field notes.', body: c.areaName ? 'Working in ' + c.areaName + '. Choose equipment in this area to check its record, or return to the map to locate it.' : 'I’m Genie. Good with records. Terrible at reading minds. Pick the equipment you’re working on, and we’ll leave the next shift something useful.', animation: 'enter', actions: action('show-map', 'Find equipment on the map') }) },
 ];
-
 export function chooseGuideRule(context: GuideContext, dismissed: string[]) {
-  return guideRules.filter((rule) => !dismissed.includes(rule.id) && rule.matches(context)).sort((a, b) => b.priority - a.priority)[0];
+  return guideRules.filter(rule => !dismissed.includes(rule.id) && rule.matches(context)).sort((a,b) => b.priority-a.priority)[0];
 }
-
+export function nextGuideMessage(context: GuideContext, personality: GuidePersonality): GuideMessage {
+  const message = chooseGuideRule(context, [])!.message(context);
+  if (personality === 'professional') return { ...message, title: context.assetId ? 'Next step for ' + context.assetId : 'Choose a task', body: message.body.replace('A confident guess is still a guess.', 'Keep unverified information separate from verified records.').replace('I’m Genie. Good with records. Terrible at reading minds. ', '') };
+  if (personality === 'full' && message.id === 'electrical') return { ...message, title: 'The panel schedule isn’t a crystal ball.' };
+  if (personality === 'full' && message.id === 'gaps') return { ...message, title: 'Retiring-electrician telepathy: still unavailable.' };
+  return message;
+}
