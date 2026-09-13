@@ -1,9 +1,10 @@
 import { ComponentRecord, DocumentRecord, EvidenceRecord, FacilityArea, FacilityAsset, RelationshipRecord, RevisionRecord, VerificationState } from '../../src/types/facility';
+import { emptyAssetProduction } from '../../src/facility/production';
 
 export const facility = { id: 'facility-j-lieb', name: 'J. Lieb Foods', status: 'Normal', location: 'Facility layout — field documentation workspace' } as const;
 
 export const areas: FacilityArea[] = [
-  { id: 'area-warehouse-b', name: 'Warehouse B', shortName: 'Warehouse B', status: 'IN_PROGRESS', overlay: { x: 7, y: 13.5, width: 20.5, height: 36 }, assetIds: [] },
+  { id: 'area-warehouse-b', name: 'Warehouse B', shortName: 'Warehouse B', status: 'IN_PROGRESS', overlay: { x: 7, y: 13.5, width: 20.5, height: 36 }, assetIds: ['LIEB-WULFTEC-A6882'] },
   { id: 'area-building-c', name: 'Building C (Production)', shortName: 'Building C', status: 'IN_PROGRESS', overlay: { x: 27.5, y: 16, width: 28.2, height: 33.5, polygon: [{ x: 27.5, y: 16 }, { x: 55.7, y: 16 }, { x: 55.7, y: 49.5 }, { x: 27.5, y: 49.5 }, { x: 27.5, y: 43 }, { x: 24.2, y: 43 }, { x: 24.2, y: 20 }, { x: 27.5, y: 20 }] }, assetIds: [] },
   { id: 'area-maintenance', name: 'Maintenance', shortName: 'Maintenance', status: 'IN_PROGRESS', overlay: { x: 36.8, y: 16, width: 8.9, height: 6.5 }, assetIds: [] },
   { id: 'area-engine-room', name: 'Engine Room', shortName: 'Engine Room', status: 'IN_PROGRESS', overlay: { x: 45.8, y: 16, width: 8.4, height: 6.5 }, assetIds: [] },
@@ -18,7 +19,7 @@ export const areas: FacilityArea[] = [
   { id: 'area-warehouse-f', name: 'Warehouse F', shortName: 'Warehouse F', status: 'IN_PROGRESS', overlay: { x: 29.8, y: 53, width: 19.2, height: 22, polygon: [{ x: 32.5, y: 53 }, { x: 49, y: 53 }, { x: 49, y: 75 }, { x: 29.8, y: 75 }, { x: 29.8, y: 70 }, { x: 27.8, y: 68 }, { x: 27.8, y: 57 }, { x: 32.5, y: 57 }] }, assetIds: ['FG-L4-MTN-001', 'L2-CC-001'] },
   { id: 'area-warehouse-e', name: 'Warehouse E', shortName: 'Warehouse E', status: 'NOT_STARTED', overlay: { x: 55.7, y: 53, width: 11, height: 22, polygon: [{ x: 55.7, y: 53 }, { x: 66.7, y: 53 }, { x: 66.7, y: 73 }, { x: 65, y: 73 }, { x: 65, y: 75 }, { x: 55.7, y: 75 }] }, assetIds: [] },
   { id: 'area-main-offices', name: 'Main Offices', shortName: 'Main Offices', status: 'IN_PROGRESS', overlay: { x: 66.7, y: 53, width: 9.5, height: 25, polygon: [{ x: 66.7, y: 53 }, { x: 76.2, y: 53 }, { x: 76.2, y: 58 }, { x: 74.5, y: 58 }, { x: 74.5, y: 76 }, { x: 72.5, y: 78 }, { x: 66.7, y: 78 }] }, assetIds: [] },
-  { id: 'area-location-unconfirmed', name: 'Location unconfirmed', shortName: 'Unconfirmed', status: 'IN_PROGRESS', overlay: { x: 95, y: 95, width: 4, height: 4 }, assetIds: ['LIEB-WULFTEC-A6882', 'LIEB-KOSME-TOPIIAD-L05358'], notes: 'Administrative holding area only. It is intentionally hidden from the floor map and does not establish a physical location.', visible: false },
+  { id: 'area-location-unconfirmed', name: 'Location unconfirmed', shortName: 'Unconfirmed', status: 'IN_PROGRESS', overlay: { x: 95, y: 95, width: 4, height: 4 }, assetIds: ['LIEB-KOSME-TOPIIAD-L05358'], notes: 'Administrative holding area only. It is intentionally hidden from the floor map and does not establish a physical location.', visible: false },
 ];
 
 const fact = <T,>(value: T, evidenceIds: string[], unit?: string): { value: T; verificationStatus: 'VERIFIED'; evidenceIds: string[]; unit?: string } => ({ value, verificationStatus: 'VERIFIED', evidenceIds, unit });
@@ -49,7 +50,8 @@ export const machines: FacilityAsset[] = [{
   componentIds: ['L2-CC-PLC-001', 'L2-CC-DI-001', 'L2-CC-DI-002', 'L2-CC-DO-001', 'L2-CC-AI-001', 'L2-CC-AO-001', 'L2-CC-RO-001', ...Array.from({ length: 8 }, (_, index) => `L2-CC-VFD-${String(index + 1).padStart(3, '0')}`), 'L2-CC-PS-001', 'L2-CC-DS-001'],
   unknowns: ['Confirm cabinet asset ID', 'Confirm physical location in the field', 'Confirm upstream panel source', 'Verify device field identifiers and load assignments', 'Capture VFD parameters and motor assignments', 'Verify wiring and network topology', 'Document Line 2 recovery and troubleshooting procedures'],
 }, {
-  id: 'LIEB-WULFTEC-A6882', name: 'Wulftec WCRT-200 Stretch Wrapper', description: 'Machine A6882 / Golden State Vintners #6882 with documented VFD 7 replacement and interactive 3D reference model', type: 'Stretch Wrapper', facilityId: facility.id, areaId: 'area-location-unconfirmed', line: 'Line unconfirmed', verificationStatus: 'FIELD_VERIFY',
+  id: 'LIEB-WULFTEC-A6882', name: 'Wulftec WCRT-200 Stretch Wrapper', description: 'Last equipment on Line 4, located in Warehouse B. Machine A6882 / Golden State Vintners #6882 with documented VFD 7 replacement and interactive 3D reference model', type: 'Stretch Wrapper', facilityId: facility.id, areaId: 'area-warehouse-b', line: 'Line 4', verificationStatus: 'FIELD_VERIFY',
+  production: { ...emptyAssetProduction(), stage: 'Stretch wrapping — last equipment on Line 4', memberships: [{ lineId: 'line-4', verificationStatus: 'VERIFIED', evidenceIds: ['ev-wulftec-owner-location'], source: 'Facility owner confirmation, 2026-09-12', verifiedAt: '2026-09-12' }] },
   manufacturer: fact('Wulftec International', ['ev-wulftec-master-packet']), model: fact('WCRT-200', ['ev-wulftec-master-packet']),
   serialNumber: fact('A6882 / Golden State Vintners #6882', ['ev-wulftec-master-packet']),
   facts: [
@@ -58,7 +60,7 @@ export const machines: FacilityAsset[] = [{
     { label: 'Recorded failure', value: fact('F231 · output-current measurement imbalance', ['ev-wulftec-master-packet']) },
     { label: 'Replacement drive', value: fact('Allen-Bradley PowerFlex 4 · 22A-B8P0N104 · Series A', ['ev-wulftec-master-packet']) },
   ], componentIds: ['LIEB-WULFTEC-A6882-VFD7', 'LIEB-WULFTEC-A6882-CABINET', 'LIEB-WULFTEC-A6882-PRESTRETCH'],
-  unknowns: ['Confirm production-line membership', 'Confirm exact floor-map location', 'Confirm SLC 5/03 rack/slot/point for VFD 7 command and fault status', 'Complete loaded post-replacement functional test'],
+  unknowns: ['Confirm exact position within Warehouse B', 'Confirm SLC 5/03 rack/slot/point for VFD 7 command and fault status', 'Complete loaded post-replacement functional test'],
 }, {
   id: 'LIEB-KOSME-TOPIIAD-L05358', name: 'Kosme TOP II AD Tandem Labeler', description: '20-platform rotary labeler with CR30 controller and addressable CR22 electronic-cam assemblies', type: 'Labeler', facilityId: facility.id, areaId: 'area-location-unconfirmed', line: 'Line unconfirmed', verificationStatus: 'FIELD_VERIFY',
   manufacturer: fact('KOSME S.r.l. Unipersonale', ['ev-kosme-oem-intake']), model: fact('TOP II AD TANDEM 20/1056 CE SA4 E2', ['ev-kosme-oem-intake']),
@@ -96,6 +98,7 @@ export const components: ComponentRecord[] = [
   { id: 'KOSME-L05358-AIR-2062455', label: 'Air-treatment unit · 2062455', type: 'AIR_TREATMENT', parentId: 'LIEB-KOSME-TOPIIAD-L05358', manufacturer: 'SMC', model: '2062455', verificationStatus: 'VERIFIED', evidenceIds: ['ev-kosme-oem-intake'] },
 ];
 export const evidence: EvidenceRecord[] = [
+  { id: 'ev-wulftec-owner-location', type: 'OTHER', title: 'Owner confirmation: stretch wrapper at end of Line 4 in Warehouse B (2026-09-12)', pathOrUrl: 'assets/evidence/Wulftec-owner-location-2026-09-12.md', access: 'PUBLIC_APP' },
   { id: 'ev-machine-nameplate-001', type: 'NAMEPLATE', title: 'Machine nameplate', pathOrUrl: 'local evidence package', access: 'LOCAL_ONLY' },
   { id: 'ev-asset-tag-001', type: 'PHOTO', title: 'Equipment asset tag', pathOrUrl: 'local evidence package', access: 'LOCAL_ONLY' },
   { id: 'ev-electrical-nameplate-001', type: 'NAMEPLATE', title: 'Electrical nameplate', pathOrUrl: 'local evidence package', access: 'LOCAL_ONLY' },
@@ -139,6 +142,8 @@ export const relationships: RelationshipRecord[] = [
   ...['ev-line2-reference-drawing', 'ev-line2-reference-render'].map((id) => ({ id: `rel-line2-${id}`, source: 'L2-CC-001', target: id, type: 'SUPPORTED_BY_EVIDENCE' as const, verificationStatus: 'VERIFIED' as const, evidenceIds: [id] })),
   ...components.filter((item) => item.parentId === 'LIEB-WULFTEC-A6882').map((item) => ({ id: `rel-wulftec-component-${item.id}`, source: 'LIEB-WULFTEC-A6882', target: item.id, type: 'CONTAINS' as const, verificationStatus: item.verificationStatus, evidenceIds: item.evidenceIds })),
   { id: 'rel-wulftec-evidence', source: 'LIEB-WULFTEC-A6882', target: 'ev-wulftec-master-packet', type: 'SUPPORTED_BY_EVIDENCE', verificationStatus: 'VERIFIED', evidenceIds: ['ev-wulftec-master-packet'] },
+  { id: 'rel-wulftec-area', source: 'LIEB-WULFTEC-A6882', target: 'area-warehouse-b', type: 'LOCATED_IN', verificationStatus: 'VERIFIED', evidenceIds: ['ev-wulftec-owner-location'] },
+  { id: 'rel-wulftec-owner-evidence', source: 'LIEB-WULFTEC-A6882', target: 'ev-wulftec-owner-location', type: 'SUPPORTED_BY_EVIDENCE', verificationStatus: 'VERIFIED', evidenceIds: ['ev-wulftec-owner-location'] },
   ...components.filter((item) => item.parentId === 'LIEB-KOSME-TOPIIAD-L05358').map((item) => ({ id: `rel-kosme-component-${item.id}`, source: 'LIEB-KOSME-TOPIIAD-L05358', target: item.id, type: 'CONTAINS' as const, verificationStatus: item.verificationStatus, evidenceIds: item.evidenceIds })),
   ...['ev-kosme-oem-intake', 'ev-kosme-cr22-dossier', 'ev-kosme-photo-archive'].map((id) => ({ id: `rel-kosme-${id}`, source: 'LIEB-KOSME-TOPIIAD-L05358', target: id, type: 'SUPPORTED_BY_EVIDENCE' as const, verificationStatus: 'VERIFIED' as const, evidenceIds: [id] })),
 ];

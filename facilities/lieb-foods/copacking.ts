@@ -24,5 +24,10 @@ export function liebCopacking(): Copacking {
     add(line === 2 ? 'Manual hand stacking' : 'Automated palletizing','PALLET',false,line === 2 ? 'Manual handling; does not establish a validated inspection procedure.' : 'Mechanism and routing unconfirmed.',line === 4 ? ['EQP-PALLETIZER-AUTO-01'] : []);
     add(line === 2 ? 'Standalone pallet wrapping' : 'Inline pallet stretch wrapping','PALLET',false,'Identity, shared allocation and actual routing need field evidence.',['LIEB-WULFTEC-A6882 (candidate only; line and inline applicability unconfirmed)']);
   }
+  const wrapper = c.stages.find(stage => stage.lineId === 'line-4' && stage.name === 'Inline pallet stretch wrapping')!;
+  wrapper.assetId = 'LIEB-WULFTEC-A6882';
+  wrapper.candidates = [];
+  wrapper.alternative = 'Last equipment on Line 4, in Warehouse B. Exact upstream connections and shared service remain unconfirmed.';
+  wrapper.assignment = { ...emptyClaim(), value: 'Wulftec WCRT-200 stretch wrapper; last equipment on Line 4; Warehouse B', status: 'VERIFIED', source: 'Facility owner confirmation, 2026-09-12', evidenceIds: ['ev-wulftec-owner-location'], verifiedAt: '2026-09-12', reviewer: 'Facility owner' };
   return c;
 }

@@ -26,7 +26,7 @@ The inventory was inspected before seeding. It contains four physical asset reco
 | --- | --- | --- |
 | `L2-CC-001` | Line 2 conveyor control cabinet | Preserve cabinet identity and map; no inferred filler/rinser identity. |
 | `FG-L4-MTN-001` | L4 Meta Case Former | Candidate for Line 4 supporting box forming only; exact route requires evidence. |
-| `LIEB-WULFTEC-A6882` | Wulftec WCRT-200 stretch wrapper | Candidate reference retained; line assignment, shared service and inline applicability are unresolved. |
+| `LIEB-WULFTEC-A6882` | Wulftec WCRT-200 stretch wrapper | Owner confirmed 2026-09-12: last equipment on Line 4, in Warehouse B. Stage assigned to this asset; exact coordinates, upstream connections and shared service remain unresolved. |
 | `LIEB-KOSME-TOPIIAD-L05358` | Kosme TOP II AD Tandem Labeler | Candidate reference retained for labeling; line assignment and format applicability are unresolved. |
 
 No existing asset matches the heat tunnel, cooling tunnel or automatic palletizer candidate identifiers sufficiently to establish identity. `EQP-TUNNEL-HEAT-01`, `EQP-TUNNEL-COOL-01` and `EQP-PALLETIZER-AUTO-01` remain aliases on unassigned stages, not new inventory. No uniqueness claim about equipment types is enforced. Stumptown, Mamma Chia, Langers and Tres Agaves remain unverified brand/format candidates in the reference only.
@@ -39,7 +39,7 @@ No existing asset matches the heat tunnel, cooling tunnel or automatic palletize
 | Line 4 PET/HDPE and secondary glass capability | Equipment-specific format records and field confirmation; identify restrictions by format. |
 | Tunnel identities, functions and stage positions | Photograph nameplates and trace actual routing; obtain approved heating/hold or cooling process documents. Reconcile candidate IDs against inventory. |
 | Per-line versus shared upstream and end-of-line equipment | Walk both lines, identify each physical asset once, record counts, allocation and branch conditions; retain both conflicting source claims until resolved. |
-| Wulftec standalone/inline role and shared allocation | Field location, connection/routing evidence and equipment documentation. Confirm stretch versus shrink wrapping separately for Line 2. |
+| Wulftec exact position and shared allocation | Warehouse B and end-of-Line-4 role confirmed by owner on 2026-09-12. Capture exact position and connection/routing evidence; shared service remains unresolved. Confirm stretch versus shrink wrapping separately for Line 2. |
 | Automatic palletizer identity and mechanism | Nameplate, machine record, layout and field routing confirmation. |
 | Meta case former and Kosme labeler routing | Trace case supply and label/sleeve alternatives; confirm line memberships with sources. |
 | Bottle/case coder, closing and optional shrink paths | Trace actual routing and applicable format alternatives; establish exact order independently of the reported sequence. |

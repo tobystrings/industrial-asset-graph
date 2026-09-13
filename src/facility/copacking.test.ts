@@ -36,7 +36,14 @@ describe('co-packing records', () => {
   it('seeds reported process stages, separate case support and alternatives without physical machines or production history', () => {
     const pkg=buildLiebFoodsPackage(), c=pkg.facility.production!.copacking!; validateFacilityPackage(pkg);
     expect(pkg.assets).toHaveLength(4); expect(c.runs).toEqual([]); expect(c.products).toEqual([]); expect(c.recipes).toEqual([]);
-    expect(c.stages.every(s => s.assetId===null && s.claim.status==='USER_REPORTED')).toBe(true);
+    expect(c.stages.every(s => s.claim.status==='USER_REPORTED')).toBe(true);
+    const assigned = c.stages.filter(s => s.assetId !== null);
+    expect(assigned).toHaveLength(1);
+    expect(assigned[0]).toMatchObject({ lineId: 'line-4', assetId: 'LIEB-WULFTEC-A6882', assignment: { status: 'VERIFIED', evidenceIds: ['ev-wulftec-owner-location'] } });
+    const wrapper = pkg.assets.find(asset => asset.id === assigned[0].assetId)!;
+    expect(wrapper.areaId).toBe('area-warehouse-b');
+    expect(pkg.areas.find(area => area.id === wrapper.areaId)!.assetIds).toContain(wrapper.id);
+    expect(pkg.relationships).toContainEqual(expect.objectContaining({ source: wrapper.id, target: wrapper.areaId, type: 'LOCATED_IN', evidenceIds: ['ev-wulftec-owner-location'] }));
     expect(c.stages.filter(s => /Box/.test(s.name)).every(s => s.flow==='CASE_SUPPORT')).toBe(true);
     expect(c.stages.filter(s => s.optional)).toHaveLength(6);
     expect(c.stages.some(s => s.lineId==='line-1')).toBe(false);

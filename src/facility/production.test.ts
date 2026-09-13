@@ -53,6 +53,7 @@ describe('production documentation', () => {
   });
   it('migrates saved facility config once and round-trips edits, service history and attachments in isolation', async () => {
     const seed=buildLiebFoodsPackage(); const old=structuredClone(seed); delete old.facility.production;
+    for (const asset of old.assets) delete asset.production;
     await resetPlant(old); const upgraded=await ensurePlantSeed(seed);
     expect(upgraded.facility.production!.lines).toHaveLength(3);
     const pkg=sharedFixture(); pkg.facility.production!.lines[1].importance=7;
