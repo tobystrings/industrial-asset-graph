@@ -6,6 +6,7 @@ import PublicationStatus from '../facility/PublicationStatus';
 import { useFacilityGuide } from '../features/facility-guide';
 import { GuideReminder } from '../features/facility-guide/GuideReminder';
 import SectionPicker from './SectionPicker';
+import MachineParts from '../inventory/MachineParts';
 import { toolGroups, toolGroupFor } from './toolGroups';
 
 export function PageLink({ page, children, className = '', details = {}, current }: { page: PageId; children: ReactNode; className?: string; details?: Record<string, string>; current?: boolean }) {
@@ -35,12 +36,13 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
         guide.setOpen(true);
         navigate('help', { from: page, asset: p.get('asset') ?? (page === 'cabinet' ? facility.featureConfig.featuredCabinetAssetId ?? '' : ''), area: p.get('area') ?? '', connection: p.get('connection') ?? '', edit: p.get('edit') ?? '' });
       }}>Ask Genie <span aria-hidden="true">↗</span></button>}</div></div>
-      <div className="page-workspace"><GuideReminder/><PublicationStatus/>{children}</div>
+      <div className="page-workspace"><GuideReminder/><PublicationStatus/>{['component','cabinet','wulftec','relationships','maintenance','documentation'].includes(page) && <MachineParts assetId={new URLSearchParams(location.search).get('asset') ?? (page === 'cabinet' ? facility.featureConfig.featuredCabinetAssetId : page === 'wulftec' ? facility.featureConfig.featuredMachineAssetId : facility.components.find(c => c.id === new URLSearchParams(location.search).get('component'))?.parentId)}/> }{children}</div>
     </div>
   </div>;
 }
 
 const homeTasks = [
+  { page: 'inventory', title: 'Find a part', detail: 'Find spares, take photos, and check stock.' },
   { page: 'assets', title: 'Find an asset', detail: 'Search equipment and open its record.' },
   { page: 'map', title: 'Map', detail: 'Locate equipment and explore an area.' },
   { page: 'documents', title: 'Documents', detail: 'Open manuals, drawings and photos.' },

@@ -5,7 +5,7 @@ import { pageSearch, readPage, type PageId } from './pages';
 describe('tool navigation preserves workflows', () => {
   it('keeps every original More destination reachable exactly once', () => {
     const original: PageId[] = ['lines','documentation','maintenance','dependencies','field','observation','evidence','cabinet','wulftec','relationships','history','manage','assetAdd','connection','review','health','conflicts','database','import','setup','settings','account','help'];
-    expect(toolGroups.flatMap(group => [...group.ids]).sort()).toEqual(original.sort());
+    expect(toolGroups.flatMap(group => [...group.ids]).sort()).toEqual([...original, 'inventory'].sort());
   });
   it('returns to the matching tool group without losing the facility', () => {
     for (const group of toolGroups) for (const page of group.ids) {

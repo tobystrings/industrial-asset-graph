@@ -10,6 +10,7 @@ import type {
 } from '../types/facility';
 
 export interface FacilityIdentity {
+  inventory?: import('./inventory').PartsInventory;
   production?: import('./production').ProductionConfig;
   id: string;
   name: string;

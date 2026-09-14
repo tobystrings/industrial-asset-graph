@@ -1,4 +1,5 @@
 export const pages = {
+  inventory: ['Parts Inventory', 'Find spares, capture labels, and account for stock.'],
   history: ['Historical evidence', 'Review recovered sources, uncertainties and field tasks.'],
   lines: ['Production lines', 'Document equipment, flow and shared systems.'],
   documentation: ['Documentation queue', 'Prioritize field knowledge and survey missing facts.'],

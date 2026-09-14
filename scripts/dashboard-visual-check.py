@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 from pathlib import Path
 import os
 import subprocess
@@ -15,6 +16,7 @@ from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rej
 from copacking_visual import exercise_copacking
 from genie_visual import exercise_genie
 from large_print_visual import exercise_large_print, assert_large_print
+from inventory_visual import exercise_inventory
 import sys
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -719,6 +721,7 @@ try:
                                 page.get_by_role('navigation',name='Field sections').get_by_role('button',name=section,exact=True).click()
                                 assert_manager_geometry(page)
                                 screenshot(page,f'{label}-field-{section.lower()}')
+                    exercise_inventory(page, BASE, label, screenshot, assert_manager_geometry)
                     exercise_manager_states(page, label)
                     exercise_workspace_states(page, label)
                     exercise_private_asset_package(page, label)
@@ -742,5 +745,5 @@ try:
             'representative room/asset inspector, mobile walkthrough, manager, document, map-edit, and cabinet states were captured.'
         )
 finally:
-    server.terminate()
+    stop_preview(server)
     server.wait(timeout=10)

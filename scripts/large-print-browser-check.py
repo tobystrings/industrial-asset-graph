@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 """Readability sweep of all routes before the longer mutation/visual audit."""
 from pathlib import Path
 import json
@@ -53,5 +54,5 @@ try:
         assert not failures, json.dumps(failures, indent=2)
         print('Large-print route sweep passed.', flush=True)
 finally:
-    server.terminate()
+    stop_preview(server)
     server.wait(timeout=10)

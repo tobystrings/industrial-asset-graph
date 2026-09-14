@@ -9,3 +9,6 @@ __pycache__/
 .env.local
 .env.*.local
 !.env.example
+
+# OCR assets are generated from locked npm packages.
+/public/inventory-ocr/

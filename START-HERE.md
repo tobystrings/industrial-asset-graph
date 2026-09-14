@@ -32,3 +32,7 @@ npm run test:visual
 ```
 
 Do not weaken visual checks to make CI pass. Do not add golfgold files. Do not invent dests, motors, or film audio.
+
+## Parts inventory
+
+See [Parts Inventory](docs/PARTS-INVENTORY.md) for photo capture, local OCR, machine compatibility, stock movements, review, and photo backups. [Design](docs/PHOTO-INVENTORY-DESIGN.md) records the schema and migration decisions.

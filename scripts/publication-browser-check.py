@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 """Two isolated browsers share only a mocked authenticated publication service."""
 import os,subprocess,time,socket,json
 import hashlib
@@ -73,4 +74,4 @@ try:
         print('PASS: cross-device rename and attachment bytes, duplicate prevention, draft recovery, concurrent conflict, explicit resolution, and reload.')
         browser.close()
 finally:
-    server.terminate()
+    stop_preview(server)

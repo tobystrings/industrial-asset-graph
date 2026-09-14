@@ -36,6 +36,7 @@ import { isTransportEligible, type MutationOperation, type SyncEntityType } from
 import { applyCanonicalEntities, HttpSyncTransport, syncMutationQueue, type SyncSummary } from './syncClient';
 import { validateFacilityPackage } from './schema';
 import { validateCopackingTransition } from './copacking';
+import { applyInventoryChange, emptyInventory, validateInventoryTransition, type PartsInventory } from './inventory';
 import { iagUserFromSupabase, supabase } from './supabaseAuth';
 import type { User } from '@supabase/supabase-js';
 import { importPrivateAssetBundle, type ImportConflict } from './additivePackage';
@@ -60,6 +61,7 @@ export interface FacilityEditorApi {
   approveChange(id: string): Promise<void>;
   rejectChange(id: string): void;
   saveFacility(facility: FacilityIdentity): Promise<void>;
+  saveInventory(inventory: PartsInventory, base: PartsInventory): Promise<void>;
   saveArea(area: FacilityArea): Promise<void>;
   deleteArea(areaId: string): Promise<void>;
   saveAsset(asset: FacilityAsset, marker?: { x: number; y: number }): Promise<void>;
@@ -104,7 +106,7 @@ function stampRevision(pkg: FacilityPackage, entityId: string, reason: string, c
   };
 }
 
-type ChangeDescriptor = { entityType: SyncEntityType; operation: MutationOperation; value?: Record<string, unknown> };
+type ChangeDescriptor = { entityType: SyncEntityType; operation: MutationOperation; value?: Record<string, unknown>; inventoryBase?: PartsInventory };
 
 function descriptorForPackage(pkg: FacilityPackage, entityId: string): ChangeDescriptor {
   if (pkg.facility.id === entityId) return { entityType: 'facility', operation: 'UPSERT', value: pkg.facility as unknown as Record<string, unknown> };
@@ -118,6 +120,7 @@ function descriptorForPackage(pkg: FacilityPackage, entityId: string): ChangeDes
 }
 
 export function applyReviewedChange(current: FacilityPackage, proposed: FacilityPackage, entityId: string, descriptor: ChangeDescriptor): FacilityPackage {
+  if (descriptor.inventoryBase && proposed.facility.inventory) return { ...current, facility: { ...current.facility, inventory: applyInventoryChange(current.facility.inventory ?? emptyInventory(), descriptor.inventoryBase, proposed.facility.inventory) } };
   const upsert = <T extends { id: string }>(rows: T[], value: T) => rows.some((item) => item.id === value.id) ? rows.map((item) => item.id === value.id ? value : item) : [...rows, value];
   if (descriptor.entityType === 'facility' && descriptor.operation === 'UPSERT') return { ...current, facility: proposed.facility };
   if (descriptor.entityType === 'area') return { ...current, areas: descriptor.operation === 'DELETE' ? current.areas.filter((item) => item.id !== entityId) : upsert(current.areas, proposed.areas.find((item) => item.id === entityId)!) };
@@ -226,6 +229,7 @@ export function FacilityProvider({
     const latest = pkgRef.current;
     validateFacilityPackage(next);
     validateCopackingTransition(latest, next);
+    validateInventoryTransition(latest, next);
     const baseVersion = latest.entityVersions[entityId] ?? 0;
     const versioned = stampRevision({ ...next, packageRevision: latest.packageRevision + 1, entityVersions: { ...latest.entityVersions, [entityId]: baseVersion + 1 } }, entityId, reason, actor.name, 'APPROVED');
     await commit(versioned);
@@ -241,7 +245,7 @@ export function FacilityProvider({
     const evidenceAccess = descriptor.entityType === 'evidence' && typeof descriptor.value?.access === 'string'
       ? [descriptor.value.access as 'PUBLIC_APP' | 'LOCAL_ONLY' | 'RESTRICTED']
       : evidenceIds.map((id) => latest.evidence.find((item) => item.id === id)?.access ?? 'RESTRICTED');
-    await queueMutation({ mutationId: crypto.randomUUID(), entityId, entityType: descriptor.entityType, actorId: actor.id, clientId: clientIdentity(), baseVersion, operation: descriptor.operation, createdAt: new Date().toISOString(), reviewState: 'APPROVED', value: descriptor.value, evidenceAccess }, latest.facility.id);
+    await queueMutation({ mutationId: crypto.randomUUID(), entityId, entityType: descriptor.entityType, actorId: actor.id, clientId: clientIdentity(), baseVersion, operation: descriptor.operation, createdAt: new Date().toISOString(), reviewState: 'APPROVED', value: descriptor.entityType === 'facility' ? next.facility as unknown as Record<string, unknown> : descriptor.value, evidenceAccess }, latest.facility.id);
     const queued = await listQueuedMutations(latest.facility.id);
     setQueuedMutationCount(queued.length);
     setSync((state) => ({ ...state, phase: apiUrl ? 'PENDING' : 'LOCAL_ONLY', retained: queued }));
@@ -321,7 +325,7 @@ export function FacilityProvider({
       id: crypto.randomUUID(), entityId, reason, proposedBy: currentUser.name,
       proposedAt: new Date().toISOString(), basePackageRevision: pkg.packageRevision,
       entityType: descriptor.entityType, operation: descriptor.operation, value: descriptor.value,
-      next: structuredClone(next),
+      next: structuredClone(next), inventoryBase: descriptor.inventoryBase ? structuredClone(descriptor.inventoryBase) : undefined,
     }]);
     appendAudit(currentUser.name, 'Proposed change', `${reason} · ${entityId}`);
   }, [appendAudit, commitCanonical, currentUser, pkg.packageRevision, savePending]);
@@ -348,7 +352,7 @@ export function FacilityProvider({
       if (currentUser?.role !== 'admin') throw new Error('Administrator sign-in is required to approve changes.');
       const change = pendingRef.current.find((item) => item.id === id);
       if (!change) return;
-      const descriptor = change.entityType && change.operation ? { entityType: change.entityType, operation: change.operation, value: change.value } : descriptorForPackage(change.next, change.entityId);
+      const descriptor = change.entityType && change.operation ? { entityType: change.entityType, operation: change.operation, value: change.value, inventoryBase: change.inventoryBase } : descriptorForPackage(change.next, change.entityId);
       const reviewed = applyReviewedChange(pkgRef.current, change.next, change.entityId, descriptor);
       await commitCanonical(reviewed, change.entityId, `${change.reason} (proposed by ${change.proposedBy}; approved)`, currentUser, descriptor);
       savePending(pendingRef.current.filter((item) => item.id !== id));
@@ -360,9 +364,15 @@ export function FacilityProvider({
       savePending(pendingRef.current.filter((item) => item.id !== id));
       if (change) appendAudit(currentUser.name, 'Rejected change', `${change.reason} · ${change.entityId} · proposed by ${change.proposedBy}`);
     },
+    async saveInventory(inventory, base) {
+      const next = { ...pkgRef.current, facility: { ...pkgRef.current.facility, inventory } };
+      validateFacilityPackage(next);
+      await recordChange(next, next.facility.id, 'Parts inventory updated', { entityType: 'facility', operation: 'UPSERT', value: next.facility as unknown as Record<string, unknown>, inventoryBase: base });
+    },
     async saveFacility(facility) {
       validateFacilityPackage({ ...pkg, facility });
       validateCopackingTransition(pkgRef.current, { ...pkg, facility });
+      validateInventoryTransition(pkgRef.current, { ...pkg, facility });
       await recordChange({ ...pkg, facility }, facility.id, 'Facility identity saved in application', { entityType: 'facility', operation: 'UPSERT', value: facility as unknown as Record<string, unknown> });
     },
     async saveArea(area) {
@@ -468,15 +478,16 @@ export function FacilityProvider({
         blob: file, category, verificationStatus, access: publication.state.phase === 'DISABLED' ? 'LOCAL_ONLY' : 'PUBLIC_APP', createdAt: new Date().toISOString(),
       };
       await putAttachment(record, pkg.facility.id);
+      const latest = pkgRef.current;
       const evidenceId = `EV-${record.id}`;
-      const evidence = [...pkg.evidence, {
+      const evidence = [...latest.evidence, {
         id: evidenceId,
         type: category === 'PHOTO' ? 'PHOTO' as const : category === 'DRAWING' ? 'DRAWING' as const : category === 'PDF' ? 'MANUAL' as const : 'OTHER' as const,
         title: `${assetId} · ${file.name}`,
         pathOrUrl: `indexeddb://attachment/${record.id}`,
         access: record.access,
       }];
-      const documents = category === 'PDF' || category === 'DRAWING' ? [...pkg.documents, {
+      const documents = category === 'PDF' || category === 'DRAWING' ? [...latest.documents, {
         id: `DOC-${record.id}`,
         assetId,
         category: category === 'PDF' ? 'Field document' : 'Drawing',
@@ -486,8 +497,8 @@ export function FacilityProvider({
         required: false,
         verificationStatus,
         evidenceIds: [evidenceId],
-      }] : pkg.documents;
-      await recordChange({ ...pkg, evidence, documents }, evidenceId, 'Local evidence attached in application', { entityType: 'evidence', operation: 'UPSERT', value: evidence.at(-1) as unknown as Record<string, unknown> });
+      }] : latest.documents;
+      await recordChange({ ...latest, evidence, documents }, evidenceId, 'Local evidence attached in application', { entityType: 'evidence', operation: 'UPSERT', value: evidence.at(-1) as unknown as Record<string, unknown> });
       return record;
     },
     async deleteAttachment(id) {
@@ -516,6 +527,7 @@ export function FacilityProvider({
       return result;
     },
     async importArchive(file, mode) {
+      if (currentUser?.role !== 'admin') throw new Error('Administrator approval is required to import canonical facility records.');
       const next = await importPlantArchive(file, mode, pkg.facility.id);
       syncActiveFacilityPackage(next);
       pkgRef.current = next;
@@ -525,6 +537,7 @@ export function FacilityProvider({
       return { ...(await exportPlantBackup(pkg.facility.id)), auditLog };
     },
     async importBackup(backup, mode) {
+      if (currentUser?.role !== 'admin') throw new Error('Administrator approval is required to import canonical facility records.');
       const next = await importPlantBackup(backup, mode, pkg.facility.id);
       syncActiveFacilityPackage(next);
       pkgRef.current = next;

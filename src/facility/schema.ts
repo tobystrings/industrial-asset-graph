@@ -1,4 +1,5 @@
 import { validateStudio } from '../map/studioModel';
+import { validateInventory } from './inventory';
 import { validateCopacking } from './copacking';
 import type { FacilityPackage } from './types';
 import type { VerificationState } from '../types/facility';
@@ -36,6 +37,7 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
     if (!Array.isArray(pkg[key])) throw new Error(`Facility package ${key} must be an array.`);
   }
   const ids = new Set<string>();
+  validateInventory(pkg as FacilityPackage);
   for (const item of [...pkg.areas!, ...pkg.assets!, ...pkg.components!, ...pkg.documents!, ...pkg.evidence!]) {
     if (!item.id || ids.has(item.id)) throw new Error(`Missing or duplicate entity ID: ${item.id || '(empty)'}`);
     ids.add(item.id);

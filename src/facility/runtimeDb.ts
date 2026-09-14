@@ -2,6 +2,7 @@ import type { FacilityPackage } from './types';
 import { createStoredZip, readStoredZip } from './iagArchive';
 import { loadFacilityPackage } from './schema';
 import { mergeCopacking, portableCopacking } from './copacking';
+import { mergeInventory, validateInventoryTransition } from './inventory';
 import type { SyncMutation } from './syncContract';
 
 const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
@@ -287,7 +288,7 @@ export function portablePlantPackage(plant: FacilityPackage): FacilityPackage {
   };
   return {
     ...structuredClone(plant), evidence, components, documents, relationships,
-    facility: { ...structuredClone(plant.facility), production: plant.facility.production ? { ...structuredClone(plant.facility.production), copacking: portableCopacking(plant.facility.production.copacking, allowedEvidence) } : undefined },
+    facility: { ...structuredClone(plant.facility), inventory: plant.facility.inventory ? { ...structuredClone(plant.facility.inventory), parts: plant.facility.inventory.parts.map(p => ({ ...structuredClone(p), photos: p.photos.filter(photo => photo.access === 'PUBLIC_APP') })) } : undefined, production: plant.facility.production ? { ...structuredClone(plant.facility.production), copacking: portableCopacking(plant.facility.production.copacking, allowedEvidence) } : undefined },
     assets: plant.assets.map((asset) => ({ ...asset, production: asset.production ? { ...asset.production, memberships: asset.production.memberships.map(m => ({ ...m, verificationStatus: evidenceAllowed(m.evidenceIds) ? m.verificationStatus : 'FIELD_VERIFY' as const, evidenceIds: m.evidenceIds.filter(id => allowedEvidence.has(id)), source: evidenceAllowed(m.evidenceIds) ? m.source : 'Supporting evidence excluded from portable package by access policy.' })), service: asset.production.service.filter(s => evidenceAllowed(s.evidenceIds)) } : undefined, componentIds: asset.componentIds.filter(id => components.some(component => component.id === id)), manufacturer: protectFact(asset.manufacturer), model: protectFact(asset.model), serialNumber: protectFact(asset.serialNumber), facts: asset.facts.map((item) => ({ ...item, value: protectFact(item.value) })) })),
     revisions: plant.revisions.filter((item) => evidenceAllowed(item.evidenceIds)),
     assetSerialSources: plant.assetSerialSources.filter((item) => allowedEvidence.has(item.evidenceId)),
@@ -299,7 +300,7 @@ function mergePlant(current: FacilityPackage | null, incoming: FacilityPackage, 
   return {
     ...current,
     ...incoming,
-    facility: { ...current.facility, ...incoming.facility, production: incoming.facility.production || current.facility.production ? { ...(incoming.facility.production ?? current.facility.production!), copacking: mergeCopacking(current.facility.production?.copacking, incoming.facility.production?.copacking) } : undefined },
+    facility: { ...current.facility, ...incoming.facility, inventory: mergeInventory(current.facility.inventory, incoming.facility.inventory), production: incoming.facility.production || current.facility.production ? { ...(incoming.facility.production ?? current.facility.production!), copacking: mergeCopacking(current.facility.production?.copacking, incoming.facility.production?.copacking) } : undefined },
     featureConfig: { ...current.featureConfig, ...incoming.featureConfig },
     mapConfig: {
       ...(current.mapConfig ?? {}),
@@ -329,6 +330,7 @@ async function applyImportedPlant(
   const current = await loadPlant(facilityId);
   const next = mergePlant(current, incoming, mode);
   loadFacilityPackage(next);
+  if (current) validateInventoryTransition(current, next);
   await savePlant(next, facilityId);
   const db = await openPlantDb(facilityId);
   const tx = db.transaction([ATTACHMENT_STORE, OBSERVATION_STORE], 'readwrite');
@@ -346,12 +348,14 @@ async function applyImportedPlant(
   return next;
 }
 
-export async function exportPlantBackup(facilityId?: string): Promise<PlantBackup> {
+export async function exportPlantBackup(facilityId?: string, includeInventoryPhotos = false): Promise<PlantBackup> {
   const plant = await loadPlant(facilityId);
   if (!plant) throw new Error('No plant database is loaded');
   const [allAttachments, observations] = await Promise.all([listAttachments(undefined, facilityId), listObservations(undefined, facilityId)]);
   const plantForExport = portablePlantPackage(plant);
-  const attachments = allAttachments.filter((item) => item.access === 'PUBLIC_APP');
+  if (includeInventoryPhotos) plantForExport.facility.inventory = structuredClone(plant.facility.inventory);
+  const inventoryPhotoIds = new Set(plant.facility.inventory?.parts.flatMap(p => p.photos.map(photo => photo.id)) ?? []);
+  const attachments = allAttachments.filter((item) => item.access === 'PUBLIC_APP' || (includeInventoryPhotos && inventoryPhotoIds.has(item.id)));
   const encoded: ExportAttachment[] = [];
   for (const attachment of attachments) {
     const { blob, ...metadata } = attachment;
