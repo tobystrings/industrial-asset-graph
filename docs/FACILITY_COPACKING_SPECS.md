@@ -31,6 +31,7 @@ Reported Line 4 configuration:
 - Reported downstream stages: air knives/drying, accumulation table, bottle coder, labeling or full-body shrink sleeving, drop/case packing, case closing, and case shrink wrapping where applicable.
 - Box forming and box coding feed the case-handling process.
 - Reported palletizing: automated palletizer followed by an inline pallet stretch wrapper.
+- Owner update, 2026-09-12: the Wulftec WCRT-200 stretch wrapper is the last equipment on Line 4 and is located in Warehouse B. See `public/assets/evidence/Wulftec-owner-location-2026-09-12.md`. Exact position within Warehouse B and upstream connections remain unconfirmed.
 - Palletizer mechanism, exact machine identities, and actual routing require confirmation.
 
 Routing and shared assets:

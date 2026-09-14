@@ -17,7 +17,7 @@ export function liebProduction(): ProductionConfig {
       'PLC', 'HMI', 'I/O', 'Network', 'Control cabinet', 'VFD', 'Motor', 'Sensor', 'Valve', 'Safety device',
     ],
     survey: [
-      { id: 'survey-wulftec', category: 'Stretch wrapper', action: 'Confirm Wulftec floor location and production-line membership', lineId: '', state: 'RECORDED', notes: 'Canonical asset LIEB-WULFTEC-A6882 and its master evidence packet are deployed. Source reports Line 4, but assignment remains unconfirmed.' },
+      { id: 'survey-wulftec', category: 'Stretch wrapper', action: 'Record exact Wulftec position within Warehouse B', lineId: 'line-4', state: 'RECORDED', notes: 'Owner confirmed on 2026-09-12: LIEB-WULFTEC-A6882 is the last equipment on Line 4 and is located in Warehouse B. Exact coordinates remain to be captured.' },
       { id: 'survey-kosme', category: 'Labeler', action: 'Confirm Kosme floor location and production-line membership', lineId: '', state: 'RECORDED', notes: 'Canonical asset LIEB-KOSME-TOPIIAD-L05358, OEM evidence, CR30 procedures, CR22 dossier, and photo archive are deployed. Line assignment remains unconfirmed.' },
     ],
   };

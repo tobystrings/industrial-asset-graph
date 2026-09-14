@@ -19,6 +19,7 @@ import './features/facility-guide/guide.css';
 import './navigation/pages.css';
 import './ui/dark-theme.css';
 import './map/map-workbench.css';
+import './ui/large-print.css';
 import './ui/chrome-clearance.css';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { AuthGate } from './auth/LoginPage';

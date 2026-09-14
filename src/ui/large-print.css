@@ -1,0 +1,91 @@
+/* Shared shop-floor typography and controls. Drawing coordinates stay local to SVGs.
+   Legacy styles consume these tokens directly; chrome-clearance remains the last guard. */
+:root {
+  --iag-reading-size: 18px;
+  --iag-label-size: 20px;
+  --iag-heading-size: 28px;
+  --iag-target-size: 52px;
+  --iag-control-border: #858585;
+  --iag-focus: #fff;
+  font-size: var(--iag-reading-size, 18px);
+}
+body { font-size: var(--iag-reading-size, 18px); line-height: 1.5; }
+small, sub, sup { font-size: var(--iag-reading-size, 18px); }
+html body #root :is(.app-pages, .auth-page) { font-size: var(--iag-reading-size, 18px); }
+html body #root :is(.app-pages, .auth-page) :is(button, input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea, summary) {
+  font-size: var(--iag-reading-size, 18px);
+  min-height: var(--iag-target-size);
+  line-height: 1.4;
+}
+html body #root .app-pages :is(button, summary) { white-space: normal; overflow-wrap: anywhere; }
+html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size); }
+html body #root .app-pages :is(input, select, textarea) { min-width: 0; max-width: 100%; }
+html body #root .app-pages :is(input[type=checkbox], input[type=radio]) {
+  width: 28px; height: 28px; min-height: 28px; flex: 0 0 28px; accent-color: #eee;
+}
+html body #root .app-pages label:has(>input:is([type=checkbox], [type=radio])) { min-height: var(--iag-target-size); align-items: center; }
+html body #root :is(.app-pages, .auth-page) :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--iag-focus); outline-offset: 3px;
+}
+html body #root .app-pages :is(button, a)[aria-pressed=true],
+html body #root .app-pages button[aria-selected=true] {
+  box-shadow: inset 0 -4px 0 #fff; border-color: #eee;
+}
+html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ffd6d2; margin-block: 8px; }
+.page-navigation a { font-size: var(--iag-label-size); min-height: 56px; padding: 8px 18px; border: 2px solid transparent; }
+.page-navigation a[aria-current=page] { color: #fff; background: #343434; border-color: #eee; box-shadow: inset 0 -3px 0 #fff; }
+.page-navigation a>.nav-wide-label { font-size: inherit; line-height: inherit; }
+.page-navigation a>.nav-short-label { display: none; }
+.page-brand { font-size: var(--iag-label-size); }
+.page-brand small { font-size: var(--iag-reading-size, 18px); }
+.page-brand>span:first-child { width: 48px; height: 48px; }
+.page-title h1 { font-size: clamp(32px, 3vw, 42px); }
+.page-title-actions { flex-wrap: wrap; }
+.page-back { min-height: var(--iag-target-size); text-decoration: underline; text-underline-offset: 4px; }
+.page-title p { font-size: var(--iag-reading-size, 18px); }
+.page-account-link, .page-primary { min-height: var(--iag-target-size); white-space: normal; }
+.home-intro { padding: 12px 0; background: transparent; }
+.home-intro h2 { margin-top: 8px; }
+.home-intro p { margin-bottom: 0; }
+.home-destinations { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+.destination-card { border-color: #737373; padding: 24px; }
+.destination-card strong { font-size: 26px; line-height: 1.25; gap: 12px; }
+.destination-card p { font-size: var(--iag-reading-size, 18px); margin: 12px 0 0; }
+.home-followup h2, .more-page h2, .help-page h2 { font-size: var(--iag-heading-size); }
+.more-page { display: grid; grid-template-columns: minmax(0,1fr); max-width: 1080px; margin: auto; }
+.more-page .page-link-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border: 0; gap: 14px; background: transparent; overflow: visible; }
+.more-page .page-link-list a { border: 1px solid #737373; border-radius: 12px; padding: 22px; }
+.page-link-list strong { font-size: 22px; }
+.page-link-list small { font-size: var(--iag-reading-size, 18px); }
+.section-picker { min-width: 0; }
+.section-picker-label { display: block; font-weight: 600; margin-bottom: 10px; }
+.section-picker>div { display: flex; flex-wrap: wrap; gap: 10px; }
+.section-picker button { padding: 12px 18px; background: #181818; border: 2px solid #858585; border-radius: 10px; color: #eee; font-weight: 700; }
+.section-picker button[aria-pressed=true] { background: #343434; }
+html body #root .app-pages .inspector-tabs { flex-wrap: wrap !important; gap: 8px; padding: 12px; }
+html body #root .app-pages .inspector-tabs button { flex: 1 1 120px; font-size: var(--iag-label-size); }
+html body #root .app-pages .inspector-tabs button.active { border: 2px solid #fff; background: #343434; }
+html body #root .app-pages .map-floating-controls button { width: 52px; height: 52px; }
+html body #root .app-pages .map-readable-legend>button { font-size: var(--iag-label-size); }
+html body #root .app-pages .map-readable-legend .legend-grid span { font-size: var(--iag-label-size) !important; }
+html body #root .app-pages .field-section-tabs { flex-wrap: wrap; }
+html body #root .app-pages .field-section-tabs button { flex: 1 1 140px; }
+@media(max-width:1050px) { .more-page { grid-template-columns: minmax(0,1fr); } }
+@media(max-width:700px) {
+  .page-header { padding: 10px 14px; gap: 10px; }
+  .page-brand { font-size: var(--iag-reading-size, 18px); }
+  .page-brand>span:first-child { display: none; }
+  .page-navigation a { padding: 6px 2px; font-size: var(--iag-reading-size, 18px); min-height: 64px; }
+  .page-navigation a>.nav-wide-label { display: none; }
+  .page-navigation a>.nav-short-label { display: inline; font-size: inherit; line-height: inherit; }
+  .page-title { flex-wrap: wrap; }
+  .page-title-actions { justify-content: flex-start; }
+  .home-destinations, .more-page .page-link-list { grid-template-columns: minmax(0,1fr); }
+  .destination-card { padding: 20px; }
+  .section-picker>div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .section-picker button { padding: 10px; }
+}
+@media(max-height:500px) and (max-width:950px) {
+  .page-header { padding-block: 4px; }
+  .page-navigation a { min-height: 52px; }
+}

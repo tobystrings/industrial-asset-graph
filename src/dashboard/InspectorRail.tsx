@@ -86,7 +86,7 @@ const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
         <div className="phone-trace" data-testid="phone-trace">{nodes.map((node) => <span key={node.id}>{node.label}</span>)}</div>
         <div className="inspector-tabs" data-testid="inspector-tabs">
           {INSPECTOR_TABS.map((tab) => (
-            <button key={tab} type="button" className={inspectorTab === tab ? 'active' : ''} onClick={() => onInspectorTab(tab)}>
+            <button key={tab} type="button" aria-pressed={inspectorTab === tab} className={inspectorTab === tab ? 'active' : ''} onClick={() => onInspectorTab(tab)}>
               {tab === 'overview' ? 'Overview' : tab === 'capture' ? 'Capture' : tab === 'intel' ? 'Intel' : tab === 'record' ? 'Record' : tab === 'docs' ? 'Docs' : 'Activity'}
             </button>
           ))}

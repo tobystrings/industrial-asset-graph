@@ -5,6 +5,8 @@ import { LineCards } from '../production/LineCards';
 import PublicationStatus from '../facility/PublicationStatus';
 import { useFacilityGuide } from '../features/facility-guide';
 import { GuideReminder } from '../features/facility-guide/GuideReminder';
+import SectionPicker from './SectionPicker';
+import { toolGroups, toolGroupFor } from './toolGroups';
 
 export function PageLink({ page, children, className = '', details = {}, current }: { page: PageId; children: ReactNode; className?: string; details?: Record<string, string>; current?: boolean }) {
   const click = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -25,9 +27,9 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
   return <div className={`app-shell app-pages page-${page}`}>
     <a className="page-skip" href="#page-content">Skip to page content</a>
     <header className="page-header"><PageLink page="home" className="page-brand"><span aria-hidden="true">IAG</span><span>Industrial Asset Graph<small>{facility.facility.name}</small></span></PageLink><PageLink page="account" className="page-account-link">Account</PageLink></header>
-    <nav className="page-navigation" aria-label="Main navigation">{primary.map(([id, label, icon]) => <PageLink key={id} page={id} current={group === id}><span aria-hidden="true">{icon}</span>{label}</PageLink>)}</nav>
+    <nav className="page-navigation" aria-label="Main navigation">{primary.map(([id, label, icon]) => <PageLink key={id} page={id} current={group === id}><span aria-hidden="true">{icon}</span>{id === 'documents' ? <><span className="nav-wide-label">Documents</span><span className="nav-short-label">Docs</span></> : label}</PageLink>)}</nav>
     <div className="page-scroll" ref={scroll} id="page-content" tabIndex={-1}>
-      <div className="page-title"><div>{page !== 'home' && <PageLink page={page === 'asset' ? 'assets' : group === 'more' && page !== 'more' ? 'more' : 'home'} className="page-back">← {page === 'asset' ? 'Assets' : group === 'more' && page !== 'more' ? 'More' : 'Home'}</PageLink>}<h1 ref={heading} tabIndex={-1}>{pages[page][0]}</h1><p>{pages[page][1]}</p></div><div className="page-title-actions">{page === 'map' && <button type="button" disabled={!ready} onClick={() => dispatchEvent(new CustomEvent('iag-open-map-editor'))}>Edit map</button>}{page === 'assets' && <PageLink page="assetAdd" className="page-primary">Add equipment</PageLink>}
+      <div className="page-title"><div>{page !== 'home' && <PageLink page={page === 'asset' ? 'assets' : group === 'more' && page !== 'more' ? 'more' : 'home'} details={toolGroupFor(page) ? { tools: toolGroupFor(page)!.id } : {}} className="page-back">← {page === 'asset' ? 'Assets' : group === 'more' && page !== 'more' ? 'More' : 'Home'}</PageLink>}<h1 ref={heading} tabIndex={-1}>{pages[page][0]}</h1><p>{pages[page][1]}</p></div><div className="page-title-actions">{page === 'map' && <button type="button" disabled={!ready} onClick={() => dispatchEvent(new CustomEvent('iag-open-map-editor'))}>Edit map</button>}{page === 'assets' && <PageLink page="assetAdd" className="page-primary">Add equipment</PageLink>}
       {page !== 'help' && <button type="button" onClick={() => {
         const p = new URLSearchParams(location.search);
         guide.setOpen(true);
@@ -38,13 +40,33 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
   </div>;
 }
 
+const homeTasks = [
+  { page: 'assets', title: 'Find an asset', detail: 'Search equipment and open its record.' },
+  { page: 'map', title: 'Map', detail: 'Locate equipment and explore an area.' },
+  { page: 'documents', title: 'Documents', detail: 'Open manuals, drawings and photos.' },
+  { page: 'observation', title: 'Notes', detail: 'Record a finding from the floor.' },
+  { page: 'relationships', title: 'Troubleshooting', detail: 'Follow documented connections.' },
+  { page: 'field', title: 'Field documentation', detail: 'Check equipment and attach evidence.' },
+] as const;
+
 export function HomePage() {
-  const facility = useFacility(); const editor = useFacilityEditor();
-  return <main className="simple-home"><LineCards/><section className="home-intro"><span className="page-eyebrow">YOUR FACILITY</span><h2>One task at a time.</h2><p>Find equipment, check a document, or capture something from the floor.</p><PageLink page="field" className="page-primary">Start field documentation →</PageLink></section><div className="home-destinations">{(['map','assets','documents','cabinet'] as PageId[]).map(id => <PageLink page={id} key={id} className="destination-card"><strong>{pages[id][0]} <span aria-hidden="true">↗</span></strong><p>{pages[id][1]}</p><small>{id === 'assets' ? `${facility.assets.length} equipment records` : id === 'documents' ? `${facility.documents.length} documents` : 'Open page'}</small></PageLink>)}</div><section className="home-followup"><div><h2>Continue your work</h2><p>{editor.pendingChanges.length} changes awaiting review · {editor.queuedMutationCount} queued for sync</p><small>{editor.publication.phase !== 'DISABLED' ? editor.publication.message : editor.sync.phase === 'LOCAL_ONLY' ? 'Saved on this device. Shared sync is not configured.' : `Sync: ${editor.sync.phase.toLowerCase().replaceAll('_', ' ')}`}</small></div><PageLink page={editor.sync.conflicts.length ? 'conflicts' : 'review'}>Open review →</PageLink></section></main>;
+  const facility = useFacility();
+  const editor = useFacilityEditor();
+  return <main className="simple-home">
+    <section className="home-intro"><span className="page-eyebrow">{facility.facility.name}</span><h2>What do you need to do?</h2><p>Choose a task to get started.</p></section>
+    <div className="home-destinations">{homeTasks.map(task => <PageLink page={task.page} key={task.page} className="destination-card"><strong>{task.title}<span aria-hidden="true">↗</span></strong><p>{task.detail}</p></PageLink>)}</div>
+    <section className="home-followup"><div><h2>Continue your work</h2><p>{editor.pendingChanges.length} changes awaiting review · {editor.queuedMutationCount} queued for sync</p><small>{editor.publication.phase !== 'DISABLED' ? editor.publication.message : editor.sync.phase === 'LOCAL_ONLY' ? 'Saved on this device. Shared sync is not configured.' : `Sync: ${editor.sync.phase.toLowerCase().replaceAll('_', ' ')}`}</small></div><PageLink page={editor.sync.conflicts.length ? 'conflicts' : 'review'}>Open review →</PageLink></section>
+    <LineCards/>
+    <PageLink page="cabinet" className="destination-card"><strong>Control cabinet ↗</strong><p>Explore the drawing and select a device.</p></PageLink>
+  </main>;
 }
-const groups: { title: string; ids: PageId[] }[] = [
-  { title: 'On the floor', ids: ['lines','documentation','maintenance','dependencies','field','observation','evidence','cabinet','wulftec','relationships'] },
-  { title: 'Records & review', ids: ['history','manage','assetAdd','connection','review','health','conflicts'] },
-  { title: 'Workspace', ids: ['database','import','setup','settings','account','help'] },
-];
-export function MorePage() { return <main className="more-page">{groups.map(group => <section key={group.title}><h2>{group.title}</h2><div className="page-link-list">{group.ids.map(id => <PageLink key={id} page={id}><span><strong>{pages[id][0]}</strong><small>{pages[id][1]}</small></span><span aria-hidden="true">›</span></PageLink>)}</div></section>)}<section><h2>Deployed source files</h2><p><a href={`${import.meta.env.BASE_URL}facility-content/lieb-foods/index.html`}>All recovered plant evidence, source register, conflicts, and field tasks ↗</a></p><div className="page-link-list"><a href={`${import.meta.env.BASE_URL}assets/evidence/index.html`} target="_blank" rel="noreferrer"><span><strong>Evidence archive</strong><small>KOSME photos, OEM pages, CR22/CR30 packets, Wulftec master packet, and plant dossier.</small></span><span aria-hidden="true">↗</span></a></div></section></main>; }
+
+export function MorePage() {
+  const selected = new URLSearchParams(location.search).get('tools');
+  const group = toolGroups.find(item => item.id === selected) ?? toolGroups[0];
+  return <main className="more-page">
+    <SectionPicker label="Choose a tool group" options={toolGroups} value={group.id} onChange={tools => navigate('more', { tools })}/>
+    <section aria-label={group.label}><h2>{group.label}</h2><p>{group.description}</p><div className="page-link-list">{group.ids.map(id => <PageLink key={id} page={id}><span><strong>{id === 'observation' ? 'Notes' : pages[id][0]}</strong><small>{pages[id][1]}</small></span><span aria-hidden="true">›</span></PageLink>)}</div></section>
+    {group.id === 'advanced' && <section><h2>Deployed source files</h2><div className="page-link-list"><a href={`${import.meta.env.BASE_URL}facility-content/lieb-foods/index.html`}><span><strong>Recovered plant evidence</strong><small>Source register, conflicts and field tasks.</small></span><span aria-hidden="true">↗</span></a><a href={`${import.meta.env.BASE_URL}assets/evidence/index.html`} target="_blank" rel="noreferrer"><span><strong>Evidence archive</strong><small>KOSME photos, OEM pages, CR22/CR30 packets, Wulftec master packet, and plant dossier.</small></span><span aria-hidden="true">↗</span></a></div></section>}
+  </main>;
+}

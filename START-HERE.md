@@ -19,6 +19,7 @@ Open: **http://127.0.0.1:4173/industrial-asset-graph/**
 - Signed-in entry is Home. Primary navigation is Home, Map, Assets, Docs, and More; on phones it occupies its own bottom row.
 - Each task has a separate `?page=...` URL, including `?page=cabinet`, `?page=field`, and `?page=account`. Legacy links remain supported.
 - More lists editing, review, setup, and help pages. The guide lives on Help rather than covering every workspace.
+- The large-print system uses an 18 px reading baseline and larger controls. More separates Everyday tasks, Records & review, Admin, and Advanced Tools. See `docs/LARGE-PRINT-REDESIGN.md` for the complete navigation map; `npm run test:large-print` checks all routes and synthetic asset/facility workflows.
 
 Before completing UI work, all of these must pass:
 

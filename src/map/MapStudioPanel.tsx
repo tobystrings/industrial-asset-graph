@@ -87,6 +87,7 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
   };
   return <aside ref={panelRef} className="map-studio-panel" aria-label="Map Studio assistant and properties">
     <div className="studio-tabs" role="tablist" aria-label="Studio panels">{['Text edits','Objects','Layers'].map(t=><button key={t} role="tab" aria-selected={tab===t} aria-expanded={tab===t} onClick={()=>setTab(tab===t?null:t)}>{t}</button>)}</div>
+    <div className="studio-panel-scroll" key={tab}>
     {tab==='Text edits'&&<section className="studio-tab-body" aria-label="Text edits">
       <div className="studio-connection" data-state={connection} role="status"><b>{connection==='ready'?'AI server ready':connection==='checking'?'Checking AI connection…':'AI not connected'}</b><p>{connectionMessage}</p><button onClick={()=>void checkConnection()} disabled={!apiUrl||connection==='checking'}>Check connection</button>{connection!=='ready'&&<details><summary>Connection setup</summary><p>Deploy the map-studio function in your existing Supabase project and add GEMINI_API_KEY to its secrets. Use a Google AI Studio project on the free tier. No paid fallback is configured. Never paste the key into this editor.</p></details>}</div>
       <h3>Describe your edit</h3><p>Click or multi-select objects, then refer to “this” or “these”.</p>
@@ -120,5 +121,6 @@ export function MapStudioPanel({session:s}:{session:MapEditorSession}) {
       <p>Reference pixels are locked artwork. Replace symbols or hide features to rebuild individual portions. Hiding cleanup outlines does not reveal removed source pixels.</p>
     </section>}
     {tab&&<details className="studio-draft-history"><summary>Draft & recovery</summary><p>{s.history.past.length} undo steps · {s.history.future.length} redo steps</p><button onClick={exportDraft}>Export current draft</button><label>Restore draft<input type="file" accept=".json" onChange={async e=>{const file=e.target.files?.[0];if(!file) return;try {const value=JSON.parse(await file.text());if(value.format!=='iag-map-studio-draft'||value.version!==1||value.facilityId!==s.facility.facility.id) throw new Error('Choose a draft exported from this facility.');const next=value.draft as MapEditorDraft;const {loadFacilityPackage}=await import('../facility/schema');loadFacilityPackage({...s.facility,...next});s.commit(next,'Restored draft. Save Changes to keep it.');}catch(e){s.setMessage((e as Error).message);}}}/></label><ul>{mapChangeSummary({areas:s.facility.areas,mapConfig:s.facility.mapConfig??{}},d).map((t,i)=><li key={i}>{t}</li>)}</ul></details>}
+    </div>
   </aside>;
 }

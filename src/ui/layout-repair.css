@@ -116,7 +116,7 @@
   }
 
   .dashboard.workspace-map .reference-layout-head p {
-    font-size: 12px !important;
+    font-size: var(--iag-reading-size, 18px) !important;
   }
 
   .dashboard.workspace-map .reference-layout-actions {
@@ -126,7 +126,7 @@
   .dashboard.workspace-map .reference-layout-actions button {
     min-height: 32px !important;
     padding: 5px 8px !important;
-    font-size: 11px !important;
+    font-size: var(--iag-reading-size, 18px) !important;
   }
 
   .dashboard.workspace-map .reference-plan {
