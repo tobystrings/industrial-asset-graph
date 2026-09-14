@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 """Photo-first inventory workflow on desktop, tablet, and phone."""
 from pathlib import Path
 import json
@@ -55,5 +56,5 @@ try:
         assert not failures, json.dumps(failures, indent=2)
         print('Inventory workflow passed.', flush=True)
 finally:
-    server.terminate()
+    stop_preview(server)
     server.wait(timeout=10)

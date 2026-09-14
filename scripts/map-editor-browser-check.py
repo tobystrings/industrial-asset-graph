@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 from pathlib import Path
 import os
 import subprocess
@@ -142,6 +143,6 @@ try:
         context.close(); browser.close()
         print('Map editor browser check passed: rename, add, wall removal, merge, asset preservation, undo/redo/cancel, markup isolation, reload persistence, tablet, and phone.')
 finally:
-    server.terminate()
+    stop_preview(server)
     try: server.wait(timeout=5)
     except subprocess.TimeoutExpired: server.kill()

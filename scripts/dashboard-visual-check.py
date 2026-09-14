@@ -1,3 +1,4 @@
+from browser_test_server import stop_preview
 from pathlib import Path
 import os
 import subprocess
@@ -744,5 +745,5 @@ try:
             'representative room/asset inspector, mobile walkthrough, manager, document, map-edit, and cabinet states were captured.'
         )
 finally:
-    server.terminate()
+    stop_preview(server)
     server.wait(timeout=10)
