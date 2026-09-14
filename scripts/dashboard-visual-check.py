@@ -14,6 +14,11 @@ from map_studio_visual import exercise_map_studio, studio_pane
 from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rejected_auth
 from copacking_visual import exercise_copacking
 from genie_visual import exercise_genie
+from large_print_visual import exercise_large_print, assert_large_print
+import sys
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 output = Path('artifacts')
 output.mkdir(exist_ok=True)
@@ -47,6 +52,8 @@ def verify_pixels(path: Path) -> None:
 
 
 def screenshot(page, name: str) -> Path:
+    if page.locator('.app-pages').count() and not name.startswith('FAIL-'):
+        assert_large_print(page)
     path = output / f'{name}.png'
     page.screenshot(path=str(path), full_page=False)
     verify_pixels(path)
@@ -84,6 +91,13 @@ def assert_manager_geometry(page) -> None:
     assert metrics['content']['top']>=metrics['headerBottom']-1, f'Header covers workspace content: {metrics}'
     assert metrics['content']['bottom']<=metrics['nav']['top']+1 or metrics['content']['top']>=metrics['nav']['bottom']-1, f'Navigation covers workspace content: {metrics}'
     assert all(t['width']>=44 and t['height']>=44 for t in metrics['targets']), f'Navigation touch targets are too small: {metrics}'
+    if page.locator('.studio-panel-scroll').count():
+        clearance = page.locator('.map-studio-panel').evaluate('''el => {
+          const tabs = el.querySelector('.studio-tabs').getBoundingClientRect();
+          const body = el.querySelector('.studio-panel-scroll').getBoundingClientRect();
+          return body.top >= tabs.bottom - 1;
+        }''')
+        assert clearance, 'Map Studio tabs cover the scrolling form'
 
 
 def assert_text_contrast(locator) -> None:
@@ -627,8 +641,10 @@ try:
                     if route == 'wulftec':
                         page.locator('.wulftec-canvas[data-ready="true"]').wait_for(timeout=30000)
                     assert_manager_geometry(page)
+                    assert_large_print(page)
                     screenshot(page, f'{label}-page-{route}')
 
+                exercise_large_print(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_genie(page, label, open_page, screenshot, assert_manager_geometry, assert_text_contrast)
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 

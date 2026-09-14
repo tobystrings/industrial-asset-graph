@@ -39,7 +39,7 @@
   .iag-manager-bar button {
     min-height: 40px;
     padding: 0 11px;
-    font-size: 12px;
+    font-size: var(--iag-reading-size, 18px);
   }
 
   .app-shell.has-manager-bar .facility-guide {

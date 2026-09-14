@@ -11,7 +11,7 @@
     overflow-x: auto; flex-wrap: nowrap; white-space: nowrap;
   }
   .app-shell.has-manager-bar .reference-topbar .recent-workspace-trail button {
-    min-height: 34px; padding: 5px 8px; font-size: 12px;
+    min-height: 34px; padding: 5px 8px; font-size: var(--iag-reading-size, 18px);
   }
   html .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard,
   html .app-shell.has-manager-bar .dashboard:not(.workspace-map) {
