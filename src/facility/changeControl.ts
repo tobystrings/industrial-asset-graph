@@ -5,6 +5,7 @@ const CHANGES_KEY = 'iag-change-control-pending-changes';
 const AUDIT_KEY = 'iag-change-control-audit-log';
 export type IagUser = { id: string; name: string; role: 'technician' | 'admin' };
 export type PendingChange = {
+  inventoryBase?: import('./inventory').PartsInventory;
   id: string;
   entityId: string;
   reason: string;

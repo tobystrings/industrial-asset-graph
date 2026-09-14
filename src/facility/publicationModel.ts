@@ -47,6 +47,9 @@ export function mergePublication(base: Publication, local: Publication, shared: 
   function merge(b: unknown,l: unknown,r: unknown,path: string): unknown {
     if (same(l,r) || same(b,r)) return l;
     if (same(b,l)) return r;
+    if (/^plant\.facility\.inventory\.parts\[[^\]]+\]\.ledger$/.test(path)) {
+      conflicts.push({path,base:b,local:l,shared:r}); return l;
+    }
     if (/^history\[[^\]]+\]$/.test(path) && l && r && typeof l==='object' && typeof r==='object' && (l as HistoryRecord).digest===(r as HistoryRecord).digest) {
       const left=l as HistoryRecord,right=r as HistoryRecord;
       return {...right,...left,publicSourceBase:right.publicSourceBase??left.publicSourceBase,reviews:[...new Map([...right.reviews,...left.reviews].map(review=>[canonicalJson(review),review])).values()]};
