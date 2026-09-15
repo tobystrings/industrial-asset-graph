@@ -37,6 +37,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Verify troubleshooting database authorization and handoffs
+        run: node scripts/troubleshooting-db-check.mjs
+
       - name: Verify facility data
         run: npm run verify:data
 
@@ -53,6 +56,9 @@ jobs:
           VITE_SUPABASE_URL: https://iag-auth-test.supabase.co
           VITE_SUPABASE_ANON_KEY: synthetic-visual-test-key
         run: npm run build
+
+      - name: Verify troubleshooting browser journeys
+        run: python scripts/troubleshooting-browser-check.py
 
       - name: Verify repair and administrator journeys
         run: npm run test:repairs

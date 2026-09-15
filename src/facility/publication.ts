@@ -1,4 +1,5 @@
 import type { FacilityPackage } from './types';
+import { withClimax } from '../../facilities/lieb-foods/climax';
 import { openPlantDb, type AttachmentRecord, type ObservationRecord } from './runtimeDb';
 import { loadAuditEvents, loadPendingChanges, saveAuditEvents, savePendingChanges, type AuditEvent, type PendingChange } from './changeControl';
 import { historyFileId, type HistoryRecord } from './historicalEvidence';
@@ -114,7 +115,7 @@ export async function applyPublication(payload: Publication) {
     await new Promise<void>((resolve,reject)=>{
       const tx=db.transaction(['plant','attachments','observations','historical-evidence','publication-state'],'readwrite');
       tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
-      tx.objectStore('plant').put(payload.plant,'active');
+      tx.objectStore('plant').put(withClimax(payload.plant),'active');
       tx.objectStore('publication-state').delete('map-draft');
       payload.drafts?.forEach(d=>tx.objectStore('publication-state').put(d));
       for (const [name,values] of [['attachments',attachments],['observations',payload.observations],['historical-evidence',retainedHistory]] as const) {

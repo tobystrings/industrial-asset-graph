@@ -1,4 +1,5 @@
 import type { FacilityPackage } from './types';
+import { withClimax } from '../../facilities/lieb-foods/climax';
 import { createStoredZip, readStoredZip } from './iagArchive';
 import { loadFacilityPackage, validateFacilityPackage } from './schema';
 import { mergeCopacking, portableCopacking } from './copacking';
@@ -123,7 +124,8 @@ export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPa
   db.close();
   // Older seeds acquired production claims without their referenced seed evidence.
   // Restore only matching original evidence from this same facility; never invent a source.
-  const raw = structuredClone(existing ?? seed);
+  const raw = withClimax(structuredClone(existing ?? seed));
+  const addedClimax = JSON.stringify(raw) !== JSON.stringify(existing ?? seed);
   const required = new Set<string>();
   const collect = (value: unknown): void => {
     if (!value || typeof value !== 'object') return;
@@ -143,7 +145,7 @@ export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPa
   const addCopacking = loaded.facility.production && !loaded.facility.production.copacking && seed.facility.production?.copacking;
   if (addCopacking) loaded.facility.production!.copacking = structuredClone(addCopacking);
   validateFacilityPackage(loaded);
-  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction || addCopacking || recovered.length)) {
+  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction || addCopacking || recovered.length || addedClimax)) {
     const recoveryDb = await openPlantDb(seed.facility.id);
     const recoveryTx = recoveryDb.transaction('publication-state','readwrite');
     recoveryTx.objectStore('publication-state').put({id:'seed-recovery-'+Date.now(),facilityId:seed.facility.id,plant:existing});

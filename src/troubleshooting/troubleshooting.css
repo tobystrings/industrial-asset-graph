@@ -1,0 +1,12 @@
+.troubleshooting { display:grid; gap:20px; min-width:0; }
+.troubleshooting fieldset { border:0; padding:0; margin:0; display:grid; gap:20px; min-width:0; }
+.troubleshooting label { display:grid; gap:10px; min-width:0; }
+.troubleshooting input,.troubleshooting textarea,.troubleshooting select { width:100%; min-width:0; box-sizing:border-box; }
+.troubleshooting button { min-height:56px; white-space:normal; overflow-wrap:anywhere; }
+.troubleshooting pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:20px; max-width:100%; }
+.troubleshooting progress { width:100%; }
+.troubleshooting .slate-card { display:grid; gap:16px; }
+.troubleshooting p { overflow-wrap:anywhere; }
+.troubleshooting-print { display:none; }
+@media(max-width:600px) { .troubleshooting .slate-actions { display:grid; grid-template-columns:1fr; } }
+@media print { :where(body:has(.troubleshooting)) * { visibility:hidden; } .troubleshooting-print,.troubleshooting-print * { visibility:visible; } .troubleshooting-print { display:block; position:absolute; left:0; top:0; color:black; background:white; font-size:12pt; overflow:visible; } body:has(.troubleshooting) .page-scroll,body:has(.troubleshooting) .app-pages { overflow:visible!important; height:auto!important; } }
