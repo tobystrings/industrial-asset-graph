@@ -48,7 +48,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
     geometry(page);screenshot(page,label+'-troubleshooting-unknown')
     page.get_by_role('button',name='Prepare maintenance escalation',exact=True).click()
     page.get_by_role('button',name='Save observed outcome',exact=True).click()
-    page.get_by_role('status').filter(has_text='Shared version').wait_for()
+    page.get_by_text('Shared version 3 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
     assert next(reversed(state['cloud']['troubleshooting'].values()))['payload']['outcome']=='escalated'
     page.get_by_role('button',name='Recovery assessment',exact=True).click()
     for value in ['home','jog','isolation','power','reset']:
@@ -59,7 +59,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
     page.get_by_label('Actions already taken and whether they helped',exact=True).fill('SIMULATED: no movement or reset performed.')
     page.get_by_label('Responsible person',exact=True).fill('SIMULATED relief technician')
     page.get_by_role('button',name='Save handoff',exact=True).click()
-    page.get_by_role('status').filter(has_text='Shared version').wait_for()
+    page.get_by_text('Shared version 4 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
     with page.expect_download() as download:
         page.get_by_role('button',name='Export saved checklist / handoff',exact=True).click()
     text=open(download.value.path(),encoding='utf-8').read()
@@ -72,7 +72,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
     for key in ['Personnel clear and guarding restored','Load and mechanisms in verified condition','Position and reference valid','Correct mode and recipe','Fault and interlock status checked','Sequence ready under approved restart procedure','Operation restored and independently observed']:
         page.get_by_label(key,exact=True).select_option('yes')
     page.get_by_role('button',name='Save observed outcome',exact=True).click()
-    page.get_by_role('status').filter(has_text='Shared version').wait_for()
+    page.get_by_text('Shared version 5 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
     assert next(reversed(state['cloud']['troubleshooting'].values()))['payload']['outcome']=='restored'
     geometry(page);screenshot(page,label+'-troubleshooting-outcome')
     if label not in ('laptop-1366x768','phone-390x844'):return
@@ -92,7 +92,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
         relief_page.get_by_role('button',name='Accept handoff',exact=True).wait_for()
         assert relief_page.locator('.troubleshooting fieldset').is_disabled()
         relief_page.get_by_role('button',name='Accept handoff',exact=True).click()
-        relief_page.get_by_role('status').filter(has_text='Shared version').wait_for()
+        relief_page.get_by_text('Shared version 6 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
         relief_page.get_by_role('heading',name='Can these observations be made from a normal operating position with guards closed?',exact=True).wait_for()
         geometry(relief_page);screenshot(relief_page,label+'-troubleshooting-relief')
         assert not relief_page.get_by_role('button',name='Grant this account session access',exact=True).count()
