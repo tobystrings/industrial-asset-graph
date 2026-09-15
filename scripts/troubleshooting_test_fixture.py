@@ -100,3 +100,8 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
         page.get_by_role('alert').filter(has_text='Another device changed').wait_for()
         assert page.get_by_label('Responsible person',exact=True).input_value()=='SIMULATED relief technician'
     finally:context.close()
+    count=len(state['cloud']['troubleshooting'])
+    page.get_by_role('button',name='All sessions',exact=True).click()
+    page.get_by_role('button',name='Start and save shared session',exact=True).click()
+    page.get_by_role('heading',name='Can these observations be made from a normal operating position with guards closed?',exact=True).wait_for()
+    assert len(state['cloud']['troubleshooting'])==count+1
