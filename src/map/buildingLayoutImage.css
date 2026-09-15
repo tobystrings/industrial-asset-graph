@@ -8,7 +8,7 @@
   position: relative;
   width: var(--facility-drawing-width, 1210px);
   max-width: none;
-  background: #181818;
+  background: #263D49;
   user-select: none;
 }
 
@@ -18,7 +18,7 @@
   height: auto;
   aspect-ratio: var(--facility-drawing-ratio, 1210 / 525);
   overflow: visible;
-  background: #181818;
+  background: #263D49;
   touch-action: none;
 }
 
@@ -26,18 +26,18 @@
 .svg-coordinate-grid text { fill: #0f766e; font: 800 11px ui-monospace, monospace; paint-order: stroke; stroke: rgba(255,255,255,.92); stroke-width: 3px; }
 .svg-zone { cursor: pointer; outline: none; }
 .svg-zone rect,.svg-zone polygon { fill: transparent; stroke: transparent; stroke-width: 2; vector-effect: non-scaling-stroke; transition: fill .12s ease, stroke .12s ease; }
-.svg-zone text { fill: #143c39; font: 800 16px 'Source Sans 3', sans-serif; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: #fff; stroke-width: 7px; stroke-linejoin: round; }
+.svg-zone text { fill: #143c39; font: 800 16px 'Source Sans 3', sans-serif; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: #F2EDE3; stroke-width: 7px; stroke-linejoin: round; }
 .svg-zone:hover rect,.svg-zone:hover polygon,.svg-zone:focus-visible rect,.svg-zone:focus-visible polygon { fill: rgba(37,99,235,.08); stroke: rgba(37,99,235,.78); }
 .svg-zone:hover text,.svg-zone:focus-visible text,.svg-zone.selected text { fill: #1e3a8a; stroke: rgba(255,255,255,.92); }
 .svg-zone.selected rect,.svg-zone.selected polygon { fill: rgba(245,158,11,.12); stroke: #f59e0b; stroke-width: 3; }
 .svg-asset-marker { cursor: pointer; outline: none; }
-.svg-asset-marker rect { fill: #0f766e; stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.svg-asset-marker rect { fill: #0f766e; stroke: #F2EDE3; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .svg-asset-marker.cabinet rect { fill: #1267b5; }
 .svg-asset-marker.power rect { fill: #ca8a04; }
-.svg-asset-marker text { fill: #fff; font: 800 10px ui-monospace, monospace; pointer-events: none; }
+.svg-asset-marker text { fill: #F2EDE3; font: 800 10px ui-monospace, monospace; pointer-events: none; }
 .svg-asset-marker:hover rect,.svg-asset-marker:focus-visible rect,.svg-asset-marker.selected rect { stroke: #f59e0b; stroke-width: 4; }
 .svg-asset-marker.reference-only { cursor: default; opacity: .62; }
-.svg-asset-marker.reference-only rect { fill: #f8fafc; stroke: #64748b; stroke-dasharray: 5 3; }
+.svg-asset-marker.reference-only rect { fill: #F2EDE3; stroke: #64748b; stroke-dasharray: 5 3; }
 .svg-asset-marker.reference-only text { fill: #475569; }
 .svg-asset-marker.trace-related rect { filter: drop-shadow(0 0 8px #2dd4bf); stroke: #2dd4bf; }
 .svg-asset-marker.trace-unrelated { opacity: .18; }
@@ -63,7 +63,7 @@
   top: 14.7%;
   width: .42%;
   height: 20.1%;
-  background: #181818;
+  background: #263D49;
   pointer-events: none;
 }
 
@@ -93,7 +93,7 @@
 }
 
 .map-hotspot.selected {
-  border-color: #696969;
+  border-color: #47616A;
   background: rgba(52, 52, 52, 0.12);
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.88) inset;
 }

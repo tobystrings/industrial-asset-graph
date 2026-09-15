@@ -17,6 +17,7 @@ from copacking_visual import exercise_copacking
 from genie_visual import exercise_genie
 from large_print_visual import exercise_large_print, assert_large_print
 from inventory_visual import exercise_inventory
+from repair_visual import exercise_repair_pages
 import sys
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -43,6 +44,8 @@ VIEWPORTS = (
     ('tablet-portrait-768x1024', 768, 1024),
     ('phone-large-430x932', 430, 932),
     ('phone-390x844', 390, 844),
+    ('phone-360x800', 360, 800),
+    ('phone-320x740', 320, 740),
     ('phone-landscape-844x390', 844, 390),
 )
 REPRESENTATIVE_STATES = {'laptop-1366x768', 'phone-390x844'}
@@ -72,8 +75,8 @@ def assert_manager_geometry(page) -> None:
     }""")
     for surface in theme:
         assert surface['scheme'] == 'dark', f'Native controls lost dark mode: {surface}'
-        assert max(surface['background']) <= 55, f'Light shell surface returned: {surface}'
-        assert max(surface['background']) - min(surface['background']) <= 3, f'Colored shell surface returned: {surface}'
+        expected = [51,79,88] if surface['selector']=='.page-navigation' else [27,48,60]
+        assert surface['background'] == expected, f'Approved Slate surface changed: {surface}'
         assert min(surface['text']) >= 170, f'Dark shell text is unreadable: {surface}'
     metrics = page.evaluate("""() => {
       const nav = document.querySelector('.page-navigation').getBoundingClientRect();
@@ -92,7 +95,7 @@ def assert_manager_geometry(page) -> None:
     assert metrics['nav']['top']>=0 and metrics['nav']['bottom']<=metrics['height']+1, f'Navigation is clipped: {metrics}'
     assert metrics['content']['top']>=metrics['headerBottom']-1, f'Header covers workspace content: {metrics}'
     assert metrics['content']['bottom']<=metrics['nav']['top']+1 or metrics['content']['top']>=metrics['nav']['bottom']-1, f'Navigation covers workspace content: {metrics}'
-    assert all(t['width']>=44 and t['height']>=44 for t in metrics['targets']), f'Navigation touch targets are too small: {metrics}'
+    assert all(t['width']>=56 and t['height']>=55.9 for t in metrics['targets']), f'Navigation touch targets are too small: {metrics}'
     if page.locator('.studio-panel-scroll').count():
         clearance = page.locator('.map-studio-panel').evaluate('''el => {
           const tabs = el.querySelector('.studio-tabs').getBoundingClientRect();
@@ -416,10 +419,10 @@ def exercise_workspace_states(page, label: str) -> None:
     page.locator('.page-navigation').wait_for(state='visible')
     screenshot(page, f'{label}-documents')
     assert_manager_geometry(page)
-    page.get_by_role('navigation', name='Main navigation').get_by_role('link',name='Assets',exact=True).click()
+    page.get_by_role('navigation', name='Main navigation').get_by_role('link',name='Directory',exact=True).click()
     # This is a same-document React/history transition, not a document load.
-    page.wait_for_function("() => new URLSearchParams(location.search).get('page') === 'assets'")
-    page.get_by_role('heading',name='Assets',exact=True).wait_for(state='visible')
+    page.wait_for_function("() => new URLSearchParams(location.search).get('page') === 'home'")
+    page.get_by_role('heading',name='Directory',exact=True).wait_for(state='visible')
     page.go_back(wait_until='networkidle')
     assert 'view=documents' in page.url, f'Back did not restore documents: {page.url}'
     assert_manager_geometry(page)
@@ -646,6 +649,7 @@ try:
                     assert_large_print(page)
                     screenshot(page, f'{label}-page-{route}')
 
+                exercise_repair_pages(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_large_print(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_genie(page, label, open_page, screenshot, assert_manager_geometry, assert_text_contrast)
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
@@ -741,7 +745,7 @@ try:
         browser.close()
         assert not failures, 'Visual audit failures:\n' + '\n'.join(failures)
         print(
-            'Responsive visual audit passed at 7 desktop/tablet/phone viewports; '
+            'Responsive visual audit passed at 9 desktop/tablet/phone viewports; '
             'representative room/asset inspector, mobile walkthrough, manager, document, map-edit, and cabinet states were captured.'
         )
 finally:

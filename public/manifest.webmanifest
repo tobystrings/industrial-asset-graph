@@ -1,10 +1,10 @@
 {
   "name": "Industrial Asset Graph · J. Lieb Foods",
-  "short_name": "IAG Line 2",
-  "start_url": "/industrial-asset-graph/?view=cabinet",
+  "short_name": "IAG Maintenance",
+  "start_url": "/industrial-asset-graph/?page=home",
   "scope": "/industrial-asset-graph/",
   "display": "standalone",
-  "background_color": "#101010",
-  "theme_color": "#101010",
+  "background_color": "#1B303C",
+  "theme_color": "#1B303C",
   "lang": "en"
 }

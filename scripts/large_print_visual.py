@@ -1,6 +1,14 @@
 """Regression coverage for the large-print system and relocated navigation."""
 import re
 
+def enlarge_text(page, factor=1.5):
+    """Simulate enlarged browser text without changing the viewport or hiding content."""
+    page.evaluate('''factor => {
+      const rows=[...document.querySelectorAll('.app-pages :is(p,small,label,button,input,select,textarea,summary,h1,h2,h3,h4,dt,dd,th,td,a,span,strong,b,figcaption,time,li,option)')]
+        .filter(e=>!e.closest('svg,.sr-only')).map(e=>({e,size:parseFloat(getComputedStyle(e).fontSize)}));
+      rows.forEach(({e,size})=>e.style.setProperty('font-size',(size*factor)+'px','important'));
+    }''',factor)
+
 def assert_large_print(page):
     failures = page.evaluate('''() => {
       const nodes = [...document.querySelectorAll('.page-scroll :is(p,small,label,button,input,select,textarea,summary,h1,h2,h3,h4,dt,dd,th,td), .page-navigation a')];
@@ -14,14 +22,14 @@ def assert_large_print(page):
 def exercise_large_print(page, label, open_page, screenshot, geometry):
     open_page(page, 'home')
     assert_large_print(page)
-    for name, route in [('Find an asset','assets'), ('Map','map'), ('Documents','documents'), ('Notes','observation'), ('Troubleshooting','relationships'), ('Field documentation','field')]:
+    for name, route in [('Equipment','assets'), ('Repairs','repairs'), ('Inventory','inventory'), ('Documents','documents'), ('Facility Map','map'), ('Administration','admin')]:
         link = page.locator('.home-destinations').get_by_role('link', name=re.compile('^' + re.escape(name)))
         assert f'page={route}' in link.get_attribute('href')
-    page.locator('.home-destinations').get_by_role('link', name=re.compile('^Notes')).click()
-    page.get_by_role('heading', name='Record a finding', exact=True).wait_for()
+    page.locator('.home-destinations').get_by_role('link', name=re.compile('^Repairs')).click()
+    page.get_by_role('heading', name='My work', exact=True).wait_for()
     assert_large_print(page)
     page.go_back()
-    page.get_by_role('heading', name='Home', exact=True).wait_for()
+    page.get_by_role('heading', name='Directory', exact=True).wait_for()
     open_page(page, 'more')
     groups = [
         ('Everyday tasks', 'everyday', 'Notes', 'observation'),

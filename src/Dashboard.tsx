@@ -529,7 +529,7 @@ export default function Dashboard({
         /></Suspense>
       )}
 
-      {pageMode === 'map' && (selectedArea || selectedAsset) && <section className="map-selection-card"><div><small>Selected {selectedAsset ? 'equipment' : 'area'}</small><h2>{selectedAsset?.name ?? selectedArea?.name}</h2></div><button type="button" onClick={() => selectedAsset ? navigate('asset',{asset:selectedAsset.id,tab:'record'}) : navigate('area',{area:selectedArea!.id,tab:'record'})}>Open details →</button><button type="button" aria-label="Clear map selection" onClick={() => { setSelectedAsset(null); setSelectedArea(null); }}>×</button></section>}
+      {pageMode === 'map' && (selectedArea || selectedAsset) && <section className="map-selection-card"><div><small>Selected {selectedAsset ? 'equipment' : 'area'}</small><h2>{selectedAsset?.name ?? selectedArea?.name}</h2></div><button type="button" onClick={() => selectedAsset ? navigate('machine',{asset:selectedAsset.id}) : navigate('area',{area:selectedArea!.id,tab:'record'})}>Open details →</button><button type="button" aria-label="Clear map selection" onClick={() => { setSelectedAsset(null); setSelectedArea(null); }}>×</button></section>}
       {(!pageMode || pageMode === 'asset' || pageMode === 'area') && <InspectorRail
         ref={railRef}
         inspectorTab={inspectorTab}

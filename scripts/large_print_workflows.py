@@ -37,9 +37,9 @@ def exercise_asset_forms(page, base, width):
 
     # A full facility switch reloads the package; primary links retain its ID.
     page.goto(base+'?facilityId=test-facility&page=assets', wait_until='networkidle')
-    page.get_by_role('heading', name='Assets', exact=True).wait_for()
+    page.get_by_role('heading', name='Equipment', exact=True).wait_for()
     assert asset_id not in page.locator('.page-workspace').inner_text()
-    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='More', exact=False).click()
+    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='Directory', exact=False).click()
     assert 'facilityId=test-facility' in page.url
     edit()
     assert page.get_by_label('Name', exact=True).input_value() == 'Updated synthetic large-print form test'

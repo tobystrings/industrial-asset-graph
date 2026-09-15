@@ -1,0 +1,24 @@
+import {beforeEach,expect,it} from 'vitest';
+import {IDBFactory} from 'fake-indexeddb';
+import {sha256} from '../facility/additivePackage';
+import {exportWork,importWork} from './backup';
+import {newWork} from './model';
+import {getWorkFile,putWorkFile,readWork,updateWork} from './store';
+beforeEach(()=>{globalThis.indexedDB=new IDBFactory();globalThis.dispatchEvent=()=>true;});
+it('backs up actual originals and restores without overwriting a newer draft',async()=>{
+ const w=newWork('plant-test','author','Technician');w.note='Original note';
+ const blob=new Blob(['original bytes'],{type:'text/plain'});
+ w.files=[{id:'original-file',name:'source.txt',type:blob.type,size:blob.size,sha256:await sha256(blob)}];
+ await putWorkFile(w.facilityId,w.files[0].id,blob);await updateWork(w.facilityId,w.id,()=>w);
+ const backup=await exportWork(w.facilityId,w.authorId);
+ await updateWork(w.facilityId,w.id,old=>({...old!,note:'Later work'}));
+ expect(await importWork(backup,w.facilityId,w.authorId)).toBe(1);
+ const rows=await readWork(w.facilityId);expect(rows.find(r=>r.id===w.id)?.note).toBe('Later work');
+ const copy=rows.find(r=>r.id!==w.id)!;expect(copy.note).toBe('Original note');expect(copy.transport).toBe('local');
+ expect(copy.files[0].id).not.toBe(w.files[0].id);
+ expect(await (await getWorkFile(w.facilityId,copy.files[0].id))!.text()).toBe('original bytes');
+ await expect(importWork(backup,w.facilityId,'other-user')).rejects.toThrow('signed-in account');
+ backup.files[0].base64=btoa('damaged');
+ await expect(importWork(backup,w.facilityId,w.authorId)).rejects.toThrow('integrity');
+ expect(await readWork(w.facilityId)).toHaveLength(2);
+});

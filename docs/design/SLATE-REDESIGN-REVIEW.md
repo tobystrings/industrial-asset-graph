@@ -1,6 +1,6 @@
 # Slate maintenance redesign — design review
 
-Status: **proposed; awaiting owner design review**. September 15, 2026.
+Status: **approved by owner; implementation underway**. September 15, 2026. The owner explicitly approved everything in this task, including the reviewed design and the existing commit/merge/push/deploy scope. No further design or release approval is needed.
 
 Source: `C:/Users/tobys/Downloads/industrial-asset-graph-slate-redesign-goal.txt`, activated by the owner's request to execute it as a goal, commit, merge, push and deploy. The goal explicitly requires review of the directory and phone previews before broad implementation. Existing facility records remain authoritative.
 
@@ -81,4 +81,36 @@ Review the six-section directory, two-destination phone navigation and four phon
 - Baseline `npm run build`: passed, with existing unresolved background asset and bundle/dynamic-import warnings.
 - Baseline `npm run test:visual`: passed at all seven desktop/tablet/phone viewports on September 15, 2026. The first run used a local-only build and failed its publication-status expectation; rebuilding with CI's `VITE_IAG_PUBLICATION=true` and synthetic Supabase authentication settings resolved that configuration mismatch. No assertions were changed. The rerun completed successfully, including the 390px walkthrough, room/asset inspector, manager, document, map editing and cabinet states. Representative desktop Home, laptop equipment and phone field-sheet screenshots were visually inspected. These baseline checks do not establish correctness of the future redesign or live shared review workflow.
 - The production shared-save error originates from `validateCopacking` claim validation (`src/facility/copacking.ts`): possible causes include an unsupported claim status, a missing evidence list, or a reference absent from package evidence. The affected live record and root cause remain unverified; do not erase evidence or relax the validator to bypass this failure.
-- All preparatory verification is complete. Owner design review remains unresolved; implementation and release require that decision as specified by the goal file. Release authorization is already granted and does not need to be requested again.
+- All preparatory verification is complete. Owner design review is now resolved by explicit approval in this task. Proceed with the full implementation and release; do not request approval again.
+
+## Implementation checkpoint — September 15, 2026
+
+Owner approved the full scope, including commit, push, merge and deployment. Implementation is in progress on codex/slate-maintenance-redesign; the redesigned app has not been deployed.
+
+- Shared Slate CSS, directory, focused machine routes, local repair capture/resume and review UI are implemented but still require the full responsive and integration gate.
+- Migration server/migrations/004_repair_review.sql was installed in the existing Supabase project fgzjoiyuhutqcsuaukhu. SQL Editor readback confirmed iag_reviews and iag_work_save(uuid,text,bigint,uuid,jsonb) after COMMIT.
+- Before installation, the migration plus 004_repair_review.check.sql ran inside BEGIN/ROLLBACK against the live database. Its result was PASS for save, duplicate, conflict, immutable originals, author/admin authorization, clarification, approval distinct from application, asset/repair/document/inventory destinations, app-change drafts and repeated application. All test users, test records and canonical test changes were rolled back. This proves database transactions, not the still-unverified browser journeys.
+- Local repair storage tests (4) and seed-recovery test (1) pass. The seed-recovery fixture now correctly represents an existing production configuration missing its later copacking section. It preserves existing equipment and retains the pre-migration package.
+- Remaining: complete inventory context and repair linkage, grounded optional AI assistance, transport/backup robustness, live publication evidence repair, expanded browser journeys and all required visual/build gates, then commit/push/merge/deploy.
+
+## Second implementation checkpoint — September 15, 2026
+
+- Backend stage committed and pushed as bf66563 (durable repair/review SQL and grounded repair-assistant function). The optional repair-assistant function is deployed in fgzjoiyuhutqcsuaukhu and uses verified Supabase Auth, consistent with the existing map-studio handler. A live anonymous request returned 401 from the handler. Authenticated Gemini provider success still needs live verification; no claim is made that this has passed.
+- Added original-byte repair backup/recovery with hash checks, non-overwriting restore, attachment conflict-copy recovery, upload-response retry tests, in-flight editing protection, stable submission retries, and renewal of signed attachment links. Inventory now supports section/part/search URLs and records stock-use references back into the active repair without duplicating its entry on a retry.
+- Added machine/repair context links, corrected manual source lookup to use document paths, and separated electrical versus control component menus. Optional AI drafts remain separate from original notes/files and show citations and unknowns.
+- npm test: 69 files passed, 265 tests passed, 1 pre-existing skip. verify:data and verify:visual-contract passed. CI-format production builds passed. The new test:repairs browser test passed with separate technician/admin sessions: photo capture/resume, actual manual, unclassified note, receipt, clarification, corrected proposal, approval, competing destination conflict, application, original retention and updated repair history.
+- Visual audit now includes all original seven sizes plus 320 and 360, and representative focused machine/repair/review states. Its first failures exposed a shell color override and missing part-detail balance; those were fixed. The next pass exposed prefilled textarea accessible-name ambiguity; explicit labels fixed it and the focused journey passed. The latest full nine-size audit is still running (exec session 77307). Do not restart it merely because observation times out. Latest build excludes the subsequent signed-link refresh and inventory URL duplicate-history fix, so a final rebuild remains required.
+- Public shared snapshot revision 25 was downloaded to ignored artifacts/shared-publication-audit.json and passed validateFacilityPackage. No canonical production record was changed by this audit. The older local missing-evidence recovery remains additive with a saved original package.
+- UI changes and new tests remain uncommitted. No frontend merge or Pages deployment yet. Remaining: finish full visual/map/publication/large-print checks, text scaling and source/contrast audit, positive live assistant and shared inbox verification, final documentation and release requirement audit, then commit/push/PR/merge/Pages deployment and live smoke tests. Preserve unrelated observer text and graphify cache/memory untracked files.
+
+### Latest audit follow-up
+
+The full audit session 77307 reached the private asset import workflow and found that the legacy button labeled Open asset record was opening the new machine menu. Restored its direct asset-record route in App.tsx; the new Equipment directory and map still open the approved machine menu. This fix is newer than the running audit build. The running audit remains useful for the other viewport checks; it must finish or be explicitly stopped before the next rebuild. All 265 unit tests passed; tsc passed before this one-line route correction. New authenticated Genie positive/live shared inbox checks, text-scaling verification, final full gates and frontend release remain incomplete.
+
+## Release candidate verification — September 15, 2026
+
+The final local nine-viewport visual audit passed after the legacy asset-record navigation correction. The production-shaped build includes signed-file link renewal, inventory browser-history deduplication and the original standalone project tour export. Screenshots of the 320 px directory at 150% text size and the 390 px tour were visually reviewed: text reflows and controls occupy reserved space.
+
+All 69 unit-test files passed (265 tests, one pre-existing skip). Data and permanent visual-contract verification passed. Public publication verification validated all 107 original source hashes. The repair/admin journey, cross-browser publication, map editing, inventory workflow and 36-route large-print sweep passed. The repair journey also verifies 150% text size at 320/390/1366 and tour playback.
+
+These are local browser fixtures and repository gates. The real database transaction harness passed separately as recorded above. Real signed-in local capture returned Received by team for a factual application release-check note; the optional assistant rejected the localhost invocation (the production origin remains the allowed boundary). Production-origin provider verification, frontend CI/merge/Pages and live smoke checks remain pending.

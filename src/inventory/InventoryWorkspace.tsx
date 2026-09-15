@@ -6,6 +6,8 @@ import { PageLink } from '../navigation/AppShell';
 import './inventory.css';
 import { readLabel, labelSuggestions } from './labelReader';
 import { exportPlantBackup } from '../facility/runtimeDb';
+import { updateWork } from '../repairs/store';
+import { editedWork } from '../repairs/model';
 
 const sections = ['Parts', 'Add Part', 'Find for Machine', 'Locations', 'Low Stock', 'Activity', 'Advanced'] as const;
 type Section = typeof sections[number];
@@ -17,12 +19,19 @@ function Photo({ record }: { record: AttachmentRecord }) {
 export default function InventoryWorkspace() {
   const pkg = useFacility(), editor = useFacilityEditor();
   const inventory = pkg.facility.inventory ?? emptyInventory();
-  const initialMachine = new URLSearchParams(location.search).get('asset') ?? '';
-  const [section, setSection] = useState<Section>(initialMachine ? 'Find for Machine' : 'Parts');
-  const [machine, setMachine] = useState(initialMachine), [query, setQuery] = useState('');
-  const [draft, setDraft] = useState<InventoryPart>(() => newPart(pkg.facility.id));
+  const params = new URLSearchParams(location.search);
+  const initialMachine = params.get('asset') ?? '', workId=params.get('work')??'';
+  const routeValue=(key:string,value:string,push=false)=>{const next=new URLSearchParams(location.search);if(value)next.set(key,value);else next.delete(key);if(key==='section')next.delete('part');if(next.toString()===new URLSearchParams(location.search).toString())return;history[push?'pushState':'replaceState'](null,'','?'+next);};
+  const initialSection=sections.includes(params.get('section') as Section)?params.get('section') as Section:initialMachine?'Find for Machine':'Parts';
+  const [section, setSectionValue] = useState<Section>(initialSection);
+  const setSection=(value:Section)=>{setSectionValue(value);setSelectedValue('');routeValue('section',value,true);};
+  const [machine, setMachineValue] = useState(initialMachine), [query, setQueryValue] = useState(params.get('q')??'');
+  const setMachine=(v:string)=>{setMachineValue(v);routeValue('asset',v);};
+  const setQuery=(v:string)=>{setQueryValue(v);routeValue('q',v);};
+  const [draft, setDraft] = useState<InventoryPart>(() => structuredClone(inventory.parts.find(p=>p.id===params.get('editPart'))??newPart(pkg.facility.id)));
   const [draftBase, setDraftBase] = useState<PartsInventory>(() => structuredClone(inventory));
-  const [selected, setSelected] = useState(''), [message, setMessage] = useState(''), [busy, setBusy] = useState(false);
+  const [selected, setSelectedValue] = useState(params.get('part')??''), [message, setMessage] = useState(''), [busy, setBusy] = useState(false);
+  const setSelected=(v:string)=>{setSelectedValue(v);routeValue('part',v,true);};
   const [files, setFiles] = useState<AttachmentRecord[]>([]), [role, setRole] = useState<typeof photoRoles[number]>('Part');
   const [movement, setMovement] = useState<MovementType>('Receive'), [quantity, setQuantity] = useState('1'), [reason, setReason] = useState('');
   const [linkMachine, setLinkMachine] = useState(initialMachine), [linkStatus, setLinkStatus] = useState<typeof compatibilityStates[number]>('Needs confirmation'), [position, setPosition] = useState(''), [source, setSource] = useState('');
@@ -45,14 +54,14 @@ export default function InventoryWorkspace() {
   const savePart = async (part: InventoryPart, base = inventory) => save({ ...base, parts: base.parts.some(p => p.id === part.id) ? base.parts.map(p => p.id === part.id ? part : p) : [...base.parts, part] }, base);
   const activePart = inventory.parts.find(p => p.id === selected);
   const machineOptions = <><option value="">Choose a machine</option>{pkg.assets.map(a => <option value={a.id} key={a.id}>{a.name} ({a.id})</option>)}</>;
-  const edit = (part: InventoryPart) => { setDraftBase(structuredClone(inventory)); setDraft(structuredClone(part)); setSection('Add Part'); setMessage(''); };
+  const edit = (part: InventoryPart) => { setDraftBase(structuredClone(inventory)); setDraft(structuredClone(part)); routeValue('editPart',part.id);setSection('Add Part'); setMessage(''); };
   const backup = () => run(async () => {
     const data = await exportPlantBackup(pkg.facility.id, true);
     const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
     const anchor = document.createElement('a'); anchor.href = url; anchor.download = `${pkg.facility.id}-inventory-photo-backup.json`; anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000); setMessage('Backup downloaded with local inventory photos. Keep this file in your chosen secure storage.');
   });
-  const add = () => { setDraftBase(structuredClone(inventory)); setDraft(newPart(pkg.facility.id)); setSection('Add Part'); setMessage(''); };
+  const add = () => { setDraftBase(structuredClone(inventory)); setDraft(newPart(pkg.facility.id));routeValue('editPart',''); setSection('Add Part'); setMessage(''); };
   const upload = (incoming: FileList | null) => run(async () => {
     if (!incoming?.length) return;
     const photos = [...draft.photos];
@@ -86,6 +95,7 @@ export default function InventoryWorkspace() {
   const visible = findParts(inventory.parts, query, section === 'Find for Machine' ? machine : '').filter(p => section !== 'Low Stock' || stock(p).available <= p.minStock);
   const confirmedSpare = visible.some(p => stock(p).available > 0 && ['New', 'Used / tested'].includes(p.condition) && p.machines.some(m => m.id === machine && m.status === 'Verified spare'));
   return <main className="inventory-workspace">
+    {workId&&<PageLink page="repair" details={{work:workId,asset:initialMachine}} className="slate-card">← Return to this repair</PageLink>}
     <div className="inventory-actions"><button disabled={busy} onClick={add}>Take photo / Add part</button><button disabled={busy} onClick={() => setSection('Find for Machine')}>Find part for a machine</button></div>
     <SectionPicker label="Inventory sections" options={sections.map(label => ({ id: label, label }))} value={section} onChange={value => { if (busy) return; if (value === 'Add Part') add(); else setSection(value as Section); setSelected(''); }}/>
     <p className="inventory-notice">{editor.currentUser?.role === 'admin' ? 'Administrator stock records' : 'Changes require administrator review'} · Balances reflect this device’s synchronized records.</p>
@@ -112,7 +122,7 @@ export default function InventoryWorkspace() {
       </div><label>Notes<textarea aria-label="Notes" value={draft.notes} onChange={e => setDraft(old => ({ ...old, notes: e.target.value }))}/></label><label>Manuals, datasheets, document IDs and troubleshooting references<textarea aria-label="Manuals, datasheets, document IDs and troubleshooting references" value={draft.references} onChange={e => setDraft(old => ({ ...old, references: e.target.value }))}/></label></fieldset>
       <p>New parts start at zero. Use Receive after saving to record opening stock with a person and reason.</p><button disabled={busy} type="submit">{editor.currentUser?.role === 'admin' ? 'Save part' : 'Submit part for review'}</button>
     </form> : <>
-      {['Parts', 'Find for Machine', 'Low Stock'].includes(section) && <>
+      {!activePart && ['Parts', 'Find for Machine', 'Low Stock'].includes(section) && <>
         {section === 'Find for Machine' && <label>Machine<select aria-label="Machine" value={machine} onChange={e => setMachine(e.target.value)}>{machineOptions}</select></label>}
         <label>Search parts, label text, specifications or location<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Part number, failed component type, or location"/></label>
         <label className="inventory-file">Scan barcode / QR photo<input type="file" accept="image/*" capture="environment" onChange={e => void scan(e.target.files)}/></label>
@@ -130,8 +140,10 @@ export default function InventoryWorkspace() {
       {section === 'Locations' && <section><h2>Storage locations</h2>{[...new Set(inventory.parts.filter(p => !p.archived).map(locationLabel))].sort().map(label => <button key={label} onClick={() => { setQuery(label === 'Location not recorded' ? '' : label.replaceAll(' / ', ' ')); setSection('Parts'); }}>{label} · {inventory.parts.filter(p => locationLabel(p) === label).length} parts</button>)}<p>Edit a part’s storage fields to record its building, cabinet, rack, shelf and bin. Attach a Location photo to the part.</p></section>}
       {section === 'Activity' && <section><h2>Stock activity</h2>{inventory.parts.flatMap(p => p.ledger.map(event => ({ ...event, part: p }))).sort((a,b) => b.at.localeCompare(a.at)).map(event => <article className="inventory-card" key={event.id}><strong>{event.part.name} · {event.type} · {event.quantity} {event.part.unit}</strong><p>{event.actor} · {new Date(event.at).toLocaleString()} · {event.machineId || 'No machine'}</p><p>{event.reason}</p></article>)}<h2>Review / reorder requests</h2>{inventory.requests.map(r => <article className="inventory-card" key={r.id}><strong>{r.status} · {r.description}</strong><p>{r.machineId} · {r.actor} · {new Date(r.at).toLocaleString()}</p>{r.status === 'Open' && <button disabled={busy} onClick={() => void run(() => save({ ...inventory, requests: inventory.requests.map(row => row.id === r.id ? { ...row, status: 'Resolved' } : row) }))}>Mark resolved</button>}</article>)}</section>}
       {section === 'Advanced' && <section><h2>Inventory administration</h2><p>Administrator approval applies to technician changes. Archive records instead of deleting movement history. Facility backups include inventory records; portable exports omit local-only photo files.</p><button disabled={busy} onClick={() => void backup()}>Download backup with inventory photos</button><PageLink page="review">Review proposed changes</PageLink><PageLink page="database">Facility backups and imports</PageLink><h3>Archived parts</h3>{inventory.parts.filter(p => p.archived).map(p => <button disabled={busy || editor.currentUser?.role !== 'admin'} key={p.id} onClick={() => void run(() => savePart({ ...p, archived: false }))}>Restore {p.name}</button>)}</section>}
-      {activePart && <section className="inventory-detail" aria-label="Selected part"><h2>{activePart.name}</h2><button onClick={() => setSelected('')}>Close part details</button><p>{activePart.description}</p><p>{activePart.specifications || 'Specifications not recorded'}</p><p>{activePart.references}</p><p>Added {new Date(activePart.addedAt).toLocaleDateString()} · Last count {stock(activePart).lastVerified ? new Date(stock(activePart).lastVerified).toLocaleString() : 'Not verified'}</p>
-        <form onSubmit={e => { e.preventDefault(); void run(async () => { const at = new Date().toISOString(); const event = pendingMovement.current ?? { id: crypto.randomUUID(), sequence: activePart.ledger.length + 1, type: movement, quantity: Number(quantity), actor: editor.currentUser?.name ?? '', at, reason, machineId: linkMachine || undefined }; const updated = appendMovement(activePart, event); pendingMovement.current = event; await savePart(updated); pendingMovement.current = null; setReason(''); }); }}>
+      {activePart && <section className="inventory-detail" aria-label="Selected part"><h2>{activePart.name}</h2><p><strong>{stock(activePart).available} {activePart.unit} available · {stock(activePart).onHand} on hand</strong></p><button onClick={() => setSelected('')}>Close part details</button><p>{activePart.description}</p><p>{activePart.specifications || 'Specifications not recorded'}</p><p>{activePart.references}</p><p>Added {new Date(activePart.addedAt).toLocaleDateString()} · Last count {stock(activePart).lastVerified ? new Date(stock(activePart).lastVerified).toLocaleString() : 'Not verified'}</p>
+        <form onSubmit={e => { e.preventDefault(); void run(async () => { const at = new Date().toISOString(); const event = pendingMovement.current ?? { id: crypto.randomUUID(), sequence: activePart.ledger.length + 1, type: movement, quantity: Number(quantity), actor: editor.currentUser?.name ?? '', at, reason, machineId: linkMachine || undefined }; const updated = appendMovement(activePart, event); pendingMovement.current = event; await savePart(updated);
+          if(workId&&event.type==='Issue / install')await updateWork(pkg.facility.id,workId,old=>{if(!old)throw new Error('The stock action was saved, but this repair is unavailable. Reopen My work to record the part.');const entryId='stock-'+event.id;if(old.entries.some(e=>e.id===entryId))return old;return editedWork(old,{entries:[...old.entries,{id:entryId,at:event.at,kind:'parts',text:activePart.name+' · '+event.quantity+' '+activePart.unit+' · '+event.reason+(editor.currentUser?.role==='admin'?' · Stock movement recorded.':' · Stock change submitted for administrator review.')}]});});
+          pendingMovement.current = null; setReason(''); }); }}>
           <h3>Stock action / Verify count</h3><label>Action<select aria-label="Action" value={movement} onChange={e => { pendingMovement.current = null; setMovement(e.target.value as MovementType); }}>{movementTypes.map(type => <option key={type}>{type}</option>)}</select></label><label>{['Adjust','Verify count'].includes(movement) ? 'Actual total count' : 'Quantity'}<input required type="number" min="0" step="any" value={quantity} onChange={e => { pendingMovement.current = null; setQuantity(e.target.value); }}/></label><label>Machine for movement<select aria-label="Machine for movement" required={['Issue / install','Reserve'].includes(movement)} value={linkMachine} onChange={e => { pendingMovement.current = null; setLinkMachine(e.target.value); }}>{machineOptions}</select></label><label>Work note / reason<textarea aria-label="Work note / reason" required value={reason} onChange={e => { pendingMovement.current = null; setReason(e.target.value); }}/></label><button disabled={busy}>Record stock movement</button>
         </form>
         <h3>Compatible machines</h3>{activePart.machines.map(m => <article key={m.id}><PageLink page="asset" details={{ asset: m.id }}>{pkg.assets.find(a => a.id === m.id)?.name ?? m.id}</PageLink><p>{m.status} · {m.position} · {m.source}</p></article>)}

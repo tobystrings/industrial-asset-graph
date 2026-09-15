@@ -12,6 +12,7 @@ server=subprocess.Popen(['npm.cmd' if os.name=='nt' else 'npm','run','preview','
 base=f'http://127.0.0.1:{port}/industrial-asset-graph/'
 cloud={'publication':None,'publication_requests':{},'files':{},'submissions':{}}
 def saved(page):
+    if page.locator('.slate-sync-detail').count(): page.locator('.slate-sync-detail').evaluate("e=>e.open=true")
     try: page.locator('.publication-status.phase-saved').wait_for(timeout=30000)
     except Exception:
         print(page.locator('.publication-status').inner_text(),flush=True)
@@ -23,7 +24,9 @@ def edit(page,old,new):
     page.get_by_label('Area name',exact=True).fill(new)
 def submit(page, conflict=False):
     page.get_by_role('button',name='Save Changes',exact=True).click()
-    if conflict: page.locator('.publication-status.phase-conflict').wait_for()
+    if conflict:
+        if page.locator('.slate-sync-detail').count(): page.locator('.slate-sync-detail').evaluate("e=>e.open=true")
+        page.locator('.publication-status.phase-conflict').wait_for()
     else: page.get_by_text('Map saved across devices. GitHub publication is queued.',exact=True).wait_for()
 try:
     time.sleep(1.5)

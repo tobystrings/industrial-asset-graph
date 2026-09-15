@@ -1,5 +1,12 @@
 # Industrial Asset Graph — agent handoff
 
+## September 15 Slate maintenance redesign
+
+The owner's approved Slate design supersedes the earlier monochrome shell and five-item navigation below. The directory has Equipment, Repairs, Inventory, Documents, Facility Map, and Administration; persistent navigation is Directory / My work. Use shared Slate tokens in src/ui/slate.css, 20 px body text, 22 px actions, and 56 px primary controls. Preserve vivid map object colors. chrome-clearance.css remains the last stylesheet.
+
+Focused machine pages and resumable repairs use the existing facility IDs. Shared repair originals, private attachments, review approvals, and transactional applications use Supabase migration 004. Read [repair operations and recovery](docs/REPAIR-REVIEW.md) before changing this workflow. Optional Gemini drafts are separate from original observations; core capture and review do not require AI. The reviewed directory and implementation evidence are in [the design review](docs/design/SLATE-REDESIGN-REVIEW.md).
+
+
 **Gemini map planner:** The owner requires no paid service. Map Studio uses the Supabase `map-studio` function with server-only `GEMINI_API_KEY`, fixed Gemini 2.5 Flash, and no retries/provider fallback. See `docs/GEMINI-MAP-SETUP.md`. Never claim billing is disabled by code: the Google project must remain free-tier. Configuration status is not a successful provider test.
 
 **September 10 map correction:** The owner supersedes monochrome map rendering: use vivid area and equipment colors, high-contrast linework, readable legends above the canvas, and large editing controls. `src/map/map-workbench.css` owns map styling. Do not apply grayscale/inversion to the complete SVG or overlays; only source artwork uses polarity adjustment. Colors identify objects, not verification or safety. AI readiness is checked against the authenticated server; a configured endpoint alone is not proof of provider connectivity.

@@ -54,6 +54,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: synthetic-visual-test-key
         run: npm run build
 
+      - name: Verify repair and administrator journeys
+        run: npm run test:repairs
+
       - name: Run dashboard visual verification
         run: npm run test:visual
 
