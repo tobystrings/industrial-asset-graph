@@ -90,7 +90,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
         relief_page.goto(session_url,wait_until='networkidle')
         sign_in(relief_page)
         relief_page.get_by_role('button',name='Accept handoff',exact=True).wait_for()
-        assert relief_page.locator('.troubleshooting fieldset').is_disabled()
+        assert relief_page.get_by_role('button',name='Yes',exact=True).is_disabled()
         relief_page.get_by_role('button',name='Accept handoff',exact=True).click()
         relief_page.get_by_text('Shared version 6 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
         relief_page.get_by_role('heading',name='Can these observations be made from a normal operating position with guards closed?',exact=True).wait_for()
