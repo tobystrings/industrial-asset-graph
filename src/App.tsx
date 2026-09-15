@@ -9,6 +9,10 @@ import AppShell, { HomePage, MorePage, PageLink } from './navigation/AppShell';
 import { navigate, readPage, pages, type PageId } from './navigation/pages';
 import { buildGuideContext } from './features/facility-guide/guideContext';
 import AccountSecurity from './auth/AccountSecurity';
+import { WorkSync } from './repairs/useWork';
+import RepairPage, { WorkList } from './repairs/RepairPages';
+import ReviewPage, { AdminPage, AppRequests } from './repairs/ReviewPages';
+import MachinePage, { EquipmentPage } from './machines/MachinePages';
 const ControlCabinetView = lazy(() => import('./ControlCabinetView'));
 const WulftecViewer = lazy(() => import('./machines/WulftecWorkspace'));
 const ComponentRecordPage = lazy(() => import('./machines/ComponentRecordPage'));
@@ -52,11 +56,11 @@ export default function App() {
   const view: AppView = page === 'assets' || page === 'documents' ? page : 'dashboard';
   const dashboardPage = ['map','assets','asset','area','documents','field','relationships'].includes(page);
   const changeView = (next: AppView) => navigate(next === 'dashboard' ? 'map' : next);
-  return <AppShell page={page} navigationKey={route.key}>
+  return <AppShell page={page} navigationKey={route.key}><WorkSync/>
     {!ready ? <main className="workspace-loading" role="status">Loading local facility records…</main> :
     <Suspense fallback={<main className="workspace-loading" role="status">Opening page…</main>}>
-      {page === 'inventory' ? <InventoryWorkspace key={route.key}/> : page === 'history' ? <HistoricalWorkspace key={route.key}/> : ['lines','documentation','maintenance','dependencies'].includes(page) ? <ProductionWorkspace key={route.key} page={page}/> : page === 'wulftec' ? <WulftecViewer key={route.key}/> : page === 'component' ? <ComponentRecordPage key={route.key}/> : <>
-      {page === 'home' ? <HomePage/> : page === 'more' ? <MorePage/> : page === 'account' ? <main className="account-page"><AccountSecurity/></main> : page === 'help' ? <main className="help-page"><FacilityGuide/><section className="destination-card"><h2>Project tour</h2><p>Watch the existing narrated facility tour at your own pace.</p><a className="page-primary" href={`${import.meta.env.BASE_URL}presentation/`} target="_blank" rel="noreferrer">Open project tour ↗</a></section><PageLink page="field">Open field documentation →</PageLink></main> : page === 'cabinet' ? <ControlCabinetView key={route.key} onBack={() => navigate('assets')}/> : dashboardPage ? <Dashboard key={`${page}-${route.key}`} pageMode={page} view={view} onView={changeView} onOpenCabinet={() => navigate('cabinet',{device:new URLSearchParams(location.search).get('device') ?? ''})} onRecord={id => navigate('asset',{asset:id,tab:'record'})}/> : <ManagerPage key={page} page={page} point={mapPoint} onDone={() => { setMapPoint(null); navigate('more'); }}/>}
+      {page === 'machine' ? <MachinePage key={route.key}/> : page === 'assets' && !new URLSearchParams(location.search).has('view') && new URLSearchParams(location.search).get('section') !== 'devices' ? <EquipmentPage key={route.key}/> : page === 'repairs' ? <WorkList/> : page === 'repair' || page === 'repairSummary' ? <RepairPage key={route.key} summary={page==='repairSummary'}/> : page === 'inbox' || page === 'submission' ? <ReviewPage key={route.key}/> : page === 'admin' ? <AdminPage/> : page === 'requests' ? <AppRequests/> : page === 'inventory' ? <InventoryWorkspace key={route.key}/> : page === 'history' ? <HistoricalWorkspace key={route.key}/> : ['lines','documentation','maintenance','dependencies'].includes(page) ? <ProductionWorkspace key={route.key} page={page}/> : page === 'wulftec' ? <WulftecViewer key={route.key}/> : page === 'component' ? <ComponentRecordPage key={route.key}/> : <>
+      {page === 'home' ? <HomePage/> : page === 'more' ? <MorePage/> : page === 'account' ? <main className="account-page"><AccountSecurity/></main> : page === 'help' ? <main className="help-page"><FacilityGuide/><section className="destination-card"><h2>Project tour</h2><p>Watch the existing narrated facility tour at your own pace.</p><a className="page-primary" href={`${import.meta.env.BASE_URL}presentation/`} target="_blank" rel="noreferrer">Open project tour ↗</a></section><PageLink page="field">Open field documentation →</PageLink></main> : page === 'cabinet' ? <ControlCabinetView key={route.key} onBack={() => navigate('assets')}/> : dashboardPage ? <Dashboard key={`${page}-${route.key}`} pageMode={page} view={view} onView={changeView} onOpenCabinet={() => navigate('cabinet',{device:new URLSearchParams(location.search).get('device') ?? ''})} onRecord={id => navigate('asset',{asset:id})}/> : <ManagerPage key={page} page={page} point={mapPoint} onDone={() => { setMapPoint(null); navigate('more'); }}/>}
       </>}
     </Suspense>}
   </AppShell>;

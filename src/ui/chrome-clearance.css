@@ -2,12 +2,12 @@
 @media (min-width: 901px) {
   .app-shell.has-manager-bar .reference-topbar .workspace-tab-strip {
     top: var(--iag-header, 64px); left: 18px; right: 52%;
-    height: 42px; min-height: 42px; padding: 0; background: #121212;
+    height: 42px; min-height: 42px; padding: 0; background: #1B303C;
     overflow-x: auto; flex-wrap: nowrap;
   }
   .app-shell.has-manager-bar .reference-topbar .recent-workspace-trail {
     top: var(--iag-header, 64px); bottom: auto; left: 50%; right: 18px;
-    height: 42px; padding: 0; margin: 0; background: #121212;
+    height: 42px; padding: 0; margin: 0; background: #1B303C;
     overflow-x: auto; flex-wrap: nowrap; white-space: nowrap;
   }
   .app-shell.has-manager-bar .reference-topbar .recent-workspace-trail button {
@@ -44,9 +44,9 @@
   height: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
-  border-left: 1px solid #484848 !important;
+  border-left: 1px solid #334F58 !important;
   border-radius: 0 !important;
-  background: linear-gradient(180deg,#131313,#121212) !important;
+  background: linear-gradient(180deg,#1B303C,#1B303C) !important;
   overflow: hidden !important;
 }
 
@@ -68,7 +68,7 @@
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail p,
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail span,
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard > .rail small {
-  color: #f2f2f2 !important;
+  color: #F2EDE3 !important;
 }
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close {
@@ -81,7 +81,7 @@
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: #f2f2f2;
+  color: #F2EDE3;
   font-size: 24px;
   cursor: pointer;
 }
@@ -89,7 +89,7 @@
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close:hover,
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .map-inspector-close:focus-visible {
   background: rgba(24, 24, 24, 0.12);
-  outline: 2px solid #696969;
+  outline: 2px solid #47616A;
 }
 
 .app-shell.has-manager-bar .dashboard.workspace-map.view-dashboard .reference-plan-wrap {
@@ -175,7 +175,7 @@
     bottom: var(--manager-bar-height, 0px) !important;
     width: 100vw !important;
     height: min(52dvh, 470px) !important;
-    border: 1px solid #484848 !important;
+    border: 1px solid #334F58 !important;
     border-radius: 18px 18px 0 0 !important;
     box-shadow: 0 -18px 55px rgba(0, 0, 0, 0.45) !important;
   }

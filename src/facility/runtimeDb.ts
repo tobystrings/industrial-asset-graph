@@ -1,12 +1,12 @@
 import type { FacilityPackage } from './types';
 import { createStoredZip, readStoredZip } from './iagArchive';
-import { loadFacilityPackage } from './schema';
+import { loadFacilityPackage, validateFacilityPackage } from './schema';
 import { mergeCopacking, portableCopacking } from './copacking';
 import { mergeInventory, validateInventoryTransition } from './inventory';
 import type { SyncMutation } from './syncContract';
 
 const LEGACY_DB_NAME = 'industrial-asset-graph-runtime';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 const PLANT_STORE = 'plant';
 const ATTACHMENT_STORE = 'attachments';
 const OBSERVATION_STORE = 'observations';
@@ -90,6 +90,8 @@ export function openPlantDb(facilityId?: string): Promise<IDBDatabase> {
     const request = indexedDB.open(facilityDatabaseName(facilityId), DB_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
+      if (!db.objectStoreNames.contains('work-records')) db.createObjectStore('work-records', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('work-files')) db.createObjectStore('work-files', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('publication-state')) db.createObjectStore('publication-state', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('historical-evidence')) db.createObjectStore('historical-evidence', { keyPath: 'id' });
       if (!db.objectStoreNames.contains(PLANT_STORE)) db.createObjectStore(PLANT_STORE);
@@ -119,13 +121,35 @@ export async function ensurePlantSeed(seed: FacilityPackage): Promise<FacilityPa
   if (!existing) store.put(structuredClone(seed), ACTIVE_KEY);
   await transactionDone(tx);
   db.close();
-  const loaded = loadFacilityPackage(existing ?? seed);
+  // Older seeds acquired production claims without their referenced seed evidence.
+  // Restore only matching original evidence from this same facility; never invent a source.
+  const raw = structuredClone(existing ?? seed);
+  const required = new Set<string>();
+  const collect = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key === 'evidenceIds' && Array.isArray(child)) child.forEach(id => typeof id === 'string' && required.add(id));
+      else collect(child);
+    }
+  };
+  collect(raw.facility.production ?? seed.facility.production);
+  if (!raw.facility.production?.copacking) collect(seed.facility.production?.copacking);
+  const recovered = seed.evidence.filter(e => required.has(e.id) && !raw.evidence.some(old => old.id === e.id));
+  if (recovered.length && raw.facility.id === seed.facility.id) raw.evidence.push(...structuredClone(recovered));
+  const loaded = loadFacilityPackage(raw);
   // Add newly introduced facility configuration once; never replace saved priorities or survey work.
   const addProduction = !loaded.facility.production && seed.facility.production;
   if (addProduction) loaded.facility.production = structuredClone(seed.facility.production);
   const addCopacking = loaded.facility.production && !loaded.facility.production.copacking && seed.facility.production?.copacking;
   if (addCopacking) loaded.facility.production!.copacking = structuredClone(addCopacking);
-  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction || addCopacking)) await savePlant(loaded, seed.facility.id);
+  validateFacilityPackage(loaded);
+  if (existing && (existing.schemaVersion !== loaded.schemaVersion || addProduction || addCopacking || recovered.length)) {
+    const recoveryDb = await openPlantDb(seed.facility.id);
+    const recoveryTx = recoveryDb.transaction('publication-state','readwrite');
+    recoveryTx.objectStore('publication-state').put({id:'seed-recovery-'+Date.now(),facilityId:seed.facility.id,plant:existing});
+    await transactionDone(recoveryTx); recoveryDb.close();
+    await savePlant(loaded, seed.facility.id);
+  }
   return loaded;
 }
 

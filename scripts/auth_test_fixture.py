@@ -2,6 +2,7 @@
 import base64
 import json
 import time
+from repair_test_fixture import PATHS, handle_work
 from email.parser import BytesParser
 from email.policy import default as email_policy
 from urllib.parse import urlparse, parse_qs
@@ -11,9 +12,9 @@ PASSWORD = 'Synthetic-password-only-42!'
 
 def install_auth_fixture(page, cloud=None):
     cloud = cloud if cloud is not None else {'publication':None, 'publication_requests':{}, 'files':{}, 'submissions':{}}
-    state = {'authenticated': False, 'role': 'admin', 'recoveries': [], 'password_updates': [], 'username': 'visual-reviewer', 'logouts': 0, 'publication': None, 'publication_requests': {}, 'files': {}}
+    state = {'authenticated': False, 'role': 'admin', 'recoveries': [], 'password_updates': [], 'username': 'visual-reviewer', 'user_id':'00000000-0000-4000-8000-000000000042', 'cloud':cloud, 'logouts': 0, 'publication': None, 'publication_requests': {}, 'files': {}}
     def user():
-        return {'id': '00000000-0000-4000-8000-000000000042', 'aud': 'authenticated', 'role': 'authenticated', 'email': EMAIL, 'email_confirmed_at': '2026-09-07T00:00:00Z', 'created_at': '2026-09-07T00:00:00Z', 'app_metadata': {'provider': 'email', 'providers': ['email'], 'iag_role': state['role']}, 'user_metadata': {'full_name': 'Visual Test Reviewer'}}
+        return {'id': state['user_id'], 'aud': 'authenticated', 'role': 'authenticated', 'email': EMAIL, 'email_confirmed_at': '2026-09-07T00:00:00Z', 'created_at': '2026-09-07T00:00:00Z', 'app_metadata': {'provider': 'email', 'providers': ['email'], 'iag_role': state['role']}, 'user_metadata': {'full_name': 'Visual Test Reviewer'}}
     def session():
         enc = lambda data: base64.urlsafe_b64encode(json.dumps(data).encode()).decode().rstrip('=')
         token = enc({'alg': 'HS256', 'typ': 'JWT'})+'.'+enc({'sub': user()['id'], 'aud': 'authenticated', 'exp': int(time.time())+3600})+'.synthetic-signature'
@@ -29,7 +30,8 @@ def install_auth_fixture(page, cloud=None):
             if state['role'] != 'admin': return reply({'error':'Administrator required'},403)
             return reply({'configured':False,'provider':'gemini'})
         if '/storage/v1/object/' in url.path:
-            path = url.path.split('/iag-public/', 1)[-1]
+            path = url.path.split('/iag-work/',1)[-1] if '/iag-work/' in url.path else url.path.split('/iag-public/', 1)[-1]
+            if '/object/sign/' in url.path and request.method=='POST': return reply({'signedURL':'/object/sign/iag-work/'+path+'?token=synthetic'})
             if request.method == 'POST':
                 content=request.post_data_buffer
                 content_type=request.headers.get('content-type','')
@@ -42,6 +44,7 @@ def install_auth_fixture(page, cloud=None):
                 return route.fulfill(status=200,headers=headers,body=cloud['files'][path])
             return reply({'error':'missing synthetic file'},404)
         body = request.post_data_json if request.post_data else {}
+        if any(url.path.endswith('/'+p) for p in PATHS): return handle_work(url.path,parse_qs(url.query),body,cloud,state,user,reply)
         if url.path.endswith('/iag_publications'): return reply(cloud['publication'])
         if url.path.endswith('/iag_submissions'):
             if 'submitted_by' in parse_qs(url.query): return reply(cloud['submissions'].get(user()['id']))

@@ -4,3 +4,7 @@ verify_jwt = false
 # The handler verifies the bearer token through Supabase Auth before planning.
 [functions.map-studio]
 verify_jwt = false
+
+# Supports current Auth signing keys; handler verifies every bearer with Auth.
+[functions.repair-assistant]
+verify_jwt = false

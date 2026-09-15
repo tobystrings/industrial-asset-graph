@@ -67,7 +67,7 @@ def exercise_genie(page, label, open_page, screenshot, geometry, contrast):
     guide.get_by_label('Remind me when leaving a record with gaps').check()
     guide.get_by_role('button', name='Done', exact=True).click()
     open_page(page, f'maintenance&asset={other}')
-    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='Assets', exact=False).click()
+    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='Directory', exact=False).click()
     reminder = page.get_by_role('region', name='Documentation reminder', exact=True)
     reminder.wait_for()
     assert other in reminder.inner_text()
@@ -75,6 +75,6 @@ def exercise_genie(page, label, open_page, screenshot, geometry, contrast):
     screenshot(page, f'{label}-genie-reminder')
     reminder.get_by_role('button', name='Not now', exact=False).click()
     open_page(page, f'maintenance&asset={other}')
-    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='Assets', exact=False).click()
-    page.get_by_role('heading', name='Assets', exact=True).wait_for()
+    page.get_by_role('navigation', name='Main navigation').get_by_role('link', name='Directory', exact=False).click()
+    page.get_by_role('heading', name='Directory', exact=True).wait_for()
     assert reminder.count() == 0, 'Dismissed reminder returned after navigation/reload'

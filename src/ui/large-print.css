@@ -5,8 +5,8 @@
   --iag-label-size: 20px;
   --iag-heading-size: 28px;
   --iag-target-size: 52px;
-  --iag-control-border: #858585;
-  --iag-focus: #fff;
+  --iag-control-border: #47616A;
+  --iag-focus: #F2EDE3;
   font-size: var(--iag-reading-size, 18px);
 }
 body { font-size: var(--iag-reading-size, 18px); line-height: 1.5; }
@@ -21,7 +21,7 @@ html body #root .app-pages :is(button, summary) { white-space: normal; overflow-
 html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size); }
 html body #root .app-pages :is(input, select, textarea) { min-width: 0; max-width: 100%; }
 html body #root .app-pages :is(input[type=checkbox], input[type=radio]) {
-  width: 28px; height: 28px; min-height: 28px; flex: 0 0 28px; accent-color: #eee;
+  width: 28px; height: 28px; min-height: 28px; flex: 0 0 28px; accent-color: #F2EDE3;
 }
 html body #root .app-pages label:has(>input:is([type=checkbox], [type=radio])) { min-height: var(--iag-target-size); align-items: center; }
 html body #root :is(.app-pages, .auth-page) :is(a, button, input, select, textarea, summary):focus-visible {
@@ -29,11 +29,11 @@ html body #root :is(.app-pages, .auth-page) :is(a, button, input, select, textar
 }
 html body #root .app-pages :is(button, a)[aria-pressed=true],
 html body #root .app-pages button[aria-selected=true] {
-  box-shadow: inset 0 -4px 0 #fff; border-color: #eee;
+  box-shadow: inset 0 -4px 0 #F2EDE3; border-color: #F2EDE3;
 }
 html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ffd6d2; margin-block: 8px; }
 .page-navigation a { font-size: var(--iag-label-size); min-height: 56px; padding: 8px 18px; border: 2px solid transparent; }
-.page-navigation a[aria-current=page] { color: #fff; background: #343434; border-color: #eee; box-shadow: inset 0 -3px 0 #fff; }
+.page-navigation a[aria-current=page] { color: #F2EDE3; background: #334F58; border-color: #F2EDE3; box-shadow: inset 0 -3px 0 #F2EDE3; }
 .page-navigation a>.nav-wide-label { font-size: inherit; line-height: inherit; }
 .page-navigation a>.nav-short-label { display: none; }
 .page-brand { font-size: var(--iag-label-size); }
@@ -48,23 +48,23 @@ html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ff
 .home-intro h2 { margin-top: 8px; }
 .home-intro p { margin-bottom: 0; }
 .home-destinations { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
-.destination-card { border-color: #737373; padding: 24px; }
+.destination-card { border-color: #47616A; padding: 24px; }
 .destination-card strong { font-size: 26px; line-height: 1.25; gap: 12px; }
 .destination-card p { font-size: var(--iag-reading-size, 18px); margin: 12px 0 0; }
 .home-followup h2, .more-page h2, .help-page h2 { font-size: var(--iag-heading-size); }
 .more-page { display: grid; grid-template-columns: minmax(0,1fr); max-width: 1080px; margin: auto; }
 .more-page .page-link-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border: 0; gap: 14px; background: transparent; overflow: visible; }
-.more-page .page-link-list a { border: 1px solid #737373; border-radius: 12px; padding: 22px; }
+.more-page .page-link-list a { border: 1px solid #47616A; border-radius: 12px; padding: 22px; }
 .page-link-list strong { font-size: 22px; }
 .page-link-list small { font-size: var(--iag-reading-size, 18px); }
 .section-picker { min-width: 0; }
 .section-picker-label { display: block; font-weight: 600; margin-bottom: 10px; }
 .section-picker>div { display: flex; flex-wrap: wrap; gap: 10px; }
-.section-picker button { padding: 12px 18px; background: #181818; border: 2px solid #858585; border-radius: 10px; color: #eee; font-weight: 700; }
-.section-picker button[aria-pressed=true] { background: #343434; }
+.section-picker button { padding: 12px 18px; background: #263D49; border: 2px solid #47616A; border-radius: 10px; color: #F2EDE3; font-weight: 700; }
+.section-picker button[aria-pressed=true] { background: #334F58; }
 html body #root .app-pages .inspector-tabs { flex-wrap: wrap !important; gap: 8px; padding: 12px; }
 html body #root .app-pages .inspector-tabs button { flex: 1 1 120px; font-size: var(--iag-label-size); }
-html body #root .app-pages .inspector-tabs button.active { border: 2px solid #fff; background: #343434; }
+html body #root .app-pages .inspector-tabs button.active { border: 2px solid #F2EDE3; background: #334F58; }
 html body #root .app-pages .map-floating-controls button { width: 52px; height: 52px; }
 html body #root .app-pages .map-readable-legend>button { font-size: var(--iag-label-size); }
 html body #root .app-pages .map-readable-legend .legend-grid span { font-size: var(--iag-label-size) !important; }

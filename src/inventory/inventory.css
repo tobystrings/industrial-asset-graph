@@ -1,25 +1,25 @@
-.inventory-workspace { max-width: 1500px; margin: auto; padding: clamp(12px, 2vw, 28px); color: #edf2f7; font-size: 18px; }
+.inventory-workspace { max-width: 1500px; margin: auto; padding: clamp(12px, 2vw, 28px); color: var(--slate-text); font-size: 20px; }
 .inventory-workspace * { box-sizing: border-box; min-width: 0; }
 .inventory-workspace h2 { font-size: 28px; }
 .inventory-workspace h3 { font-size: 24px; }
 .inventory-workspace p { line-height: 1.6; overflow-wrap: anywhere; }
 .inventory-workspace label { display: grid; gap: 8px; font-size: 20px; margin: 16px 0; }
-.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea, .inventory-workspace button, .inventory-workspace a { font: inherit; font-size: 18px; }
-.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea { width: 100%; min-height: 52px; color: #f3f6fa; background: #111a26; border: 1px solid #708298; border-radius: 8px; padding: 12px; }
+.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea, .inventory-workspace button, .inventory-workspace a { font: inherit; font-size: 20px; }
+.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea { width: 100%; min-height: 56px; color: var(--slate-text); background: var(--slate-surface); border: 1px solid var(--slate-border); border-radius: 8px; padding: 12px; }
 .inventory-workspace textarea { min-height: 110px; resize: vertical; }
-.inventory-workspace button, .inventory-workspace a { min-height: 52px; padding: 12px 16px; margin: 6px 8px 6px 0; border: 1px solid #91a9c7; border-radius: 8px; color: #f7fbff; background: #243951; white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
+.inventory-workspace button, .inventory-workspace a { min-height: 56px; padding: 12px 16px; margin: 6px 8px 6px 0; border: 1px solid var(--slate-border); border-radius: 8px; color: var(--slate-text); background: var(--slate-nav); white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
 .inventory-workspace button:disabled { opacity: .6; cursor: wait; }
-.inventory-workspace :focus-visible { outline: 3px solid #7dd3fc; outline-offset: 3px; }
-.inventory-workspace fieldset { margin: 24px 0; border: 1px solid #6b7d91; border-radius: 12px; padding: 18px; }
+.inventory-workspace :focus-visible { outline: 3px solid var(--slate-accent); outline-offset: 3px; }
+.inventory-workspace fieldset { margin: 24px 0; border: 1px solid var(--slate-border); border-radius: 12px; padding: 18px; }
 .inventory-workspace legend { font-size: 24px; padding: 0 8px; }
 .inventory-grid, .inventory-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
-.inventory-card, .inventory-detail { background: #182433; border: 1px solid #50647d; border-radius: 12px; padding: 20px; margin: 16px 0; overflow-wrap: anywhere; }
-.inventory-detail { border: 2px solid #8ecdf5; }
+.inventory-card, .inventory-detail { background: var(--slate-surface); border: 1px solid var(--slate-border); border-radius: 12px; padding: 20px; margin: 16px 0; overflow-wrap: anywhere; }
+.inventory-detail { border: 2px solid var(--slate-border); }
 .inventory-photos { display: flex; flex-wrap: wrap; gap: 16px; }
 .inventory-photos figure { margin: 0; max-width: 280px; }
-.inventory-workspace img { width: 100%; max-height: 240px; object-fit: contain; background: #0d1520; border-radius: 8px; }
+.inventory-workspace img { width: 100%; max-height: 240px; object-fit: contain; background: var(--slate-bg); border-radius: 8px; }
 .inventory-workspace .inventory-check { display: flex; align-items: center; gap: 12px; }
 .inventory-workspace .inventory-check input { width: 28px; flex: 0 0 28px; }
-.inventory-message { border: 2px solid #93c5fd; padding: 16px; border-radius: 8px; }
+.inventory-message { border: 2px solid var(--slate-accent); padding: 16px; border-radius: 8px; }
 .inventory-file input { padding: 8px; }
-@media (max-width: 600px) { .inventory-workspace fieldset, .inventory-card, .inventory-detail { padding: 12px; } .inventory-actions { display: grid; } .inventory-workspace button { width: 100%; margin-right: 0; } .inventory-workspace input[type=file] { font-size: 18px; } }
+@media (max-width: 600px) { .inventory-workspace fieldset, .inventory-card, .inventory-detail { padding: 12px; } .inventory-actions { display: grid; } .inventory-workspace button { width: 100%; margin-right: 0; } .inventory-workspace input[type=file] { font-size: 20px; } }
