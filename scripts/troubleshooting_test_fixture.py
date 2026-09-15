@@ -75,3 +75,28 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
     page.get_by_role('status').filter(has_text='Shared version').wait_for()
     assert next(reversed(state['cloud']['troubleshooting'].values()))['payload']['outcome']=='restored'
     geometry(page);screenshot(page,label+'-troubleshooting-outcome')
+    if label not in ('laptop-1366x768','phone-390x844'):return
+    page.get_by_role('button',name='Shift handoff',exact=True).click()
+    page.get_by_label('Relief’s confirmed account email',exact=True).fill('relief@example.test')
+    page.get_by_role('button',name='Grant this account session access',exact=True).click()
+    page.get_by_role('status').filter(has_text='Participant access saved').wait_for()
+    # Fresh browser context represents another authorized device and another user.
+    from auth_test_fixture import install_auth_fixture, sign_in
+    context=page.context.browser.new_context(viewport=page.viewport_size,service_workers='block')
+    relief_page=context.new_page()
+    relief_state=install_auth_fixture(relief_page,state['cloud'])
+    relief_state.update(user_id='00000000-0000-4000-8000-000000000043',role='technician')
+    try:
+        relief_page.goto(session_url,wait_until='networkidle')
+        sign_in(relief_page)
+        relief_page.get_by_role('button',name='Accept handoff',exact=True).wait_for()
+        assert relief_page.locator('.troubleshooting fieldset').is_disabled()
+        relief_page.get_by_role('button',name='Accept handoff',exact=True).click()
+        relief_page.get_by_role('status').filter(has_text='Shared version').wait_for()
+        relief_page.get_by_role('heading',name='Can these observations be made from a normal operating position with guards closed?',exact=True).wait_for()
+        geometry(relief_page);screenshot(relief_page,label+'-troubleshooting-relief')
+        assert not relief_page.get_by_role('button',name='Grant this account session access',exact=True).count()
+        page.get_by_role('button',name='Save handoff',exact=True).click()
+        page.get_by_role('alert').filter(has_text='Another device changed').wait_for()
+        assert page.get_by_label('Responsible person',exact=True).input_value()=='SIMULATED relief technician'
+    finally:context.close()
