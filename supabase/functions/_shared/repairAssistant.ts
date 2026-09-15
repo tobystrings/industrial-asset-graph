@@ -1,4 +1,5 @@
-import {GEMINI_MODEL,PlannerError} from './mapPlanner.ts';
+import {PlannerError} from './mapPlanner.ts';
+export const REPAIR_GEMINI_MODEL = 'gemini-3.1-flash-lite';
 export interface RepairInput { note:string; sources:{id:string;title:string;text:string}[] }
 export interface RepairInterpretation {
  kind:'repair'|'note'|'question'|'correction'|'app-change';
@@ -19,8 +20,16 @@ export function repairInterpretation(raw:unknown,input:RepairInput):RepairInterp
 export async function assistRepair(raw:unknown,key:string,fetcher:typeof fetch=fetch) {
  const input=repairInput(raw);
  if(!key.trim())throw new PlannerError('Connected Genie is unavailable. Your notes, files, and manual summary still work.',503);
- const response=await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(40000),body:JSON.stringify({systemInstruction:{parts:[{text:INSTRUCTION}]},contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:3000,thinkingConfig:{thinkingBudget:0}}})});
- if(!response.ok)throw new PlannerError(response.status===429?'Genie is busy. Try later; your work remains saved.':'Genie could not read this request. Keep the original for administrator review.',response.status===429?429:502);
+ const response=await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${REPAIR_GEMINI_MODEL}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(40000),body:JSON.stringify({systemInstruction:{parts:[{text:INSTRUCTION}]},contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:3000,thinkingConfig:{thinkingLevel:'minimal'}}})});
+ if(!response.ok){
+  const failure=await response.json().catch(()=>null);
+  const message=typeof failure?.error?.message==='string'?failure.error.message:'';
+  const category=/reported as leaked/i.test(message)?'KEY_REPORTED_LEAKED':/API key.*not valid/i.test(message)?'KEY_INVALID':/user location is not supported/i.test(message)?'LOCATION_UNSUPPORTED':response.status===404?'MODEL_UNAVAILABLE':'PROVIDER_REJECTED';
+  const statuses=['PERMISSION_DENIED','UNAUTHENTICATED','INVALID_ARGUMENT','NOT_FOUND','RESOURCE_EXHAUSTED','FAILED_PRECONDITION','INTERNAL','UNAVAILABLE'];
+  // Log only fixed categories and HTTP status, never provider messages, prompts or credentials.
+  console.warn('Repair assistant provider failure',JSON.stringify({httpStatus:response.status,status:statuses.includes(failure?.error?.status)?failure.error.status:'UNKNOWN',category,model:REPAIR_GEMINI_MODEL}));
+  throw new PlannerError(response.status===429?'Genie is busy. Try later; your work remains saved.':'Genie could not read this request. Keep the original for administrator review.',response.status===429?429:502);
+ }
  const data=await response.json();const candidate=data.candidates?.[0];
  if(candidate?.finishReason!=='STOP')throw new PlannerError('Genie could not interpret this material. Submit the original for review.');
  try{return repairInterpretation(JSON.parse(candidate.content.parts.filter((p:{thought?:boolean})=>!p.thought).map((p:{text?:string})=>p.text??'').join('')),input);}catch{throw new PlannerError('Genie could not interpret this material. Submit the original for review.');}
