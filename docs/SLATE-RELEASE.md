@@ -31,4 +31,4 @@ Local release gates passed: 69 test files, 265 tests, one pre-existing skip; dat
 
 [PR #59](https://github.com/tobystrings/industrial-asset-graph/pull/59) is open. Backend migration and authenticated Edge Function are installed in the existing Supabase project. Real receipt `e42e5eb6-5fb4-450e-8020-1dac5d494a3a` tracks this software release; its original explicitly makes no machine repair or parts-use claim. The app-change queue links it to PR #59.
 
-Pending: final CI on the release commit, merge, GitHub Pages deployment, production-origin assistant result and deployed smoke checks. This report does not yet claim production completion.
+The final CI, merge, Pages deployment and production-origin smoke evidence are recorded in PR #59. The results above are the release-candidate verification record; consult the PR for the final deployment outcome. The service-worker cache version is updated so existing installations receive the new manifest and source-browser styling.

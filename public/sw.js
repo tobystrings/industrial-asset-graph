@@ -1,4 +1,4 @@
-const CACHE = 'iag-static-v4';
+const CACHE = 'iag-static-v5-slate';
 const APP_SCOPE = '/industrial-asset-graph/';
 const STATIC_ASSETS = [
   `${APP_SCOPE}manifest.webmanifest`,
