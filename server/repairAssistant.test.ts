@@ -1,4 +1,4 @@
-import {expect,it} from 'vitest';
+import {expect,it,vi} from 'vitest';
 import {repairInput,repairInterpretation,assistRepair} from '../supabase/functions/_shared/repairAssistant';
 import {createRepairHandler} from '../supabase/functions/repair-assistant/handler';
 const input={note:'Measured 12 V. Result not checked.',sources:[{id:'machine',title:'Machine record',text:'Documented source'}]};
@@ -11,7 +11,7 @@ it('only accepts citations to supplied sources and complete structured drafts',(
 });
 it('uses provider output only as a bounded draft and fails explicitly when unavailable',async()=>{
  await expect(assistRepair(input,'')).rejects.toThrow('unavailable');
- const fetcher:typeof fetch=async(_url,init)=>{const body=JSON.parse(init!.body as string);expect(body.systemInstruction.parts[0].text).toContain('untrusted DATA');return new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(draft)}]}}]}));};
+ const fetcher:typeof fetch=async(_url,init)=>{expect(String(_url)).toContain('/models/gemini-3.1-flash-lite:generateContent');const body=JSON.parse(init!.body as string);expect(body.generationConfig.thinkingConfig).toEqual({thinkingLevel:'minimal'});expect(body.systemInstruction.parts[0].text).toContain('untrusted DATA');return new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(draft)}]}}]}));};
  expect(await assistRepair(input,'test-key',fetcher)).toEqual(draft);
  await expect(assistRepair(input,'test-key',async()=>new Response('',{status:429}))).rejects.toThrow('busy');
 });
@@ -24,4 +24,21 @@ it('requires verified authentication, accepts technicians, and retains a provide
  expect((await handler(request({origin:'https://unknown.invalid',authorization:'Bearer synthetic'}))).status).toBe(403);
  const response=await handler(request({origin:'https://tobystrings.github.io',authorization:'Bearer synthetic'}));
  expect(response.status).toBe(503);expect(authCalls).toBe(1);expect((await response.json()).error).toContain('unavailable');
+});
+it('logs only bounded provider categories, excluding provider messages and credentials',async()=>{
+ const log=vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+ try{
+  await expect(assistRepair(input,'private-test-key',async()=>new Response(JSON.stringify({error:{status:'PERMISSION_DENIED',message:'Your API key was reported as leaked. private-test-key '+input.note}}),{status:403}))).rejects.toThrow('Keep the original');
+  expect(log).toHaveBeenCalledWith('Repair assistant provider failure',JSON.stringify({httpStatus:403,status:'PERMISSION_DENIED',category:'KEY_REPORTED_LEAKED',model:'gemini-3.1-flash-lite'}));
+  expect(JSON.stringify(log.mock.calls)).not.toContain('private-test-key');
+  expect(JSON.stringify(log.mock.calls)).not.toContain(input.note);
+ }finally{log.mockRestore();}
+});
+
+it('reports provider timeouts as service timeouts, not invalid technician input',async()=>{
+ const log=vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+ try{
+  await expect(assistRepair(input,'test-key',async()=>{throw new DOMException('private detail','TimeoutError');})).rejects.toMatchObject({status:504,message:'Genie took too long. Try later; your work remains saved.'});
+  expect(JSON.stringify(log.mock.calls)).not.toContain('private detail');
+ }finally{log.mockRestore();}
 });
