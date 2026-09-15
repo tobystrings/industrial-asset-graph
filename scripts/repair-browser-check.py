@@ -110,6 +110,14 @@ try:
             tech.locator('#playBtn').click()
             assert tech.locator('#completeFilm').evaluate('e=>e.paused')
             tech.screenshot(path=f'artifacts/project-tour-{width}.png')
+        for width in [320,390,1366]:
+            tech.set_viewport_size({'width':width,'height':900})
+            for route in ['assets/evidence/index.html','facility-content/lieb-foods/browse.html']:
+                tech.goto(base+route,wait_until='networkidle')
+                assert tech.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+                assert tech.locator('body').evaluate("e=>getComputedStyle(e).backgroundColor")=='rgb(27, 48, 60)'
+                assert tech.locator('a').evaluate_all("els=>els.every(e=>e.getBoundingClientRect().height>=56)")
+                tech.screenshot(path=f'artifacts/slate-archive-{width}-{route.split("/")[0]}.png')
         browser.close()
         print('PASS: technician capture/photo/resume, unknown outcome, shared receipt, clarification, admin correction, approval, conflict, apply, source retention, updated history and role separation.')
 finally:
