@@ -42,6 +42,7 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
     page.get_by_label('Exact HMI message / fault code',exact=True).fill('SIMULATED: unknown fault')
     page.get_by_role('button',name='Start and save shared session',exact=True).click()
     page.get_by_role('heading',name='Can these observations be made from a normal operating position with guards closed?',exact=True).wait_for()
+    page.get_by_text('Shared version 1 received. Reconfirm time-sensitive conditions.',exact=True).wait_for()
     session_url=page.url
     page.get_by_role('button',name='Not sure',exact=True).click()
     page.get_by_role('button',name='Prepare maintenance escalation',exact=True).wait_for()

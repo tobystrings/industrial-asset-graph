@@ -19,7 +19,7 @@ export default function Troubleshooting({assetId}:{assetId:string}){
  const pending=useRef<{signature:string;id:string}|null>(null);
  const requestId=(signature:string)=>{if(pending.current?.signature!==signature)pending.current={signature,id:crypto.randomUUID()};return pending.current.id;};
  const run=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');try{await fn();}catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}};
- const load=async(s:Session)=>{setSession(s);setDraft(structuredClone(s.payload));setSelected(null);setNote('');const [history,people]=await Promise.all([sessionHistory(s.id),participants(s.id)]);setEvents(history);setMembers(people);const p=new URLSearchParams(location.search);p.set('session',s.id);window.history.replaceState(null,'','?'+p);setStatus('Shared version '+s.version+' received. Reconfirm time-sensitive conditions.');};
+ const load=async(s:Session)=>{setSession(s);setDraft(structuredClone(s.payload));setSelected(null);setNote('');const p=new URLSearchParams(location.search);p.set('session',s.id);window.history.replaceState(null,'','?'+p);const [history,people]=await Promise.all([sessionHistory(s.id),participants(s.id)]);setEvents(history);setMembers(people);setStatus('Shared version '+s.version+' received. Reconfirm time-sensitive conditions.');};
  useEffect(()=>{void run(async()=>{const rows=await listSessions(pkg.facility.id,assetId);setSessions(rows);const target=rows.find(s=>s.id===requested);if(target)await load(target);});},[pkg.facility.id,assetId]);
  useEffect(()=>{const t=setInterval(()=>setClock(Date.now()),30000);return()=>clearInterval(t);},[]);
  const write=async(action:string,payload:Session['payload'])=>{
