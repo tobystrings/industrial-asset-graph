@@ -4,9 +4,10 @@ import { areas, assetSerialSources, components, documents, evidence, facility, m
 import { featureConfig } from './config';
 import { mapConfig } from './map';
 import { liebProduction } from './production';
+import { withClimax } from './climax';
 
 export function buildLiebFoodsPackage(): FacilityPackage {
-  return { schemaVersion: 2, packageRevision: 1, entityVersions: {}, facility: { ...facility, production: liebProduction() }, featureConfig, mapConfig, areas, assets: machines, components, relationships, documents, evidence, revisions, assetSerialSources };
+  return withClimax({ schemaVersion: 2, packageRevision: 1, entityVersions: {}, facility: { ...facility, production: liebProduction() }, featureConfig, mapConfig, areas, assets: machines, components, relationships, documents, evidence, revisions, assetSerialSources });
 }
 
 export default buildLiebFoodsPackage;

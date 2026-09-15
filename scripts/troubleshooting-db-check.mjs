@@ -1,0 +1,43 @@
+import { PGlite } from '@electric-sql/pglite';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+
+const db=new PGlite();
+const owner='10000000-0000-0000-0000-000000000001',relief='10000000-0000-0000-0000-000000000002',outsider='10000000-0000-0000-0000-000000000003';
+const id=randomUUID(),asset='LIEB-L2-CLIMAX-6759';
+let count=0;
+const pass=()=>count++;
+try {
+ await db.exec(`create schema auth; create role anon; create role authenticated;
+ create table auth.users(id uuid primary key,email text,confirmed_at timestamptz,raw_app_meta_data jsonb default '{}');
+ create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+ create table public.iag_publications(facility_id text,payload jsonb);
+ grant usage on schema auth to authenticated; grant execute on function auth.uid() to authenticated;`);
+ for(const [u,e] of [[owner,'owner@test.invalid'],[relief,'relief@test.invalid'],[outsider,'outsider@test.invalid']])await db.query('insert into auth.users(id,email,confirmed_at) values($1,$2,now())',[u,e]);
+ await db.exec(await readFile(new URL('../server/migrations/005_troubleshooting.sql',import.meta.url),'utf8'));pass();
+ const as=async u=>{await db.query("select set_config('request.jwt.claim.sub',$1,false)",[u]);};
+ const payload={revision:'climax-2026-09-15-draft-1',symptom:'nothing',intake:{role:'operator'},answers:{},epoch:0,recovery:{},recoveryKind:'reset',restart:{},outcome:'unresolved',nextAction:'Simulated test only',responsible:'Unknown',isolation:'Unknown',actions:'Simulated observations',workId:''};
+ const save=async(base,action,p=payload,request=randomUUID(),sid=id,facility='facility-j-lieb')=>(await db.query('select public.iag_troubleshooting_save($1,$2,$3,$4,$5,$6,$7) result',[sid,facility,asset,base,action,p,request])).rows[0].result;
+ await as(owner);const request=randomUUID();let s=await save(0,'create',payload,request);assert.equal(s.version,1);pass();
+ assert.equal((await save(0,'create',payload,request)).version,1);pass();
+ assert.equal((await save(0,'notes')).status,'conflict');pass();
+ await assert.rejects(()=>save(0,'create',payload,randomUUID(),randomUUID(),'other'));pass();
+ await as(outsider);await assert.rejects(()=>save(1,'notes'));pass();
+ await db.exec('set role authenticated');assert.equal((await db.query('select * from public.iag_troubleshooting')).rows.length,0);pass();
+ await assert.rejects(()=>db.query('update public.iag_troubleshooting set version=99'));pass();await db.exec('reset role');
+ await as(owner);await db.query('select public.iag_troubleshooting_invite($1,$2)',[id,'relief@test.invalid']);pass();
+ await as(relief);await assert.rejects(()=>save(1,'notes'));pass();
+ s=await save(1,'accept',s.payload);assert.equal(s.payload.epoch,1);pass();
+ let p=structuredClone(s.payload);p.answers.safety={answer:'yes',note:'Simulated guards-closed observation',at:'2000-01-01',author:owner,epoch:0};
+ s=await save(2,'answer',p);assert.equal(s.payload.answers.safety.author,relief);assert.equal(s.payload.answers.safety.epoch,1);assert.notEqual(s.payload.answers.safety.at,'2000-01-01');pass();
+ p=structuredClone(s.payload);p.answers.safety.answer='unknown';s=await save(3,'answer',p);assert.equal(s.payload.answers.safety.answer,'unknown');pass();
+ const history=await db.query('select payload from public.iag_troubleshooting_events where session_id=$1 order by version',[id]);assert.equal(history.rows[2].payload.answers.safety.answer,'yes');pass();
+ p=structuredClone(s.payload);p.outcome='restored';await assert.rejects(()=>save(4,'outcome',p));pass();
+ for(const key of ['personnel','load','reference','mode','fault','sequence','operation'])p.restart[key]='yes';s=await save(4,'outcome',p);assert.equal(s.payload.outcome,'restored');pass();
+ s=await save(5,'state-change',s.payload);assert.equal(s.payload.outcome,'unresolved');assert.equal(s.payload.epoch,3);assert.deepEqual(s.payload.restart,{});pass();
+ p=structuredClone(s.payload);p.outcome='escalated';s=await save(6,'outcome',p);assert.equal(s.payload.outcome,'escalated');pass();
+ await assert.rejects(()=>db.query('select public.iag_troubleshooting_invite($1,$2)',[id,'outsider@test.invalid']));pass();
+ await db.exec('set role authenticated');assert.equal((await db.query('select * from public.iag_troubleshooting')).rows.length,1);assert.equal((await db.query('select * from public.iag_troubleshooting_events')).rows.length,7);pass();
+ console.log(`${count} database assertions passed: authorization, RLS, idempotency, conflicts, immutable history, fresh handoff and verified outcomes. All observations simulated.`);
+} finally {await db.close();}

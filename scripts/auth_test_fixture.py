@@ -3,6 +3,7 @@ import base64
 import json
 import time
 from repair_test_fixture import PATHS, handle_work
+from troubleshooting_test_fixture import PATHS as TROUBLESHOOTING_PATHS, handle_troubleshooting
 from email.parser import BytesParser
 from email.policy import default as email_policy
 from urllib.parse import urlparse, parse_qs
@@ -45,6 +46,7 @@ def install_auth_fixture(page, cloud=None):
             return reply({'error':'missing synthetic file'},404)
         body = request.post_data_json if request.post_data else {}
         if any(url.path.endswith('/'+p) for p in PATHS): return handle_work(url.path,parse_qs(url.query),body,cloud,state,user,reply)
+        if any(url.path.endswith('/'+p) for p in TROUBLESHOOTING_PATHS): return handle_troubleshooting(url.path,parse_qs(url.query),body,cloud,state,user,reply)
         if url.path.endswith('/iag_publications'): return reply(cloud['publication'])
         if url.path.endswith('/iag_submissions'):
             if 'submitted_by' in parse_qs(url.query): return reply(cloud['submissions'].get(user()['id']))
