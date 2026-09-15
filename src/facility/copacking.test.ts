@@ -35,7 +35,7 @@ describe('co-packing records', () => {
   });
   it('seeds reported process stages, separate case support and alternatives without physical machines or production history', () => {
     const pkg=buildLiebFoodsPackage(), c=pkg.facility.production!.copacking!; validateFacilityPackage(pkg);
-    expect(pkg.assets).toHaveLength(4); expect(c.runs).toEqual([]); expect(c.products).toEqual([]); expect(c.recipes).toEqual([]);
+    expect(pkg.assets).toHaveLength(5); expect(c.runs).toEqual([]); expect(c.products).toEqual([]); expect(c.recipes).toEqual([]);
     expect(c.stages.every(s => s.claim.status==='USER_REPORTED')).toBe(true);
     const assigned = c.stages.filter(s => s.assetId !== null);
     expect(assigned).toHaveLength(1);
@@ -89,11 +89,11 @@ describe('co-packing records', () => {
   it('upgrades once, preserves line edits and round trips records through existing IndexedDB archives', async () => {
     const seed=buildLiebFoodsPackage(), old=structuredClone(seed); delete old.facility.production!.copacking; old.facility.production!.lines[0].importance=9;
     await resetPlant(old); let upgraded=await ensurePlantSeed(seed); expect(upgraded.facility.production!.lines[0].importance).toBe(9);
-    upgraded=await ensurePlantSeed(seed); expect(upgraded.facility.production!.copacking!.stages).toHaveLength(36); expect(upgraded.assets).toHaveLength(4);
+    upgraded=await ensurePlantSeed(seed); expect(upgraded.facility.production!.copacking!.stages).toHaveLength(36); expect(upgraded.assets).toHaveLength(5);
     const pkg=fixture(); pkg.facility.production!.copacking!.runs.push(run(pkg.facility.production!.copacking!)); await savePlant(pkg);
     const archive=await exportPlantArchive(pkg.facility.id); await resetPlant(seed); await importPlantArchive(archive,'replace',pkg.facility.id);
     expect((await loadPlant(pkg.facility.id))!.facility.production!.copacking).toEqual(pkg.facility.production!.copacking);
-    await importPlantArchive(archive,'merge',pkg.facility.id); expect((await loadPlant(pkg.facility.id))!.assets).toHaveLength(4);
+    await importPlantArchive(archive,'merge',pkg.facility.id); expect((await loadPlant(pkg.facility.id))!.assets).toHaveLength(5);
     await expect(importPlantArchive(archive,'replace',demoFacilityPackage.facility.id)).rejects.toThrow();
   });
   it('keeps controlled evidence and dependent historical snapshots out of portable exports', () => {
