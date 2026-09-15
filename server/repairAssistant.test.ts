@@ -34,3 +34,11 @@ it('logs only bounded provider categories, excluding provider messages and crede
   expect(JSON.stringify(log.mock.calls)).not.toContain(input.note);
  }finally{log.mockRestore();}
 });
+
+it('reports provider timeouts as service timeouts, not invalid technician input',async()=>{
+ const log=vi.spyOn(console,'warn').mockImplementation(()=>undefined);
+ try{
+  await expect(assistRepair(input,'test-key',async()=>{throw new DOMException('private detail','TimeoutError');})).rejects.toMatchObject({status:504,message:'Genie took too long. Try later; your work remains saved.'});
+  expect(JSON.stringify(log.mock.calls)).not.toContain('private detail');
+ }finally{log.mockRestore();}
+});

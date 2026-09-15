@@ -20,7 +20,12 @@ export function repairInterpretation(raw:unknown,input:RepairInput):RepairInterp
 export async function assistRepair(raw:unknown,key:string,fetcher:typeof fetch=fetch) {
  const input=repairInput(raw);
  if(!key.trim())throw new PlannerError('Connected Genie is unavailable. Your notes, files, and manual summary still work.',503);
- const response=await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${REPAIR_GEMINI_MODEL}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(40000),body:JSON.stringify({systemInstruction:{parts:[{text:INSTRUCTION}]},contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:3000,thinkingConfig:{thinkingLevel:'minimal'}}})});
+ let response:Response;
+ try{response=await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${REPAIR_GEMINI_MODEL}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},signal:AbortSignal.timeout(90000),body:JSON.stringify({systemInstruction:{parts:[{text:INSTRUCTION}]},contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:3000,thinkingConfig:{thinkingLevel:'minimal'}}})});}catch(error){
+  const timeout=error instanceof Error&&['TimeoutError','AbortError'].includes(error.name);
+  console.warn('Repair assistant provider failure',JSON.stringify({status:timeout?'TIMEOUT':'NETWORK_ERROR',model:REPAIR_GEMINI_MODEL}));
+  throw new PlannerError(timeout?'Genie took too long. Try later; your work remains saved.':'Genie could not connect. Your original work remains saved.',timeout?504:502);
+ }
  if(!response.ok){
   const failure=await response.json().catch(()=>null);
   const message=typeof failure?.error?.message==='string'?failure.error.message:'';
