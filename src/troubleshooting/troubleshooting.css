@@ -9,4 +9,4 @@
 .troubleshooting p { overflow-wrap:anywhere; }
 .troubleshooting-print { display:none; }
 @media(max-width:600px) { .troubleshooting .slate-actions { display:grid; grid-template-columns:1fr; } }
-@media print { body * { visibility:hidden; } .troubleshooting-print,.troubleshooting-print * { visibility:visible; } .troubleshooting-print { display:block; position:absolute; left:0; top:0; color:black; background:white; font-size:12pt; overflow:visible; } .page-scroll,.app-pages { overflow:visible!important; height:auto!important; } }
+@media print { body:has(.troubleshooting) * { visibility:hidden; } .troubleshooting-print,.troubleshooting-print * { visibility:visible; } .troubleshooting-print { display:block; position:absolute; left:0; top:0; color:black; background:white; font-size:12pt; overflow:visible; } body:has(.troubleshooting) .page-scroll,body:has(.troubleshooting) .app-pages { overflow:visible!important; height:auto!important; } }

@@ -64,6 +64,11 @@ def exercise_troubleshooting(page,label,open_page,screenshot,geometry,state):
         page.get_by_role('button',name='Export saved checklist / handoff',exact=True).click()
     text=open(download.value.path(),encoding='utf-8').read()
     assert 'SIMULATED' in text and 'Audit history' in text and 'not a substitute' in text
+    page.emulate_media(media='print')
+    assert page.locator('.troubleshooting-print').is_visible()
+    assert 'SIMULATED' in page.locator('.troubleshooting-print').inner_text()
+    screenshot(page,label+'-troubleshooting-print')
+    page.emulate_media(media='screen')
     page.goto(session_url,wait_until='networkidle')
     page.get_by_role('button',name='Guided checks',exact=True).wait_for()
     page.get_by_role('button',name='Record outcome',exact=True).click()
