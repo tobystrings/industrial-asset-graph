@@ -35,7 +35,7 @@ html body #root .app-shell.app-pages{height:var(--app-height,100dvh);min-height:
 .destination-card small{color:#C3D0D2;font-weight:600}
 .destination-card:hover{border-color:#47616A}
 .home-followup{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px;background:#263D49;border:1px solid #334F58;border-radius:16px}
-.home-followup h2,.more-page h2,.help-page h2{font-size:19px;margin:0 0 10px;color:#F2EDE3}
+.home-followup h2,.more-page h2,.help-page h2{font-size:var(--iag-label-size);margin:0 0 10px;color:#F2EDE3}
 .home-followup p{margin:0 0 6px;color:#C3D0D2}.home-followup small{color:#C3D0D2}.home-followup a{white-space:nowrap;color:#C3D0D2;min-height:44px;display:flex;align-items:center}
 .more-page{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.more-page section{min-width:0}
 .page-link-list{border:1px solid #334F58;border-radius:14px;overflow:hidden;background:#263D49}
@@ -65,7 +65,7 @@ html body #root .app-shell.app-pages .reference-plan-wrap{min-height:clamp(280px
 html body #root .app-shell.app-pages .reference-plan-image-stage,html body #root .app-shell.app-pages .facility-map-svg{width:var(--facility-drawing-width,1210px)!important}
 html body #root .app-shell.app-pages .reference-info-strip{max-height:140px!important;overflow:auto!important}
 html body #root .app-shell.app-pages .reference-layout-actions{display:flex!important;flex-wrap:wrap;gap:6px;overflow:visible!important}
-html body #root .app-shell.app-pages .reference-layout-actions button{display:inline-flex!important;min-height:44px!important;align-items:center;justify-content:center}
+html body #root .app-shell.app-pages .reference-layout-actions button{display:inline-flex!important;min-height:var(--iag-target-size)!important;min-width:var(--iag-target-size)!important;font-size:var(--iag-label-size)!important;align-items:center;justify-content:center}
 html body #root .app-shell.app-pages .cabinet-detail-heading>span:not(.device-sticky),html body #root .app-shell.app-pages .cabinet-detail-heading>code{color:#C3D0D2!important}
 html body #root .app-shell.app-pages .dashboard>.rail{display:flex!important;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;min-width:0!important;margin-top:20px!important;border-radius:14px;overflow:hidden!important;background:#1B303C!important;color:#F2EDE3}
 html body #root .app-shell.app-pages .dashboard>.rail .rail-body{max-height:none!important;overflow:visible!important}
@@ -122,7 +122,7 @@ html body #root .app-shell.app-pages .field-doc-layout{grid-template-columns:min
 html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-relations,html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-relations{display:none!important}
 .field-section-tabs{display:flex;gap:8px;margin:18px 0}.field-section-tabs button{flex:1;min-width:0;background:#263D49;color:#C3D0D2;border:1px solid #334F58;border-radius:9px;padding:10px 6px}.field-section-tabs button[aria-pressed=true]{background:#263D49;color:#F2EDE3}
 .map-selection-card{display:flex;align-items:center;gap:12px;padding:18px;margin-top:16px;background:#263D49;border:1px solid #334F58;border-radius:12px;color:#F2EDE3}
-.map-selection-card>div{flex:1;min-width:0}.map-selection-card h2{font-size:19px;line-height:1.3;margin:5px 0;color:#F2EDE3}.map-selection-card small{color:#C3D0D2}
+.map-selection-card>div{flex:1;min-width:0}.map-selection-card h2{font-size:var(--iag-label-size);line-height:1.3;margin:5px 0;color:#F2EDE3}.map-selection-card small{color:#C3D0D2}
 .map-selection-card button{background:#263D49;color:#C3D0D2;border:1px solid #334F58;border-radius:8px;padding:10px;min-width:44px}
 html body #root .app-shell.app-pages .cabinet-page .cabinet-summary span,html body #root .app-shell.app-pages .cabinet-page .cabinet-summary b,html body #root .app-shell.app-pages .cabinet-page .cabinet-detail p{color:#F2EDE3}
 html body #root .app-shell.app-pages .asset-directory .system-chips,html body #root .app-shell.app-pages .asset-directory .area-group>header{background:#263D49!important;border-color:#334F58!important}

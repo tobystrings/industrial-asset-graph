@@ -18,7 +18,7 @@ html body #root :is(.app-pages, .auth-page) :is(button, input:not([type=checkbox
   line-height: 1.4;
 }
 html body #root .app-pages :is(button, summary) { white-space: normal; overflow-wrap: anywhere; }
-html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size); }
+html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size) !important; }
 html body #root .app-pages :is(input, select, textarea) { min-width: 0; max-width: 100%; }
 html body #root .app-pages :is(input[type=checkbox], input[type=radio]) {
   width: 28px; height: 28px; min-height: 28px; flex: 0 0 28px; accent-color: #F2EDE3;
@@ -65,7 +65,7 @@ html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ff
 html body #root .app-pages .inspector-tabs { flex-wrap: wrap !important; gap: 8px; padding: 12px; }
 html body #root .app-pages .inspector-tabs button { flex: 1 1 120px; font-size: var(--iag-label-size); }
 html body #root .app-pages .inspector-tabs button.active { border: 2px solid #F2EDE3; background: #334F58; }
-html body #root .app-pages .map-floating-controls button { width: 52px; height: 52px; }
+html body #root .app-pages .map-floating-controls button { width: var(--iag-target-size); height: var(--iag-target-size); min-width: var(--iag-target-size) !important; }
 html body #root .app-pages .map-readable-legend>button { font-size: var(--iag-label-size); }
 html body #root .app-pages .map-readable-legend .legend-grid span { font-size: var(--iag-label-size) !important; }
 html body #root .app-pages .field-section-tabs { flex-wrap: wrap; }
