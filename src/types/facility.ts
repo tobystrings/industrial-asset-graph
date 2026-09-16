@@ -25,7 +25,7 @@ export interface FacilityAsset {
   facts: { label: string; value: VerifiedFact<string | number> }[];
   componentIds: string[]; unknowns: string[];
 }
-export interface ComponentRecord { id: string; label: string; type: string; parentId: string; verificationStatus: VerificationState; manufacturer?: string; model?: string; evidenceIds: string[]; productFamilyId?: string; }
+export interface ComponentRecord { savedParameters?: import('../equipmentImages/model').SavedParameterRecord[]; id: string; label: string; type: string; parentId: string; verificationStatus: VerificationState; manufacturer?: string; model?: string; evidenceIds: string[]; productFamilyId?: string; }
 export interface RelationshipRecord { id: string; source: string; target: string; type: RelationshipType; verificationStatus: VerificationState; evidenceIds: string[]; sourceReference?: string; verifiedAt?: string; note?: string; route?: 'NORMAL' | 'BRANCH' | 'BYPASS' | 'REDUNDANT'; }
 export type SignalKind = 'ANALOG' | 'DIGITAL' | 'NETWORK' | 'DISCRETE';
 export interface ProductParam {

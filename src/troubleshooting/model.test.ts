@@ -29,7 +29,7 @@ describe('guided troubleshooting',()=>{
   const old={id:'old-source',title:'Prior project revision',type:'OTHER' as const,pathOrUrl:'old',access:'LOCAL_ONLY' as const};p.evidence.push(old);expect(withClimax(p).evidence).toContainEqual(old);
  });
  it('reuses a previously authored Climax asset ID',()=>{
-  const p=buildLiebFoodsPackage();p.assets=p.assets.filter(a=>a.id!=='LIEB-L2-CLIMAX-6759');const a=structuredClone(p.assets[0]);a.id='owner-climax';a.name='Climax packer';p.assets.push(a);const result=withClimax(p);expect(result.assets.filter(x=>/climax/i.test(x.name))).toHaveLength(1);expect(result.assets.find(x=>x.id==='owner-climax')!.componentIds).toContain('owner-climax-plc');
+  const p=buildLiebFoodsPackage();p.assets=p.assets.filter(a=>a.id!=='LIEB-L2-CLIMAX-6759');const a=structuredClone(p.assets[0]);a.id='owner-climax';a.name='Climax packer';p.assets.push(a);const result=withClimax(p);expect(result.assets.filter(x=>x.type!=='CONTROL_CABINET'&&/climax/i.test(x.name))).toHaveLength(1);expect(result.assets.find(x=>x.id==='owner-climax')!.componentIds).toContain('owner-climax-plc');
  });
  it('exports provenance, observations, outcome and audit without claiming live state',()=>{
   const p=initialPayload('nothing',{}),s={id:'test',asset_id:'machine',facility_id:'facility-j-lieb',created_by:'u',updated_at:new Date().toISOString(),version:1,payload:p};

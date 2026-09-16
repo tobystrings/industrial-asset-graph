@@ -1,3 +1,4 @@
+import { validateEquipmentImages } from '../equipmentImages/model';
 import { validateStudio } from '../map/studioModel';
 import { validateInventory } from './inventory';
 import { validateCopacking } from './copacking';
@@ -127,6 +128,7 @@ export function validateFacilityPackage(input: unknown): asserts input is Facili
     if (marker.assetId && !assetIds.has(marker.assetId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing asset ${marker.assetId}.`);
     if (marker.areaId && !areaIds.has(marker.areaId)) throw new Error(`Map marker ${marker.id ?? '(unnamed)'} references missing area ${marker.areaId}.`);
   }
+  validateEquipmentImages(pkg as FacilityPackage);
   const studioErrors = validateStudio(pkg.mapConfig ?? {});
   validateCopacking(pkg as FacilityPackage);
   if (studioErrors.length) throw new Error(studioErrors[0]);

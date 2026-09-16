@@ -37,6 +37,7 @@ export interface FacilityDriveSlot {
 }
 
 export interface FacilityFeatureConfig {
+  imageViews?: import('../equipmentImages/model').EquipmentImageView[];
   defaultAreaId: string;
   featuredCabinetAssetId: string;
   featuredMachineAssetId: string;

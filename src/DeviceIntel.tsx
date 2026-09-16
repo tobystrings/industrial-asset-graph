@@ -1,3 +1,4 @@
+import { useFacility } from './facility';
 import { useState } from 'react';
 import { intelSectionsCollapsed } from './lib/hrefMatrix';
 import DriveSlots from './DriveSlots';
@@ -25,6 +26,7 @@ export default function DeviceIntel({
   deviceOrComponentId: string;
   onSelectDrive?: (componentId: string, cabinetDeviceId: string) => void;
 }) {
+  const pkg = useFacility();
   const componentId = resolveComponentId(deviceOrComponentId);
   const family = familyForComponent(componentId);
   const params = paramsForProduct(componentId);
@@ -55,7 +57,7 @@ export default function DeviceIntel({
       {installedManual && (
         <p className="manual-path">Manual · {installedManual.path}{installedManual.excerpt.toLowerCase().includes('not in this build') ? ' · missing' : ''}</p>
       )}
-      <p className="him-banner" data-testid="him-backup">{himBackupStatus(componentId).message}</p>
+      <p className="him-banner" data-testid="him-backup">{himBackupStatus(componentId, pkg.components.find(c => c.id === componentId)?.savedParameters).message}</p>
       <div className="reconnect-card fault-card" data-testid="fault-card" data-status={card.status}>
         <b>If this drive faults</b>
         <p>{card.message}</p>
