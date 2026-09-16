@@ -1,3 +1,4 @@
+import { imageViews } from '../equipmentImages/model';
 import DeviceIntel from '../DeviceIntel';
 import MachineParts from '../inventory/MachineParts';
 import { PageLink } from '../navigation/AppShell';
@@ -149,7 +150,7 @@ export default function SelectedAssetPanel({
       <MachineParts assetId={asset.id}/>
       <div className="asset-actions">
         <WulftecRecordLink asset={asset}/>
-        {isFeaturedCabinet && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
+        {imageViews(facility,asset.id).length > 0 && <PageLink page="cabinet" details={{asset:asset.id}} className="open-cabinet-cta">Explore cabinet photos</PageLink>}{isFeaturedCabinet && <button className="open-cabinet-cta" type="button" onClick={onOpenCabinet}>Cabinet</button>}
         {isFeaturedCabinet && <button className="packet-btn" type="button" onClick={onFocusCabinet}>{focusCabinet ? 'Board' : 'At panel'}</button>}
         <a className="film-chapter is-ghost" href={standalonePresentationHref()} target="_blank" rel="noopener noreferrer">{film.kind === 'chapter' ? 'Presentation ↗' : 'Presentation ↗'}</a>
         <button className="packet-btn" type="button" onClick={() => onPacket(asset.id)}>Packet</button>

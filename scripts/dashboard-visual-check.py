@@ -433,6 +433,13 @@ def exercise_workspace_states(page, label: str) -> None:
     page.locator('.page-navigation').wait_for(state='visible')
     screenshot(page, f'{label}-control-cabinet')
     assert_manager_geometry(page)
+    page.goto(f'{BASE}?page=cabinet&asset=LIEB-L2-CLIMAX-6759-CABINET&image=climax-interior&component=LIEB-L2-CLIMAX-6759-CABINET-upper-left&section=parameters', wait_until='networkidle')
+    page.get_by_test_id('equipment-images').wait_for(state='visible')
+    assert 'No saved parameter record' in page.locator('.equipment-information').inner_text()
+    page.locator('.equipment-information' if page.viewport_size['width']<700 else '.equipment-visual').scroll_into_view_if_needed()
+    screenshot(page, f'{label}-climax-photo-cabinet')
+    assert_manager_geometry(page)
+
 
 
 def diagnostic(page, label: str) -> None:

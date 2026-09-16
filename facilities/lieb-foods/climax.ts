@@ -1,3 +1,4 @@
+import { withClimaxImages } from './climaxImages';
 import type { FacilityPackage } from '../../src/facility/types';
 import type { RegisterEntry } from '../../src/types/facility';
 import { ASSET_ID, evidence, REVISION } from '../../src/troubleshooting/catalog';
@@ -11,7 +12,7 @@ export function withClimax(original:FacilityPackage):FacilityPackage {
  if(original.facility.id!=='facility-j-lieb')return original;
  const pkg=structuredClone(original);
  // Honor an existing field-created Climax identity instead of manufacturing another machine.
- const existing=pkg.assets.find(a=>a.id===ASSET_ID)||pkg.assets.find(a=>/climax/i.test(a.name+' '+a.manufacturer.value));
+ const existing=pkg.assets.find(a=>a.id===ASSET_ID)||pkg.assets.find(a=>!/cabinet/i.test(a.type)&&/climax/i.test(a.name+' '+a.manufacturer.value));
  const id=existing?.id??ASSET_ID;
  if(!existing){
   const fact={value:null,verificationStatus:'FIELD_VERIFY' as const,evidenceIds:[sourceId]};
@@ -30,5 +31,5 @@ export function withClimax(original:FacilityPackage):FacilityPackage {
  });
  if(!pkg.documents.some(d=>d.id===docId))pkg.documents.push({id:docId,assetId:id,category:'Controls',title:'Climax source-backed control associations — draft',path:'docs/machines/LIEB-L2-CLIMAX-6759/source-review.md',state:'DRAFT',required:true,verificationStatus:'INFERRED',evidenceIds:[originalId],register:{kind:'Saved control logic associations (not wiring)',entries}});
  if(!pkg.documents.some(d=>d.id===docId+'-review'))pkg.documents.push({id:docId+'-review',assetId:id,category:'Troubleshooting',title:'Climax troubleshooting source review and validation needs',path:'docs/machines/LIEB-L2-CLIMAX-6759/source-review.md',state:'DRAFT',required:true,verificationStatus:'INFERRED',evidenceIds:[sourceId]});
- return pkg;
+ return withClimaxImages(pkg, id);
 }

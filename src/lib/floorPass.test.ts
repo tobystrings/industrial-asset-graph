@@ -57,6 +57,6 @@ describe('floor-pass helpers', () => {
     );
     expect(fromRects.scale).toBe(2);
     expect(fromRects.x).toBe(400 / 2 - 210 * 2);
-    expect(machines.length).toBe(5);
+    expect(machines.length).toBe(6);
   });
 });

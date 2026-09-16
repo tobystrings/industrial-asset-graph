@@ -1,3 +1,5 @@
+import EquipmentImageWorkspace from './equipmentImages/EquipmentImageWorkspace';
+import { imageViews } from './equipmentImages/model';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import DeviceIntel from './DeviceIntel';
 import FloorPacket from './FloorPacket';
@@ -29,7 +31,14 @@ const packageAssetUrl = (pkg: CabinetPackage | null, file: string) => {
 };
 const pretty = (value: string) => value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-export default function ControlCabinetView({ onBack }: { onBack: () => void }) {
+export default function ControlCabinetView(props: { onBack: () => void }) {
+  const pkg = useFacility();
+  const assetId = new URLSearchParams(location.search).get('asset') || pkg.featureConfig.featuredCabinetAssetId;
+  if (imageViews(pkg, assetId).length) return <EquipmentImageWorkspace assetId={assetId}/>;
+  if (assetId !== pkg.featureConfig.featuredCabinetAssetId) return <main className="slate-workspace"><h2>No cabinet image is recorded for this equipment.</h2><button onClick={props.onBack}>Choose equipment</button></main>;
+  return <LegacyControlCabinetView {...props}/>;
+}
+function LegacyControlCabinetView({ onBack }: { onBack: () => void }) {
   const { facility, featureConfig } = useFacility();
   const cabinetPackage = cabinetPackageFor(featureConfig.featuredCabinetAssetId, featureConfig);
   const assetUrl = (file: string) => packageAssetUrl(cabinetPackage, file);

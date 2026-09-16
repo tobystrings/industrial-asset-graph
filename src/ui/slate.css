@@ -41,3 +41,6 @@ a.slate-card{display:flex;align-items:center;justify-content:space-between;gap:1
 .slate-file{position:relative;min-height:56px;display:flex!important;align-items:center;justify-content:center;cursor:pointer;font-size:22px}
 .slate-file input[type=file]{position:absolute!important;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;border:0!important;clip-path:inset(50%)}
 .slate-file:focus-within{outline:3px solid var(--slate-accent);outline-offset:3px}
+
+.page-map .page-title-actions .map-unplaced-link{white-space:normal;overflow-wrap:anywhere;min-width:0;max-width:100%;text-align:center}
+.page-map .page-title-actions{min-width:0;max-width:100%;flex-shrink:1}

@@ -304,8 +304,8 @@ export function portablePlantPackage(plant: FacilityPackage): FacilityPackage {
   const evidence = plant.evidence.filter((item) => item.access === 'PUBLIC_APP');
   const allowedEvidence = new Set(evidence.map((item) => item.id));
   const evidenceAllowed = (ids: string[]) => ids.every((id) => allowedEvidence.has(id));
-  const components = plant.components.filter((item) => evidenceAllowed(item.evidenceIds));
   const documents = plant.documents.filter((item) => evidenceAllowed(item.evidenceIds) && !item.path.startsWith('indexeddb://'));
+  const components = plant.components.filter((item) => evidenceAllowed(item.evidenceIds)).map(c => ({...c, ...(c.savedParameters ? {savedParameters:c.savedParameters.filter(r => documents.some(d => d.id === r.sourceDocumentId))} : {})}));
   const entityIds = new Set([...plant.areas, ...plant.assets, ...components, ...documents, ...evidence].map((item) => item.id));
   const relationships = plant.relationships.filter((item) => entityIds.has(item.source) && entityIds.has(item.target) && evidenceAllowed(item.evidenceIds));
   const protectFact = <T extends { verificationStatus: string; evidenceIds: string[]; note?: string }>(fact: T): T => {
@@ -314,6 +314,7 @@ export function portablePlantPackage(plant: FacilityPackage): FacilityPackage {
   };
   return {
     ...structuredClone(plant), evidence, components, documents, relationships,
+    featureConfig: {...structuredClone(plant.featureConfig), ...(plant.featureConfig.imageViews ? {imageViews:plant.featureConfig.imageViews.filter(v=>allowedEvidence.has(v.evidenceId)).map(v=>({...v,regions:v.regions.filter(r=>r.entityId===v.assetId||components.some(c=>c.id===r.entityId))}))} : {})},
     facility: { ...structuredClone(plant.facility), inventory: plant.facility.inventory ? { ...structuredClone(plant.facility.inventory), parts: plant.facility.inventory.parts.map(p => ({ ...structuredClone(p), photos: p.photos.filter(photo => photo.access === 'PUBLIC_APP') })) } : undefined, production: plant.facility.production ? { ...structuredClone(plant.facility.production), copacking: portableCopacking(plant.facility.production.copacking, allowedEvidence) } : undefined },
     assets: plant.assets.map((asset) => ({ ...asset, production: asset.production ? { ...asset.production, memberships: asset.production.memberships.map(m => ({ ...m, verificationStatus: evidenceAllowed(m.evidenceIds) ? m.verificationStatus : 'FIELD_VERIFY' as const, evidenceIds: m.evidenceIds.filter(id => allowedEvidence.has(id)), source: evidenceAllowed(m.evidenceIds) ? m.source : 'Supporting evidence excluded from portable package by access policy.' })), service: asset.production.service.filter(s => evidenceAllowed(s.evidenceIds)) } : undefined, componentIds: asset.componentIds.filter(id => components.some(component => component.id === id)), manufacturer: protectFact(asset.manufacturer), model: protectFact(asset.model), serialNumber: protectFact(asset.serialNumber), facts: asset.facts.map((item) => ({ ...item, value: protectFact(item.value) })) })),
     revisions: plant.revisions.filter((item) => evidenceAllowed(item.evidenceIds)),

@@ -63,6 +63,9 @@ jobs:
       - name: Verify repair and administrator journeys
         run: npm run test:repairs
 
+      - name: Verify equipment photo navigation
+        run: python scripts/equipment-images-browser-check.py
+
       - name: Run dashboard visual verification
         run: npm run test:visual
 
