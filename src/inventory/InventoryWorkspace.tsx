@@ -3,6 +3,7 @@ import { useFacility, useFacilityEditor, type AttachmentRecord } from '../facili
 import { appendMovement, compatibilityStates, emptyInventory, findParts, locationLabel, movementTypes, newPart, partCategories, photoRoles, stock, type InventoryPart, type MovementType, type PartsInventory, type StockMovement } from '../facility/inventory';
 import SectionPicker from '../navigation/SectionPicker';
 import { PageLink } from '../navigation/AppShell';
+import { pushPageSearch } from '../navigation/pages';
 import './inventory.css';
 import { readLabel, labelSuggestions } from './labelReader';
 import { exportPlantBackup } from '../facility/runtimeDb';
@@ -21,7 +22,7 @@ export default function InventoryWorkspace() {
   const inventory = pkg.facility.inventory ?? emptyInventory();
   const params = new URLSearchParams(location.search);
   const initialMachine = params.get('asset') ?? '', workId=params.get('work')??'';
-  const routeValue=(key:string,value:string,push=false)=>{const next=new URLSearchParams(location.search);if(value)next.set(key,value);else next.delete(key);if(key==='section')next.delete('part');if(next.toString()===new URLSearchParams(location.search).toString())return;history[push?'pushState':'replaceState'](null,'','?'+next);};
+  const routeValue=(key:string,value:string,push=false)=>{const next=new URLSearchParams(location.search);if(value)next.set(key,value);else next.delete(key);if(key==='section')next.delete('part');if(next.toString()===new URLSearchParams(location.search).toString())return;if(push)pushPageSearch('?'+next);else history.replaceState(history.state,'','?'+next);};
   const initialSection=sections.includes(params.get('section') as Section)?params.get('section') as Section:initialMachine?'Find for Machine':'Parts';
   const [section, setSectionValue] = useState<Section>(initialSection);
   const setSection=(value:Section)=>{setSectionValue(value);setSelectedValue('');routeValue('section',value,true);};

@@ -25,7 +25,7 @@ import { prefersReducedMotion, scrollPaneToTop } from './lib/scrollChrome';
 import { dashboardSearch, genieQueryFromSearch, phoneTabFromQuery, subscribeViewport } from './lib/viewport';
 import MapStage, { mapModeFromQuery, type MapMode } from './map/MapStage';
 import type { DocumentationState, FacilityArea, FacilityAsset, ReviewDecision, SystemKind, VerificationState } from './types/facility';
-import { navigate, type PageId } from './navigation/pages';
+import { navigate, navigateBack, type PageId } from './navigation/pages';
 
 const DocumentsWorkspace = lazy(() => import('./dashboard/DocumentsWorkspace'));
 const FieldDocumentationWorkspace = lazy(() => import('./dashboard/FieldDocumentationWorkspace'));
@@ -100,7 +100,10 @@ export default function Dashboard({
   });
   const [mapMode, setMapMode] = useState<MapMode>(mapModeFromQuery(location.search));
   const [systemKind, setSystemKind] = useState<SystemKind>('ALL');
-  const [docStateFilter, setDocStateFilter] = useState<DocumentationState | 'ALL'>('ALL');
+  const [docStateFilter, setDocStateFilter] = useState<DocumentationState | 'ALL'>(() => {
+    const filter = params.get('docState');
+    return ['COMPLETE','REVIEW','IN_PROGRESS','DRAFT','NOT_STARTED'].includes(filter ?? '') ? filter as DocumentationState : 'ALL';
+  });
   const [packetOpen, setPacketOpen] = useState(false);
   const [packetAsset, setPacketAsset] = useState(featuredCabinetAssetId);
   const [focusCabinet, setFocusCabinet] = useState(params.get('focus') === 'cabinet');
@@ -135,17 +138,19 @@ export default function Dashboard({
       ...genieQueryFromSearch(location.search),
     });
     const destination = new URLSearchParams(search);
+    if (params.has('work')) destination.set('work',params.get('work')!);
+    if (pageMode === 'documents' && docStateFilter !== 'ALL') destination.set('docState',docStateFilter);
     if (pageMode === 'documents' && params.has('assembly')) {
       for (const key of ['assembly', 'scope', 'explode']) if (params.has(key)) destination.set(key, params.get(key)!);
     }
-    history.replaceState(null, '', `${location.pathname}?${destination}`);
+    history.replaceState(history.state, '', `${location.pathname}?${destination}`);
     if (workspaceTab === 'field') {
       const fieldParams = new URLSearchParams(location.search);
       fieldParams.set('field', '1');
-      history.replaceState(null, '', `${location.pathname}?${fieldParams.toString()}${location.hash}`);
+      history.replaceState(history.state, '', `${location.pathname}?${fieldParams.toString()}${location.hash}`);
     }
     localStorage.setItem('industrial-asset-selection', JSON.stringify({ area: selectedArea?.id, asset: selectedAsset?.id }));
-  }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen, workspaceTab, traceMode, traceOn]);
+  }, [selectedArea, selectedAsset, view, activeDocument, mapMode, inspectorTab, focusCabinet, paletteOpen, paletteQuery, focusDevice, doorOpen, workspaceTab, traceMode, traceOn, docStateFilter]);
 
   useEffect(() => {
     if (pageMode !== 'map' || params.get('edit') !== '1') return;
@@ -315,7 +320,7 @@ export default function Dashboard({
     if (selectedAsset) next.set('asset', selectedAsset.id);
     next.set('trace', mode);
     next.delete('command');
-    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
+    history.replaceState(history.state, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
   const selectArea = (area: FacilityArea) => {
@@ -332,7 +337,7 @@ export default function Dashboard({
     const next = new URLSearchParams(location.search);
     next.set('area', area.id);
     next.delete('asset');
-    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
+    history.replaceState(history.state, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
   const selectAsset = (asset: FacilityAsset) => {
@@ -350,7 +355,7 @@ export default function Dashboard({
     const next = new URLSearchParams(location.search);
     next.set('asset', asset.id);
     next.set('area', asset.areaId);
-    history.replaceState(null, '', `${location.pathname}?${next.toString()}${location.hash}`);
+    history.replaceState(history.state, '', `${location.pathname}?${next.toString()}${location.hash}`);
   };
 
   useEffect(() => {
@@ -502,7 +507,7 @@ export default function Dashboard({
                 setWorkspaceTab('map');
                 const next = new URLSearchParams(location.search);
                 next.delete('trace'); next.delete('command');
-                history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+                history.replaceState(history.state, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
               }}
             />
           )}
@@ -524,7 +529,11 @@ export default function Dashboard({
         <Suspense fallback={<section className="panel workspace-loading" aria-live="polite">Loading document workspace…</section>}><DocumentsWorkspace
           activeDocument={activeDocument}
           docStateFilter={docStateFilter}
-          onDocument={id => pageMode ? navigate('documents', id ? {doc:id} : {}) : setActiveDocument(id)}
+          onDocument={id => {
+            if (!pageMode) { setActiveDocument(id); return; }
+            if (!id) { navigateBack(); return; }
+            navigate('documents',{doc:id,asset:selectedAsset?.id ?? '',work:params.get('work') ?? '',docState:docStateFilter});
+          }}
           onDocStateFilter={setDocStateFilter}
         /></Suspense>
       )}

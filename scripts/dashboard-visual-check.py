@@ -16,6 +16,7 @@ from auth_test_fixture import install_auth_fixture, exercise_login, exercise_rej
 from copacking_visual import exercise_copacking
 from genie_visual import exercise_genie
 from large_print_visual import exercise_large_print, assert_large_print
+from navigation_visual import exercise_navigation
 from inventory_visual import exercise_inventory
 from repair_visual import exercise_repair_pages
 from troubleshooting_test_fixture import exercise_troubleshooting
@@ -660,6 +661,8 @@ try:
                 exercise_repair_pages(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_troubleshooting(page, label, open_page, screenshot, assert_manager_geometry, auth_state)
                 exercise_large_print(page, label, open_page, screenshot, assert_manager_geometry)
+                if label in REPRESENTATIVE_STATES:
+                    exercise_navigation(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_genie(page, label, open_page, screenshot, assert_manager_geometry, assert_text_contrast)
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 

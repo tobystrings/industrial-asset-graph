@@ -17,7 +17,7 @@ export default function WulftecWorkspace() {
     const query = new URLSearchParams(location.search);
     query.set('assembly', next.selected); query.set('scope', next.scope); query.set('explode', String(next.explosion));
     if (asset) query.set('asset', asset.id);
-    history.replaceState(null, '', `${location.pathname}?${query}`);
+    history.replaceState(history.state, '', `${location.pathname}?${query}`);
   }, [asset?.id]);
   const parts = asset ? linkedComponents(plant, asset, state.selected) : [];
   const details = asset ? modelDetails(asset.id, state.selected, state.scope, state.explosion) : {};

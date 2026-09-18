@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react';
 import { useFacility, useFacilityEditor } from '../facility';
-import { navigate, pageSearch, pages, type PageId } from './pages';
+import { navigate, navigateBack, backDestination, backLabel, rememberScroll, pageSearch, pages, type PageId } from './pages';
 import PublicationStatus from '../facility/PublicationStatus';
 import { useFacilityGuide } from '../features/facility-guide';
 import { GuideReminder } from '../features/facility-guide/GuideReminder';
@@ -18,21 +18,48 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
   const facility = useFacility();
   const editor = useFacilityEditor();
   const guide = useFacilityGuide();
+  const [,refreshContext] = useState(0);
+  useEffect(() => {
+    const refresh = () => refreshContext(value=>value+1);
+    addEventListener('iag-navigation-context',refresh);
+    return () => removeEventListener('iag-navigation-context',refresh);
+  },[]);
   const heading = useRef<HTMLHeadingElement>(null);
   const scroll = useRef<HTMLDivElement>(null);
+  const scrollTimer = useRef<number | undefined>(undefined);
   const context = new URLSearchParams(location.search);
   const assetId = context.get('asset') ?? '';
   const machine = facility.assets.find(a => a.id === assetId);
   const work = ['repairs','repair','repairSummary','submission'].includes(page);
-  const backPage: PageId = ['repair','repairSummary'].includes(page) ? (machine ? 'machine' : 'repairs') : page === 'machine' ? 'assets' : toolGroupFor(page) && !['assets','documents','map','inventory'].includes(page) ? 'more' : 'home';
+  const back = backDestination(location.search,history.state);
   const title = page === 'machine' && machine ? machine.name : pages[page][0];
-  useEffect(() => { scroll.current?.scrollTo(0, 0); heading.current?.focus({ preventScroll: true }); document.title = title + ' · Industrial Asset Graph'; }, [title, navigationKey]);
+  useEffect(() => {
+    const top = history.state?.iagScroll ?? 0;
+    const pane = scroll.current;
+    heading.current?.focus({ preventScroll: true });
+    document.title = title + ' · Industrial Asset Graph';
+    if (!pane) return;
+    // Lazy workspaces may not have their full height on the first render.
+    const restore = () => pane.scrollTo(0,top);
+    restore();
+    const observer = new MutationObserver(restore);
+    if (top > 0) observer.observe(pane,{childList:true,subtree:true});
+    const stop = () => observer.disconnect();
+    pane.addEventListener('wheel',stop,{once:true});
+    pane.addEventListener('touchstart',stop,{once:true});
+    const timer = window.setTimeout(stop,2000);
+    return () => { stop(); clearTimeout(timer); clearTimeout(scrollTimer.current); pane.removeEventListener('wheel',stop); pane.removeEventListener('touchstart',stop); };
+  }, [title, navigationKey]);
   return <div className={'app-shell app-pages page-' + page}>
     <a className="page-skip" href="#page-content">Skip to page content</a>
     <header className="page-header"><PageLink page="home" className="page-brand"><span aria-hidden="true">IAG</span><span>Industrial Asset Graph<small>{facility.facility.name}</small></span></PageLink><PageLink page="account" className="page-account-link">Account</PageLink></header>
     <nav className="page-navigation" aria-label="Main navigation"><PageLink page="home" current={!work}>Directory</PageLink><PageLink page="repairs" current={work}>My work</PageLink></nav>
-    <div className="page-scroll" ref={scroll} id="page-content" tabIndex={-1}>
-      <div className="page-title"><div>{page !== 'home' && <PageLink page={backPage} details={backPage === 'machine' ? {asset:assetId} : toolGroupFor(page) ? {tools:toolGroupFor(page)!.id} : {}} className="page-back">← {backPage === 'machine' ? 'Machine' : backPage === 'assets' ? 'Equipment' : backPage === 'more' ? 'More' : backPage === 'repairs' ? 'My work' : 'Directory'}</PageLink>}{machine && page !== 'machine' && <p className="machine-context">{machine.name}</p>}<h1 ref={heading} tabIndex={-1}>{title}</h1>{pages[page][1] && <p>{pages[page][1]}</p>}</div><div className="page-title-actions">
+    <div className="page-scroll" ref={scroll} id="page-content" tabIndex={-1} onScroll={event=>{
+      const top=event.currentTarget.scrollTop, route=location.search;
+      clearTimeout(scrollTimer.current);
+      scrollTimer.current=window.setTimeout(()=>{if(location.search===route)rememberScroll(top);},250);
+    }}>
+      <div className="page-title"><div>{page !== 'home' && <a href={back.search} className="page-back" onClick={event=>{if(event.button||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();navigateBack();}}>← {backLabel(back.search)}</a>}{machine && page !== 'machine' && <p className="machine-context">{machine.name}</p>}<h1 ref={heading} tabIndex={-1}>{title}</h1>{pages[page][1] && <p>{pages[page][1]}</p>}</div><div className="page-title-actions">
       {page === 'map' && facility.areas.filter(a=>a.visible===false&&a.assetIds.length>0).map(a=><PageLink key={a.id} page="area" details={{area:a.id,tab:'record'}} className="page-primary map-unplaced-link">{a.name} equipment</PageLink>)}
       {page === 'map' && editor.currentUser?.role === 'admin' && <button type="button" disabled={!editor.ready} onClick={() => dispatchEvent(new CustomEvent('iag-open-map-editor'))}>Edit map</button>}
       {page === 'assets' && editor.currentUser?.role === 'admin' && <PageLink page="assetAdd" className="page-primary">Add equipment</PageLink>}

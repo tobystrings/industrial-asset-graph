@@ -1,5 +1,7 @@
 /* Map-specific color and scale. The application shell can remain neutral. */
 .reference-layout { --map-paper:#090d18; --map-selection:#ffcf40; }
+.map-area-picker{display:grid;gap:8px;min-width:0;padding:12px 16px;font-size:var(--iag-reading-size);font-weight:600}
+.map-area-picker select{width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:12px;border:1px solid var(--slate-border);border-radius:8px;font:inherit}
 html body #root .reference-layout :is(.facility-map-svg,.studio-saved-overlay,.map-editor-svg,.reference-plan){filter:none}
 html body #root .reference-layout .facility-map-svg{background:var(--map-paper)!important}
 .reference-layout .map-reference-artwork{filter:grayscale(1) invert(1)}

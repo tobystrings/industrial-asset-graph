@@ -31,7 +31,7 @@ export default function RepairPage({summary=false}:{summary?:boolean}){
   const id=params.get('work')??created.id,record=records.find(w=>w.id===id);
   const [error,setError]=useState(''),[busy,setBusy]=useState(false),[entryKind,setEntryKind]=useState<WorkEntry['kind']>('note'),[guided,setGuided]=useState(params.get('guided')==='1'),[step,setStep]=useState(0),[remote,setRemote]=useState<{payload:WorkRecord;version:number}|null>(null),[listening,setListening]=useState(false);
   const note=useRef<HTMLTextAreaElement>(null),voice=useRef<SpeechRecognitionLike|null>(null);
-  useEffect(()=>{if(!params.get('work')&&editor.currentUser){void updateWork(pkg.facility.id,id,old=>old??created).then(()=>{const p=new URLSearchParams(location.search);p.set('work',id);history.replaceState(null,'','?'+p);}).catch(e=>setError(String(e)));}},[id]);
+  useEffect(()=>{if(!params.get('work')&&editor.currentUser){void updateWork(pkg.facility.id,id,old=>old??created).then(()=>{const p=new URLSearchParams(location.search);p.set('work',id);history.replaceState(history.state,'','?'+p);}).catch(e=>setError(String(e)));}},[id]);
   useEffect(()=>()=>voice.current?.stop(),[]);
   const run=async(action:()=>Promise<unknown>)=>{setBusy(true);setError('');try{await action();}catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}};
   const change=(patch:Partial<WorkRecord>)=>updateWork(pkg.facility.id,id,old=>editedWork(old!,patch)).catch(e=>setError(String(e)));
