@@ -1,6 +1,6 @@
 # Audit fixes — 18 September 2026
 
-This follow-up records changes after the [original page audit](README.md). The original screenshots and findings describe commit `fc6b04e`; they are retained as before evidence. These changes are on draft PR #63, not the deployed application.
+This follow-up records changes after the [original page audit](README.md). The original screenshots and findings describe commit `fc6b04e`; they are retained as before evidence. Reviewed fix commit: `a2053864a1461ba2839b6a559fabf0f4787338ae`, on [draft PR #63](https://github.com/tobystrings/industrial-asset-graph/pull/63), not the deployed application.
 
 ## Findings and corrections
 
@@ -39,6 +39,9 @@ Tests use isolated authentication and service fixtures. Their success establishe
 - Focused audit fixes: 39 state checks passed across 1366, 390 and 320 pixels, including enlarged text.
 - Complete technician/administrator repair journey: passed, including enlarged-text geometry.
 - Map editor and simulated publication suites: passed before the final header/label wrapping adjustment; the full visual rerun checks that adjustment.
-- Full nine-viewport visual rerun and final 36-route large-print sweep: running at this commit. An earlier broad run timed out after Submit for review; a focused reproduction and the next full-run desktop state passed. This is retained as a test reliability observation, not silently counted as a pass.
+- Final 36-route large-print sweep: passed at 1366, 768 and 390 pixels.
+- Full nine-viewport visual rerun: passed, including desktop/laptop, both tablet orientations, 430/390/360/320px phones and phone landscape. Representative workflows include inventory, Health destinations, Back context, editing, capture, documents, map and cabinet states.
+- An earlier broad run timed out after Submit for review. A focused reproduction, the dedicated repair journey and the complete subsequent nine-viewport run passed. The earlier failure is retained as a reliability observation; no retry or weakened assertion was added to hide it.
+- [GitHub CI for the fix commit](https://github.com/tobystrings/industrial-asset-graph/actions/runs/35389135415) was still running when this report was updated. Its database authorization, build, troubleshooting, repair/admin and equipment-photo steps had passed. Local success is not a claim that CI has finished.
 
 The fetched integration baseline remains `4e19597c51d6b0486b13405744a03e594cd9b53b`. No main merge or Pages deployment was performed.
