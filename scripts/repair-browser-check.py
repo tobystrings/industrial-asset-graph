@@ -23,7 +23,10 @@ def screenshot(page,label):
     assert_large_print(page);page.screenshot(path='artifacts/'+label+'.png')
 def geometry(page):
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
-    assert page.locator('.page-scroll').evaluate('e=>e.scrollWidth<=e.clientWidth+1')
+    fits = page.locator('.page-scroll').evaluate('e=>e.scrollWidth<=e.clientWidth+1')
+    if not fits:
+        page.screenshot(path='artifacts/FAIL-repair-text-overflow.png')
+    assert fits, str({'url':page.url,'viewport':page.viewport_size,'overflow':page.locator('.page-scroll').evaluate('e=>({width:e.clientWidth,scrollWidth:e.scrollWidth})')})
     assert page.evaluate('''()=>{
       const content=document.querySelector('.page-scroll').getBoundingClientRect();
       const header=document.querySelector('.page-header').getBoundingClientRect();

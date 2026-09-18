@@ -13,9 +13,10 @@ def assert_large_print(page):
     # Measure the settled UI, not a frame midway through its entrance scale.
     # Keep the same size thresholds; finite animations must finish first.
     page.evaluate('''async () => {
-      await Promise.all(document.getAnimations()
+      await Promise.race([Promise.all(document.getAnimations()
         .filter(animation => animation.playState === 'running' && Number.isFinite(animation.effect.getComputedTiming().endTime))
-        .map(animation => animation.finished.catch(() => {})));
+        .map(animation => animation.finished.catch(() => {}))),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Finite UI animations did not settle within 5 seconds')), 5000))]);
     }''')
     failures = page.evaluate('''() => {
       const nodes = [...document.querySelectorAll('.app-pages *')];
