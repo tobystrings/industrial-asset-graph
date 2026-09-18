@@ -84,7 +84,7 @@ export default function Dashboard({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mapInspectorDismissed, setMapInspectorDismissed] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>(
-    params.get('tab') ? parseInspectorTab(params.get('tab')) : (initialAsset?.id === featuredCabinetAssetId ? 'intel' : parseInspectorTab(params.get('tab'))),
+    params.get('tab') ? parseInspectorTab(params.get('tab')) : pageMode === 'area' ? 'record' : (initialAsset?.id === featuredCabinetAssetId ? 'intel' : parseInspectorTab(params.get('tab'))),
   );
   const [phoneTab, setPhoneTab] = useState<'map' | 'find' | 'queue' | 'cabinet' | 'docs' | 'more'>(() => {
     const tab = phoneTabFromQuery(params.get('tab'), params.get('command'));

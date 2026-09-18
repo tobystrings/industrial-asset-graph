@@ -1,5 +1,7 @@
 # Page-by-page system audit — 18 September 2026
 
+**Follow-up:** see [implemented fixes and current verification](FIXES.md). This document preserves the original audit findings and before screenshots.
+
 Reviewed app commit: `fc6b04effb4f4cbc8b0644af2f8be418d7f8c90d`. Fetched integration/live Pages baseline at audit start: `4e19597c51d6b0486b13405744a03e594cd9b53b`. **These are different versions. This audit covers the draft readability branch, not a deployment of it.**
 
 Local Chrome, disposable authentication/service fixtures, published snapshot route identifiers. No production records were changed. Runtime backend credentials, real authorization/passkeys, email, microphone permissions, physical equipment truth and actual cross-device publication remain unverified. A successful link click is not a successful business transaction.

@@ -1,3 +1,4 @@
+from section_picker_visual import choose_section, selected_section
 """Exercise Back through real clicks; services use the suite's isolated fixtures."""
 import re
 from urllib.parse import urlparse, parse_qs
@@ -64,12 +65,12 @@ def exercise_navigation(page, label, open_page, screenshot, geometry):
     assert query().get('page') == ['admin']
 
     open_page(page, 'inventory')
-    page.get_by_role('button',name='Locations',exact=True).click()
+    choose_section(page, 'Inventory sections', 'Locations')
     assert query().get('section') == ['Locations']
-    page.get_by_role('button',name='Low Stock',exact=True).click()
+    choose_section(page, 'Inventory sections', 'Low Stock')
     back()
     assert query().get('section') == ['Locations']
-    assert page.get_by_role('button',name='Locations',exact=True).get_attribute('aria-pressed') == 'true'
+    assert selected_section(page, 'Inventory sections', 'Locations')
 
     open_page(page, 'map&asset=L2-CC-001')
     page.get_by_role('button', name='Open details →', exact=True).click()

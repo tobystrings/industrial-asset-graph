@@ -19,6 +19,7 @@ from large_print_visual import exercise_large_print, assert_large_print
 from navigation_visual import exercise_navigation
 from inventory_visual import exercise_inventory
 from repair_visual import exercise_repair_pages
+from audit_regressions_visual import exercise_audit_regressions
 from troubleshooting_test_fixture import exercise_troubleshooting
 import sys
 
@@ -446,6 +447,7 @@ def exercise_workspace_states(page, label: str) -> None:
 def diagnostic(page, label: str) -> None:
     print(f'{label} failure URL: {page.url}',flush=True)
     try:
+        (output / f'FAIL-{label}.txt').write_text(page.locator('body').inner_text(), encoding='utf-8')
         screenshot(page, f'FAIL-{label}')
     except Exception:
         pass
@@ -663,6 +665,7 @@ try:
                 exercise_large_print(page, label, open_page, screenshot, assert_manager_geometry)
                 if label in REPRESENTATIVE_STATES:
                     exercise_navigation(page, label, open_page, screenshot, assert_manager_geometry)
+                    exercise_audit_regressions(page, label, open_page, screenshot, assert_manager_geometry)
                 exercise_genie(page, label, open_page, screenshot, assert_manager_geometry, assert_text_contrast)
                 exercise_map_studio(page,label,open_page,screenshot,assert_manager_geometry)
 

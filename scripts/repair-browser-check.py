@@ -46,6 +46,7 @@ try:
         browser=pw.chromium.launch(**launch)
         admin=browser.new_page(viewport={'width':1366,'height':900},service_workers='block')
         admin_state=install_auth_fixture(admin,cloud);admin.goto(base+'?page=admin',wait_until='networkidle');sign_in(admin)
+        admin.get_by_text('Shared save status',exact=True).click()
         admin.locator('.publication-status.phase-saved').wait_for(timeout=30000)
         tech=browser.new_page(viewport={'width':390,'height':844},service_workers='block')
         tech_state=install_auth_fixture(tech,cloud);tech_state['role']='technician';tech_state['user_id']='00000000-0000-4000-8000-000000000043'

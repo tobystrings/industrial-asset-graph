@@ -1,6 +1,7 @@
 import { domainLabels } from '../lib/relationshipSemantics';
 import type { TroubleshootMode, TroubleshootReport } from '../lib/troubleshootGraph';
 import type { FacilityAsset } from '../types/facility';
+import { useFacility } from '../facility';
 
 const modes: { id: TroubleshootMode; label: string; help: string }[] = [
   { id: 'direct', label: 'Directly connected', help: 'One documented connection away' },
@@ -27,8 +28,10 @@ export default function RelationshipsWorkspace({ report, mode, selectedAsset, on
   onMap: () => void;
   onExit: () => void;
 }) {
+  const facility = useFacility();
   return (
     <section className="relationship-panel troubleshoot-panel panel enter" data-guide-target="relationships" data-testid="troubleshoot-mode">
+      <label className="trace-asset-picker">Equipment to troubleshoot<select aria-label="Equipment to troubleshoot" value={selectedAsset?.id ?? ''} onChange={event=>{if(event.target.value)onAsset(event.target.value);}}><option value="">Choose equipment</option>{facility.assets.map(asset=><option key={asset.id} value={asset.id}>{asset.name}</option>)}</select></label>
       <header className="troubleshoot-head">
         <div><small>Troubleshoot / Impact Mode</small><h1>{report.selected?.label ?? selectedAsset?.name ?? 'Select an asset'}</h1><code>{report.selected?.id ?? selectedAsset?.id ?? 'No asset selected'}</code></div>
         <div className="troubleshoot-head-actions"><button type="button" onClick={onMap}>View on map</button><button className="troubleshoot-exit" type="button" onClick={onExit}>Clear / Exit</button></div>

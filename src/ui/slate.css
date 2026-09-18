@@ -1,4 +1,24 @@
 /* Approved Slate system. Shared geometry remains in chrome-clearance.css. */
+/* Large type must reflow without increasing the shell or compressing list rows. */
+html body #root .app-shell.app-pages{grid-template-columns:minmax(0,1fr)}
+.page-header,.page-header>*{min-width:0}
+.page-header{flex-wrap:wrap}
+.page-brand{flex:1;overflow-wrap:anywhere}
+.page-brand{flex-basis:min-content;overflow-wrap:normal}
+.page-navigation a,.page-navigation a>span{overflow-wrap:anywhere;max-width:100%;text-align:center}
+.page-skip{top:0;transform:translateY(-150%)}
+.page-skip:focus{transform:none}
+.page-account-link{flex:0 0 auto;max-width:50%;overflow-wrap:anywhere}
+.page-title>div,.page-workspace>*{min-width:0}
+.page-title,.simple-home,.destination-card{overflow-wrap:anywhere}
+.app-pages .iag-editor-form,.app-pages .iag-editor-form>*{min-width:0;max-width:100%}
+.app-pages .iag-manage-list>button{flex-shrink:0;gap:16px;height:auto}
+.app-pages .iag-manage-list>button span{min-width:0;overflow-wrap:anywhere}
+.app-pages .iag-manage-list>button b{flex:0 0 auto;white-space:nowrap}
+.app-pages .iag-db-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+.app-pages .iag-db-stats span{min-width:0;overflow-wrap:anywhere}
+.app-pages .iag-import-mode label{min-width:0;overflow-wrap:anywhere}
+@media(max-width:700px){.app-pages .iag-db-stats{grid-template-columns:minmax(0,1fr)}}
 :root{--slate-bg:#1B303C;--slate-surface:#263D49;--slate-text:#F2EDE3;--slate-muted:#C3D0D2;--slate-border:#47616A;--slate-accent:#91D8C7;--slate-ink:#193B37;--slate-nav:#334F58;--theme-page:var(--slate-bg);--theme-surface:var(--slate-surface);--theme-raised:var(--slate-nav);--theme-text:var(--slate-text);--theme-muted:var(--slate-muted);--theme-border:var(--slate-border);--iag-reading-size:24px;--iag-label-size:28px;--iag-heading-size:36px;--iag-target-size:72px;--iag-focus:var(--slate-accent);font-size:var(--iag-reading-size);accent-color:var(--slate-accent)}
 html body #root .app-shell.app-pages{background:var(--slate-bg)!important;color:var(--slate-text)!important}
 html body #root .page-header{background:var(--slate-bg)!important;color:var(--slate-text)!important}
@@ -34,6 +54,24 @@ a.slate-card{display:flex;align-items:center;justify-content:space-between;gap:1
 @media(prefers-reduced-motion:reduce){.slate-workspace *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .slate-sync-detail{margin-top:24px;font-size:var(--iag-reading-size)}.slate-sync-detail>summary{min-height:var(--iag-target-size);display:flex;align-items:center;cursor:pointer;color:var(--slate-muted)}
+.page-help-action:not(:empty){margin-top:24px}
+.page-help-action button{min-height:var(--iag-target-size);padding:14px 20px;border:1px solid var(--slate-border);border-radius:12px;background:var(--slate-surface);color:var(--slate-text)}
+.production-navigation{margin-bottom:16px}.production-navigation summary{cursor:pointer;display:flex;align-items:center}
+.page-map .page-title>div{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px}
+html body #root .app-pages .reference-layout:not(.map-studio){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html body #root .app-pages .reference-layout:not(.map-studio)>.reference-layout-head,
+html body #root .app-pages .reference-layout:not(.map-studio)>.reference-drawing-sheet{grid-column:1/-1}
+@media(max-width:700px){
+  .section-picker>div{display:none}
+  html body #root .app-pages .reference-layout:not(.map-studio){display:flex;flex-direction:column}
+  .reference-layout:not(.map-studio)>.map-area-picker{order:0}
+  .reference-layout:not(.map-studio)>.reference-drawing-sheet{order:1}
+  .reference-layout:not(.map-studio)>.map-readable-legend{order:2}
+  .reference-layout:not(.map-studio)>.reference-layout-head{order:3}
+}
+.trace-asset-picker{display:grid;gap:8px;margin-bottom:20px}
+.trace-asset-picker select{width:100%;padding:12px;border:1px solid var(--slate-border);border-radius:10px}
+html body #root .app-pages :is(.troubleshoot-panel,.cabinet-header,.rail-chrome,.inspector-tabs){background:var(--slate-surface)!important;color:var(--slate-text)!important}
 
 /* Focused work pages share a reading column with their title. */
 :is(.page-repair,.page-repairSummary,.page-machine,.page-repairs,.page-inbox,.page-submission,.page-admin,.page-requests) .page-title{max-width:860px;margin-left:auto;margin-right:auto}

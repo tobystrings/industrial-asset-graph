@@ -1,3 +1,4 @@
+from section_picker_visual import choose_section, selected_section
 """Regression coverage for the large-print system and relocated navigation."""
 import re
 
@@ -31,6 +32,15 @@ def assert_large_print(page):
       .map(el => { const r=el.getBoundingClientRect(); return {text:el.textContent.slice(0,60),cls:el.className,width:r.width,height:r.height}; })
       .filter(r => r.width < 71.9 || r.height < 71.9).slice(0,20)''')
     assert not controls, f'Large-print control target regressed: {controls}'
+    clipped = page.evaluate('''() => [...document.querySelectorAll('.page-navigation a')].filter(link => {
+      const box=link.getBoundingClientRect(), walker=document.createTreeWalker(link,NodeFilter.SHOW_TEXT);
+      let node; while(node=walker.nextNode()) { if(!node.textContent.trim())continue;
+        const range=document.createRange();range.selectNodeContents(node);
+        if([...range.getClientRects()].some(r=>r.width && (r.left<box.left-1||r.right>box.right+1||r.top<box.top-1||r.bottom>box.bottom+1)))return true;
+      } return false;
+    }).map(link=>link.textContent)''')
+    assert not clipped, f'Navigation text escapes its button: {clipped}'
+    assert page.locator('.page-skip').evaluate('e=>e.matches(":focus")||e.getBoundingClientRect().bottom<=0'), 'Unfocused skip link covers the header'
 
 
 def exercise_large_print(page, label, open_page, screenshot, geometry):
@@ -52,21 +62,27 @@ def exercise_large_print(page, label, open_page, screenshot, geometry):
         ('Advanced Tools', 'advanced', 'Plant database', 'database'),
     ]
     for name, group, target, route in groups:
-        page.get_by_role('button', name=name, exact=True).click()
-        assert page.get_by_role('button', name=name, exact=True).get_attribute('aria-pressed') == 'true'
+        choose_section(page, 'Choose a tool group', name)
+        assert selected_section(page, 'Choose a tool group', name)
         geometry(page)
         assert_large_print(page)
         screenshot(page, f'{label}-tools-{group}')
         page.locator('.more-page').get_by_role('link').filter(has=page.get_by_text(target, exact=True)).click()
         page.wait_for_function('(route) => new URLSearchParams(location.search).get("page") === route', arg=route)
         page.get_by_role('link', name='← More', exact=True).click()
-        assert page.get_by_role('button', name=name, exact=True).get_attribute('aria-pressed') == 'true'
+        assert selected_section(page, 'Choose a tool group', name)
         assert new_group(page) == group
     # Reload and history must retain the chosen group, including facility context.
     page.reload(wait_until='networkidle')
     assert new_group(page) == 'advanced'
-    page.get_by_role('button', name='Everyday tasks', exact=True).focus()
-    page.keyboard.press('Enter')
+    selector = page.get_by_role('combobox',name='Choose a tool group',exact=True)
+    if selector.is_visible():
+        selector.focus()
+        page.keyboard.press('Home')
+        page.keyboard.press('Tab')
+    else:
+        page.get_by_role('button',name='Everyday tasks',exact=True).focus()
+        page.keyboard.press('Enter')
     assert new_group(page) == 'everyday'
     geometry(page)
 

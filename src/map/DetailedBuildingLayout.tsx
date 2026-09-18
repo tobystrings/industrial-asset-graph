@@ -44,7 +44,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [gesturing, setGesturing] = useState(false);
   const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(() => new URLSearchParams(location.search).get('edit') === '1');
-  const [legendOpen, setLegendOpen] = useState(()=>window.innerWidth>=900);
+  const [legendOpen, setLegendOpen] = useState(false);
   const [gridOpen, setGridOpen] = useState(false);
   const [gridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
   const [mapSearch, setMapSearch] = useState('');

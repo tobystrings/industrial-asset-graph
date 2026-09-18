@@ -170,3 +170,14 @@ html body #root .app-shell.app-pages .cabinet-drawing{min-width:0!important}
 }
 @media(max-width:400px){.home-destinations{grid-template-columns:1fr}.page-brand>span:first-child{display:none}.page-title{flex-wrap:wrap}}
 @media(max-height:500px) and (max-width:950px){.page-header{padding-top:6px;padding-bottom:6px}.page-navigation{padding-top:2px;padding-bottom:2px}.page-navigation a{min-height:44px}.page-scroll{padding-top:12px}}
+
+/* A visible current section replaces offscreen tabs on phones. */
+.section-picker-select,.inspector-section-picker{display:none}
+@media(max-width:700px){
+  .section-picker>div{display:none}
+  .section-picker-select{display:block;width:100%;padding:12px;border:1px solid var(--slate-border);border-radius:10px}
+  html body #root .app-shell.app-pages .dashboard>.rail .inspector-tabs{display:none!important}
+  .inspector-section-picker{display:grid;gap:8px;padding:12px}
+  .inspector-section-picker select{width:100%;padding:12px}
+  .app-pages .phone-trace{display:none!important}
+}
