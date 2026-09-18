@@ -31,7 +31,7 @@
 .auth-forgot { align-self:flex-end; margin-top:-14px; }
 .auth-card .auth-primary { display:flex; justify-content:space-between; align-items:center; width:100%; min-height:50px; padding:12px 18px; background:#334F58; color:#F2EDE3; border:1px solid #47616A; border-radius:8px; font-size:var(--iag-reading-size, 18px); font-weight:650; }
 .auth-primary:hover { background:#334F58; }
-.auth-primary span { font-size:20px; }
+.auth-primary span { font-size:var(--iag-reading-size); }
 .auth-divider { display:flex; align-items:center; gap:14px; margin:23px 0; color:#C3D0D2; font-size:var(--iag-reading-size, 18px); }
 .auth-divider::before,.auth-divider::after { content:''; height:1px; flex:1; background:#263D49; }
 .auth-card .auth-passkey { width:100%; min-height:50px; display:flex; align-items:center; justify-content:center; gap:12px; background:#263D49; color:#F2EDE3; border:1px solid #334F58; border-radius:8px; font-size:var(--iag-reading-size, 18px); font-weight:650; }

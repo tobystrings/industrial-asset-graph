@@ -38,7 +38,7 @@ Do not remove phone, tablet, landscape, or desktop coverage to make a test pass.
 
 ## 3. Fixed chrome may never cover content
 
-The owner-requested September 2026 page redesign uses one shared app shell: header, primary navigation, and a separately scrolling page. Navigation occupies a structural grid row (bottom on phones); manager forms and the guide are dedicated pages. Do not restore stacked global toolbars. The audit checks actual header/navigation/content bounds, 44-pixel primary touch targets, and horizontal overflow while retaining all seven viewport sizes and the existing workspace workflows.
+The owner-requested September 2026 page redesign uses one shared app shell: header, primary navigation, and a separately scrolling page. Navigation occupies a structural grid row (bottom on phones); manager forms and the guide are dedicated pages. Do not restore stacked global toolbars. The audit checks actual header/navigation/content bounds, 72-pixel primary touch targets, and horizontal overflow while retaining all seven viewport sizes and the existing workspace workflows.
 
 The Plant Manager bar, Facility Guide, headers, navigation, and any future fixed/sticky chrome must reserve real layout space.
 
@@ -100,6 +100,10 @@ Phone:
 Do not simply scale down the desktop cabinet layout for phones.
 
 ## 7. Contrast and readability
+
+The owner's September 18 direction is a **giant, friendly app**. Shared HTML reading text uses a minimum 24 px, action labels use 28 px, and buttons, disclosure controls, and primary navigation use minimum 72 × 72 px touch targets. These are defaults on phones as well as desktops; reflow the content instead of shrinking the type. Main destinations use large task cards with plain-language descriptions. Focused document screens show the document title without repeating the machine title and equipment ID above it. Administrative map actions follow the map, so they do not displace the main task on phones. Preserve contextual Back navigation and the user's filters and position.
+
+Technical drawings retain their contained pan/zoom surfaces and must provide a readable selection path; an HTML font-size measurement does not certify text embedded in an SVG transform, photograph, or PDF.
 
 Dark-on-dark and light-on-light text are regressions.
 

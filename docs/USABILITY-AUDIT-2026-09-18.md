@@ -2,6 +2,16 @@
 
 The owner's reported failures were small print and Back links that skip parent screens. This review addresses those failures; it is not an acceptance certificate for the entire product.
 
+## Follow-up: giant, friendly default
+
+The owner clarified that making a dense technical application merely readable was insufficient. The shared default now uses 24 px reading text, 28 px action labels, 36–48 px primary headings, and 72 px controls. Former 20/22 px CSS exceptions consume the shared tokens. Main destinations have large cards with a short description of the task. Equipment cards have more space between choices. Phone layouts retain the large type and reflow.
+
+Machine documents use their own title in the shell and omit the repeated machine name, equipment ID and unrelated cabinet-photo action above the document. Document headings use a consistent 32 px size to avoid tall stacks of wrapped words on phones. Equipment IDs remain in Overview. Map administration and help follow the map rather than filling the phone's first screen. Phone map detail tabs use two columns so their labels remain whole. Contextual Back, filters and position are preserved by the preceding change.
+
+The permanent HTML assertions are strengthened from 20 to 24 px and from 56 to 72 px; no coverage is removed. A separate local sweep checks 17 entry/detail routes at desktop, 390 px phone and 320 px phone widths (51 screens). All meet those text/control minima. The sweep found and corrected cabinet headings and guide branding that still used smaller fixed sizes. The deeper workflow audit additionally caught 23 px headings in the expanded equipment directory; those and the remaining fixed-size exceptions were corrected. Real link journeys through documents, machine components, inventory and map pass on desktop and phone. The final complete nine-viewport workflow run passed against the stable completed build, including the stronger 24/72 px assertions and enlarged-text checks. Unit tests (284 passed, one existing conditional skip), data verification, visual-contract verification and production build also pass. Exploratory runs stopped for fixes are not counted as passes. The original validation below applies to commit 9556b22; this paragraph records the giant-friendly follow-up.
+
+The map drawing's small overview labels and overlapping authored area labels remain known limitations. These shared-layout changes do not establish that every technical workspace has a finished friendly interaction design, nor do they verify production authentication and shared writes.
+
 ## Baseline and method
 
 GitHub main and the successful Pages deployment were `4e19597c51d6b0486b13405744a03e594cd9b53b`. The public live snapshot matched repository revision 30. The public login was opened in Chromium. Signed-in UI inspection used the deployed frontend with intercepted authentication and shared-service responses, in disposable browser contexts using the bundled seed records. It did **not** authenticate to, or write audit data into, production services; it also does not establish correct rendering of every subsequently authored production record.
@@ -34,7 +44,7 @@ The existing full nine-viewport audit and readable-text/control assertions remai
 ## Boundaries and outstanding acceptance
 
 - The existing 20 px check covers HTML interface text. The new map-selection journey also checks effective SVG screen pixels. Overview drawings still contain small labels; the readable picker and focused-area view are the supported reading path. Raster drawing/photo/PDF text is not made larger by the HTML rule and remains dependent on its local viewer. This change does not certify all embedded print.
-- Screenshot review still shows overlapping labels where map areas overlap (for example Building C / Cook Rooms), and the phone map's four detail tabs wrap “cabinets” awkwardly. These are unresolved map-layout findings, not passing usability results. The new focused label is readable, but this is not a finished map redesign.
+- Screenshot review still shows overlapping labels where map areas overlap (for example Building C / Cook Rooms). This is an unresolved map-layout finding, not a passing usability result. The phone detail-tab wrapping found in the initial review is corrected in the giant-friendly follow-up. The focused label is readable, but this is not a finished map redesign.
 - The 34-state sweep checks rendered entry/detail screens. It does not prove every feature or every combination of settings works.
 - Live sign-in, real cross-device saves, actual repair submission/review transactions, deployed migration 005, passkeys and AI providers were not verified in an authenticated production session during this audit.
 - Local source changes, local test results, GitHub CI, merge and Pages deployment are separate states. An open PR is not a deployed fix.

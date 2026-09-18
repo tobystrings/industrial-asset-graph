@@ -1,10 +1,10 @@
-.inventory-workspace { max-width: 1500px; margin: auto; padding: clamp(12px, 2vw, 28px); color: var(--slate-text); font-size: 20px; }
+.inventory-workspace { max-width: 1500px; margin: auto; padding: clamp(12px, 2vw, 28px); color: var(--slate-text); font-size:var(--iag-reading-size); }
 .inventory-workspace * { box-sizing: border-box; min-width: 0; }
 .inventory-workspace h2 { font-size: 28px; }
 .inventory-workspace h3 { font-size: 24px; }
 .inventory-workspace p { line-height: 1.6; overflow-wrap: anywhere; }
-.inventory-workspace label { display: grid; gap: 8px; font-size: 20px; margin: 16px 0; }
-.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea, .inventory-workspace button, .inventory-workspace a { font: inherit; font-size: 20px; }
+.inventory-workspace label { display: grid; gap: 8px; font-size:var(--iag-reading-size); margin: 16px 0; }
+.inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea, .inventory-workspace button, .inventory-workspace a { font: inherit; font-size:var(--iag-reading-size); }
 .inventory-workspace input, .inventory-workspace select, .inventory-workspace textarea { width: 100%; min-height: 56px; color: var(--slate-text); background: var(--slate-surface); border: 1px solid var(--slate-border); border-radius: 8px; padding: 12px; }
 .inventory-workspace textarea { min-height: 110px; resize: vertical; }
 .inventory-workspace button, .inventory-workspace a { min-height: 56px; padding: 12px 16px; margin: 6px 8px 6px 0; border: 1px solid var(--slate-border); border-radius: 8px; color: var(--slate-text); background: var(--slate-nav); white-space: normal; overflow-wrap: anywhere; cursor: pointer; }
@@ -22,4 +22,4 @@
 .inventory-workspace .inventory-check input { width: 28px; flex: 0 0 28px; }
 .inventory-message { border: 2px solid var(--slate-accent); padding: 16px; border-radius: 8px; }
 .inventory-file input { padding: 8px; }
-@media (max-width: 600px) { .inventory-workspace fieldset, .inventory-card, .inventory-detail { padding: 12px; } .inventory-actions { display: grid; } .inventory-workspace button { width: 100%; margin-right: 0; } .inventory-workspace input[type=file] { font-size: 20px; } }
+@media (max-width: 600px) { .inventory-workspace fieldset, .inventory-card, .inventory-detail { padding: 12px; } .inventory-actions { display: grid; } .inventory-workspace button { width: 100%; margin-right: 0; } .inventory-workspace input[type=file] { font-size:var(--iag-reading-size); } }

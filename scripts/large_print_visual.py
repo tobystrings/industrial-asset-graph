@@ -21,14 +21,14 @@ def assert_large_print(page):
       const nodes = [...document.querySelectorAll('.app-pages *')];
       return nodes.filter(el => el.getClientRects().length && !el.closest('svg,.sr-only') && getComputedStyle(el).visibility !== 'hidden')
         .filter(el => [...el.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim()) || el.matches('input,select,textarea'))
-        .filter(el => parseFloat(getComputedStyle(el).fontSize) < 20)
+        .filter(el => parseFloat(getComputedStyle(el).fontSize) < 24)
         .map(el => ({tag:el.tagName, cls:el.className, text:(el.textContent || '').slice(0,65), size:getComputedStyle(el).fontSize})).slice(0,20);
     }''')
     assert not failures, f'Large-print reading baseline regressed: {failures}'
     controls = page.evaluate('''() => [...document.querySelectorAll('.app-pages button, .app-pages summary, .page-header a, .page-navigation a')]
       .filter(el => el.getClientRects().length && !el.closest('svg,.sr-only') && getComputedStyle(el).visibility !== 'hidden')
       .map(el => { const r=el.getBoundingClientRect(); return {text:el.textContent.slice(0,60),cls:el.className,width:r.width,height:r.height}; })
-      .filter(r => r.width < 55.9 || r.height < 55.9).slice(0,20)''')
+      .filter(r => r.width < 71.9 || r.height < 71.9).slice(0,20)''')
     assert not controls, f'Large-print control target regressed: {controls}'
 
 

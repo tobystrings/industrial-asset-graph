@@ -15,13 +15,13 @@ html,body,#root,.app-shell{background:#263D49!important}
 .reference-nav-group button.side-active{background:linear-gradient(90deg,#334F58,#334F58)!important;color:#F2EDE3!important;box-shadow:none!important}
 .reference-nav-icon{display:grid;place-items:center;width:22px;color:#F2EDE3;font-size:var(--iag-reading-size, 18px)}
 .reference-collapse{margin-top:auto!important;width:100%;min-height:40px;padding:8px 12px!important;border:0!important;border-radius:6px!important;background:transparent!important;color:#F2EDE3!important;text-align:left!important;font-size:var(--iag-reading-size, 18px)!important}
-.reference-collapse span{display:inline-block;margin-right:12px;font-size:22px;vertical-align:-2px}
+.reference-collapse span{display:inline-block;margin-right:12px;font-size:var(--iag-label-size);vertical-align:-2px}
 
 /* Fixed top bar starts after sidebar */
 .reference-topbar.top-nav{position:fixed!important;z-index:55!important;left:var(--ref-sidebar)!important;right:0!important;top:0!important;width:auto!important;height:var(--ref-topbar)!important;min-height:var(--ref-topbar)!important;padding:0 18px!important;display:flex!important;align-items:center!important;gap:16px!important;background:#1B303C!important;border:0!important;border-bottom:1px solid #334F58!important;box-shadow:none!important;backdrop-filter:none!important}
-.reference-menu-button{display:grid!important;place-items:center!important;width:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important;border:0!important;background:transparent!important;color:#F2EDE3!important;font-size:21px!important}
+.reference-menu-button{display:grid!important;place-items:center!important;width:38px!important;min-width:38px!important;min-height:38px!important;padding:0!important;border:0!important;background:transparent!important;color:#F2EDE3!important;font-size:var(--iag-reading-size)!important}
 .reference-breadcrumbs{display:flex;align-items:center;gap:12px;min-width:0;color:#F2EDE3;font-size:var(--iag-reading-size, 18px);white-space:nowrap}
-.reference-breadcrumbs strong{font-size:20px;color:#F2EDE3;letter-spacing:.01em}
+.reference-breadcrumbs strong{font-size:var(--iag-reading-size);color:#F2EDE3;letter-spacing:.01em}
 .reference-breadcrumbs>span:not(.reference-breadcrumb-map){color:#C3D0D2}
 .reference-breadcrumb-map{color:#C3D0D2}
 .reference-breadcrumb-detail{color:#F2EDE3;max-width:300px;overflow:hidden;text-overflow:ellipsis}
@@ -31,7 +31,7 @@ html,body,#root,.app-shell{background:#263D49!important}
 .reference-search input{display:block!important;width:100%!important;height:100%!important;padding:0!important;border:0!important;background:transparent!important;color:#F2EDE3!important;font-size:var(--iag-reading-size, 18px)!important;outline:0!important}
 .reference-search input::placeholder{color:#C3D0D2}
 .reference-search kbd{display:none!important}.reference-search-icon{color:#C3D0D2;font-size:18px}
-.reference-icon-button,.reference-user-button{display:grid;place-items:center;flex:0 0 auto;width:38px;height:38px;padding:0;border:0;border-radius:50%;background:transparent;color:#F2EDE3;font-size:20px}
+.reference-icon-button,.reference-user-button{display:grid;place-items:center;flex:0 0 auto;width:38px;height:38px;padding:0;border:0;border-radius:50%;background:transparent;color:#F2EDE3;font-size:var(--iag-reading-size)}
 .reference-icon-button:nth-of-type(3){border:2px solid #334F58;font-size:var(--iag-reading-size, 18px)}
 .reference-user-button{background:#263D49;color:#F2EDE3;font-size:var(--iag-reading-size, 18px);font-weight:800}
 .reference-topbar .mobile-search-button{display:none!important}
@@ -103,7 +103,7 @@ html,body,#root,.app-shell{background:#263D49!important}
   .dashboard.workspace-map.view-dashboard>.map-panel{height:calc(100dvh - var(--ref-topbar))!important;overflow:auto!important}
   .dashboard.workspace-map .reference-layout{padding:10px!important}
   .dashboard.workspace-map .reference-layout-head{align-items:flex-start!important;gap:8px!important}
-  .dashboard.workspace-map .reference-layout-head h2{font-size:22px!important}
+  .dashboard.workspace-map .reference-layout-head h2{font-size:var(--iag-label-size)!important}
   .dashboard.workspace-map .reference-layout-actions{gap:6px!important}
   .dashboard.workspace-map .reference-layout-actions button{min-width:auto!important;padding:6px 9px!important;font-size:var(--iag-reading-size, 18px)!important}
   .dashboard.workspace-map .reference-layout-actions::after{display:none!important}
