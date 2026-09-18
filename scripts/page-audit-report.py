@@ -154,7 +154,7 @@ for i,n in enumerate(nodes,1):
       '- **Visual review:** '+n['visual'],
       '- **Functional review:** '+n['functional'],
       '- **Measured states:** '+str(len(rows))+' desktop/phone captures. '+('Automated findings recorded; inspect the artifact.' if issue else 'No automated finding recorded in these captured states; not a blanket accessibility pass.'),
-      '- **Source:** '+', '.join('`'+f+'`' for f in n['files']), ''])
+      '- **Source:** '+(', '.join('`'+f+'`' for f in n['files']) or 'Standalone exported content; see the path in the manifest.'), ''])
 md.extend(['## Remaining verification before calling this demo-ready','',
 'Fix F1–F3 and rerun the failing checks without reducing thresholds. Review the first-screen task hierarchy (F4), then complete populated requests, full legacy capture/trace/hotspot flows and role-specific states. Verify real backend permissions and synchronization against an authorized test facility. Exercise keyboard/screen-reader flows and actual phone input/media. Recheck the deployed commit after merge/deployment; a draft PR and green build do not establish deployment.','',
 '## Reproduce','',

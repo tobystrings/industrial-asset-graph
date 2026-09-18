@@ -525,7 +525,7 @@ Machine sections, inventory sections and asset tabs are states within a page. Th
 - **Visual review:** Standalone page captured and visually reviewed on desktop and phone. Separate navigation shell.
 - **Functional review:** Tour playback tested separately. Archive links and 3D controls are not all exercised; rendering is not full content verification.
 - **Measured states:** 2 desktop/phone captures. No automated finding recorded in these captured states; not a blanket accessibility pass.
-- **Source:** 
+- **Source:** Standalone exported content; see the path in the manifest.
 
 ### 42. Standalone machine viewer (`standalone-screen-70`)
 
@@ -535,7 +535,7 @@ Machine sections, inventory sections and asset tabs are states within a page. Th
 - **Visual review:** Standalone page captured and visually reviewed on desktop and phone. Separate navigation shell.
 - **Functional review:** Tour playback tested separately. Archive links and 3D controls are not all exercised; rendering is not full content verification.
 - **Measured states:** 2 desktop/phone captures. No automated finding recorded in these captured states; not a blanket accessibility pass.
-- **Source:** 
+- **Source:** Standalone exported content; see the path in the manifest.
 
 ### 43. Evidence archive (`standalone-screen-71`)
 
@@ -545,7 +545,7 @@ Machine sections, inventory sections and asset tabs are states within a page. Th
 - **Visual review:** Standalone page captured and visually reviewed on desktop and phone. Separate navigation shell.
 - **Functional review:** Tour playback tested separately. Archive links and 3D controls are not all exercised; rendering is not full content verification.
 - **Measured states:** 2 desktop/phone captures. No automated finding recorded in these captured states; not a blanket accessibility pass.
-- **Source:** 
+- **Source:** Standalone exported content; see the path in the manifest.
 
 ### 44. Recovered plant sources (`standalone-screen-72`)
 
@@ -555,7 +555,7 @@ Machine sections, inventory sections and asset tabs are states within a page. Th
 - **Visual review:** Standalone page captured and visually reviewed on desktop and phone. Separate navigation shell.
 - **Functional review:** Tour playback tested separately. Archive links and 3D controls are not all exercised; rendering is not full content verification.
 - **Measured states:** 2 desktop/phone captures. No automated finding recorded in these captured states; not a blanket accessibility pass.
-- **Source:** 
+- **Source:** Standalone exported content; see the path in the manifest.
 
 ## Remaining verification before calling this demo-ready
 
