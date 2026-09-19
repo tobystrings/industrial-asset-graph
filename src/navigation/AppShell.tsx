@@ -26,6 +26,13 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
   },[]);
   const heading = useRef<HTMLHeadingElement>(null);
   const scroll = useRef<HTMLDivElement>(null);
+  const publicationDetails = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    // Reveal problems without closing the user's panel when saving succeeds.
+    if (['ERROR','CONFLICT'].includes(editor.publication.phase) && publicationDetails.current) {
+      publicationDetails.current.open = true;
+    }
+  }, [editor.publication.phase, page, editor.currentUser?.role]);
   const scrollTimer = useRef<number | undefined>(undefined);
   const context = new URLSearchParams(location.search);
   const assetId = context.get('asset') ?? '';
@@ -69,7 +76,7 @@ export default function AppShell({ page, children, navigationKey }: { page: Page
         guide.setOpen(true); navigate('help', { from: page, asset: assetId || (page === 'cabinet' ? facility.featureConfig.featuredCabinetAssetId ?? '' : ''), area: context.get('area') ?? '', connection: context.get('connection') ?? '', edit: context.get('edit') ?? '' });
       }}>Ask Genie <span aria-hidden="true">↗</span></button>}</div>{page === 'map' && <section className="slate-workspace map-secondary-actions" aria-label="More map options"><h2>More map options</h2>      {page === 'map' && facility.areas.filter(a=>a.visible===false&&a.assetIds.length>0).map(a=><PageLink key={a.id} page="area" details={{area:a.id,tab:'record'}} className="page-primary map-unplaced-link">{a.name} equipment</PageLink>)}
       {page === 'map' && editor.currentUser?.role === 'admin' && <button type="button" disabled={!editor.ready} onClick={() => { dispatchEvent(new CustomEvent('iag-open-map-editor')); scroll.current?.scrollTo(0,0); }}>Edit map</button>}
-<PageLink page="help" details={{from:'map'}} className="slate-card">Get help with the map →</PageLink></section>}{(['admin','conflicts','review'].includes(page)||(editor.currentUser?.role==='admin'&&['map','evidence','database','manage'].includes(page)))&&<details className="slate-sync-detail" open={['ERROR','CONFLICT'].includes(editor.publication.phase) || undefined}><summary>Shared save status</summary><PublicationStatus/></details>}</div>
+<PageLink page="help" details={{from:'map'}} className="slate-card">Get help with the map →</PageLink></section>}{(['admin','conflicts','review'].includes(page)||(editor.currentUser?.role==='admin'&&['map','evidence','database','manage'].includes(page)))&&<details className="slate-sync-detail" ref={publicationDetails}><summary>Shared save status</summary><PublicationStatus/></details>}</div>
     </div>
   </div>;
 }

@@ -1,6 +1,6 @@
 from browser_test_server import stop_preview
 """Two isolated browsers share only a mocked authenticated publication service."""
-import os,subprocess,time,socket,json
+import os,subprocess,time,socket,json,urllib.request
 import hashlib
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -11,8 +11,10 @@ with socket.socket() as sock:
 server=subprocess.Popen(['npm.cmd' if os.name=='nt' else 'npm','run','preview','--','--host','127.0.0.1','--port',str(port),'--strictPort'],stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
 base=f'http://127.0.0.1:{port}/industrial-asset-graph/'
 cloud={'publication':None,'publication_requests':{},'files':{},'submissions':{}}
-def saved(page):
-    if page.locator('.slate-sync-detail').count(): page.locator('.slate-sync-detail').evaluate("e=>e.open=true")
+def saved(page, open_panel=True):
+    panel = page.locator('.slate-sync-detail')
+    if open_panel and panel.count() and panel.get_attribute('open') is None:
+        panel.locator('summary').click()
     try: page.locator('.publication-status.phase-saved').wait_for(timeout=30000)
     except Exception:
         print(page.locator('.publication-status').inner_text(),flush=True)
@@ -25,11 +27,15 @@ def edit(page,old,new):
 def submit(page, conflict=False):
     page.get_by_role('button',name='Save Changes',exact=True).click()
     if conflict:
-        if page.locator('.slate-sync-detail').count(): page.locator('.slate-sync-detail').evaluate("e=>e.open=true")
         page.locator('.publication-status.phase-conflict').wait_for()
     else: page.get_by_text('Map saved across devices. GitHub publication is queued.',exact=True).wait_for()
 try:
-    time.sleep(1.5)
+    for attempt in range(60):
+        try:
+            with urllib.request.urlopen(base, timeout=2): break
+        except (OSError, TimeoutError):
+            if attempt == 59: raise
+            time.sleep(.5)
     with sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True)
         contexts=[browser.new_context(viewport={'width':1366,'height':900},service_workers='block') for _ in range(2)]
@@ -52,13 +58,18 @@ try:
         first.locator('[aria-label="Edit area Local concurrent name"]').click(force=True)
         assert first.get_by_label('Area name',exact=True).input_value()=='Local concurrent name'
         edit(second,'Shared receiving','Remote concurrent name');submit(second);saved(second)
+        first.locator('.slate-sync-detail summary').click()
+        assert first.locator('.slate-sync-detail').get_attribute('open') is None
         submit(first, conflict=True)
         first.locator('.publication-status.phase-conflict').wait_for()
         assert cloud['publication']['payload']['plant']['areas'] != []
         first.get_by_text('conflicting fields — compare before choosing',exact=False).click()
         assert 'Local concurrent name' in first.locator('.publication-compare').all_text_contents()[0]
         assert 'Remote concurrent name' in first.locator('.publication-compare').all_text_contents()[0]
-        first.get_by_role('button',name='Keep this device’s conflicting values',exact=True).click();saved(first)
+        first.get_by_role('button',name='Keep this device’s conflicting values',exact=True).click()
+        # The resolution result must remain visible without reopening the panel.
+        saved(first, open_panel=False)
+        assert first.locator('.slate-sync-detail').get_attribute('open') is not None
         second.reload(wait_until='networkidle');saved(second)
         second.locator('.svg-zone[aria-label="Select Local concurrent name"]').wait_for()
         first.goto(base+'?page=evidence',wait_until='networkidle');saved(first)

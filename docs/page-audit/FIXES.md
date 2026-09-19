@@ -34,6 +34,12 @@ Tests use isolated authentication and service fixtures. Their success establishe
 
 ## Validation
 
+### Publication-panel release correction
+
+CI subsequently caught the shared-save panel collapsing as a conflict changed to a successful save. The panel now opens automatically for errors/conflicts and retains the user's open state after resolution. The publication browser test uses actual disclosure clicks, starts the conflict with the panel closed, and requires the saved result to remain visible without reopening it. Cross-device revision, attachment-byte, duplicate, recovery and reload assertions are unchanged. The corrected publication journey passed locally. The installed-app cache version is also updated for this release.
+
+The latest release gate is [PR #63 checks](https://github.com/tobystrings/industrial-asset-graph/pull/63/checks). The results below describe the preceding audit-fix build; they do not replace validation of this final correction.
+
 - Unit tests: 71 files passed; 284 tests passed, one conditional skip.
 - Facility data, permanent visual contract and production build: passed.
 - Focused audit fixes: 39 state checks passed across 1366, 390 and 320 pixels, including enlarged text.
@@ -42,6 +48,6 @@ Tests use isolated authentication and service fixtures. Their success establishe
 - Final 36-route large-print sweep: passed at 1366, 768 and 390 pixels.
 - Full nine-viewport visual rerun: passed, including desktop/laptop, both tablet orientations, 430/390/360/320px phones and phone landscape. Representative workflows include inventory, Health destinations, Back context, editing, capture, documents, map and cabinet states.
 - An earlier broad run timed out after Submit for review. A focused reproduction, the dedicated repair journey and the complete subsequent nine-viewport run passed. The earlier failure is retained as a reliability observation; no retry or weakened assertion was added to hide it.
-- [GitHub CI for the fix commit](https://github.com/tobystrings/industrial-asset-graph/actions/runs/35389135415) was still running when this report was updated. Its database authorization, build, troubleshooting, repair/admin and equipment-photo steps had passed. Local success is not a claim that CI has finished.
+- [GitHub CI](https://github.com/tobystrings/industrial-asset-graph/actions/runs/35390231216) failed on the publication panel visibility described above, after the visual regression completed. This prompted the release correction rather than a weaker assertion.
 
-The fetched integration baseline remains `4e19597c51d6b0486b13405744a03e594cd9b53b`. No main merge or Pages deployment was performed.
+The integration baseline for these changes is `4e19597c51d6b0486b13405744a03e594cd9b53b`. Check the PR's merge state and GitHub Pages deployment for release status; this audit document is not proof of deployment.
