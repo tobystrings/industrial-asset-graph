@@ -23,7 +23,10 @@ def screenshot(page,label):
     assert_large_print(page);page.screenshot(path='artifacts/'+label+'.png')
 def geometry(page):
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
-    assert page.locator('.page-scroll').evaluate('e=>e.scrollWidth<=e.clientWidth+1')
+    fits = page.locator('.page-scroll').evaluate('e=>e.scrollWidth<=e.clientWidth+1')
+    if not fits:
+        page.screenshot(path='artifacts/FAIL-repair-text-overflow.png')
+    assert fits, str({'url':page.url,'viewport':page.viewport_size,'overflow':page.locator('.page-scroll').evaluate('e=>({width:e.clientWidth,scrollWidth:e.scrollWidth})')})
     assert page.evaluate('''()=>{
       const content=document.querySelector('.page-scroll').getBoundingClientRect();
       const header=document.querySelector('.page-header').getBoundingClientRect();
@@ -43,6 +46,7 @@ try:
         browser=pw.chromium.launch(**launch)
         admin=browser.new_page(viewport={'width':1366,'height':900},service_workers='block')
         admin_state=install_auth_fixture(admin,cloud);admin.goto(base+'?page=admin',wait_until='networkidle');sign_in(admin)
+        admin.get_by_text('Shared save status',exact=True).click()
         admin.locator('.publication-status.phase-saved').wait_for(timeout=30000)
         tech=browser.new_page(viewport={'width':390,'height':844},service_workers='block')
         tech_state=install_auth_fixture(tech,cloud);tech_state['role']='technician';tech_state['user_id']='00000000-0000-4000-8000-000000000043'

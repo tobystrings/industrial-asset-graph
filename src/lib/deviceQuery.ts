@@ -32,5 +32,5 @@ export function writeDeviceQuery(deviceId: string, options?: { cabinet?: boolean
     next.set('view', 'cabinet');
   }
   next.set('device', deviceId);
-  history.replaceState(null, '', `${location.pathname}?${next}`);
+  history.replaceState(history.state, '', `${location.pathname}?${next}`);
 }

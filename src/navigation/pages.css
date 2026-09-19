@@ -10,7 +10,7 @@ html body #root .app-shell.app-pages{height:var(--app-height,100dvh);min-height:
 .page-navigation{grid-row:2;display:flex;justify-content:center;gap:8px;padding:8px 16px;background:#263D49;border-bottom:1px solid #334F58}
 .page-navigation a{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;min-width:100px;color:#C3D0D2;border-radius:10px;text-decoration:none;font-weight:600;font-size:var(--iag-reading-size, 18px)}
 .page-navigation a[aria-current=page]{color:#C3D0D2;background:#263D49}
-.page-navigation a>span{font-size:20px;line-height:1}
+.page-navigation a>span{font-size:var(--iag-reading-size);line-height:1}
 .page-scroll{grid-row:3;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding:20px;padding:28px clamp(16px,4vw,48px) 40px}
 .page-title{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1440px;margin:0 auto 24px}
 .page-title h1{font-size:clamp(25px,3vw,34px);line-height:1.15;letter-spacing:-.02em;margin:4px 0 8px;color:#F2EDE3;outline:none}
@@ -30,12 +30,12 @@ html body #root .app-shell.app-pages{height:var(--app-height,100dvh);min-height:
 .home-intro p{max-width:460px;font-size:18px;margin:0 0 24px;color:#C3D0D2}
 .home-destinations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .destination-card{display:block;padding:24px;background:#263D49;border:1px solid #334F58;border-radius:16px;text-decoration:none;color:#F2EDE3;min-width:0}
-.destination-card strong{display:flex;justify-content:space-between;font-size:22px;font-weight:600}
+.destination-card strong{display:flex;justify-content:space-between;font-size:var(--iag-label-size);font-weight:600}
 .destination-card p{color:#C3D0D2;margin:12px 0 24px}
 .destination-card small{color:#C3D0D2;font-weight:600}
 .destination-card:hover{border-color:#47616A}
 .home-followup{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px;background:#263D49;border:1px solid #334F58;border-radius:16px}
-.home-followup h2,.more-page h2,.help-page h2{font-size:19px;margin:0 0 10px;color:#F2EDE3}
+.home-followup h2,.more-page h2,.help-page h2{font-size:var(--iag-label-size);margin:0 0 10px;color:#F2EDE3}
 .home-followup p{margin:0 0 6px;color:#C3D0D2}.home-followup small{color:#C3D0D2}.home-followup a{white-space:nowrap;color:#C3D0D2;min-height:44px;display:flex;align-items:center}
 .more-page{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.more-page section{min-width:0}
 .page-link-list{border:1px solid #334F58;border-radius:14px;overflow:hidden;background:#263D49}
@@ -65,7 +65,7 @@ html body #root .app-shell.app-pages .reference-plan-wrap{min-height:clamp(280px
 html body #root .app-shell.app-pages .reference-plan-image-stage,html body #root .app-shell.app-pages .facility-map-svg{width:var(--facility-drawing-width,1210px)!important}
 html body #root .app-shell.app-pages .reference-info-strip{max-height:140px!important;overflow:auto!important}
 html body #root .app-shell.app-pages .reference-layout-actions{display:flex!important;flex-wrap:wrap;gap:6px;overflow:visible!important}
-html body #root .app-shell.app-pages .reference-layout-actions button{display:inline-flex!important;min-height:44px!important;align-items:center;justify-content:center}
+html body #root .app-shell.app-pages .reference-layout-actions button{display:inline-flex!important;min-height:var(--iag-target-size)!important;min-width:var(--iag-target-size)!important;font-size:var(--iag-label-size)!important;align-items:center;justify-content:center}
 html body #root .app-shell.app-pages .cabinet-detail-heading>span:not(.device-sticky),html body #root .app-shell.app-pages .cabinet-detail-heading>code{color:#C3D0D2!important}
 html body #root .app-shell.app-pages .dashboard>.rail{display:flex!important;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;min-width:0!important;margin-top:20px!important;border-radius:14px;overflow:hidden!important;background:#1B303C!important;color:#F2EDE3}
 html body #root .app-shell.app-pages .dashboard>.rail .rail-body{max-height:none!important;overflow:visible!important}
@@ -122,7 +122,7 @@ html body #root .app-shell.app-pages .field-doc-layout{grid-template-columns:min
 html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-relations,html body #root .app-shell.app-pages .field-doc-workspace[data-section=checklist] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=connections] .field-doc-evidence,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-checklist,html body #root .app-shell.app-pages .field-doc-workspace[data-section=evidence] .field-doc-relations{display:none!important}
 .field-section-tabs{display:flex;gap:8px;margin:18px 0}.field-section-tabs button{flex:1;min-width:0;background:#263D49;color:#C3D0D2;border:1px solid #334F58;border-radius:9px;padding:10px 6px}.field-section-tabs button[aria-pressed=true]{background:#263D49;color:#F2EDE3}
 .map-selection-card{display:flex;align-items:center;gap:12px;padding:18px;margin-top:16px;background:#263D49;border:1px solid #334F58;border-radius:12px;color:#F2EDE3}
-.map-selection-card>div{flex:1;min-width:0}.map-selection-card h2{font-size:19px;line-height:1.3;margin:5px 0;color:#F2EDE3}.map-selection-card small{color:#C3D0D2}
+.map-selection-card>div{flex:1;min-width:0}.map-selection-card h2{font-size:var(--iag-label-size);line-height:1.3;margin:5px 0;color:#F2EDE3}.map-selection-card small{color:#C3D0D2}
 .map-selection-card button{background:#263D49;color:#C3D0D2;border:1px solid #334F58;border-radius:8px;padding:10px;min-width:44px}
 html body #root .app-shell.app-pages .cabinet-page .cabinet-summary span,html body #root .app-shell.app-pages .cabinet-page .cabinet-summary b,html body #root .app-shell.app-pages .cabinet-page .cabinet-detail p{color:#F2EDE3}
 html body #root .app-shell.app-pages .asset-directory .system-chips,html body #root .app-shell.app-pages .asset-directory .area-group>header{background:#263D49!important;border-color:#334F58!important}
@@ -154,7 +154,7 @@ html body #root .app-shell.app-pages .cabinet-drawing{min-width:0!important}
   html body #root .app-shell.app-pages{grid-template-rows:auto minmax(0,1fr) auto}
   .page-header{padding:12px 16px}.page-brand{font-size:var(--iag-reading-size, 18px);gap:9px}.page-brand>span:first-child{width:34px;height:34px;border-radius:10px;font-size:var(--iag-reading-size, 18px)}.page-brand small{font-size:var(--iag-reading-size, 18px)}.page-account-link{font-size:var(--iag-reading-size, 18px);padding:8px 12px}
   .page-navigation{grid-row:3;justify-content:space-around;gap:0;border-top:1px solid #334F58;border-bottom:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
-  .page-navigation a{flex:1;min-width:0;min-height:54px;flex-direction:column;gap:5px;font-size:var(--iag-reading-size, 18px)}.page-navigation a>span{font-size:20px}
+  .page-navigation a{flex:1;min-width:0;min-height:54px;flex-direction:column;gap:5px;font-size:var(--iag-reading-size, 18px)}.page-navigation a>span{font-size:var(--iag-reading-size)}
   .page-scroll{grid-row:2;padding:18px 16px 24px}.page-title{margin-bottom:20px;align-items:flex-start}.page-title h1{font-size:27px}.page-title p{font-size:var(--iag-reading-size, 18px)}.page-title .page-primary,.page-title>button{padding:8px 12px;font-size:var(--iag-reading-size, 18px)}
   .home-intro{padding:26px 22px;border-radius:16px}.home-intro p{font-size:var(--iag-reading-size, 18px)}.simple-home{gap:16px}.home-destinations{gap:12px}.destination-card{padding:18px}.destination-card strong{font-size:18px}.destination-card p{font-size:var(--iag-reading-size, 18px);margin-bottom:18px}.destination-card small{font-size:var(--iag-reading-size, 18px)}
   .home-followup{padding:20px;align-items:flex-start;flex-direction:column;gap:12px}.more-page{grid-template-columns:1fr;gap:24px}.more-page section:last-child{grid-column:auto}.page-link-list a{padding:16px;min-height:80px}
@@ -163,10 +163,21 @@ html body #root .app-shell.app-pages .cabinet-drawing{min-width:0!important}
   html body #root .app-shell.app-pages .reference-layout-heading{flex-wrap:wrap!important;height:auto!important;min-height:0!important}
   html body #root .app-shell.app-pages .reference-plan-wrap{min-height:300px!important;max-height:55dvh}
   html body #root .app-shell.app-pages .dashboard>.rail{margin-top:16px!important}
-  html body #root .app-shell.app-pages .cabinet-header{padding:16px!important}html body #root .app-shell.app-pages .cabinet-header h1{font-size:22px}
+  html body #root .app-shell.app-pages .cabinet-header{padding:16px!important}html body #root .app-shell.app-pages .cabinet-header h1{font-size:var(--iag-label-size)}
   html body #root .app-shell.app-pages .cabinet-workspace{display:flex!important;flex-direction:column;gap:16px;min-height:0!important}
   html body #root .app-shell.app-pages .cabinet-detail{order:0!important}html body #root .app-shell.app-pages .cabinet-device-list{order:1!important}html body #root .app-shell.app-pages .cabinet-drawing{order:2!important}
   html body #root .app-shell.app-pages .cabinet-svg{height:360px!important;max-height:65dvh}
 }
 @media(max-width:400px){.home-destinations{grid-template-columns:1fr}.page-brand>span:first-child{display:none}.page-title{flex-wrap:wrap}}
 @media(max-height:500px) and (max-width:950px){.page-header{padding-top:6px;padding-bottom:6px}.page-navigation{padding-top:2px;padding-bottom:2px}.page-navigation a{min-height:44px}.page-scroll{padding-top:12px}}
+
+/* A visible current section replaces offscreen tabs on phones. */
+.section-picker-select,.inspector-section-picker{display:none}
+@media(max-width:700px){
+  .section-picker>div{display:none}
+  .section-picker-select{display:block;width:100%;padding:12px;border:1px solid var(--slate-border);border-radius:10px}
+  html body #root .app-shell.app-pages .dashboard>.rail .inspector-tabs{display:none!important}
+  .inspector-section-picker{display:grid;gap:8px;padding:12px}
+  .inspector-section-picker select{width:100%;padding:12px}
+  .app-pages .phone-trace{display:none!important}
+}

@@ -26,7 +26,7 @@ html body #root .map-studio .reference-plan-wrap{height:100%;min-height:320px;ma
 .map-studio-panel button,.studio-window-actions button{min-height:44px;background:#263D49;color:#F2EDE3;border:1px solid #47616A;border-radius:6px;padding:7px 10px;font-size:var(--iag-reading-size, 18px);cursor:pointer;white-space:normal}
 .map-studio-panel button:disabled{opacity:.5;cursor:not-allowed}.map-studio-panel button[aria-pressed=true]{border-color:#47616A;background:#334F58}
 .map-studio-panel .studio-primary{background:#334F58;border-color:#47616A;color:#F2EDE3;font-weight:700}
-.studio-tab-body{display:grid;gap:12px;padding:14px}.studio-tab-body h3{margin:4px 0;font-size:18px;color:#F2EDE3}.studio-tab-body p{margin:0;line-height:1.45}.studio-tab-body small{font-size:var(--iag-reading-size, 18px);color:#C3D0D2;line-height:1.4}
+.studio-tab-body{display:grid;gap:12px;padding:14px}.studio-tab-body h3{margin:4px 0;font-size:var(--iag-label-size);color:#F2EDE3}.studio-tab-body p{margin:0;line-height:1.45}.studio-tab-body small{font-size:var(--iag-reading-size, 18px);color:#C3D0D2;line-height:1.4}
 .studio-tab-body label,.studio-draft-history label{display:grid;gap:5px;font-size:var(--iag-reading-size, 18px);color:#C3D0D2}
 .studio-tab-body input,.studio-tab-body textarea,.studio-tab-body select,.studio-draft-history input{width:100%;padding:9px;background:#1B303C;color:#F2EDE3;border:1px solid #47616A;border-radius:6px;font:inherit;min-height:44px;max-width:100%}
 .studio-tab-body textarea{resize:vertical;min-height:120px;font-size:var(--iag-reading-size, 18px)}.studio-tab-body input[type=checkbox]{min-height:20px;width:20px;height:20px;margin:0}

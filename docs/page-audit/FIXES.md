@@ -1,0 +1,53 @@
+# Audit fixes — 18 September 2026
+
+This follow-up records changes after the [original page audit](README.md). The original screenshots and findings describe commit `fc6b04e`; they are retained as before evidence. Reviewed fix commit: `a2053864a1461ba2839b6a559fabf0f4787338ae`, on [draft PR #63](https://github.com/tobystrings/industrial-asset-graph/pull/63), not the deployed application.
+
+## Findings and corrections
+
+| Finding | Implemented correction | Regression evidence |
+| --- | --- | --- |
+| F1: Data health Open and Trace do nothing | Use the shared router to open the selected area/asset record or an equipment trace. Component sources resolve to their parent equipment. | Click actual Health targets and assert destination and selected record. |
+| F2: Phone database overflows | Stack phone statistics, constrain form children, and wrap export/import labels. | Phone route geometry and screenshots. |
+| F3: Narrow-phone Directory overflows at 150% text | Constrain shell grid tracks and header children; let long labels reflow. | Retain the original 320px enlarged-text repair assertion. |
+| F6: Manage assets rows overlap | Prevent rows shrinking below their text; reserve room for Edit. | Assert that each row contains its text, including wrapped names. |
+| F7: Selected phone asset tab is hidden | Show a native Asset section selector with the current section selected. Use the same approach for Inventory and More. | Select sections, follow links, return, reload, and exercise keyboard selection. |
+| F4: Chrome displaces the task | Move supplementary help and save details below content; retain save-error attention at the top. Collapse production related-page links. Remove duplicate inventory actions/context and put the map before secondary controls on phones. | Screenshots and existing navigation, map, inventory and repair journeys. |
+| F5: Inconsistent legacy panels and empty troubleshooting | Apply Slate surfaces to legacy headers/panels and provide an inline equipment picker for troubleshooting. Area links open their record by default. | Troubleshooting selection and area/asset captures. |
+
+The readability branch also contains the earlier large-print design (24px reading text, 28px labels, 72px targets) and contextual Back navigation. A Back action should return to the preceding workspace and preserve its context; direct links use the defined parent fallback.
+
+Final screenshot inspection found two additional enlarged-text defects: the Directory label escaped its button, and the unfocused skip link became visible above the header. Navigation labels now wrap within their targets, the header can wrap onto another row, and the skip link stays offscreen until focused. Regression assertions now measure navigation text containment and skip-link visibility as well as font and target sizes.
+
+## Evidence and scope
+
+Focused after screenshots and results are in `artifacts/audit-fixes/`. `scripts/audit-fixes-browser-check.py` exercises the corrected states at 1366, 390 and 320 pixels. `scripts/audit_regressions_visual.py` adds the Health, row containment, database and selected-section regressions to the existing full visual suite at representative desktop and phone sizes. No original viewport, font threshold, geometry assertion or transaction assertion was removed.
+
+Selected after screenshots: [Manage rows](after/390-manage-rows.png), [Inventory form](after/390-inventory-add.png), [selected asset section](after/390-asset-section.png), [Health opens its area](after/390-health-open.png), [320px Directory at 150% text](after/320-home-text-150.png).
+
+Tests use isolated authentication and service fixtures. Their success establishes browser behavior against those contracts, not live backend authorization, actual cross-device publication, passkeys, email, microphone or camera behavior on a physical phone.
+
+## Remaining work
+
+- Dense labels embedded in technical map drawings still require local zoom; some authored labels overlap. This is not resolved by the shared UI font changes.
+- The initial audit covered every registered page visually, but did not execute every control or business transaction. Populated request variants and every legacy capture/hotspot path still need deeper coverage.
+- Verify real backend behavior against an authorized test facility and inspect the deployed build after integration. Local checks and a draft PR do not establish deployment.
+
+## Validation
+
+### Publication-panel release correction
+
+CI subsequently caught the shared-save panel collapsing as a conflict changed to a successful save. The panel now opens automatically for errors/conflicts and retains the user's open state after resolution. The publication browser test uses actual disclosure clicks, starts the conflict with the panel closed, and requires the saved result to remain visible without reopening it. Cross-device revision, attachment-byte, duplicate, recovery and reload assertions are unchanged. The corrected publication journey passed locally. The installed-app cache version is also updated for this release.
+
+The latest release gate is [PR #63 checks](https://github.com/tobystrings/industrial-asset-graph/pull/63/checks). The results below describe the preceding audit-fix build; they do not replace validation of this final correction.
+
+- Unit tests: 71 files passed; 284 tests passed, one conditional skip.
+- Facility data, permanent visual contract and production build: passed.
+- Focused audit fixes: 39 state checks passed across 1366, 390 and 320 pixels, including enlarged text.
+- Complete technician/administrator repair journey: passed, including enlarged-text geometry.
+- Map editor and simulated publication suites: passed before the final header/label wrapping adjustment; the full visual rerun checks that adjustment.
+- Final 36-route large-print sweep: passed at 1366, 768 and 390 pixels.
+- Full nine-viewport visual rerun: passed, including desktop/laptop, both tablet orientations, 430/390/360/320px phones and phone landscape. Representative workflows include inventory, Health destinations, Back context, editing, capture, documents, map and cabinet states.
+- An earlier broad run timed out after Submit for review. A focused reproduction, the dedicated repair journey and the complete subsequent nine-viewport run passed. The earlier failure is retained as a reliability observation; no retry or weakened assertion was added to hide it.
+- [GitHub CI](https://github.com/tobystrings/industrial-asset-graph/actions/runs/35390231216) failed on the publication panel visibility described above, after the visual regression completed. This prompted the release correction rather than a weaker assertion.
+
+The integration baseline for these changes is `4e19597c51d6b0486b13405744a03e594cd9b53b`. Check the PR's merge state and GitHub Pages deployment for release status; this audit document is not proof of deployment.

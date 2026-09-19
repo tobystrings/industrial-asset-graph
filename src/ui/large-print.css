@@ -1,10 +1,10 @@
 /* Shared shop-floor typography and controls. Drawing coordinates stay local to SVGs.
    Legacy styles consume these tokens directly; chrome-clearance remains the last guard. */
 :root {
-  --iag-reading-size: 18px;
-  --iag-label-size: 20px;
-  --iag-heading-size: 28px;
-  --iag-target-size: 52px;
+  --iag-reading-size: 24px;
+  --iag-label-size: 28px;
+  --iag-heading-size: 36px;
+  --iag-target-size: 72px;
   --iag-control-border: #47616A;
   --iag-focus: #F2EDE3;
   font-size: var(--iag-reading-size, 18px);
@@ -18,7 +18,7 @@ html body #root :is(.app-pages, .auth-page) :is(button, input:not([type=checkbox
   line-height: 1.4;
 }
 html body #root .app-pages :is(button, summary) { white-space: normal; overflow-wrap: anywhere; }
-html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size); }
+html body #root :is(.app-pages, .auth-page) button { min-height: var(--iag-target-size) !important; min-width: var(--iag-target-size) !important; }
 html body #root .app-pages :is(input, select, textarea) { min-width: 0; max-width: 100%; }
 html body #root .app-pages :is(input[type=checkbox], input[type=radio]) {
   width: 28px; height: 28px; min-height: 28px; flex: 0 0 28px; accent-color: #F2EDE3;
@@ -32,7 +32,7 @@ html body #root .app-pages button[aria-selected=true] {
   box-shadow: inset 0 -4px 0 #F2EDE3; border-color: #F2EDE3;
 }
 html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ffd6d2; margin-block: 8px; }
-.page-navigation a { font-size: var(--iag-label-size); min-height: 56px; padding: 8px 18px; border: 2px solid transparent; }
+.page-navigation a { font-size: var(--iag-label-size); min-height: var(--iag-target-size); padding: 8px 18px; border: 2px solid transparent; }
 .page-navigation a[aria-current=page] { color: #F2EDE3; background: #334F58; border-color: #F2EDE3; box-shadow: inset 0 -3px 0 #F2EDE3; }
 .page-navigation a>.nav-wide-label { font-size: inherit; line-height: inherit; }
 .page-navigation a>.nav-short-label { display: none; }
@@ -55,7 +55,7 @@ html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ff
 .more-page { display: grid; grid-template-columns: minmax(0,1fr); max-width: 1080px; margin: auto; }
 .more-page .page-link-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border: 0; gap: 14px; background: transparent; overflow: visible; }
 .more-page .page-link-list a { border: 1px solid #47616A; border-radius: 12px; padding: 22px; }
-.page-link-list strong { font-size: 22px; }
+.page-link-list strong { font-size:var(--iag-label-size); }
 .page-link-list small { font-size: var(--iag-reading-size, 18px); }
 .section-picker { min-width: 0; }
 .section-picker-label { display: block; font-weight: 600; margin-bottom: 10px; }
@@ -65,7 +65,7 @@ html body #root .app-pages button.danger { border: 2px solid #efaaa5; color: #ff
 html body #root .app-pages .inspector-tabs { flex-wrap: wrap !important; gap: 8px; padding: 12px; }
 html body #root .app-pages .inspector-tabs button { flex: 1 1 120px; font-size: var(--iag-label-size); }
 html body #root .app-pages .inspector-tabs button.active { border: 2px solid #F2EDE3; background: #334F58; }
-html body #root .app-pages .map-floating-controls button { width: 52px; height: 52px; }
+html body #root .app-pages .map-floating-controls button { width: var(--iag-target-size); height: var(--iag-target-size); min-width: var(--iag-target-size) !important; }
 html body #root .app-pages .map-readable-legend>button { font-size: var(--iag-label-size); }
 html body #root .app-pages .map-readable-legend .legend-grid span { font-size: var(--iag-label-size) !important; }
 html body #root .app-pages .field-section-tabs { flex-wrap: wrap; }

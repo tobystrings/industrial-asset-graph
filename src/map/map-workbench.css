@@ -1,5 +1,7 @@
 /* Map-specific color and scale. The application shell can remain neutral. */
 .reference-layout { --map-paper:#090d18; --map-selection:#ffcf40; }
+.map-area-picker{display:grid;gap:8px;min-width:0;padding:12px 16px;font-size:var(--iag-reading-size);font-weight:600}
+.map-area-picker select{width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:12px;border:1px solid var(--slate-border);border-radius:8px;font:inherit}
 html body #root .reference-layout :is(.facility-map-svg,.studio-saved-overlay,.map-editor-svg,.reference-plan){filter:none}
 html body #root .reference-layout .facility-map-svg{background:var(--map-paper)!important}
 .reference-layout .map-reference-artwork{filter:grayscale(1) invert(1)}
@@ -15,7 +17,7 @@ html body #root .reference-layout .reference-plan-wrap{background:var(--map-pape
 .reference-layout .svg-zone.selected>rect,.reference-layout .svg-zone.selected>polygon,
 .reference-layout .map-editor-areas>g.selected>rect:not(.selection-bounds),.reference-layout .map-editor-areas>g.selected>polygon{stroke:var(--map-selection);stroke-width:4;fill-opacity:.5}
 .reference-layout .map-editor-areas .selection-bounds{stroke:var(--map-selection);stroke-width:3}
-.reference-layout .svg-zone text,.reference-layout .map-editor-areas text{fill:#F2EDE3;stroke:#090d18;stroke-width:5px;font-size:22px;font-weight:800;paint-order:stroke;stroke-linejoin:round}
+.reference-layout .svg-zone text,.reference-layout .map-editor-areas text{fill:#F2EDE3;stroke:#090d18;stroke-width:5px;font-size:var(--iag-label-size);font-weight:800;paint-order:stroke;stroke-linejoin:round}
 .reference-layout .svg-zone:hover text,.reference-layout .svg-zone.selected text{fill:#F2EDE3;stroke:#090d18}
 .reference-layout .map-editor-walls polyline{stroke:#f4f6ff}
 .reference-layout .map-editor-walls polyline.selected{stroke:var(--map-selection)}
@@ -65,7 +67,7 @@ html body #root .reference-layout .area-grid>button{min-height:44px}
  html body #root .map-studio:fullscreen{overflow:auto}
 }
 html body #root .map-studio .studio-window-actions{font-size:var(--iag-reading-size, 18px)}
-html body #root .map-studio .studio-window-actions b{font-size:22px;margin-right:auto}
+html body #root .map-studio .studio-window-actions b{font-size:var(--iag-label-size);margin-right:auto}
 html body #root .map-studio :is(button,input,select,textarea){font-size:var(--iag-reading-size, 18px);min-height:48px}
 html body #root .map-studio :is(.studio-tab-body label,.map-area-properties label,.map-editor-message){font-size:var(--iag-reading-size, 18px)}
 /* Reserve a real tab row; only the form body scrolls beneath it. */
@@ -120,7 +122,7 @@ html body #root .reference-layout .reference-layout-actions button{font-size:var
 html body #root .map-studio .studio-assistant-jump{background:#2448ad;border-color:#91afff;color:#F2EDE3}
 @media(max-width:600px){
  html body #root .map-studio .studio-window-actions{display:grid;grid-template-columns:1fr auto;gap:6px}
- html body #root .map-studio .studio-window-actions b{font-size:20px}
+ html body #root .map-studio .studio-window-actions b{font-size:var(--iag-reading-size)}
  html body #root .map-studio .studio-window-actions button{min-height:44px;font-size:var(--iag-reading-size, 18px)}
  html body #root .map-studio .studio-window-actions>button:not(.studio-assistant-jump){display:none}
  html body #root .map-studio .map-readable-legend{margin:0;padding:4px 10px}

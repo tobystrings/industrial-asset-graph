@@ -44,7 +44,7 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const [gesturing, setGesturing] = useState(false);
   const [metaTab, setMetaTab] = useState<MetaTab>(() => loadAppSettings().mapDetails);
   const [editMode, setEditMode] = useState(() => new URLSearchParams(location.search).get('edit') === '1');
-  const [legendOpen, setLegendOpen] = useState(()=>window.innerWidth>=900);
+  const [legendOpen, setLegendOpen] = useState(false);
   const [gridOpen, setGridOpen] = useState(false);
   const [gridPoint] = useState<{ x: number; y: number; label: string } | null>(null);
   const [mapSearch, setMapSearch] = useState('');
@@ -109,11 +109,11 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
   const zoneShape = (area: FacilityArea) => area.overlay.polygon?.map((point) => `${point.x / 100 * drawingWidth},${point.y / 100 * drawingHeight}`).join(' ');
   const mapPoints = (points: Array<{ x: number; y: number }>) => points.map((point) => `${point.x / 100 * drawingWidth},${point.y / 100 * drawingHeight}`).join(' ');
 
-  const focusBounds = (x: number, y: number, width: number, height: number) => {
+  const focusBounds = (x: number, y: number, width: number, height: number, minimumScale = 0.2) => {
     const hostWidth = Math.max(0, (planWrapRef.current?.clientWidth ?? 0) - 28);
     const hostHeight = Math.max(0, (planWrapRef.current?.clientHeight ?? 0) - 28);
     if (!hostWidth || !hostHeight) return;
-    const scale = clampScale(Math.min(2.4, hostWidth / Math.max(width * 1.45, 1), hostHeight / Math.max(height * 1.45, 1)));
+    const scale = clampScale(Math.max(minimumScale,Math.min(2.4, hostWidth / Math.max(width * 1.45, 1), hostHeight / Math.max(height * 1.45, 1))));
     setView({ scale, x: hostWidth / 2 - (x + width / 2) * scale, y: hostHeight / 2 - (y + height / 2) * scale });
   };
 
@@ -130,7 +130,9 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
     if (result.kind === 'area') {
       onArea(result.area);
       const box = result.area.overlay;
-      focusBounds(box.x / 100 * drawingWidth, box.y / 100 * drawingHeight, box.width / 100 * drawingWidth, box.height / 100 * drawingHeight);
+      // Area labels bottom out at 14 drawing units. At 1.5× they render at
+      // least 21 screen pixels; retain contained panning for larger rooms.
+      focusBounds(box.x / 100 * drawingWidth, box.y / 100 * drawingHeight, box.width / 100 * drawingWidth, box.height / 100 * drawingHeight, 1.5);
     }
     else {
       const area = areas.find((item) => item.id === result.asset.areaId);
@@ -217,6 +219,12 @@ export default function DetailedBuildingLayout({ selectedArea, selectedAsset, fi
 
   return <section className={`reference-layout ${editMode ? 'map-studio' : ''} studio-pane-${studioPane}`} aria-label="Building Layout">
     <header className="reference-layout-head"><div><h2>{editMode ? 'Map Studio' : mapConfig?.drawingTitle ?? 'Building Layout'}</h2><p className="map-honesty-note">Live area labels reflect saved edits. The background is a reference drawing; equipment locations require field verification.</p></div><div className="map-toolbar-search"><label><span className="sr-only">Search map</span><input value={mapSearch} onChange={(event) => setMapSearch(event.target.value)} placeholder="Search rooms, areas, or assets…" /></label>{searchResults.length > 0 && <div className="map-search-results">{searchResults.map((result) => <button type="button" key={`${result.kind}-${result.id}`} onClick={() => openSearchResult(result)}><b>{result.title}</b><small>{result.kind === 'asset' ? result.asset.type : 'Room / area'}</small></button>)}</div>}</div><div className="reference-layout-actions" aria-label="Map controls"><div className="map-layer-control"><button type="button" aria-expanded={layerOpen} onClick={() => setLayerOpen((open) => !open)}>Layers</button>{layerOpen && <div className="map-layer-menu"><label><input type="checkbox" checked={layers.cabinets} onChange={(event) => setLayers((value) => ({ ...value, cabinets: event.target.checked }))}/>Control cabinets</label><label><input type="checkbox" checked={layers.machines} onChange={(event) => setLayers((value) => ({ ...value, machines: event.target.checked }))}/>Machines</label><label><input type="checkbox" checked={layers.reference} onChange={(event) => setLayers((value) => ({ ...value, reference: event.target.checked }))}/>Reference symbols</label></div>}</div><button type="button" aria-pressed={gridOpen} onClick={() => setGridOpen((open) => !open)}>Grid</button><button type="button" onClick={() => zoomBy(-.15)} aria-label="Zoom out">−</button><output className="map-zoom-readout" aria-live="polite">{Math.round(view.scale * 100)}%</output><button type="button" onClick={() => zoomBy(.15)} aria-label="Zoom in">+</button><button type="button" onClick={fitPlan}>Fit</button><button type="button" onClick={resetPlan}>Reset</button><button className="edit-map-action" type="button" aria-pressed={editMode} onClick={() => { if (editMode) { void mapEditor.finish(); return; } if (mapEditor.editor.currentUser?.role !== 'admin') { window.dispatchEvent(new CustomEvent('iag-open-users')); return; } setEditMode(true); window.dispatchEvent(new CustomEvent('iag-map-edit-mode', { detail: true })); }}>{editMode ? 'Done' : 'Edit Map'}</button></div></header>
+    {!editMode&&<label className="map-area-picker">Find an area<select aria-label="Find an area" value={selectedArea?.visible!==false ? selectedArea?.id ?? '' : ''} onChange={event=>{
+      const area=areas.find(item=>item.id===event.target.value);
+      if(!area)return;
+      openSearchResult({kind:'area',id:area.id,title:area.name,area});
+      requestAnimationFrame(()=>planWrapRef.current?.scrollIntoView({block:'center',behavior:'instant'}));
+    }}><option value="">Choose an area to enlarge</option>{areas.filter(area=>area.visible!==false).map(area=><option key={area.id} value={area.id}>{area.name}</option>)}</select></label>}
     {editMode&&<nav className="studio-mobile-nav" aria-label="Map Studio sections">{['canvas','tools','assistant'].map(p=><button key={p} aria-pressed={studioPane===p} onClick={()=>setStudioPane(p)}>{p==='canvas'?'Map':p==='tools'?'Drawing tools':'Text / objects / layers'}</button>)}</nav>}
     {editMode&&<div className="studio-window-actions"><b>Map Studio</b><button className="studio-assistant-jump" onClick={()=>window.dispatchEvent(new Event('iag-map-assistant'))}>AI / text edits</button><button onClick={()=>{const section=planWrapRef.current?.closest('section.reference-layout');if(document.fullscreenElement) void document.exitFullscreen();else if(section?.requestFullscreen) void section.requestFullscreen().catch(()=>mapEditor.setMessage('Full screen is unavailable in this browser.'));}}>Full screen</button><button onClick={()=>{if(mapEditor.dirty){mapEditor.setMessage('Save Changes before opening another editor window.');return;}window.open(`${location.pathname}?page=map&edit=1`,'iag-map-studio','popup,width=1600,height=1000');}}>Pop out</button><span>{mapEditor.previewDraft?'Preview — apply or discard in Text edits':mapEditor.tool==='pan'?'Drag to pan · scroll to zoom':'Drag to draw or move · scroll to zoom'}</span></div>}
     <aside className="map-readable-legend" aria-label="Map color legend">

@@ -112,7 +112,7 @@
   }
 
   .dashboard.workspace-map .reference-layout-head h2 {
-    font-size: 20px !important;
+    font-size:var(--iag-reading-size) !important;
   }
 
   .dashboard.workspace-map .reference-layout-head p {

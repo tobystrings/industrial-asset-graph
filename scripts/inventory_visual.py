@@ -1,3 +1,4 @@
+from section_picker_visual import choose_section, selected_section
 """Photo-to-stock workflow in isolated authenticated browser fixtures only."""
 import io
 import json
@@ -6,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 def exercise_inventory(page, base, label, screenshot, geometry):
     page.goto(base+'?page=inventory', wait_until='networkidle')
-    page.get_by_role('button', name='Take photo / Add part', exact=True).click()
+    choose_section(page, 'Inventory sections', 'Add Part')
     page.get_by_label('Name / description', exact=True).fill('Synthetic inventory contactor')
     page.get_by_label('Manufacturer part number', exact=True).fill('TEST-INVENTORY-24')
     page.get_by_label('Manufacturer', exact=True).fill('Synthetic manufacturer')
@@ -59,9 +60,9 @@ def exercise_inventory(page, base, label, screenshot, geometry):
     page.get_by_role('region', name='Selected part').locator('p').filter(has_text='Synthetic physical count confirmed').wait_for()
     geometry(page)
     screenshot(page, f'{label}-inventory-stock-history')
-    page.get_by_role('button', name='Activity', exact=True).click()
+    choose_section(page, 'Inventory sections', 'Activity')
     assert 'Synthetic installation check' in page.locator('.inventory-workspace').inner_text()
-    page.get_by_role('button', name='Advanced', exact=True).click()
+    choose_section(page, 'Inventory sections', 'Advanced')
     with page.expect_download() as download:
         page.get_by_role('button', name='Download backup with inventory photos', exact=True).click()
     backup = json.loads(open(download.value.path(), encoding='utf-8').read())

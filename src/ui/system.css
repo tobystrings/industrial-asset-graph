@@ -183,7 +183,7 @@
 .document-empty button { margin-top: 5px; padding: 7px 10px; border: 1px solid #334F58; border-radius: 6px; background: #263D49; color: #C3D0D2; font-weight: 800; cursor: pointer; }
 .document-preview { background: #263D49 !important; border-left: 1px solid var(--iag-border); }
 .document-detail { position: relative; }
-.document-close { position: sticky; top: 8px; z-index: 2; float: right; width: 34px; height: 34px; border: 1px solid #334F58; border-radius: 7px; background: #263D49; color: #F2EDE3; font-size: 20px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.document-close { position: sticky; top: 8px; z-index: 2; float: right; width: 34px; height: 34px; border: 1px solid #334F58; border-radius: 7px; background: #263D49; color: #F2EDE3; font-size:var(--iag-reading-size); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
 .document-status-line { padding: 7px 9px; border: 1px solid #334F58; border-radius: 6px; background: #263D49; color: #C3D0D2; }
 
 /* Reduce visual noise: fewer floating/glass effects, more consistent controls. */
@@ -252,7 +252,7 @@ textarea:focus-visible {
     border-radius: 7px;
     background: rgba(24, 24, 24, 0.07);
     color: #F2EDE3;
-    font-size: 21px;
+    font-size: var(--iag-reading-size);
   }
   .facility-sidebar.open {
     top: calc(58px + env(safe-area-inset-top)) !important;

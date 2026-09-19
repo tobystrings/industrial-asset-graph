@@ -27,7 +27,7 @@ main.dashboard.workspace-relationships > .rail { display: none !important; }
 
 @media (max-width: 520px) {
   main.dashboard.workspace-relationships .troubleshoot-head > div { padding-right: 124px; }
-  main.dashboard.workspace-relationships .troubleshoot-head h1 { font-size: 23px; }
+  main.dashboard.workspace-relationships .troubleshoot-head h1 { font-size: var(--iag-reading-size); }
   main.dashboard.workspace-relationships .trace-mode-picker { scrollbar-width: none; }
   main.dashboard.workspace-relationships .trace-mode-picker::-webkit-scrollbar { display: none; }
 }

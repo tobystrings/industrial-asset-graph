@@ -84,6 +84,7 @@ const InspectorRail = forwardRef<HTMLDivElement, Props>(function InspectorRail({
       <div className="rail-chrome">
         {onCloseMapInspector && <button className="map-inspector-close" type="button" aria-label="Close map inspector" onClick={onCloseMapInspector}>×</button>}
         <div className="phone-trace" data-testid="phone-trace">{nodes.map((node) => <span key={node.id}>{node.label}</span>)}</div>
+        <label className="inspector-section-picker">Asset section<select aria-label="Asset section" value={inspectorTab} onChange={event=>onInspectorTab(event.target.value as InspectorTab)}>{INSPECTOR_TABS.map(tab=><option key={tab} value={tab}>{tab === 'intel' ? 'Equipment intelligence' : tab === 'docs' ? 'Documents' : tab.charAt(0).toUpperCase()+tab.slice(1)}</option>)}</select></label>
         <div className="inspector-tabs" data-testid="inspector-tabs">
           {INSPECTOR_TABS.map((tab) => (
             <button key={tab} type="button" aria-pressed={inspectorTab === tab} className={inspectorTab === tab ? 'active' : ''} onClick={() => onInspectorTab(tab)}>

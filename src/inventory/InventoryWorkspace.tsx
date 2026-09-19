@@ -3,6 +3,7 @@ import { useFacility, useFacilityEditor, type AttachmentRecord } from '../facili
 import { appendMovement, compatibilityStates, emptyInventory, findParts, locationLabel, movementTypes, newPart, partCategories, photoRoles, stock, type InventoryPart, type MovementType, type PartsInventory, type StockMovement } from '../facility/inventory';
 import SectionPicker from '../navigation/SectionPicker';
 import { PageLink } from '../navigation/AppShell';
+import { pushPageSearch } from '../navigation/pages';
 import './inventory.css';
 import { readLabel, labelSuggestions } from './labelReader';
 import { exportPlantBackup } from '../facility/runtimeDb';
@@ -21,7 +22,7 @@ export default function InventoryWorkspace() {
   const inventory = pkg.facility.inventory ?? emptyInventory();
   const params = new URLSearchParams(location.search);
   const initialMachine = params.get('asset') ?? '', workId=params.get('work')??'';
-  const routeValue=(key:string,value:string,push=false)=>{const next=new URLSearchParams(location.search);if(value)next.set(key,value);else next.delete(key);if(key==='section')next.delete('part');if(next.toString()===new URLSearchParams(location.search).toString())return;history[push?'pushState':'replaceState'](null,'','?'+next);};
+  const routeValue=(key:string,value:string,push=false)=>{const next=new URLSearchParams(location.search);if(value)next.set(key,value);else next.delete(key);if(key==='section')next.delete('part');if(next.toString()===new URLSearchParams(location.search).toString())return;if(push)pushPageSearch('?'+next);else history.replaceState(history.state,'','?'+next);};
   const initialSection=sections.includes(params.get('section') as Section)?params.get('section') as Section:initialMachine?'Find for Machine':'Parts';
   const [section, setSectionValue] = useState<Section>(initialSection);
   const setSection=(value:Section)=>{setSectionValue(value);setSelectedValue('');routeValue('section',value,true);};
@@ -96,9 +97,7 @@ export default function InventoryWorkspace() {
   const confirmedSpare = visible.some(p => stock(p).available > 0 && ['New', 'Used / tested'].includes(p.condition) && p.machines.some(m => m.id === machine && m.status === 'Verified spare'));
   return <main className="inventory-workspace">
     {workId&&<PageLink page="repair" details={{work:workId,asset:initialMachine}} className="slate-card">← Return to this repair</PageLink>}
-    <div className="inventory-actions"><button disabled={busy} onClick={add}>Take photo / Add part</button><button disabled={busy} onClick={() => setSection('Find for Machine')}>Find part for a machine</button></div>
     <SectionPicker label="Inventory sections" options={sections.map(label => ({ id: label, label }))} value={section} onChange={value => { if (busy) return; if (value === 'Add Part') add(); else setSection(value as Section); setSelected(''); }}/>
-    <p className="inventory-notice">{editor.currentUser?.role === 'admin' ? 'Administrator stock records' : 'Changes require administrator review'} · Balances reflect this device’s synchronized records.</p>
     {message && <p role="status" className="inventory-message">{message}</p>}
     {section === 'Add Part' ? <form onSubmit={submitPart} className="inventory-form">
       <h2>{inventory.parts.some(p => p.id === draft.id) ? 'Edit part' : 'Add a part'}</h2>
@@ -154,5 +153,6 @@ export default function InventoryWorkspace() {
         <button disabled={busy || editor.currentUser?.role !== 'admin'} onClick={() => void run(async () => { if (stock(activePart).onHand || stock(activePart).reserved) throw new Error('Dispose or transfer remaining stock before archiving.'); await savePart({ ...activePart, archived: true }); setSelected(''); })}>Archive empty part</button>
       </section>}
     </>}
+    <p className="inventory-notice">{editor.currentUser?.role === 'admin' ? 'Administrator stock records' : 'Changes require administrator review'} · Balances reflect this device’s synchronized records.</p>
   </main>;
 }

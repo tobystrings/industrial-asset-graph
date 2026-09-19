@@ -1,0 +1,294 @@
+flowchart LR
+  machine["Machine"]
+  repairs["My work"]
+  repair["Repair"]
+  repairSummary["Finish repair"]
+  admin["Administration"]
+  inbox["Review Inbox"]
+  submission["Review submission"]
+  requests["App-change requests"]
+  inventory["Parts Inventory"]
+  history["Historical evidence"]
+  lines["Production lines"]
+  documentation["Documentation queue"]
+  maintenance["Equipment field sheet"]
+  dependencies["Dependency records"]
+  home["Directory"]
+  map["Map"]
+  assets["Equipment"]
+  asset["Asset record"]
+  area["Area details"]
+  documents["Documents"]
+  cabinet["Control cabinet"]
+  wulftec["Wulftec 3D model"]
+  component["Component record"]
+  field["Field documentation"]
+  relationships["Troubleshooting"]
+  more["More"]
+  account["Account"]
+  review["Review changes"]
+  assetAdd["Add equipment"]
+  manage["Manage assets"]
+  connection["Connections"]
+  evidence["Attach evidence"]
+  observation["Record a finding"]
+  setup["Plant setup"]
+  database["Plant database"]
+  settings["Settings"]
+  conflicts["Resolve sync conflicts"]
+  health["Data health"]
+  import["Import records"]
+  help["Guide & training"]
+  standalone_screen_69["Project tour"]
+  standalone_screen_70["Standalone machine viewer"]
+  standalone_screen_71["Evidence archive"]
+  standalone_screen_72["Recovered plant sources"]
+  account --> home
+  account --> more
+  account --> repairs
+  admin --> account
+  admin --> documentation
+  admin --> health
+  admin --> home
+  admin --> inbox
+  admin --> map
+  admin --> more
+  admin --> repairs
+  admin --> requests
+  admin --> review
+  area --> account
+  area --> home
+  area --> map
+  area --> repairs
+  asset --> account
+  asset --> home
+  asset --> inventory
+  asset --> machine
+  asset --> maintenance
+  asset --> repairs
+  asset --> standalone_screen_69
+  assetAdd --> account
+  assetAdd --> home
+  assetAdd --> more
+  assetAdd --> repairs
+  assets --> account
+  assets --> asset
+  assets --> assetAdd
+  assets --> component
+  assets --> home
+  assets --> lines
+  assets --> machine
+  assets --> map
+  assets --> repairs
+  cabinet --> account
+  cabinet --> home
+  cabinet --> machine
+  cabinet --> more
+  cabinet --> repairs
+  component --> account
+  component --> asset
+  component --> documents
+  component --> home
+  component --> machine
+  component --> repairs
+  conflicts --> account
+  conflicts --> home
+  conflicts --> more
+  conflicts --> repairs
+  connection --> account
+  connection --> home
+  connection --> more
+  connection --> repairs
+  database --> account
+  database --> home
+  database --> more
+  database --> repairs
+  dependencies --> account
+  dependencies --> documentation
+  dependencies --> documents
+  dependencies --> home
+  dependencies --> lines
+  dependencies --> maintenance
+  dependencies --> more
+  dependencies --> repairs
+  documentation --> account
+  documentation --> assetAdd
+  documentation --> dependencies
+  documentation --> home
+  documentation --> lines
+  documentation --> maintenance
+  documentation --> more
+  documentation --> repairs
+  documents --> account
+  documents --> home
+  documents --> repairs
+  evidence --> account
+  evidence --> home
+  evidence --> machine
+  evidence --> repairs
+  field --> account
+  field --> home
+  field --> more
+  field --> repairs
+  health --> account
+  health --> area
+  health --> asset
+  health --> home
+  health --> more
+  health --> relationships
+  health --> repairs
+  help --> account
+  help --> field
+  help --> home
+  help --> more
+  help --> repairs
+  help --> standalone_screen_69
+  history --> account
+  history --> asset
+  history --> home
+  history --> more
+  history --> repairs
+  home --> account
+  home --> admin
+  home --> assets
+  home --> documents
+  home --> inventory
+  home --> map
+  home --> more
+  home --> repair
+  home --> repairs
+  import --> account
+  import --> home
+  import --> more
+  import --> repairs
+  inbox --> account
+  inbox --> admin
+  inbox --> home
+  inbox --> repairs
+  inventory --> account
+  inventory --> database
+  inventory --> home
+  inventory --> repairs
+  inventory --> review
+  lines --> account
+  lines --> asset
+  lines --> dependencies
+  lines --> documentation
+  lines --> documents
+  lines --> home
+  lines --> maintenance
+  lines --> more
+  lines --> repairs
+  machine --> account
+  machine --> asset
+  machine --> assets
+  machine --> cabinet
+  machine --> component
+  machine --> documents
+  machine --> evidence
+  machine --> home
+  machine --> inventory
+  machine --> maintenance
+  machine --> manage
+  machine --> relationships
+  machine --> repair
+  machine --> repairs
+  maintenance --> account
+  maintenance --> asset
+  maintenance --> dependencies
+  maintenance --> documentation
+  maintenance --> documents
+  maintenance --> evidence
+  maintenance --> home
+  maintenance --> lines
+  maintenance --> machine
+  maintenance --> manage
+  maintenance --> repairs
+  manage --> account
+  manage --> home
+  manage --> machine
+  manage --> repairs
+  map --> account
+  map --> area
+  map --> help
+  map --> home
+  map --> machine
+  map --> repairs
+  more --> account
+  more --> assetAdd
+  more --> cabinet
+  more --> conflicts
+  more --> connection
+  more --> database
+  more --> dependencies
+  more --> documentation
+  more --> evidence
+  more --> field
+  more --> health
+  more --> help
+  more --> history
+  more --> home
+  more --> import
+  more --> inventory
+  more --> lines
+  more --> maintenance
+  more --> manage
+  more --> observation
+  more --> relationships
+  more --> repairs
+  more --> review
+  more --> settings
+  more --> setup
+  more --> standalone_screen_71
+  more --> standalone_screen_72
+  more --> wulftec
+  observation --> account
+  observation --> home
+  observation --> more
+  observation --> repairs
+  relationships --> account
+  relationships --> home
+  relationships --> more
+  relationships --> repairs
+  repair --> account
+  repair --> home
+  repair --> inventory
+  repair --> machine
+  repair --> repairSummary
+  repair --> repairs
+  repairSummary --> account
+  repairSummary --> home
+  repairSummary --> repair
+  repairSummary --> repairs
+  repairSummary --> submission
+  repairs --> account
+  repairs --> home
+  repairs --> repair
+  requests --> account
+  requests --> admin
+  requests --> home
+  requests --> repairs
+  review --> account
+  review --> home
+  review --> more
+  review --> repairs
+  settings --> account
+  settings --> home
+  settings --> more
+  settings --> repairs
+  setup --> account
+  setup --> home
+  setup --> more
+  setup --> repairs
+  standalone_screen_70 --> wulftec
+  standalone_screen_72 --> home
+  submission --> account
+  submission --> home
+  submission --> inbox
+  submission --> repairs
+  wulftec --> account
+  wulftec --> asset
+  wulftec --> documents
+  wulftec --> home
+  wulftec --> more
+  wulftec --> repairs

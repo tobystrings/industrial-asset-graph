@@ -3,7 +3,7 @@
 .troubleshooting label { display:grid; gap:10px; min-width:0; }
 .troubleshooting input,.troubleshooting textarea,.troubleshooting select { width:100%; min-width:0; box-sizing:border-box; }
 .troubleshooting button { min-height:56px; white-space:normal; overflow-wrap:anywhere; }
-.troubleshooting pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:20px; max-width:100%; }
+.troubleshooting pre { white-space:pre-wrap; overflow-wrap:anywhere; font-size:var(--iag-reading-size); max-width:100%; }
 .troubleshooting progress { width:100%; }
 .troubleshooting .slate-card { display:grid; gap:16px; }
 .troubleshooting p { overflow-wrap:anywhere; }

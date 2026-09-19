@@ -5,18 +5,18 @@
 .equipment-images button[aria-pressed=true]{border-color:#f7cb63;background:#49402b;color:#fff}
 .equipment-images a{color:#b7d9ff;text-decoration:underline;overflow-wrap:anywhere}
 .equipment-breadcrumbs,.equipment-tabs,.equipment-view-controls,.equipment-zoom{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.equipment-breadcrumbs{font-size:18px;margin-bottom:16px}.equipment-layout{display:grid;grid-template-columns:minmax(180px,.65fr) minmax(0,1.6fr) minmax(280px,1fr);gap:18px;align-items:start}
+.equipment-breadcrumbs{font-size:var(--iag-reading-size);margin-bottom:16px}.equipment-layout{display:grid;grid-template-columns:minmax(180px,.65fr) minmax(0,1.6fr) minmax(280px,1fr);gap:18px;align-items:start}
 .equipment-device-list,.equipment-information{background:#202226;border:1px solid #5b6068;border-radius:12px;padding:16px}
 .equipment-device-list{display:grid;gap:10px}.equipment-device-list input{width:100%;margin-top:8px}.equipment-device-list button{width:100%}
-.equipment-information h3{margin-top:0}.equipment-information p,.equipment-caption{overflow-wrap:anywhere}.equipment-id{font-size:18px;overflow-wrap:anywhere}.equipment-tabs{margin:16px 0}.equipment-tabs button{flex:1 1 110px}.equipment-information>button{margin-bottom:16px}
+.equipment-information h3{margin-top:0}.equipment-information p,.equipment-caption{overflow-wrap:anywhere}.equipment-id{font-size:var(--iag-reading-size);overflow-wrap:anywhere}.equipment-tabs{margin:16px 0}.equipment-tabs button{flex:1 1 110px}.equipment-information>button{margin-bottom:16px}
 .equipment-image-surface{width:100%;max-height:70vh;overflow:auto;background:#111;border:1px solid #717780;border-radius:8px;touch-action:pan-x pan-y}
 .equipment-image-surface svg{display:block;height:auto;max-width:none!important;filter:none!important;user-select:none}
 .equipment-image-surface image{filter:none!important}
 .equipment-image-surface rect{fill:transparent;stroke:#ffdd76;stroke-width:2;vector-effect:non-scaling-stroke;cursor:pointer}
 .equipment-image-surface rect.selected,.equipment-image-surface g:hover rect,.equipment-image-surface g:focus rect{fill:#ffd35e33;stroke:#fff;stroke-width:4}
-.equipment-image-surface g:focus{outline:none}.equipment-zoom{margin:12px 0}.equipment-caption{font-size:18px;line-height:1.5;color:#dedede}.equipment-connection{padding:12px 0;border-top:1px solid #717780}.equipment-connection dt{font-weight:600;margin-top:12px}.equipment-connection dd{margin:4px 0 12px}.equipment-information li{margin:10px 0}
+.equipment-image-surface g:focus{outline:none}.equipment-zoom{margin:12px 0}.equipment-caption{font-size:var(--iag-reading-size);line-height:1.5;color:#dedede}.equipment-connection{padding:12px 0;border-top:1px solid #717780}.equipment-connection dt{font-weight:600;margin-top:12px}.equipment-connection dd{margin:4px 0 12px}.equipment-information li{margin:10px 0}
 @media(max-width:1100px){.equipment-layout{grid-template-columns:minmax(0,1fr) minmax(270px,.8fr)}.equipment-device-list{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}.equipment-device-list h3,.equipment-device-list label{grid-column:1/-1}}
-@media(max-width:700px){.equipment-images{padding:12px}.equipment-layout{display:flex;flex-direction:column}.equipment-information{order:0;width:100%}.equipment-device-list{order:1;width:100%;grid-template-columns:1fr}.equipment-visual{order:2;width:100%}.equipment-image-surface{max-height:65vh}.equipment-breadcrumbs{font-size:18px;margin-bottom:16px}.equipment-tabs button{font-size:20px}.equipment-view-controls button{flex:1 1 140px}}
+@media(max-width:700px){.equipment-images{padding:12px}.equipment-layout{display:flex;flex-direction:column}.equipment-information{order:0;width:100%}.equipment-device-list{order:1;width:100%;grid-template-columns:1fr}.equipment-visual{order:2;width:100%}.equipment-image-surface{max-height:65vh}.equipment-breadcrumbs{font-size:var(--iag-reading-size);margin-bottom:16px}.equipment-tabs button{font-size:var(--iag-reading-size)}.equipment-view-controls button{flex:1 1 140px}}
 
 .equipment-phone-selector{display:none}
 @media(max-width:700px){.equipment-phone-selector{display:block;width:100%}.equipment-device-list>button,.equipment-device-list>label{display:none}}
