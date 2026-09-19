@@ -104,15 +104,24 @@ try:
         # The existing tour link must resolve in the built app, including original media.
         for width in [390,1366]:
             tech.set_viewport_size({'width':width,'height':900})
+            hidden_artwork=[]
+            def track_artwork(request):
+                if '/presentation/assets/' in request.url and request.resource_type=='image':hidden_artwork.append(request.url)
+            tech.on('request',track_artwork)
             tech.goto(base+'presentation/',wait_until='networkidle')
+            tech.remove_listener('request',track_artwork)
+            assert not hidden_artwork,'Tour eagerly downloaded hidden slide artwork before playback'
             tech.locator('#startBtn').wait_for()
             assert tech.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
             assert tech.evaluate("document.querySelector('.controls').getBoundingClientRect().top>=document.querySelector('.film').getBoundingClientRect().bottom")
             tech.locator('#startBtn').click()
             tech.wait_for_function("document.querySelector('#completeFilm').currentTime>0",timeout=30000)
             tech.locator('#nextBtn').click()
+            assert tech.locator('.scene.active').evaluate('e=>getComputedStyle(e).backgroundImage!=="none"'),'Visible chapter did not load its artwork'
             tech.locator('#playBtn').click()
             assert tech.locator('#completeFilm').evaluate('e=>e.paused')
+            tech.locator('#nextBtn').click()
+            assert tech.locator('.scene.active .cinematic-shot').first.evaluate('e=>getComputedStyle(e).backgroundImage!=="none"'),'Visible cinematic shot did not load its artwork'
             tech.screenshot(path=f'artifacts/project-tour-{width}.png')
         for width in [320,390,1366]:
             tech.set_viewport_size({'width':width,'height':900})

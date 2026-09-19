@@ -57,6 +57,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: synthetic-visual-test-key
         run: npm run build
 
+      - name: Verify fresh install and installed-app updates
+        run: npm run test:service-worker
+
       - name: Verify troubleshooting browser journeys
         run: python scripts/troubleshooting-browser-check.py
 

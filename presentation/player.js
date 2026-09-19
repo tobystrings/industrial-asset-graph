@@ -148,12 +148,24 @@ function resolveStartScene() {
   return sceneAt(audio.currentTime || 0);
 }
 
+function loadVisual(element) {
+  if (!element) return;
+  for (const target of [element, ...element.querySelectorAll('[data-background],img[data-src]')]) {
+    if (target.dataset.background && !target.style.backgroundImage) {
+      target.style.backgroundImage = `url(${JSON.stringify(target.dataset.background)})`;
+    }
+    if (target.matches('img[data-src]') && !target.getAttribute('src')) target.src = target.dataset.src;
+  }
+}
+
 function updateCinematicPhases() {
   if (sceneIndex === 0 && introScene) {
     const position = Math.min(1, audio.currentTime / segmentTimes.introEnd);
     let phase = 0;
     introPhaseFractions.forEach((fraction, index) => { if (position >= fraction) phase = index; });
     introScene.dataset.phase = String(phase);
+    loadVisual(introScene.querySelector(`.intro-phase.phase-${phase}`));
+    if (audio.currentTime > 0) loadVisual(introScene.querySelector(`.intro-phase.phase-${phase + 1}`));
   }
   if (sceneIndex === chapters.length - 1 && finaleScene) {
     const position = Math.min(1, (audio.currentTime - segmentTimes.mainEnd) / Math.max(.1, duration() - segmentTimes.mainEnd));
@@ -164,7 +176,12 @@ function updateCinematicPhases() {
   const board = document.querySelector('.scene.active.cinematic-scene');
   if (board) {
     const progress = sceneLocalProgress();
-    board.dataset.beat = String(Math.min(3, Math.floor(progress * 4)));
+    const beat = Math.min(3, Math.floor(progress * 4));
+    board.dataset.beat = String(beat);
+    // Hidden slides used to download the entire artwork set before playback.
+    // Load this shot and the next one; narration keeps its original media file.
+    const shots = [...board.querySelectorAll('.cinematic-shot')];
+    for (const shot of shots.slice(beat, beat + 2)) loadVisual(shot);
   }
 }
 
@@ -172,6 +189,7 @@ function updateScene(index = sceneIndex) {
   sceneIndex = Math.max(0, Math.min(chapters.length - 1, index));
   $$('.scene').forEach((element, i) => {
     element.classList.toggle('active', i === sceneIndex);
+    if (i === sceneIndex && element.dataset.background) loadVisual(element);
     const visual = manifestScenes[i]?.visual || '';
     element.classList.toggle('still-hold', stillHoldsKenBurns(visual) || element.classList.contains('still-hold'));
   });
