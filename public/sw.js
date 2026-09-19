@@ -1,4 +1,4 @@
-const CACHE = 'iag-static-v6-friendly';
+const CACHE = 'iag-static-v7-update';
 const APP_SCOPE = '/industrial-asset-graph/';
 const STATIC_ASSETS = [
   `${APP_SCOPE}manifest.webmanifest`,
@@ -20,7 +20,11 @@ self.addEventListener('activate', (event) => {
     await Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)));
     await self.clients.claim();
     const clients = await self.clients.matchAll({ type: 'window' });
-    await Promise.all(clients.map((client) => client.navigate(client.url)));
+    // A navigation can wait for this worker's activation before its fetch runs.
+    // Waiting for that navigation here would deadlock activation and page load.
+    for (const client of clients) {
+      void client.navigate(client.url).catch(() => undefined);
+    }
   })());
 });
 
