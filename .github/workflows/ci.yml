@@ -72,6 +72,9 @@ jobs:
       - name: Run dashboard visual verification
         run: npm run test:visual
 
+      - name: Verify large-print routes and facility workflows
+        run: npm run test:large-print
+
       - name: Verify Map Studio workflows
         run: npm run test:map-editor
 

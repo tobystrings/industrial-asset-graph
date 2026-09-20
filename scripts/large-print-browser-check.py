@@ -18,6 +18,12 @@ with socket.socket() as sock:
 server = subprocess.Popen(['npm.cmd' if os.name == 'nt' else 'npm', 'run', 'preview', '--', '--host', '127.0.0.1', '--port', str(port), '--strictPort'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 base = f'http://127.0.0.1:{port}/industrial-asset-graph/'
 routes = ['home','more','more&tools=records','more&tools=admin','more&tools=advanced','map','assets','asset&asset=L2-CC-001&tab=record','asset&asset=L2-CC-001&tab=intel','asset&asset=L2-CC-001&tab=docs','asset&asset=L2-CC-001&tab=capture','area&area=area-warehouse-e','documents','cabinet','wulftec','field','relationships','lines','documentation','maintenance&asset=L2-CC-001','dependencies','history','review','assetAdd','manage','connection','evidence','observation','setup','database','settings','conflicts','health','import','account','help']
+# Preserve the original sweep and include the focused workspaces added since it.
+# Populated repair summaries/submissions are covered by repair-browser-check.py.
+routes += ['inventory', 'repairs', 'repair&asset=L2-CC-001', 'admin', 'inbox', 'requests', 'machine&asset=L2-CC-001']
+routes += [f'machine&asset=L2-CC-001&section={section}' for section in
+           ['overview', 'troubleshooting', 'history', 'electrical', 'controls', 'parts', 'manuals', 'photos']]
+Path('artifacts').mkdir(exist_ok=True)
 try:
     for attempt in range(60):
         try:
@@ -45,7 +51,8 @@ try:
                     assert not overflow, 'Page has horizontal overflow'
                 except Exception as error:
                     failures.append({'viewport':f'{width}x{height}', 'route':route, 'error':str(error)})
-                    page.screenshot(path=f'artifacts/large-print-{width}-{route.split("&")[0]}.png')
+                    route_label = route.replace('&', '-').replace('=', '-')
+                    page.screenshot(path=f'artifacts/large-print-{width}-{route_label}.png')
             exercise_asset_forms(page, base, width)
             page.close()
             print(f'Checked {len(routes)} routes at {width}x{height}', flush=True)
