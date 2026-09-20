@@ -1,5 +1,7 @@
 # Large-print interface redesign
 
+This document records the September 14 implementation. For the current Directory / My work navigation, newer machine and administration pages, and the September 19 specification audit, see [the current navigation map and audit](LARGE-PRINT-SPEC-AUDIT.md).
+
 ## Inventory and navigation plan (before implementation)
 
 All existing `PageId` values, legacy query links, inspector tab IDs, facility parameters, editor events and data operations stay intact.
